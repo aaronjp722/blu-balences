@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing | Blu Balences</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0B1F3A;
+    --accent: #2E8BF7;
+    --accent-light: #d6eaff;
+    --cream: #F7F5F0;
+    --white: #ffffff;
+    --text: #0B1F3A;
+    --muted: #556070;
+    --border: #dde3ed;
+    --blue: #1E4D8C;
+    --font-display: 'DM Serif Display', serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+  body { font-family: var(--font-body); color: var(--text); background: var(--white); font-size: 16px; line-height: 1.7; }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--navy);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 6%; height: 68px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .logo { font-family: var(--font-display); font-size: 22px; color: var(--white); text-decoration: none; }
+  .logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 14px; transition: color 0.2s; letter-spacing: 0.02em; }
+  .nav-links a:hover, .nav-links a.active { color: var(--white); }
+  .nav-cta { background: var(--accent); color: var(--white) !important; padding: 8px 20px; border-radius: 6px; font-weight: 500 !important; }
+
+  .page-hero { background: var(--navy); padding: 80px 6% 70px; text-align: center; }
+  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+  .page-hero h1 { font-family: var(--font-display); font-size: clamp(34px, 5vw, 52px); color: var(--white); line-height: 1.1; margin-bottom: 18px; }
+  .page-hero p { color: rgba(255,255,255,0.6); font-size: 17px; max-width: 560px; margin: 0 auto; line-height: 1.75; }
+
+  .guarantee {
+    background: var(--accent-light); padding: 16px 6%;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    font-size: 14px; color: var(--blue);
+  }
+  .guarantee-icon { width: 22px; height: 22px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .guarantee-icon svg { width: 11px; height: 11px; fill: none; stroke: white; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .pricing-section { padding: 80px 6%; background: var(--cream); }
+  .pricing-intro { text-align: center; margin-bottom: 56px; }
+  .pricing-intro h2 { font-family: var(--font-display); font-size: clamp(28px, 4vw, 40px); color: var(--navy); margin-bottom: 14px; line-height: 1.2; }
+  .pricing-intro p { font-size: 16px; color: var(--muted); max-width: 520px; margin: 0 auto; }
+
+  .pricing-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1080px; margin: 0 auto 48px; }
+
+  .pricing-card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 40px 32px; display: flex; flex-direction: column; }
+  .pricing-card.featured { background: var(--navy); border-color: var(--navy); }
+
+  .popular-badge { display: inline-block; background: var(--accent); color: white; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 12px; border-radius: 4px; margin-bottom: 18px; align-self: flex-start; }
+
+  .pricing-card h2 { font-family: var(--font-display); font-size: 26px; color: var(--navy); margin-bottom: 6px; }
+  .pricing-card.featured h2 { color: var(--white); }
+  .card-tagline { font-size: 14px; color: var(--muted); margin-bottom: 28px; line-height: 1.5; }
+  .pricing-card.featured .card-tagline { color: rgba(255,255,255,0.5); }
+
+  .price-num { font-family: var(--font-display); font-size: 44px; color: var(--navy); line-height: 1; display: inline; }
+  .pricing-card.featured .price-num { color: var(--white); }
+  .price-range-suffix { font-family: var(--font-body); font-size: 22px; font-weight: 300; color: var(--muted); }
+  .pricing-card.featured .price-range-suffix { color: rgba(255,255,255,0.45); }
+  .price-period { font-size: 13px; color: var(--muted); margin-bottom: 32px; margin-top: 4px; }
+  .pricing-card.featured .price-period { color: rgba(255,255,255,0.4); }
+
+  .feature-list { list-style: none; border-top: 1px solid var(--border); padding-top: 24px; flex: 1; }
+  .pricing-card.featured .feature-list { border-color: rgba(255,255,255,0.12); }
+  .feature-list li { font-size: 14px; color: var(--muted); padding: 7px 0 7px 22px; position: relative; line-height: 1.5; }
+  .pricing-card.featured .feature-list li { color: rgba(255,255,255,0.65); }
+  .feature-list li::before { content: '✓'; position: absolute; left: 0; color: var(--accent); font-weight: 500; }
+
+  .best-for { font-size: 12px; color: var(--muted); font-style: italic; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .pricing-card.featured .best-for { color: rgba(255,255,255,0.35); border-color: rgba(255,255,255,0.1); }
+
+  .btn-cta { display: block; text-align: center; padding: 13px 24px; border-radius: 6px; text-decoration: none; font-size: 15px; font-weight: 500; margin-top: 28px; transition: all 0.2s; }
+  .btn-blue { background: var(--accent); color: white; }
+  .btn-blue:hover { background: #1a72d6; }
+  .btn-ghost { border: 1px solid var(--border); color: var(--navy); background: transparent; }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  .quarterly-note { max-width: 1080px; margin: 0 auto; background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .quarterly-note .q-label { font-family: var(--font-display); font-size: 18px; color: var(--navy); margin-bottom: 4px; }
+  .quarterly-note p { font-size: 14px; color: var(--muted); max-width: 540px; }
+  .quarterly-note .q-tag { background: var(--accent-light); color: var(--blue); font-size: 13px; font-weight: 500; padding: 6px 16px; border-radius: 20px; white-space: nowrap; }
+
+  .faq-section { padding: 80px 6%; background: var(--white); }
+  .faq-section h2 { font-family: var(--font-display); font-size: clamp(26px, 3vw, 36px); color: var(--navy); margin-bottom: 40px; text-align: center; }
+  .faq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-width: 900px; margin: 0 auto; }
+  .faq-item { padding: 28px; border: 1px solid var(--border); border-radius: 12px; }
+  .faq-item h3 { font-family: var(--font-display); font-size: 18px; color: var(--navy); margin-bottom: 10px; }
+  .faq-item p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+  .cta-section { background: var(--navy); padding: 80px 6%; text-align: center; }
+  .cta-section h2 { font-family: var(--font-display); font-size: clamp(28px, 4vw, 42px); color: var(--white); margin-bottom: 16px; }
+  .cta-section p { color: rgba(255,255,255,0.6); font-size: 16px; max-width: 480px; margin: 0 auto 36px; }
+
+  footer { background: #080f1a; padding: 36px 6%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .footer-logo { font-family: var(--font-display); font-size: 18px; color: var(--white); }
+  .footer-logo span { color: var(--accent); }
+  footer p { font-size: 13px; color: rgba(255,255,255,0.35); }
+
+  @media (max-width: 860px) {
+    .pricing-cards { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .quarterly-note { flex-direction: column; }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">Blu <span>Balences</span></a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/services">Services</a></li>
+    <li><a href="/pricing" class="active">Pricing</a></li>
+    <li><a href="mailto:hello@blubalences.com" class="nav-cta">Get Started</a></li>
+  </ul>
+</nav>
+
+<div class="page-hero">
+  <p class="section-label">Pricing</p>
+  <h1>Transparent pricing.<br>No surprises.</h1>
+  <p>No contracts. No hidden fees. Most small businesses lose thousands each year to messy books — clean bookkeeping costs less than one bad decision.</p>
+</div>
+
+<div class="guarantee">
+  <div class="guarantee-icon"><svg viewBox="0 0 12 12"><polyline points="1,6 4.5,9.5 11,2.5"/></svg></div>
+  100% satisfaction in month one — or you pay nothing.
+</div>
+
+<section class="pricing-section">
+  <div class="pricing-intro">
+    <h2>Choose the level of help you need</h2>
+    <p>Whether you want to stay hands-on or hand it off completely, we have a plan that fits.</p>
+  </div>
+
+  <div class="pricing-cards">
+
+    <div class="pricing-card">
+      <h2>Essential</h2>
+      <p class="card-tagline">Simple, accurate bookkeeping every month</p>
+      <div><span class="price-num">$300</span><span class="price-range-suffix">–$350</span></div>
+      <p class="price-period">per month</p>
+      <ul class="feature-list">
+        <li>Monthly bank and card reconciliation</li>
+        <li>Expense categorization with bank rules</li>
+        <li>Monthly financial statements</li>
+        <li>Email support for money questions</li>
+      </ul>
+      <p class="best-for">Best for freelancers and solo owners under $100k revenue</p>
+      <a href="mailto:hello@blubalences.com" class="btn-cta btn-ghost">Get started</a>
+    </div>
+
+    <div class="pricing-card featured">
+      <span class="popular-badge">Most Popular</span>
+      <h2>Professional</h2>
+      <p class="card-tagline">Clear numbers that support growth</p>
+      <div><span class="price-num">$350</span><span class="price-range-suffix" style="color:rgba(255,255,255,0.45)">–$450</span></div>
+      <p class="price-period">per month</p>
+      <ul class="feature-list">
+        <li>Everything in Essential</li>
+        <li>Light AR and AP tracking</li>
+        <li>Quarterly performance summary</li>
+        <li>Priority support</li>
+      </ul>
+      <p class="best-for">Best for growing businesses with multiple accounts</p>
+      <a href="mailto:hello@blubalences.com" class="btn-cta btn-blue">Get started</a>
+    </div>
+
+    <div class="pricing-card">
+      <h2>Premium</h2>
+      <p class="card-tagline">Hands-on support and advanced reporting</p>
+      <div><span class="price-num">$450</span><span class="price-range-suffix">–$750</span></div>
+      <p class="price-period">per month</p>
+      <ul class="feature-list">
+        <li>Everything in Professional</li>
+        <li>Custom reports and KPI dashboards</li>
+        <li>Accrual, payroll, and loan tracking</li>
+        <li>Monthly video walkthrough of your books</li>
+        <li>CPA-ready books for tax time</li>
+      </ul>
+      <p class="best-for">Best for established or multi-entity businesses</p>
+      <a href="mailto:hello@blubalences.com" class="btn-cta btn-ghost">Get started</a>
+    </div>
+
+  </div>
+
+  <div class="quarterly-note">
+    <div>
+      <p class="q-label">Not ready for monthly bookkeeping?</p>
+      <p>Quarterly bookkeeping is available at 75% of the monthly rate. Ideal if you don't need monthly reports but still want clean, tax-ready books.</p>
+    </div>
+    <span class="q-tag">75% of monthly rate</span>
+  </div>
+</section>
+
+<section class="faq-section">
+  <h2>Common questions</h2>
+  <div class="faq-grid">
+    <div class="faq-item">
+      <h3>Is there a contract?</h3>
+      <p>No. Cancel anytime. We earn your business every month, not through lock-in.</p>
+    </div>
+    <div class="faq-item">
+      <h3>What's the guarantee?</h3>
+      <p>If you're not satisfied after your first month, you don't pay. Simple as that.</p>
+    </div>
+    <div class="faq-item">
+      <h3>How is pricing set?</h3>
+      <p>Pricing reflects your transaction volume and complexity. We quote a fixed price upfront — no surprise bills.</p>
+    </div>
+    <div class="faq-item">
+      <h3>Do you handle taxes?</h3>
+      <p>We don't provide tax or audit services, but we keep your books CPA-ready so filing is easy.</p>
+    </div>
+    <div class="faq-item">
+      <h3>What software do you use?</h3>
+      <p>We work primarily in QuickBooks Online and handle setup, cleanup, and ongoing management.</p>
+    </div>
+    <div class="faq-item">
+      <h3>How quickly can you start?</h3>
+      <p>Book a free consultation and we can typically get started within a week, even for catch-up work.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <p class="section-label" style="color: var(--accent);">Get Started</p>
+  <h2>Every month you wait costs you clarity.</h2>
+  <p>One free call today could save you hours of stress this year.</p>
+  <a href="mailto:hello@blubalences.com" class="btn-cta btn-blue" style="display:inline-block; padding: 15px 40px; font-size: 16px;">Book a Free Consultation</a>
+</section>
+
+<footer>
+  <div class="footer-logo">Blu <span>Balences</span></div>
+  <p>Fully remote bookkeeping for small businesses. &copy; 2026 Blu Balences.</p>
+  <p>We do not provide tax or audit services.</p>
+</footer>
+
+</body>
+</html>
