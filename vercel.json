@@ -1,7 +1,4 @@
 {
-  "redirects": [
-    { "source": "/", "destination": "/Document%20Creation", "permanent": false }
-  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
