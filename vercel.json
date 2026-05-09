@@ -4,6 +4,7 @@
     { "source": "/contract-template", "destination": "/contract-template.html" },
     { "source": "/blu-balence-calculator", "destination": "/blu-balence-calculator.html" },
     { "source": "/sign-document", "destination": "/sign-document.html" },
+    { "source": "/calendar", "destination": "/calendar.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
