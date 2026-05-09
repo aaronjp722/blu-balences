@@ -5,6 +5,7 @@
     { "source": "/blu-balence-calculator", "destination": "/blu-balence-calculator.html" },
     { "source": "/sign-document", "destination": "/sign-document.html" },
     { "source": "/calendar", "destination": "/calendar.html" },
+    { "source": "/blu-balence-email-contacts", "destination": "/blu_balence_email_contacts.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
