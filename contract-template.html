@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Contract | Blu Balances</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #111827;
+      --text-main: #e5e7eb;
+      --text-sub: #9ca3af;
+      --border: rgba(255,255,255,.12);
+      --primary: #3b82f6;
+      --success: #22c55e;
+      --input-bg: #020617;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      margin: 0;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    .container { max-width: 680px; margin: 0 auto; }
+    .header { margin-bottom: 32px; }
+    .header h1 { margin: 0 0 6px; font-size: 28px; font-weight: 700; }
+    .header p { margin: 0; color: var(--text-sub); font-size: 14px; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 20px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="date"] {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      transition: border-color .15s;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.6);
+      cursor: pointer;
+    }
+
+    input:focus { outline: none; border-color: var(--primary); }
+    input::placeholder { color: #4b5563; }
+
+    .prefix-input { position: relative; }
+    .prefix-input span {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-sub);
+      font-size: 14px;
+      pointer-events: none;
+    }
+    .prefix-input input { padding-left: 26px; }
+
+    hr { border: 0; border-top: 1px solid var(--border); margin: 24px 0; }
+
+    .cleanup-toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .cleanup-toggle input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .cleanup-toggle-label { font-size: 14px; font-weight: 600; color: var(--text-main); }
+
+    .cleanup-fields { display: none; margin-top: 24px; }
+    .cleanup-fields.visible { display: block; }
+
+    .btn-create {
+      width: 100%;
+      padding: 16px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+      letter-spacing: .02em;
+    }
+
+    .btn-create:hover  { background: #2563eb; }
+    .btn-create:active { transform: scale(.99); }
+    .btn-create:disabled { opacity: .55; cursor: not-allowed; }
+
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1e293b;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      box-shadow: 0 20px 40px rgba(0,0,0,.5);
+      transition: transform .3s ease;
+      z-index: 100;
+    }
+
+    .toast.show    { transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--success); color: var(--success); }
+    .toast.error   { border-color: #ef4444; color: #ef4444; }
+
+    @media (max-width: 560px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>Create Contract</h1>
+    <p>Blu Balances | Contract Management</p>
+  </div>
+
+  <form id="contract-form" autocomplete="off">
+
+    <div class="card">
+      <div class="section-title">Client Information</div>
+
+      <div class="form-group">
+        <label>Business Name</label>
+        <input type="text" id="business_name" placeholder="Acme Corp" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Contact Name</label>
+          <input type="text" id="contact_name" placeholder="Jane Smith" required>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="email" placeholder="jane@acme.com" required>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0;">
+        <label>Phone Number</label>
+        <input type="tel" id="phone" placeholder="(555) 000-0000" required>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Pricing</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Monthly Service Price</label>
+          <div class="prefix-input">
+            <span>$</span>
+            <input type="number" id="monthly_price" placeholder="0.00" min="0" step="0.01" required>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Additional Services Price</label>
+          <div class="prefix-input">
+            <span>$</span>
+            <input type="number" id="additional_services_price" placeholder="0.00" min="0" step="0.01">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Contract Dates</div>
+
+      <div class="form-group">
+        <label>Contract Effective Date</label>
+        <input type="date" id="effective_date" required>
+      </div>
+
+      <hr>
+
+      <label class="cleanup-toggle">
+        <input type="checkbox" id="cleanup_toggle" onchange="toggleCleanup(this)">
+        <span class="cleanup-toggle-label">Include Cleanup Period</span>
+      </label>
+
+      <div class="cleanup-fields" id="cleanup-fields">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Start of Cleanup Period</label>
+            <input type="date" id="cleanup_start">
+          </div>
+          <div class="form-group">
+            <label>End of Cleanup Period</label>
+            <input type="date" id="cleanup_end">
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-bottom:0;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Clean Up Price</label>
+            <div class="prefix-input">
+              <span>$</span>
+              <input type="number" id="cleanup_price" placeholder="0.00" min="0" step="0.01">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Upfront Cleanup Price</label>
+            <div class="prefix-input">
+              <span>$</span>
+              <input type="number" id="upfront_cleanup_price" placeholder="0.00" min="0" step="0.01">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <button type="submit" class="btn-create" id="submit-btn">
+      Create Contract
+    </button>
+
+  </form>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const WEBHOOK_URL = "https://hook.us1.make.com/gtsp4m0n8bli6trnew1d6ctxuqx8bngp";
+
+function toggleCleanup(cb) {
+  document.getElementById("cleanup-fields").classList.toggle("visible", cb.checked);
+}
+
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove("show"), 3500);
+}
+
+document.getElementById("contract-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const btn = document.getElementById("submit-btn");
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+
+  const includeCleanup = document.getElementById("cleanup_toggle").checked;
+
+  const payload = {
+    business_name:             document.getElementById("business_name").value.trim(),
+    contact_name:              document.getElementById("contact_name").value.trim(),
+    email:                     document.getElementById("email").value.trim(),
+    phone:                     document.getElementById("phone").value.trim(),
+    monthly_price:             parseFloat(document.getElementById("monthly_price").value) || 0,
+    additional_services_price: parseFloat(document.getElementById("additional_services_price").value) || 0,
+    effective_date:            document.getElementById("effective_date").value,
+    include_cleanup_period:    includeCleanup,
+    cleanup_start:             includeCleanup ? document.getElementById("cleanup_start").value : null,
+    cleanup_end:               includeCleanup ? document.getElementById("cleanup_end").value   : null,
+    cleanup_price:             includeCleanup ? (parseFloat(document.getElementById("cleanup_price").value) || 0)         : null,
+    upfront_cleanup_price:     includeCleanup ? (parseFloat(document.getElementById("upfront_cleanup_price").value) || 0) : null,
+  };
+
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error("Webhook returned " + res.status);
+
+    showToast("Contract created successfully!", "success");
+    e.target.reset();
+    document.getElementById("cleanup-fields").classList.remove("visible");
+
+  } catch (err) {
+    console.error(err);
+    showToast("Failed to create contract. Try again.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Create Contract";
+  }
+});
+</script>
+
+</body>
+</html>
