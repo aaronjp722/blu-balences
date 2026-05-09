@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/document-creation", "destination": "/document-creation.html" },
+    { "source": "/contract-template", "destination": "/contract-template.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
