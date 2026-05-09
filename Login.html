@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blu Balence | Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0a1628; --navy2: #0f1f3d; --navy3: #162444;
+      --blue: #2563eb; --blue-light: #3b82f6; --blue-glow: rgba(37,99,235,0.2);
+      --green: #16a34a; --red: #ef4444;
+      --text: #e2e8f0; --text-sub: #94a3b8; --text-dim: #64748b;
+      --border: rgba(255,255,255,0.08); --white: #ffffff;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .login-wrap {
+      width: 100%;
+      max-width: 400px;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.5px;
+      text-align: center;
+      margin-bottom: 32px;
+      display: block;
+      text-decoration: none;
+    }
+    .logo span { color: var(--blue-light); }
+    .card {
+      background: var(--navy2);
+      border: 1px solid rgba(59,130,246,0.15);
+      border-radius: 16px;
+      padding: 36px 32px;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 6px;
+      letter-spacing: -0.3px;
+    }
+    .card-sub {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-bottom: 28px;
+    }
+    .form-field { margin-bottom: 16px; }
+    .form-field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 7px;
+    }
+    .form-field input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-field input:focus {
+      border-color: var(--blue-light);
+      box-shadow: 0 0 0 3px var(--blue-glow);
+    }
+    .form-field input::placeholder { color: var(--text-dim); }
+    .btn {
+      width: 100%;
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+    .btn:hover { background: var(--blue-light); }
+    .btn:active { transform: scale(0.99); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .error-box {
+      display: none;
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 13px;
+      color: #fca5a5;
+      margin-top: 14px;
+    }
+    .forgot {
+      display: block;
+      text-align: right;
+      font-size: 12px;
+      color: var(--text-dim);
+      text-decoration: none;
+      margin-top: -10px;
+      margin-bottom: 20px;
+      transition: color 0.2s;
+    }
+    .forgot:hover { color: var(--blue-light); }
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+    .reset-section { display: none; }
+    .reset-section .card-title { font-size: 16px; }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-sub);
+      text-decoration: none;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--white); }
+    .success-box {
+      display: none;
+      background: rgba(22,163,74,0.08);
+      border: 1px solid rgba(22,163,74,0.25);
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 13px;
+      color: #86efac;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-wrap">
+  <a href="/" class="logo">Blu <span>Balence</span></a>
+
+  <!-- LOGIN SECTION -->
+  <div class="card" id="login-section">
+    <div class="card-title">Internal Sign In</div>
+    <div class="card-sub">Team access only</div>
+    <form id="login-form" onsubmit="handleLogin(event)">
+      <div class="form-field">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="you@blubalences.com" required autocomplete="email">
+      </div>
+      <div class="form-field">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <a class="forgot" onclick="showReset()">Forgot password?</a>
+      <button type="submit" class="btn" id="login-btn">Sign In</button>
+      <div class="error-box" id="login-error"></div>
+    </form>
+  </div>
+
+  <!-- RESET SECTION -->
+  <div class="card reset-section" id="reset-section">
+    <a class="back-link" onclick="showLogin()">&#8592; Back to sign in</a>
+    <div class="card-title">Reset your password</div>
+    <div class="card-sub" style="margin-bottom:20px;">We'll send a reset link to your email.</div>
+    <form id="reset-form" onsubmit="handleReset(event)">
+      <div class="form-field">
+        <label>Email</label>
+        <input type="email" id="reset-email" placeholder="you@blubalences.com" required autocomplete="email">
+      </div>
+      <button type="submit" class="btn" id="reset-btn">Send Reset Link</button>
+      <div class="error-box" id="reset-error"></div>
+      <div class="success-box" id="reset-success">Reset link sent. Check your email.</div>
+    </form>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+  const supabase = createClient(
+    "https://rfdvogakvyodixgpvqvz.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1NTA0NjEsImV4cCI6MjA2MjEyNjQ2MX0.BeyAZjJSVBkNyBCBiJFZVGJRImvz1p7M3mM-9Cxn3Dc"
+  );
+
+  // If already logged in, redirect to dashboard
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) window.location.href = "/calendar";
+
+  window.showReset = () => {
+    document.getElementById("login-section").style.display = "none";
+    document.getElementById("reset-section").style.display = "block";
+  };
+
+  window.showLogin = () => {
+    document.getElementById("reset-section").style.display = "none";
+    document.getElementById("login-section").style.display = "block";
+  };
+
+  window.handleLogin = async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("login-btn");
+    const err = document.getElementById("login-error");
+    btn.disabled = true;
+    btn.textContent = "Signing in...";
+    err.style.display = "none";
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: document.getElementById("email").value.trim(),
+      password: document.getElementById("password").value
+    });
+
+    if (error) {
+      err.textContent = error.message === "Invalid login credentials"
+        ? "Incorrect email or password."
+        : error.message;
+      err.style.display = "block";
+      btn.disabled = false;
+      btn.textContent = "Sign In";
+    } else {
+      window.location.href = "/calendar";
+    }
+  };
+
+  window.handleReset = async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("reset-btn");
+    const err = document.getElementById("reset-error");
+    const ok  = document.getElementById("reset-success");
+    btn.disabled = true;
+    btn.textContent = "Sending...";
+    err.style.display = "none";
+    ok.style.display  = "none";
+
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      document.getElementById("reset-email").value.trim(),
+      { redirectTo: `${window.location.origin}/reset-password` }
+    );
+
+    if (error) {
+      err.textContent = error.message;
+      err.style.display = "block";
+      btn.disabled = false;
+      btn.textContent = "Send Reset Link";
+    } else {
+      ok.style.display = "block";
+      btn.textContent = "Sent";
+    }
+  };
+</script>
+</body>
+</html>
