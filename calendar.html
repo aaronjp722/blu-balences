@@ -35,7 +35,6 @@
       overflow: hidden;
     }
 
-    /* ── TOP BAR ── */
     .topbar {
       display: flex;
       align-items: center;
@@ -68,38 +67,13 @@
       flex-shrink: 0;
     }
 
-    .logo-text {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .logo-sep {
-      width: 1px;
-      height: 24px;
-      background: var(--border);
-      margin: 0 4px;
-    }
-
-    .topbar-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text);
-    }
-
+    .logo-text { font-size: 16px; font-weight: 700; color: var(--text); }
+    .logo-sep { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+    .topbar-title { font-size: 15px; font-weight: 600; color: var(--text); }
     .topbar-spacer { flex: 1; }
 
-    .tz-select-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .tz-label {
-      font-size: 12px;
-      color: var(--text-sub);
-      font-weight: 500;
-    }
+    .tz-select-wrap { display: flex; align-items: center; gap: 8px; }
+    .tz-label { font-size: 12px; color: var(--text-sub); font-weight: 500; }
 
     select {
       background: var(--input-bg);
@@ -111,7 +85,6 @@
       padding: 6px 10px;
       cursor: pointer;
     }
-
     select:focus { outline: none; border-color: var(--primary); }
 
     .btn {
@@ -124,550 +97,155 @@
       cursor: pointer;
       transition: background .15s, transform .1s;
     }
-
     .btn:active { transform: scale(.98); }
-
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-primary:hover { background: var(--primary-dark); }
-
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
     .btn-ghost:hover { background: var(--surface2); }
-
     .btn-danger { background: var(--danger); color: #fff; }
     .btn-danger:hover { background: #dc2626; }
 
     .btn-icon {
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text);
-      cursor: pointer;
-      font-size: 16px;
-      transition: background .15s;
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; border: 1px solid var(--border);
+      background: transparent; color: var(--text);
+      cursor: pointer; font-size: 16px; transition: background .15s;
     }
     .btn-icon:hover { background: var(--surface2); }
 
-    /* ── CALENDAR TOOLBAR ── */
     .cal-toolbar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      display: flex; align-items: center; gap: 12px;
       padding: 10px 20px;
       background: var(--surface);
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
 
-    .nav-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .nav-group { display: flex; align-items: center; gap: 6px; }
 
-    .period-label {
-      font-size: 18px;
-      font-weight: 700;
-      min-width: 200px;
-    }
+    .period-label { font-size: 18px; font-weight: 700; min-width: 200px; }
 
     .view-tabs {
       display: flex;
       background: var(--input-bg);
       border: 1px solid var(--border);
       border-radius: 9px;
-      padding: 3px;
-      gap: 2px;
+      padding: 3px; gap: 2px;
     }
 
     .view-tab {
-      padding: 5px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      color: var(--text-sub);
-      border: none;
-      background: transparent;
+      padding: 5px 14px; border-radius: 6px;
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      color: var(--text-sub); border: none; background: transparent;
       font-family: 'Inter', sans-serif;
       transition: background .15s, color .15s;
     }
+    .view-tab.active { background: var(--primary); color: #fff; }
 
-    .view-tab.active {
-      background: var(--primary);
-      color: #fff;
-    }
+    .cal-main { flex: 1; overflow: hidden; position: relative; }
 
-    /* ── MAIN LAYOUT ── */
-    .cal-main {
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-    }
-
-    /* ── MONTH VIEW ── */
-    .month-view {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-
-    .month-header {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-
-    .month-dow {
-      padding: 8px 0;
-      text-align: center;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-sub);
-      text-transform: uppercase;
-      letter-spacing: .06em;
-    }
-
-    .month-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      grid-template-rows: repeat(6, 1fr);
-      flex: 1;
-      overflow: hidden;
-    }
-
-    .month-cell {
-      border-right: 1px solid var(--border2);
-      border-bottom: 1px solid var(--border2);
-      padding: 6px;
-      cursor: pointer;
-      transition: background .1s;
-      overflow: hidden;
-      min-height: 0;
-    }
-
+    /* MONTH */
+    .month-view { display: flex; flex-direction: column; height: 100%; }
+    .month-header { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .month-dow { padding: 8px 0; text-align: center; font-size: 11px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: .06em; }
+    .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(6, 1fr); flex: 1; overflow: hidden; }
+    .month-cell { border-right: 1px solid var(--border2); border-bottom: 1px solid var(--border2); padding: 6px; cursor: pointer; transition: background .1s; overflow: hidden; min-height: 0; }
     .month-cell:hover { background: var(--surface2); }
     .month-cell.other-month .cell-day { color: var(--text-dim); }
     .month-cell.today { background: var(--today); }
-    .month-cell.today .cell-day {
-      background: var(--primary);
-      color: #fff;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .cell-day {
-      font-size: 13px;
-      font-weight: 500;
-      margin-bottom: 4px;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .event-pill {
-      background: var(--primary);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 500;
-      padding: 2px 6px;
-      border-radius: 4px;
-      margin-bottom: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      cursor: pointer;
-      transition: background .1s;
-    }
-
+    .month-cell.today .cell-day { background: var(--primary); color: #fff; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+    .cell-day { font-size: 13px; font-weight: 500; margin-bottom: 4px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+    .event-pill { background: var(--primary); color: #fff; font-size: 11px; font-weight: 500; padding: 2px 6px; border-radius: 4px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: background .1s; }
     .event-pill:hover { background: var(--primary-dark); }
-
-    .more-events {
-      font-size: 11px;
-      color: var(--text-sub);
-      padding: 1px 4px;
-      cursor: pointer;
-    }
-
+    .more-events { font-size: 11px; color: var(--text-sub); padding: 1px 4px; cursor: pointer; }
     .more-events:hover { color: var(--primary); }
 
-    /* ── WEEK VIEW ── */
-    .week-view {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .week-header-row {
-      display: grid;
-      grid-template-columns: 60px repeat(7, 1fr);
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-
-    .week-header-gutter { }
-
-    .week-header-day {
-      padding: 8px 4px;
-      text-align: center;
-      border-left: 1px solid var(--border2);
-    }
-
-    .week-header-dow {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-sub);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-
-    .week-header-num {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.2;
-    }
-
-    .week-header-num.today {
-      color: var(--primary);
-    }
-
-    .week-body {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
-
+    /* WEEK */
+    .week-view { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+    .week-header-row { display: grid; grid-template-columns: 60px repeat(7, 1fr); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .week-header-day { padding: 8px 4px; text-align: center; border-left: 1px solid var(--border2); }
+    .week-header-dow { font-size: 11px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: .05em; }
+    .week-header-num { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1.2; }
+    .week-header-num.today { color: var(--primary); }
+    .week-body { flex: 1; overflow-y: auto; overflow-x: hidden; }
     .week-body::-webkit-scrollbar { width: 6px; }
-    .week-body::-webkit-scrollbar-track { background: transparent; }
     .week-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-    .week-time-grid {
-      display: grid;
-      grid-template-columns: 60px repeat(7, 1fr);
-      position: relative;
-    }
-
-    .week-hour-label {
-      font-size: 11px;
-      color: var(--text-dim);
-      text-align: right;
-      padding-right: 10px;
-      height: 60px;
-      display: flex;
-      align-items: flex-start;
-      padding-top: 4px;
-      flex-shrink: 0;
-    }
-
-    .week-col {
-      border-left: 1px solid var(--border2);
-      position: relative;
-      cursor: pointer;
-    }
-
+    .week-time-grid { display: grid; grid-template-columns: 60px repeat(7, 1fr); position: relative; }
+    .week-hour-label { font-size: 11px; color: var(--text-dim); text-align: right; padding-right: 10px; height: 60px; display: flex; align-items: flex-start; padding-top: 4px; flex-shrink: 0; }
+    .week-col { border-left: 1px solid var(--border2); position: relative; cursor: pointer; }
     .week-col:hover { background: rgba(59,130,246,.03); }
+    .hour-line { height: 60px; border-bottom: 1px solid var(--border2); }
 
-    .hour-line {
-      height: 60px;
-      border-bottom: 1px solid var(--border2);
-    }
-
-    .week-event {
-      position: absolute;
-      left: 2px;
-      right: 2px;
-      background: var(--primary);
-      border-radius: 5px;
-      padding: 3px 6px;
-      font-size: 11px;
-      font-weight: 500;
-      color: #fff;
-      overflow: hidden;
-      cursor: pointer;
-      z-index: 2;
-      transition: background .1s;
-    }
-
-    .week-event:hover { background: var(--primary-dark); }
-
-    /* ── DAY VIEW ── */
-    .day-view {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-
-    .day-header {
-      padding: 12px 20px;
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-
-    .day-header h2 {
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .day-body {
-      flex: 1;
-      overflow-y: auto;
-      display: grid;
-      grid-template-columns: 60px 1fr;
-    }
-
+    /* DAY */
+    .day-view { display: flex; flex-direction: column; height: 100%; }
+    .day-header { padding: 12px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .day-header h2 { font-size: 20px; font-weight: 700; }
+    .day-body { flex: 1; overflow-y: auto; display: grid; grid-template-columns: 60px 1fr; }
     .day-body::-webkit-scrollbar { width: 6px; }
-    .day-body::-webkit-scrollbar-track { background: transparent; }
     .day-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-    .day-labels {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .day-label {
-      height: 60px;
-      font-size: 11px;
-      color: var(--text-dim);
-      text-align: right;
-      padding-right: 10px;
-      padding-top: 4px;
-      border-bottom: 1px solid var(--border2);
-      flex-shrink: 0;
-    }
-
-    .day-col {
-      border-left: 1px solid var(--border2);
-      position: relative;
-    }
-
-    .day-hour-row {
-      height: 60px;
-      border-bottom: 1px solid var(--border2);
-      cursor: pointer;
-    }
-
+    .day-labels { display: flex; flex-direction: column; }
+    .day-label { height: 60px; font-size: 11px; color: var(--text-dim); text-align: right; padding-right: 10px; padding-top: 4px; border-bottom: 1px solid var(--border2); flex-shrink: 0; }
+    .day-col { border-left: 1px solid var(--border2); position: relative; }
+    .day-hour-row { height: 60px; border-bottom: 1px solid var(--border2); cursor: pointer; }
     .day-hour-row:hover { background: rgba(59,130,246,.04); }
-
-    .day-event {
-      position: absolute;
-      left: 4px;
-      right: 4px;
-      background: var(--primary);
-      border-radius: 6px;
-      padding: 4px 8px;
-      font-size: 12px;
-      font-weight: 500;
-      color: #fff;
-      cursor: pointer;
-      z-index: 2;
-    }
-
+    .day-event { position: absolute; left: 4px; right: 4px; background: var(--primary); border-radius: 6px; padding: 4px 8px; font-size: 12px; font-weight: 500; color: #fff; cursor: pointer; z-index: 2; }
     .day-event:hover { background: var(--primary-dark); }
 
-    /* ── MODAL ── */
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.7);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
+    /* MODAL */
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
     .modal-backdrop.open { display: flex; }
-
-    .modal {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 28px;
-      width: 100%;
-      max-width: 480px;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
     .modal::-webkit-scrollbar { width: 4px; }
     .modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-    .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-    }
-
-    .modal-title {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .modal-close {
-      width: 30px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 7px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-sub);
-      cursor: pointer;
-      font-size: 18px;
-      line-height: 1;
-    }
-
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .modal-title { font-size: 18px; font-weight: 700; }
+    .modal-close { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 7px; border: 1px solid var(--border); background: transparent; color: var(--text-sub); cursor: pointer; font-size: 18px; line-height: 1; }
     .modal-close:hover { background: var(--surface2); color: var(--text); }
 
-    .form-group {
-      margin-bottom: 18px;
-    }
-
+    .form-group { margin-bottom: 18px; }
     .form-group:last-of-type { margin-bottom: 0; }
 
-    label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-sub);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      margin-bottom: 7px;
-    }
+    label { display: block; font-size: 12px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 7px; }
 
-    input[type="text"],
-    input[type="tel"],
-    input[type="date"],
-    input[type="time"],
-    textarea,
-    select {
-      width: 100%;
-      padding: 10px 12px;
-      background: var(--input-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
+    input[type="text"], input[type="tel"], input[type="date"], input[type="time"], textarea, select {
+      width: 100%; padding: 10px 12px;
+      background: var(--input-bg); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text);
+      font-family: 'Inter', sans-serif; font-size: 14px;
       transition: border-color .15s;
     }
-
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
-
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); }
     input::placeholder, textarea::placeholder { color: var(--text-dim); }
-
     textarea { resize: vertical; min-height: 80px; }
-
     input[type="date"]::-webkit-calendar-picker-indicator,
-    input[type="time"]::-webkit-calendar-picker-indicator {
-      filter: invert(0.6);
-      cursor: pointer;
-    }
+    input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.6); cursor: pointer; }
 
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-footer { display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end; }
 
-    .modal-footer {
-      display: flex;
-      gap: 10px;
-      margin-top: 24px;
-      justify-content: flex-end;
-    }
+    .event-detail-field { display: flex; flex-direction: column; gap: 3px; margin-bottom: 16px; }
+    .event-detail-label { font-size: 11px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: .05em; }
+    .event-detail-value { font-size: 14px; color: var(--text); }
 
-    /* ── EVENT DETAIL MODAL ── */
-    .event-detail-field {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      margin-bottom: 16px;
-    }
-
-    .event-detail-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-sub);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-
-    .event-detail-value {
-      font-size: 14px;
-      color: var(--text);
-    }
-
-    /* ── TOAST ── */
     .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
+      position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(80px);
-      background: #1e293b;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 22px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
+      background: #1e293b; border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 22px;
+      font-size: 14px; font-weight: 600; color: var(--text);
       box-shadow: 0 16px 40px rgba(0,0,0,.5);
-      transition: transform .3s ease;
-      z-index: 9999;
-      white-space: nowrap;
+      transition: transform .3s ease; z-index: 9999; white-space: nowrap;
     }
-
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.success { border-color: var(--success); color: var(--success); }
     .toast.error { border-color: var(--danger); color: var(--danger); }
 
-    /* ── LOADING ── */
-    .loading-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(11,18,32,.6);
-      z-index: 2000;
-      align-items: center;
-      justify-content: center;
-    }
-
+    .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(11,18,32,.6); z-index: 2000; align-items: center; justify-content: center; }
     .loading-overlay.show { display: flex; }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--border);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-    }
-
+    .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── SCROLLBAR GLOBAL ── */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -681,7 +259,6 @@
 </head>
 <body>
 
-<!-- TOP BAR -->
 <div class="topbar">
   <a class="logo" href="/">
     <div class="logo-mark">B</div>
@@ -706,7 +283,6 @@
   <button class="btn btn-primary" onclick="openNewModal()">+ New Appointment</button>
 </div>
 
-<!-- CALENDAR TOOLBAR -->
 <div class="cal-toolbar">
   <div class="nav-group">
     <button class="btn-icon" onclick="navigate(-1)">&#8249;</button>
@@ -722,7 +298,6 @@
   </div>
 </div>
 
-<!-- CALENDAR MAIN -->
 <div class="cal-main" id="cal-main"></div>
 
 <!-- CREATE/EDIT MODAL -->
@@ -732,25 +307,26 @@
       <span class="modal-title" id="modal-title">New Appointment</span>
       <button class="modal-close" onclick="closeModal('appt-modal')">&#215;</button>
     </div>
-
     <input type="hidden" id="edit-id">
-
     <div class="form-group">
       <label>Appointment Name / Title</label>
       <input type="text" id="appt-name" placeholder="e.g. Monthly Review" required>
     </div>
-
     <div class="form-group">
       <label>Client Name</label>
       <input type="text" id="appt-client" placeholder="Jane Smith">
     </div>
-
-    <div class="form-group">
-      <label>Phone Number</label>
-      <input type="tel" id="appt-phone" placeholder="(555) 000-0000">
-    </div>
-
     <div class="form-row">
+      <div class="form-group" style="margin-bottom:0;">
+        <label>Phone Number</label>
+        <input type="tel" id="appt-phone" placeholder="(555) 000-0000">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>Email Address</label>
+        <input type="text" id="appt-email" placeholder="jane@example.com">
+      </div>
+    </div>
+    <div class="form-row" style="margin-top:18px;">
       <div class="form-group" style="margin-bottom:0;">
         <label>Date</label>
         <input type="date" id="appt-date" required>
@@ -760,7 +336,6 @@
         <input type="time" id="appt-time" required>
       </div>
     </div>
-
     <div class="form-group" style="margin-top:18px;">
       <label>Timezone</label>
       <select id="appt-tz">
@@ -774,12 +349,10 @@
         <option value="UTC">UTC</option>
       </select>
     </div>
-
     <div class="form-group">
       <label>Notes</label>
       <textarea id="appt-notes" placeholder="Any additional details…"></textarea>
     </div>
-
     <div class="modal-footer">
       <button class="btn btn-ghost" id="delete-btn" style="display:none;margin-right:auto;" onclick="deleteAppointment()">Delete</button>
       <button class="btn btn-ghost" onclick="closeModal('appt-modal')">Cancel</button>
@@ -788,14 +361,13 @@
   </div>
 </div>
 
-<!-- EVENT DETAIL MODAL -->
+<!-- DETAIL MODAL -->
 <div class="modal-backdrop" id="detail-modal">
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="detail-name"></span>
       <button class="modal-close" onclick="closeModal('detail-modal')">&#215;</button>
     </div>
-
     <div class="event-detail-field">
       <span class="event-detail-label">Client</span>
       <span class="event-detail-value" id="detail-client">—</span>
@@ -805,6 +377,10 @@
       <span class="event-detail-value" id="detail-phone">—</span>
     </div>
     <div class="event-detail-field">
+      <span class="event-detail-label">Email</span>
+      <span class="event-detail-value" id="detail-email">—</span>
+    </div>
+    <div class="event-detail-field">
       <span class="event-detail-label">Date & Time</span>
       <span class="event-detail-value" id="detail-datetime">—</span>
     </div>
@@ -812,7 +388,6 @@
       <span class="event-detail-label">Notes</span>
       <span class="event-detail-value" id="detail-notes" style="white-space:pre-wrap;">—</span>
     </div>
-
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('detail-modal')">Close</button>
       <button class="btn btn-primary" onclick="openEditFromDetail()">Edit</button>
@@ -820,12 +395,7 @@
   </div>
 </div>
 
-<!-- LOADING -->
-<div class="loading-overlay" id="loading">
-  <div class="spinner"></div>
-</div>
-
-<!-- TOAST -->
+<div class="loading-overlay" id="loading"><div class="spinner"></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -843,10 +413,7 @@ async function sbFetch(path, opts = {}) {
       ...(opts.headers || {})
     }
   });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err);
-  }
+  if (!res.ok) { const err = await res.text(); throw new Error(err); }
   const text = await res.text();
   return text ? JSON.parse(text) : null;
 }
@@ -865,58 +432,33 @@ function tzAbbr(tz) {
 function localToUtc(dateStr, timeStr, tz) {
   const tempDate = new Date(`${dateStr}T${timeStr}:00`);
   const [wantH, wantM] = timeStr.split(":").map(Number);
-  const tzParts = new Intl.DateTimeFormat("en-US", {
-    timeZone: tz, hour: "2-digit", minute: "2-digit", hour12: false
-  }).formatToParts(tempDate);
+  const tzParts = new Intl.DateTimeFormat("en-US", { timeZone: tz, hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(tempDate);
   const tzH = parseInt(tzParts.find(p => p.type === "hour").value);
   const tzM = parseInt(tzParts.find(p => p.type === "minute").value);
-  const diffMs = ((wantH - tzH) * 60 + (wantM - tzM)) * 60000;
-  return new Date(tempDate.getTime() + diffMs).toISOString();
-}
-
-function toTzString(date, tz) {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit"
-  }).format(date);
+  return new Date(tempDate.getTime() + ((wantH - tzH) * 60 + (wantM - tzM)) * 60000).toISOString();
 }
 
 function formatTimeInTz(isoStr, tz) {
-  return new Intl.DateTimeFormat("en-US", {
-    timeZone: tz, hour: "numeric", minute: "2-digit", hour12: true
-  }).format(new Date(isoStr));
+  return new Intl.DateTimeFormat("en-US", { timeZone: tz, hour: "numeric", minute: "2-digit", hour12: true }).format(new Date(isoStr));
 }
 
 function formatDateInTz(isoStr, tz) {
-  return new Intl.DateTimeFormat("en-US", {
-    timeZone: tz, weekday: "long", year: "numeric", month: "long", day: "numeric"
-  }).format(new Date(isoStr));
+  return new Intl.DateTimeFormat("en-US", { timeZone: tz, weekday: "long", year: "numeric", month: "long", day: "numeric" }).format(new Date(isoStr));
 }
 
 function getLocalDateParts(isoStr, tz) {
-  const fmt = new Intl.DateTimeFormat("en-CA", {
-    timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", hour12: false
-  });
-  const parts = fmt.formatToParts(new Date(isoStr));
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date(isoStr));
   const get = t => parts.find(p => p.type === t).value;
-  return {
-    year: parseInt(get("year")), month: parseInt(get("month")),
-    day: parseInt(get("day")), hour: parseInt(get("hour")), minute: parseInt(get("minute"))
-  };
+  return { year: parseInt(get("year")), month: parseInt(get("month")), day: parseInt(get("day")), hour: parseInt(get("hour")), minute: parseInt(get("minute")) };
 }
 
 async function loadAppointments() {
   showLoading(true);
   try {
-    const data = await sbFetch("appointments?select=*&order=appointment_utc.asc");
-    appointments = data || [];
+    appointments = await sbFetch("appointments?select=*&order=appointment_utc.asc") || [];
     render();
-  } catch (e) {
-    console.error(e);
-    showToast("Failed to load appointments", "error");
-  } finally {
-    showLoading(false);
-  }
+  } catch (e) { console.error(e); showToast("Failed to load appointments", "error"); }
+  finally { showLoading(false); }
 }
 
 async function saveAppointment() {
@@ -924,6 +466,7 @@ async function saveAppointment() {
   const name = document.getElementById("appt-name").value.trim();
   const client = document.getElementById("appt-client").value.trim();
   const phone = document.getElementById("appt-phone").value.trim();
+  const email = document.getElementById("appt-email").value.trim();
   const date = document.getElementById("appt-date").value;
   const time = document.getElementById("appt-time").value;
   const tz = document.getElementById("appt-tz").value;
@@ -933,7 +476,8 @@ async function saveAppointment() {
 
   const payload = {
     name, client_name: client || null, phone: phone || null,
-    notes: notes || null, appointment_utc: localToUtc(date, time, tz), timezone: tz
+    email: email || null, notes: notes || null,
+    appointment_utc: localToUtc(date, time, tz), timezone: tz
   };
 
   showLoading(true);
@@ -947,12 +491,8 @@ async function saveAppointment() {
     }
     closeModal("appt-modal");
     await loadAppointments();
-  } catch (e) {
-    console.error(e);
-    showToast("Failed to save appointment", "error");
-  } finally {
-    showLoading(false);
-  }
+  } catch (e) { console.error(e); showToast("Failed to save appointment", "error"); }
+  finally { showLoading(false); }
 }
 
 async function deleteAppointment() {
@@ -964,29 +504,22 @@ async function deleteAppointment() {
     showToast("Appointment deleted", "success");
     closeModal("appt-modal");
     await loadAppointments();
-  } catch (e) {
-    console.error(e);
-    showToast("Failed to delete appointment", "error");
-  } finally {
-    showLoading(false);
-  }
+  } catch (e) { console.error(e); showToast("Failed to delete appointment", "error"); }
+  finally { showLoading(false); }
 }
 
 function navigate(dir) {
   if (currentView === "month") cursor.setMonth(cursor.getMonth() + dir);
   else if (currentView === "week") cursor.setDate(cursor.getDate() + dir * 7);
   else cursor.setDate(cursor.getDate() + dir);
-  cursor = new Date(cursor);
-  render();
+  cursor = new Date(cursor); render();
 }
 
 function goToday() { cursor = new Date(); render(); }
 
 function setView(v) {
   currentView = v;
-  document.querySelectorAll(".view-tab").forEach(t => {
-    t.classList.toggle("active", t.textContent.toLowerCase() === v);
-  });
+  document.querySelectorAll(".view-tab").forEach(t => t.classList.toggle("active", t.textContent.toLowerCase() === v));
   render();
 }
 
@@ -1005,25 +538,19 @@ function updatePeriodLabel() {
   if (currentView === "month") {
     el.textContent = cursor.toLocaleDateString("en-US", { month: "long", year: "numeric" });
   } else if (currentView === "week") {
-    const start = weekStart(cursor);
-    const end = new Date(start); end.setDate(end.getDate() + 6);
-    el.textContent = `${start.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${end.toLocaleDateString("en-US", { month: "short", day: "numeric" })}, ${end.getFullYear()}`;
+    const s = weekStart(cursor), e = new Date(s); e.setDate(e.getDate() + 6);
+    el.textContent = `${s.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${e.toLocaleDateString("en-US", { month: "short", day: "numeric" })}, ${e.getFullYear()}`;
   } else {
     el.textContent = cursor.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
   }
 }
 
-function weekStart(d) {
-  const day = new Date(d);
-  day.setDate(day.getDate() - day.getDay());
-  return day;
-}
+function weekStart(d) { const day = new Date(d); day.setDate(day.getDate() - day.getDay()); return day; }
 
 function renderMonth(container) {
   const year = cursor.getFullYear(), month = cursor.getMonth();
   const today = new Date();
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
+  const firstDay = new Date(year, month, 1), lastDay = new Date(year, month + 1, 0);
   const startOffset = firstDay.getDay();
   const days = [];
   for (let i = 0; i < startOffset; i++) days.push({ date: new Date(year, month, -startOffset + i + 1), other: true });
@@ -1053,7 +580,7 @@ function renderMonth(container) {
       pill.className = "event-pill";
       pill.textContent = `${formatTimeInTz(ev.appointment_utc, displayTz)} ${ev.name}`;
       pill.title = ev.name;
-      pill.onclick = (e) => { e.stopPropagation(); openDetail(ev); };
+      pill.onclick = e => { e.stopPropagation(); openDetail(ev); };
       cell.appendChild(pill);
     });
 
@@ -1061,7 +588,7 @@ function renderMonth(container) {
       const more = document.createElement("div");
       more.className = "more-events";
       more.textContent = `+${dayEvents.length - 3} more`;
-      more.onclick = (e) => { e.stopPropagation(); cursor = new Date(date); setView("day"); };
+      more.onclick = e => { e.stopPropagation(); cursor = new Date(date); setView("day"); };
       cell.appendChild(more);
     }
     grid.appendChild(cell);
@@ -1069,8 +596,7 @@ function renderMonth(container) {
 }
 
 function renderWeek(container) {
-  const start = weekStart(cursor);
-  const today = new Date();
+  const start = weekStart(cursor), today = new Date();
   const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   let headerCols = `<div class="week-header-gutter"></div>`;
   for (let i = 0; i < 7; i++) {
@@ -1103,8 +629,7 @@ function renderWeek(container) {
     for (let d = 0; d < 7; d++) {
       const date = new Date(start); date.setDate(date.getDate() + d);
       if (p.year === date.getFullYear() && p.month === (date.getMonth()+1) && p.day === date.getDate()) {
-        const allCols = grid.querySelectorAll(".week-col");
-        const targetCol = allCols[p.hour * 7 + d];
+        const targetCol = grid.querySelectorAll(".week-col")[p.hour * 7 + d];
         if (targetCol) {
           const evEl = document.createElement("div");
           evEl.style.cssText = "position:absolute;top:0;left:2px;right:2px;background:var(--primary);border-radius:5px;padding:3px 6px;font-size:11px;font-weight:500;color:#fff;overflow:hidden;cursor:pointer;z-index:2;";
@@ -1112,7 +637,7 @@ function renderWeek(container) {
           targetCol.style.position = "relative";
           targetCol.appendChild(evEl);
           targetCol.onclick = null;
-          evEl.onclick = (e) => { e.stopPropagation(); openDetail(ev); };
+          evEl.onclick = e => { e.stopPropagation(); openDetail(ev); };
         }
         break;
       }
@@ -1154,7 +679,7 @@ function renderDay(container) {
     evEl.className = "day-event";
     evEl.style.top = `${(p.hour + p.minute / 60) * 60}px`;
     evEl.innerHTML = `<strong>${formatTimeInTz(ev.appointment_utc, displayTz)}</strong> — ${ev.name}${ev.client_name ? ` (${ev.client_name})` : ""}`;
-    evEl.onclick = (e) => { e.stopPropagation(); openDetail(ev); };
+    evEl.onclick = e => { e.stopPropagation(); openDetail(ev); };
     colEl.appendChild(evEl);
   });
 }
@@ -1165,6 +690,7 @@ function openNewModal(date, time) {
   document.getElementById("appt-name").value = "";
   document.getElementById("appt-client").value = "";
   document.getElementById("appt-phone").value = "";
+  document.getElementById("appt-email").value = "";
   document.getElementById("appt-notes").value = "";
   document.getElementById("delete-btn").style.display = "none";
   const d = date || new Date();
@@ -1180,6 +706,7 @@ function openEditModal(ev) {
   document.getElementById("appt-name").value = ev.name || "";
   document.getElementById("appt-client").value = ev.client_name || "";
   document.getElementById("appt-phone").value = ev.phone || "";
+  document.getElementById("appt-email").value = ev.email || "";
   document.getElementById("appt-notes").value = ev.notes || "";
   document.getElementById("delete-btn").style.display = "inline-flex";
   const tz = ev.timezone || displayTz;
@@ -1196,6 +723,7 @@ function openDetail(ev) {
   document.getElementById("detail-name").textContent = ev.name;
   document.getElementById("detail-client").textContent = ev.client_name || "—";
   document.getElementById("detail-phone").textContent = ev.phone || "—";
+  document.getElementById("detail-email").textContent = ev.email || "—";
   const tz = ev.timezone || displayTz;
   const displayTimeInViewTz = tz !== displayTz ? ` (${formatTimeInTz(ev.appointment_utc, displayTz)} ${tzAbbr(displayTz)})` : "";
   document.getElementById("detail-datetime").textContent = `${formatDateInTz(ev.appointment_utc, tz)} at ${formatTimeInTz(ev.appointment_utc, tz)} ${tzAbbr(tz)}${displayTimeInViewTz}`;
@@ -1212,13 +740,12 @@ function openModal(id) { document.getElementById(id).classList.add("open"); }
 function closeModal(id) { document.getElementById(id).classList.remove("open"); }
 
 document.querySelectorAll(".modal-backdrop").forEach(el => {
-  el.addEventListener("click", (e) => { if (e.target === el) el.classList.remove("open"); });
+  el.addEventListener("click", e => { if (e.target === el) el.classList.remove("open"); });
 });
 
 function showToast(msg, type = "success") {
   const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.className = `toast ${type} show`;
+  t.textContent = msg; t.className = `toast ${type} show`;
   setTimeout(() => t.classList.remove("show"), 3200);
 }
 
