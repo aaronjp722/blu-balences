@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar | Blu Balence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1220;
+      --surface: #111827;
+      --surface2: #1a2336;
+      --border: rgba(255,255,255,.10);
+      --border2: rgba(255,255,255,.06);
+      --text: #e5e7eb;
+      --text-sub: #9ca3af;
+      --text-dim: #4b5563;
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --today: rgba(59,130,246,.15);
+      --input-bg: #020617;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      background: var(--primary);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .logo-sep {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .topbar-spacer { flex: 1; }
+
+    .tz-select-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tz-label {
+      font-size: 12px;
+      color: var(--text-sub);
+      font-weight: 500;
+    }
+
+    select {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    select:focus { outline: none; border-color: var(--primary); }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+    }
+
+    .btn:active { transform: scale(.98); }
+
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-ghost:hover { background: var(--surface2); }
+
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
+
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 16px;
+      transition: background .15s;
+    }
+    .btn-icon:hover { background: var(--surface2); }
+
+    /* ── CALENDAR TOOLBAR ── */
+    .cal-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .nav-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .period-label {
+      font-size: 18px;
+      font-weight: 700;
+      min-width: 200px;
+    }
+
+    .view-tabs {
+      display: flex;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .view-tab {
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--text-sub);
+      border: none;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      transition: background .15s, color .15s;
+    }
+
+    .view-tab.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .cal-main {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── MONTH VIEW ── */
+    .month-view {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .month-header {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .month-dow {
+      padding: 8px 0;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-template-rows: repeat(6, 1fr);
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .month-cell {
+      border-right: 1px solid var(--border2);
+      border-bottom: 1px solid var(--border2);
+      padding: 6px;
+      cursor: pointer;
+      transition: background .1s;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .month-cell:hover { background: var(--surface2); }
+    .month-cell.other-month .cell-day { color: var(--text-dim); }
+    .month-cell.today { background: var(--today); }
+    .month-cell.today .cell-day {
+      background: var(--primary);
+      color: #fff;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cell-day {
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .event-pill {
+      background: var(--primary);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      transition: background .1s;
+    }
+
+    .event-pill:hover { background: var(--primary-dark); }
+
+    .more-events {
+      font-size: 11px;
+      color: var(--text-sub);
+      padding: 1px 4px;
+      cursor: pointer;
+    }
+
+    .more-events:hover { color: var(--primary); }
+
+    /* ── WEEK VIEW ── */
+    .week-view {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .week-header-row {
+      display: grid;
+      grid-template-columns: 60px repeat(7, 1fr);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .week-header-gutter { }
+
+    .week-header-day {
+      padding: 8px 4px;
+      text-align: center;
+      border-left: 1px solid var(--border2);
+    }
+
+    .week-header-dow {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .week-header-num {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .week-header-num.today {
+      color: var(--primary);
+    }
+
+    .week-body {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .week-body::-webkit-scrollbar { width: 6px; }
+    .week-body::-webkit-scrollbar-track { background: transparent; }
+    .week-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .week-time-grid {
+      display: grid;
+      grid-template-columns: 60px repeat(7, 1fr);
+      position: relative;
+    }
+
+    .week-hour-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: right;
+      padding-right: 10px;
+      height: 60px;
+      display: flex;
+      align-items: flex-start;
+      padding-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .week-col {
+      border-left: 1px solid var(--border2);
+      position: relative;
+      cursor: pointer;
+    }
+
+    .week-col:hover { background: rgba(59,130,246,.03); }
+
+    .hour-line {
+      height: 60px;
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .week-event {
+      position: absolute;
+      left: 2px;
+      right: 2px;
+      background: var(--primary);
+      border-radius: 5px;
+      padding: 3px 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #fff;
+      overflow: hidden;
+      cursor: pointer;
+      z-index: 2;
+      transition: background .1s;
+    }
+
+    .week-event:hover { background: var(--primary-dark); }
+
+    /* ── DAY VIEW ── */
+    .day-view {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .day-header {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .day-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .day-body {
+      flex: 1;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: 60px 1fr;
+    }
+
+    .day-body::-webkit-scrollbar { width: 6px; }
+    .day-body::-webkit-scrollbar-track { background: transparent; }
+    .day-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .day-labels {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .day-label {
+      height: 60px;
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: right;
+      padding-right: 10px;
+      padding-top: 4px;
+      border-bottom: 1px solid var(--border2);
+      flex-shrink: 0;
+    }
+
+    .day-col {
+      border-left: 1px solid var(--border2);
+      position: relative;
+    }
+
+    .day-hour-row {
+      height: 60px;
+      border-bottom: 1px solid var(--border2);
+      cursor: pointer;
+    }
+
+    .day-hour-row:hover { background: rgba(59,130,246,.04); }
+
+    .day-event {
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      background: var(--primary);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #fff;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .day-event:hover { background: var(--primary-dark); }
+
+    /* ── MODAL ── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal::-webkit-scrollbar { width: 4px; }
+    .modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-sub);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .modal-close:hover { background: var(--surface2); color: var(--text); }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group:last-of-type { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 7px;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="date"],
+    input[type="time"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      transition: border-color .15s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    input::placeholder, textarea::placeholder { color: var(--text-dim); }
+
+    textarea { resize: vertical; min-height: 80px; }
+
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.6);
+      cursor: pointer;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+      justify-content: flex-end;
+    }
+
+    /* ── EVENT DETAIL MODAL ── */
+    .event-detail-field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-bottom: 16px;
+    }
+
+    .event-detail-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .event-detail-value {
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1e293b;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      box-shadow: 0 16px 40px rgba(0,0,0,.5);
+      transition: transform .3s ease;
+      z-index: 9999;
+      white-space: nowrap;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--success); color: var(--success); }
+    .toast.error { border-color: var(--danger); color: var(--danger); }
+
+    /* ── LOADING ── */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(11,18,32,.6);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading-overlay.show { display: flex; }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── SCROLLBAR GLOBAL ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    @media (max-width: 640px) {
+      .form-row { grid-template-columns: 1fr; }
+      .view-tab { padding: 5px 10px; font-size: 12px; }
+      .period-label { font-size: 15px; min-width: 140px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a class="logo" href="/">
+    <div class="logo-mark">B</div>
+    <span class="logo-text">Blu Balence</span>
+  </a>
+  <div class="logo-sep"></div>
+  <span class="topbar-title">Appointments</span>
+  <div class="topbar-spacer"></div>
+  <div class="tz-select-wrap">
+    <span class="tz-label">Timezone</span>
+    <select id="tz-select" onchange="onTzChange()">
+      <option value="America/New_York">Eastern (EST/EDT)</option>
+      <option value="America/Chicago">Central (CST/CDT)</option>
+      <option value="America/Denver">Mountain (MST/MDT)</option>
+      <option value="America/Los_Angeles">Pacific (PST/PDT)</option>
+      <option value="America/Phoenix">Arizona (MST)</option>
+      <option value="America/Anchorage">Alaska (AKST)</option>
+      <option value="Pacific/Honolulu">Hawaii (HST)</option>
+      <option value="UTC">UTC</option>
+    </select>
+  </div>
+  <button class="btn btn-primary" onclick="openNewModal()">+ New Appointment</button>
+</div>
+
+<!-- CALENDAR TOOLBAR -->
+<div class="cal-toolbar">
+  <div class="nav-group">
+    <button class="btn-icon" onclick="navigate(-1)">&#8249;</button>
+    <button class="btn btn-ghost" style="padding:6px 12px;font-size:13px;" onclick="goToday()">Today</button>
+    <button class="btn-icon" onclick="navigate(1)">&#8250;</button>
+  </div>
+  <span class="period-label" id="period-label"></span>
+  <div style="flex:1;"></div>
+  <div class="view-tabs">
+    <button class="view-tab active" onclick="setView('month')">Month</button>
+    <button class="view-tab" onclick="setView('week')">Week</button>
+    <button class="view-tab" onclick="setView('day')">Day</button>
+  </div>
+</div>
+
+<!-- CALENDAR MAIN -->
+<div class="cal-main" id="cal-main"></div>
+
+<!-- CREATE/EDIT MODAL -->
+<div class="modal-backdrop" id="appt-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">New Appointment</span>
+      <button class="modal-close" onclick="closeModal('appt-modal')">&#215;</button>
+    </div>
+
+    <input type="hidden" id="edit-id">
+
+    <div class="form-group">
+      <label>Appointment Name / Title</label>
+      <input type="text" id="appt-name" placeholder="e.g. Monthly Review" required>
+    </div>
+
+    <div class="form-group">
+      <label>Client Name</label>
+      <input type="text" id="appt-client" placeholder="Jane Smith">
+    </div>
+
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" id="appt-phone" placeholder="(555) 000-0000">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group" style="margin-bottom:0;">
+        <label>Date</label>
+        <input type="date" id="appt-date" required>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>Time</label>
+        <input type="time" id="appt-time" required>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top:18px;">
+      <label>Timezone</label>
+      <select id="appt-tz">
+        <option value="America/New_York">Eastern (EST/EDT)</option>
+        <option value="America/Chicago">Central (CST/CDT)</option>
+        <option value="America/Denver">Mountain (MST/MDT)</option>
+        <option value="America/Los_Angeles">Pacific (PST/PDT)</option>
+        <option value="America/Phoenix">Arizona (MST)</option>
+        <option value="America/Anchorage">Alaska (AKST)</option>
+        <option value="Pacific/Honolulu">Hawaii (HST)</option>
+        <option value="UTC">UTC</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="appt-notes" placeholder="Any additional details…"></textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="delete-btn" style="display:none;margin-right:auto;" onclick="deleteAppointment()">Delete</button>
+      <button class="btn btn-ghost" onclick="closeModal('appt-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAppointment()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT DETAIL MODAL -->
+<div class="modal-backdrop" id="detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="detail-name"></span>
+      <button class="modal-close" onclick="closeModal('detail-modal')">&#215;</button>
+    </div>
+
+    <div class="event-detail-field">
+      <span class="event-detail-label">Client</span>
+      <span class="event-detail-value" id="detail-client">—</span>
+    </div>
+    <div class="event-detail-field">
+      <span class="event-detail-label">Phone</span>
+      <span class="event-detail-value" id="detail-phone">—</span>
+    </div>
+    <div class="event-detail-field">
+      <span class="event-detail-label">Date & Time</span>
+      <span class="event-detail-value" id="detail-datetime">—</span>
+    </div>
+    <div class="event-detail-field">
+      <span class="event-detail-label">Notes</span>
+      <span class="event-detail-value" id="detail-notes" style="white-space:pre-wrap;">—</span>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('detail-modal')">Close</button>
+      <button class="btn btn-primary" onclick="openEditFromDetail()">Edit</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = "https://rfdvogakvyodixgpvqvz.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E";
+
+async function sbFetch(path, opts = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...opts,
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      "Prefer": opts.prefer || "return=representation",
+      ...(opts.headers || {})
+    }
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+let appointments = [];
+let currentView = "month";
+let cursor = new Date();
+let displayTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+let detailEventId = null;
+
+function tzAbbr(tz) {
+  return new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "short" })
+    .formatToParts(new Date()).find(p => p.type === "timeZoneName")?.value || tz;
+}
+
+function localToUtc(dateStr, timeStr, tz) {
+  const tempDate = new Date(`${dateStr}T${timeStr}:00`);
+  const [wantH, wantM] = timeStr.split(":").map(Number);
+  const tzParts = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz, hour: "2-digit", minute: "2-digit", hour12: false
+  }).formatToParts(tempDate);
+  const tzH = parseInt(tzParts.find(p => p.type === "hour").value);
+  const tzM = parseInt(tzParts.find(p => p.type === "minute").value);
+  const diffMs = ((wantH - tzH) * 60 + (wantM - tzM)) * 60000;
+  return new Date(tempDate.getTime() + diffMs).toISOString();
+}
+
+function toTzString(date, tz) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit"
+  }).format(date);
+}
+
+function formatTimeInTz(isoStr, tz) {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: tz, hour: "numeric", minute: "2-digit", hour12: true
+  }).format(new Date(isoStr));
+}
+
+function formatDateInTz(isoStr, tz) {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: tz, weekday: "long", year: "numeric", month: "long", day: "numeric"
+  }).format(new Date(isoStr));
+}
+
+function getLocalDateParts(isoStr, tz) {
+  const fmt = new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hour12: false
+  });
+  const parts = fmt.formatToParts(new Date(isoStr));
+  const get = t => parts.find(p => p.type === t).value;
+  return {
+    year: parseInt(get("year")), month: parseInt(get("month")),
+    day: parseInt(get("day")), hour: parseInt(get("hour")), minute: parseInt(get("minute"))
+  };
+}
+
+async function loadAppointments() {
+  showLoading(true);
+  try {
+    const data = await sbFetch("appointments?select=*&order=appointment_utc.asc");
+    appointments = data || [];
+    render();
+  } catch (e) {
+    console.error(e);
+    showToast("Failed to load appointments", "error");
+  } finally {
+    showLoading(false);
+  }
+}
+
+async function saveAppointment() {
+  const id = document.getElementById("edit-id").value;
+  const name = document.getElementById("appt-name").value.trim();
+  const client = document.getElementById("appt-client").value.trim();
+  const phone = document.getElementById("appt-phone").value.trim();
+  const date = document.getElementById("appt-date").value;
+  const time = document.getElementById("appt-time").value;
+  const tz = document.getElementById("appt-tz").value;
+  const notes = document.getElementById("appt-notes").value.trim();
+
+  if (!name || !date || !time) { showToast("Name, date, and time are required", "error"); return; }
+
+  const payload = {
+    name, client_name: client || null, phone: phone || null,
+    notes: notes || null, appointment_utc: localToUtc(date, time, tz), timezone: tz
+  };
+
+  showLoading(true);
+  try {
+    if (id) {
+      await sbFetch(`appointments?id=eq.${id}`, { method: "PATCH", prefer: "return=minimal", body: JSON.stringify(payload) });
+      showToast("Appointment updated", "success");
+    } else {
+      await sbFetch("appointments", { method: "POST", body: JSON.stringify(payload) });
+      showToast("Appointment created", "success");
+    }
+    closeModal("appt-modal");
+    await loadAppointments();
+  } catch (e) {
+    console.error(e);
+    showToast("Failed to save appointment", "error");
+  } finally {
+    showLoading(false);
+  }
+}
+
+async function deleteAppointment() {
+  const id = document.getElementById("edit-id").value;
+  if (!id || !confirm("Delete this appointment?")) return;
+  showLoading(true);
+  try {
+    await sbFetch(`appointments?id=eq.${id}`, { method: "DELETE", prefer: "return=minimal" });
+    showToast("Appointment deleted", "success");
+    closeModal("appt-modal");
+    await loadAppointments();
+  } catch (e) {
+    console.error(e);
+    showToast("Failed to delete appointment", "error");
+  } finally {
+    showLoading(false);
+  }
+}
+
+function navigate(dir) {
+  if (currentView === "month") cursor.setMonth(cursor.getMonth() + dir);
+  else if (currentView === "week") cursor.setDate(cursor.getDate() + dir * 7);
+  else cursor.setDate(cursor.getDate() + dir);
+  cursor = new Date(cursor);
+  render();
+}
+
+function goToday() { cursor = new Date(); render(); }
+
+function setView(v) {
+  currentView = v;
+  document.querySelectorAll(".view-tab").forEach(t => {
+    t.classList.toggle("active", t.textContent.toLowerCase() === v);
+  });
+  render();
+}
+
+function onTzChange() { displayTz = document.getElementById("tz-select").value; render(); }
+
+function render() {
+  updatePeriodLabel();
+  const main = document.getElementById("cal-main");
+  if (currentView === "month") renderMonth(main);
+  else if (currentView === "week") renderWeek(main);
+  else renderDay(main);
+}
+
+function updatePeriodLabel() {
+  const el = document.getElementById("period-label");
+  if (currentView === "month") {
+    el.textContent = cursor.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  } else if (currentView === "week") {
+    const start = weekStart(cursor);
+    const end = new Date(start); end.setDate(end.getDate() + 6);
+    el.textContent = `${start.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${end.toLocaleDateString("en-US", { month: "short", day: "numeric" })}, ${end.getFullYear()}`;
+  } else {
+    el.textContent = cursor.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+  }
+}
+
+function weekStart(d) {
+  const day = new Date(d);
+  day.setDate(day.getDate() - day.getDay());
+  return day;
+}
+
+function renderMonth(container) {
+  const year = cursor.getFullYear(), month = cursor.getMonth();
+  const today = new Date();
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const startOffset = firstDay.getDay();
+  const days = [];
+  for (let i = 0; i < startOffset; i++) days.push({ date: new Date(year, month, -startOffset + i + 1), other: true });
+  for (let i = 1; i <= lastDay.getDate(); i++) days.push({ date: new Date(year, month, i), other: false });
+  while (days.length < 42) days.push({ date: new Date(year, month + 1, days.length - startOffset - lastDay.getDate() + 1), other: true });
+
+  container.innerHTML = `<div class="month-view"><div class="month-header">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d => `<div class="month-dow">${d}</div>`).join("")}</div><div class="month-grid" id="month-grid"></div></div>`;
+  const grid = document.getElementById("month-grid");
+
+  days.forEach(({ date, other }) => {
+    const isToday = date.toDateString() === today.toDateString();
+    const cell = document.createElement("div");
+    cell.className = `month-cell${other ? " other-month" : ""}${isToday ? " today" : ""}`;
+    cell.onclick = () => openNewModal(date);
+    const dayEl = document.createElement("div");
+    dayEl.className = "cell-day";
+    dayEl.textContent = date.getDate();
+    cell.appendChild(dayEl);
+
+    const dayEvents = appointments.filter(a => {
+      const p = getLocalDateParts(a.appointment_utc, displayTz);
+      return p.year === date.getFullYear() && p.month === (date.getMonth()+1) && p.day === date.getDate();
+    });
+
+    dayEvents.slice(0, 3).forEach(ev => {
+      const pill = document.createElement("div");
+      pill.className = "event-pill";
+      pill.textContent = `${formatTimeInTz(ev.appointment_utc, displayTz)} ${ev.name}`;
+      pill.title = ev.name;
+      pill.onclick = (e) => { e.stopPropagation(); openDetail(ev); };
+      cell.appendChild(pill);
+    });
+
+    if (dayEvents.length > 3) {
+      const more = document.createElement("div");
+      more.className = "more-events";
+      more.textContent = `+${dayEvents.length - 3} more`;
+      more.onclick = (e) => { e.stopPropagation(); cursor = new Date(date); setView("day"); };
+      cell.appendChild(more);
+    }
+    grid.appendChild(cell);
+  });
+}
+
+function renderWeek(container) {
+  const start = weekStart(cursor);
+  const today = new Date();
+  const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  let headerCols = `<div class="week-header-gutter"></div>`;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start); d.setDate(d.getDate() + i);
+    const isToday = d.toDateString() === today.toDateString();
+    headerCols += `<div class="week-header-day"><div class="week-header-dow">${DAYS[i]}</div><div class="week-header-num${isToday ? " today" : ""}">${d.getDate()}</div></div>`;
+  }
+  container.innerHTML = `<div class="week-view"><div class="week-header-row">${headerCols}</div><div class="week-body"><div class="week-time-grid" id="week-grid"></div></div></div>`;
+  const grid = document.getElementById("week-grid");
+
+  for (let h = 0; h < 24; h++) {
+    const lbl = document.createElement("div");
+    lbl.className = "week-hour-label";
+    lbl.textContent = h === 0 ? "" : formatHour(h);
+    grid.appendChild(lbl);
+    for (let d = 0; d < 7; d++) {
+      const col = document.createElement("div");
+      col.className = "week-col";
+      const line = document.createElement("div");
+      line.className = "hour-line";
+      col.appendChild(line);
+      const date = new Date(start); date.setDate(date.getDate() + d);
+      col.onclick = () => openNewModal(date, `${String(h).padStart(2,"0")}:00`);
+      grid.appendChild(col);
+    }
+  }
+
+  appointments.forEach(ev => {
+    const p = getLocalDateParts(ev.appointment_utc, displayTz);
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(start); date.setDate(date.getDate() + d);
+      if (p.year === date.getFullYear() && p.month === (date.getMonth()+1) && p.day === date.getDate()) {
+        const allCols = grid.querySelectorAll(".week-col");
+        const targetCol = allCols[p.hour * 7 + d];
+        if (targetCol) {
+          const evEl = document.createElement("div");
+          evEl.style.cssText = "position:absolute;top:0;left:2px;right:2px;background:var(--primary);border-radius:5px;padding:3px 6px;font-size:11px;font-weight:500;color:#fff;overflow:hidden;cursor:pointer;z-index:2;";
+          evEl.innerHTML = `<div>${formatTimeInTz(ev.appointment_utc, displayTz)}</div><div>${ev.name}</div>`;
+          targetCol.style.position = "relative";
+          targetCol.appendChild(evEl);
+          targetCol.onclick = null;
+          evEl.onclick = (e) => { e.stopPropagation(); openDetail(ev); };
+        }
+        break;
+      }
+    }
+  });
+}
+
+function formatHour(h) {
+  if (h === 0) return "12 AM";
+  if (h < 12) return `${h} AM`;
+  if (h === 12) return "12 PM";
+  return `${h - 12} PM`;
+}
+
+function renderDay(container) {
+  const isToday = cursor.toDateString() === new Date().toDateString();
+  container.innerHTML = `<div class="day-view"><div class="day-header"><h2 style="color:${isToday ? 'var(--primary)' : 'var(--text)'}">${cursor.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}</h2></div><div class="day-body"><div class="day-labels" id="day-labels"></div><div class="day-col" id="day-col"></div></div></div>`;
+  const labelsEl = document.getElementById("day-labels");
+  const colEl = document.getElementById("day-col");
+  colEl.style.position = "relative";
+
+  for (let h = 0; h < 24; h++) {
+    const lbl = document.createElement("div");
+    lbl.className = "day-label";
+    lbl.textContent = h === 0 ? "" : formatHour(h);
+    labelsEl.appendChild(lbl);
+    const row = document.createElement("div");
+    row.className = "day-hour-row";
+    row.onclick = () => openNewModal(cursor, `${String(h).padStart(2,"0")}:00`);
+    colEl.appendChild(row);
+  }
+
+  appointments.filter(ev => {
+    const p = getLocalDateParts(ev.appointment_utc, displayTz);
+    return p.year === cursor.getFullYear() && p.month === (cursor.getMonth()+1) && p.day === cursor.getDate();
+  }).forEach(ev => {
+    const p = getLocalDateParts(ev.appointment_utc, displayTz);
+    const evEl = document.createElement("div");
+    evEl.className = "day-event";
+    evEl.style.top = `${(p.hour + p.minute / 60) * 60}px`;
+    evEl.innerHTML = `<strong>${formatTimeInTz(ev.appointment_utc, displayTz)}</strong> — ${ev.name}${ev.client_name ? ` (${ev.client_name})` : ""}`;
+    evEl.onclick = (e) => { e.stopPropagation(); openDetail(ev); };
+    colEl.appendChild(evEl);
+  });
+}
+
+function openNewModal(date, time) {
+  document.getElementById("modal-title").textContent = "New Appointment";
+  document.getElementById("edit-id").value = "";
+  document.getElementById("appt-name").value = "";
+  document.getElementById("appt-client").value = "";
+  document.getElementById("appt-phone").value = "";
+  document.getElementById("appt-notes").value = "";
+  document.getElementById("delete-btn").style.display = "none";
+  const d = date || new Date();
+  document.getElementById("appt-date").value = d.toISOString().split("T")[0];
+  document.getElementById("appt-time").value = time || "09:00";
+  document.getElementById("appt-tz").value = displayTz;
+  openModal("appt-modal");
+}
+
+function openEditModal(ev) {
+  document.getElementById("modal-title").textContent = "Edit Appointment";
+  document.getElementById("edit-id").value = ev.id;
+  document.getElementById("appt-name").value = ev.name || "";
+  document.getElementById("appt-client").value = ev.client_name || "";
+  document.getElementById("appt-phone").value = ev.phone || "";
+  document.getElementById("appt-notes").value = ev.notes || "";
+  document.getElementById("delete-btn").style.display = "inline-flex";
+  const tz = ev.timezone || displayTz;
+  const p = getLocalDateParts(ev.appointment_utc, tz);
+  document.getElementById("appt-date").value = `${p.year}-${String(p.month).padStart(2,"0")}-${String(p.day).padStart(2,"0")}`;
+  document.getElementById("appt-time").value = `${String(p.hour).padStart(2,"0")}:${String(p.minute).padStart(2,"0")}`;
+  document.getElementById("appt-tz").value = tz;
+  closeModal("detail-modal");
+  openModal("appt-modal");
+}
+
+function openDetail(ev) {
+  detailEventId = ev.id;
+  document.getElementById("detail-name").textContent = ev.name;
+  document.getElementById("detail-client").textContent = ev.client_name || "—";
+  document.getElementById("detail-phone").textContent = ev.phone || "—";
+  const tz = ev.timezone || displayTz;
+  const displayTimeInViewTz = tz !== displayTz ? ` (${formatTimeInTz(ev.appointment_utc, displayTz)} ${tzAbbr(displayTz)})` : "";
+  document.getElementById("detail-datetime").textContent = `${formatDateInTz(ev.appointment_utc, tz)} at ${formatTimeInTz(ev.appointment_utc, tz)} ${tzAbbr(tz)}${displayTimeInViewTz}`;
+  document.getElementById("detail-notes").textContent = ev.notes || "—";
+  openModal("detail-modal");
+}
+
+function openEditFromDetail() {
+  const ev = appointments.find(a => a.id === detailEventId);
+  if (ev) openEditModal(ev);
+}
+
+function openModal(id) { document.getElementById(id).classList.add("open"); }
+function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+
+document.querySelectorAll(".modal-backdrop").forEach(el => {
+  el.addEventListener("click", (e) => { if (e.target === el) el.classList.remove("open"); });
+});
+
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove("show"), 3200);
+}
+
+function showLoading(v) { document.getElementById("loading").classList.toggle("show", v); }
+
+(function init() {
+  const tzSel = document.getElementById("tz-select");
+  const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  if ([...tzSel.options].some(o => o.value === browserTz)) { tzSel.value = browserTz; displayTz = browserTz; }
+  render();
+  loadAppointments();
+})();
+</script>
+
+</body>
+</html>
