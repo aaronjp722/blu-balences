@@ -1,725 +1,962 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blu Balences | Bookkeeping for Small Businesses</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --navy: #0B1F3A;
-    --navy-mid: #162d4f;
-    --blue: #1E4D8C;
-    --accent: #2E8BF7;
-    --accent-light: #d6eaff;
-    --cream: #F7F5F0;
-    --white: #ffffff;
-    --text: #0B1F3A;
-    --muted: #556070;
-    --border: #dde3ed;
-    --font-display: 'DM Serif Display', serif;
-    --font-body: 'DM Sans', sans-serif;
-  }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    font-family: var(--font-body);
-    color: var(--text);
-    background: var(--white);
-    font-size: 16px;
-    line-height: 1.7;
-  }
-
-  /* NAV */
-  nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: var(--navy);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 6%;
-    height: 68px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-
-  .logo {
-    font-family: var(--font-display);
-    font-size: 22px;
-    color: var(--white);
-    text-decoration: none;
-    letter-spacing: 0.01em;
-  }
-
-  .logo span { color: var(--accent); }
-
-  .nav-links {
-    display: flex;
-    gap: 32px;
-    list-style: none;
-  }
-
-  .nav-links a {
-    color: rgba(255,255,255,0.75);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 400;
-    letter-spacing: 0.02em;
-    transition: color 0.2s;
-  }
-
-  .nav-links a:hover { color: var(--white); }
-
-  .nav-cta {
-    background: var(--accent);
-    color: var(--white) !important;
-    padding: 8px 20px;
-    border-radius: 6px;
-    font-weight: 500 !important;
-  }
-
-  .nav-cta:hover { background: #1a72d6; }
-
-  /* HERO */
-  .hero {
-    background: var(--navy);
-    padding: 100px 6% 90px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: center;
-    min-height: 560px;
-  }
-
-  .hero-label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 20px;
-  }
-
-  .hero h1 {
-    font-family: var(--font-display);
-    font-size: clamp(38px, 5vw, 58px);
-    color: var(--white);
-    line-height: 1.1;
-    margin-bottom: 24px;
-  }
-
-  .hero h1 em {
-    font-style: italic;
-    color: var(--accent);
-  }
-
-  .hero p {
-    color: rgba(255,255,255,0.65);
-    font-size: 17px;
-    line-height: 1.75;
-    margin-bottom: 36px;
-    max-width: 480px;
-  }
-
-  .hero-btns {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-  }
-
-  .btn-primary {
-    background: var(--accent);
-    color: var(--white);
-    padding: 13px 28px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 15px;
-    transition: background 0.2s;
-    display: inline-block;
-  }
-
-  .btn-primary:hover { background: #1a72d6; }
-
-  .btn-outline {
-    border: 1px solid rgba(255,255,255,0.25);
-    color: rgba(255,255,255,0.85);
-    padding: 13px 28px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 400;
-    font-size: 15px;
-    transition: border-color 0.2s, color 0.2s;
-    display: inline-block;
-  }
-
-  .btn-outline:hover { border-color: rgba(255,255,255,0.5); color: var(--white); }
-
-  .hero-visual {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-  }
-
-  .hero-card {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 16px;
-    padding: 32px;
-    width: 100%;
-    max-width: 340px;
-  }
-
-  .hero-card-label {
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.4);
-    margin-bottom: 20px;
-  }
-
-  .hero-stat {
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-
-  .hero-stat:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-
-  .hero-stat-num {
-    font-family: var(--font-display);
-    font-size: 32px;
-    color: var(--white);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .hero-stat-desc {
-    font-size: 13px;
-    color: rgba(255,255,255,0.5);
-  }
-
-  /* TRUST BAR */
-  .trust-bar {
-    background: var(--accent-light);
-    padding: 20px 6%;
-    display: flex;
-    align-items: center;
-    gap: 40px;
-    flex-wrap: wrap;
-  }
-
-  .trust-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    color: var(--blue);
-    font-weight: 400;
-  }
-
-  .trust-icon {
-    width: 20px;
-    height: 20px;
-    background: var(--accent);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .trust-icon svg { width: 10px; height: 10px; fill: white; }
-
-  /* SECTIONS */
-  section { padding: 90px 6%; }
-
-  .section-label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 14px;
-  }
-
-  h2 {
-    font-family: var(--font-display);
-    font-size: clamp(30px, 4vw, 44px);
-    line-height: 1.15;
-    margin-bottom: 18px;
-    color: var(--navy);
-  }
-
-  .section-intro {
-    color: var(--muted);
-    font-size: 17px;
-    max-width: 580px;
-    line-height: 1.75;
-  }
-
-  /* WHY SECTION */
-  .why { background: var(--cream); }
-
-  .why-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 28px;
-    margin-top: 52px;
-  }
-
-  .why-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 32px 28px;
-  }
-
-  .why-num {
-    font-family: var(--font-display);
-    font-size: 48px;
-    color: var(--accent-light);
-    line-height: 1;
-    margin-bottom: 16px;
-    -webkit-text-stroke: 2px var(--accent);
-    color: transparent;
-  }
-
-  .why-card h3 {
-    font-family: var(--font-display);
-    font-size: 20px;
-    color: var(--navy);
-    margin-bottom: 10px;
-  }
-
-  .why-card p { font-size: 15px; color: var(--muted); line-height: 1.7; }
-
-  /* SERVICES */
-  #services { background: var(--white); }
-
-  .services-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
-    margin-top: 52px;
-  }
-
-  .service-card {
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 36px 30px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .service-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--accent);
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .service-card:hover { border-color: var(--accent); box-shadow: 0 4px 24px rgba(30,77,140,0.08); }
-  .service-card:hover::before { opacity: 1; }
-
-  .service-icon {
-    width: 48px;
-    height: 48px;
-    background: var(--accent-light);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-
-  .service-icon svg { width: 22px; height: 22px; stroke: var(--accent); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-
-  .service-card h3 {
-    font-family: var(--font-display);
-    font-size: 22px;
-    color: var(--navy);
-    margin-bottom: 10px;
-  }
-
-  .service-card p { font-size: 15px; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
-
-  .service-tasks { list-style: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
-
-  .service-tasks li {
-    font-size: 13px;
-    color: var(--muted);
-    padding: 4px 0;
-    padding-left: 16px;
-    position: relative;
-  }
-
-  .service-tasks li::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    font-size: 12px;
-  }
-
-  .badge {
-    display: inline-block;
-    background: var(--accent-light);
-    color: var(--blue);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 4px;
-    margin-bottom: 14px;
-  }
-
-  /* PRICING */
-  .pricing { background: var(--cream); }
-
-  .pricing-note {
-    display: inline-block;
-    margin-top: 16px;
-    font-size: 14px;
-    color: var(--muted);
-    font-style: italic;
-  }
-
-  .pricing-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 24px;
-    margin-top: 52px;
-  }
-
-  .pricing-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 36px 30px;
-  }
-
-  .pricing-card.featured {
-    background: var(--navy);
-    border-color: var(--navy);
-  }
-
-  .pricing-card h3 {
-    font-family: var(--font-display);
-    font-size: 22px;
-    color: var(--navy);
-    margin-bottom: 8px;
-  }
-
-  .pricing-card.featured h3 { color: var(--white); }
-
-  .pricing-card p { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
-  .pricing-card.featured p { color: rgba(255,255,255,0.55); }
-
-  .price-label {
-    font-family: var(--font-display);
-    font-size: 38px;
-    color: var(--navy);
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-
-  .pricing-card.featured .price-label { color: var(--white); }
-
-  .price-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
-  .pricing-card.featured .price-sub { color: rgba(255,255,255,0.45); }
-
-  .pricing-list { list-style: none; border-top: 1px solid var(--border); padding-top: 20px; }
-  .pricing-card.featured .pricing-list { border-color: rgba(255,255,255,0.12); }
-
-  .pricing-list li {
-    font-size: 14px;
-    color: var(--muted);
-    padding: 6px 0;
-    padding-left: 18px;
-    position: relative;
-  }
-
-  .pricing-card.featured .pricing-list li { color: rgba(255,255,255,0.65); }
-
-  .pricing-list li::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    font-weight: 500;
-  }
-
-  /* CTA */
-  .cta-section {
-    background: var(--navy);
-    padding: 100px 6%;
-    text-align: center;
-  }
-
-  .cta-section h2 { color: var(--white); }
-  .cta-section .section-intro { color: rgba(255,255,255,0.6); margin: 0 auto 36px; text-align: center; max-width: 520px; }
-
-  /* FOOTER */
-  footer {
-    background: #080f1a;
-    padding: 40px 6%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-
-  .footer-logo {
-    font-family: var(--font-display);
-    font-size: 18px;
-    color: var(--white);
-  }
-
-  .footer-logo span { color: var(--accent); }
-
-  footer p { font-size: 13px; color: rgba(255,255,255,0.35); }
-
-  @media (max-width: 768px) {
-    .hero { grid-template-columns: 1fr; padding: 60px 6%; }
-    .hero-visual { display: none; }
-    .nav-links { display: none; }
-    .trust-bar { gap: 20px; }
-    footer { flex-direction: column; text-align: center; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blu Balence | Bookkeeping That Pays For Itself</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0a1628;
+      --navy2: #0f1f3d;
+      --navy3: #162444;
+      --blue: #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow: rgba(37,99,235,0.25);
+      --gold: #f59e0b;
+      --red: #dc2626;
+      --red-bg: #1f0a0a;
+      --green: #16a34a;
+      --text: #e2e8f0;
+      --text-sub: #94a3b8;
+      --text-dim: #64748b;
+      --border: rgba(255,255,255,0.08);
+      --card: rgba(255,255,255,0.04);
+      --white: #ffffff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,22,40,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+    }
+    .nav-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+    }
+    .logo {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--white);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: var(--blue-light); }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-sub);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      background: var(--blue);
+      color: var(--white) !important;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-weight: 600 !important;
+      font-size: 14px !important;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--blue-light) !important; color: var(--white) !important; }
+
+    /* HERO */
+    .hero {
+      padding: 80px 32px 100px;
+      max-width: 1140px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 72px;
+      align-items: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue-glow);
+      border: 1px solid rgba(59,130,246,0.3);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blue-light);
+      margin-bottom: 24px;
+    }
+    .hero-badge::before { content: "●"; font-size: 8px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    h1 {
+      font-size: clamp(36px, 5vw, 58px);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -2px;
+      color: var(--white);
+      margin-bottom: 24px;
+    }
+    h1 em { font-style: normal; color: var(--blue-light); }
+    .hero-sub {
+      font-size: 19px;
+      color: var(--text-sub);
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 520px;
+    }
+    .hero-trust {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text-sub);
+      font-weight: 500;
+    }
+    .trust-item .check { color: var(--green); font-size: 16px; }
+
+    /* BOOKING CARD */
+    .booking-card {
+      background: var(--navy2);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 20px;
+      padding: 36px 32px;
+      box-shadow: 0 0 60px rgba(37,99,235,0.15), 0 24px 48px rgba(0,0,0,0.4);
+    }
+    .card-headline {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+    .card-sub {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-bottom: 24px;
+    }
+    .form-field { margin-bottom: 14px; }
+    .form-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+      border-color: var(--blue-light);
+      box-shadow: 0 0 0 3px var(--blue-glow);
+    }
+    .form-field select option { background: var(--navy2); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn-primary {
+      width: 100%;
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      padding: 15px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 6px;
+      letter-spacing: -0.2px;
+    }
+    .btn-primary:hover { background: var(--blue-light); }
+    .btn-primary:active { transform: scale(0.99); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .card-guarantee {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 14px;
+    }
+    .card-guarantee span { color: var(--green); }
+    .success-state {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .success-icon { font-size: 52px; margin-bottom: 16px; }
+    .success-state h3 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 10px;
+    }
+    .success-state p { font-size: 15px; color: var(--text-sub); line-height: 1.6; }
+
+    /* SECTIONS */
+    .section { padding: 90px 32px; }
+    .section-inner { max-width: 1140px; margin: 0 auto; }
+    .section-label {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--blue-light);
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: clamp(30px, 4vw, 46px);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    h2 em { font-style: normal; color: var(--blue-light); }
+    .section-desc {
+      font-size: 18px;
+      color: var(--text-sub);
+      max-width: 600px;
+      margin-bottom: 56px;
+      line-height: 1.7;
+    }
+
+    /* PAIN */
+    .pain-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .pain-card {
+      background: var(--red-bg);
+      border: 1px solid rgba(220,38,38,0.2);
+      border-radius: 16px;
+      padding: 28px 28px 28px 24px;
+      border-left: 3px solid var(--red);
+    }
+    .pain-emoji { font-size: 28px; margin-bottom: 14px; display: block; }
+    .pain-card h3 { font-size: 17px; font-weight: 700; color: #fca5a5; margin-bottom: 10px; }
+    .pain-card p { font-size: 15px; color: #9ca3af; line-height: 1.6; }
+
+    /* SOLUTION */
+    .solution { background: var(--navy2); }
+    .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+    .step-card {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+    }
+    .step-number {
+      width: 36px; height: 36px;
+      background: var(--blue);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800; color: var(--white);
+      margin-bottom: 16px;
+    }
+    .step-card h3 { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 10px; }
+    .step-card p { font-size: 14px; color: var(--text-sub); line-height: 1.6; }
+
+    /* PROOF */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 64px; }
+    .stat-box {
+      background: var(--navy2);
+      border: 1px solid rgba(59,130,246,0.15);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 40px; font-weight: 900; color: var(--white);
+      letter-spacing: -2px; line-height: 1; margin-bottom: 8px;
+    }
+    .stat-number span { color: var(--blue-light); }
+    .stat-label { font-size: 14px; color: var(--text-sub); font-weight: 500; }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .testimonial {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .stars { color: var(--gold); font-size: 16px; margin-bottom: 14px; letter-spacing: 2px; }
+    .testimonial-text { font-size: 15px; color: var(--text); line-height: 1.7; font-style: italic; margin-bottom: 20px; }
+    .testimonial-author { display: flex; align-items: center; gap: 12px; }
+    .author-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%; background: var(--blue);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 16px; color: var(--white); flex-shrink: 0;
+    }
+    .author-name { font-size: 14px; font-weight: 700; color: var(--white); }
+    .author-biz { font-size: 13px; color: var(--text-sub); }
+
+    /* SERVICES */
+    .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .service-card {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 28px;
+    }
+    .service-icon { font-size: 32px; margin-bottom: 16px; display: block; }
+    .service-card h3 { font-size: 19px; font-weight: 700; color: var(--white); margin-bottom: 12px; }
+    .service-card p { font-size: 15px; color: var(--text-sub); line-height: 1.7; }
+    .service-list { margin-top: 16px; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .service-list li { font-size: 14px; color: var(--text-sub); display: flex; align-items: flex-start; gap: 8px; }
+    .service-list li::before { content: "✓"; color: var(--green); font-weight: 700; flex-shrink: 0; }
+
+    /* PRICING */
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: start; }
+    .pricing-card {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 28px;
+      position: relative;
+    }
+    .pricing-card.featured { border-color: var(--blue-light); box-shadow: 0 0 40px var(--blue-glow); }
+    .featured-badge {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      background: var(--blue); color: var(--white);
+      font-size: 12px; font-weight: 700; padding: 5px 18px; border-radius: 100px; white-space: nowrap;
+    }
+    .pricing-tier { font-size: 14px; font-weight: 600; color: var(--blue-light); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    .pricing-price { font-size: 38px; font-weight: 900; color: var(--white); letter-spacing: -2px; line-height: 1; margin-bottom: 6px; }
+    .pricing-price sup { font-size: 22px; vertical-align: top; margin-top: 8px; }
+    .pricing-range { font-size: 14px; color: var(--text-dim); margin-bottom: 6px; }
+    .pricing-note { font-size: 13px; color: var(--text-sub); margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+    .pricing-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+    .pricing-list li { font-size: 14px; color: var(--text-sub); display: flex; align-items: flex-start; gap: 10px; }
+    .pricing-list li::before { content: "✓"; color: var(--green); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .btn-outline {
+      width: 100%; background: transparent; color: var(--blue-light);
+      border: 1px solid var(--blue-light); border-radius: 10px; padding: 13px;
+      font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+      text-decoration: none; display: block; text-align: center;
+    }
+    .btn-outline:hover { background: var(--blue); color: var(--white); border-color: var(--blue); }
+    .btn-solid {
+      width: 100%; background: var(--blue); color: var(--white);
+      border: 1px solid var(--blue); border-radius: 10px; padding: 13px;
+      font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+      text-decoration: none; display: block; text-align: center;
+    }
+    .btn-solid:hover { background: var(--blue-light); }
+
+    /* CTA */
+    .cta-section { background: var(--navy2); padding: 90px 32px; }
+    .cta-inner { max-width: 720px; margin: 0 auto; text-align: center; }
+    .cta-inner h2 { margin-bottom: 16px; }
+    .cta-inner p { font-size: 18px; color: var(--text-sub); margin-bottom: 48px; line-height: 1.7; }
+    .cta-form {
+      background: var(--navy);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 20px; padding: 40px; text-align: left;
+    }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 32px; text-align: center; color: var(--text-dim); font-size: 14px; }
+    footer a { color: var(--text-sub); text-decoration: none; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 32px; right: 32px;
+      background: var(--navy2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px 20px; color: var(--text);
+      font-size: 14px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 9999; max-width: 320px;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: rgba(22,163,74,0.4); }
+    .toast.error { border-color: rgba(220,38,38,0.4); }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; gap: 48px; }
+      .pain-grid { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .services-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .section { padding: 60px 20px; }
+      nav { padding: 0 20px; }
+      .hero { padding: 48px 20px 60px; }
+      .cta-form { padding: 24px 20px; }
+      .steps-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <a href="#home" class="logo">Blu <span>Balences</span></a>
-  <ul class="nav-links">
-    <li><a href="#home">Home</a></li>
-    <li><a href="#services">Services</a></li>
-    <li><a href="/pricing">Pricing</a></li>
-    <li><a href="#contact" class="nav-cta">Get Started</a></li>
-  </ul>
+  <div class="nav-inner">
+    <a href="#" class="logo">Blu <span>Balence</span></a>
+    <ul class="nav-links">
+      <li><a href="#pain">Why Us</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#book" class="nav-cta">Book Free Call</a></li>
+    </ul>
+  </div>
 </nav>
 
 <!-- HERO -->
-<section id="home" class="hero">
-  <div class="hero-content">
-    <p class="hero-label">Remote Bookkeeping for Small Businesses</p>
-    <h1>Your books,<br><em>balanced.</em><br>Your mind, free.</h1>
-    <p>Blu Balences handles your bookkeeping so you can focus on what you do best — running and growing your business. Clean books, clear reports, zero stress.</p>
-    <div class="hero-btns">
-      <a href="#contact" class="btn-primary">Book a Free Consultation</a>
-      <a href="#services" class="btn-outline">See Our Services</a>
+<section style="padding-top: 0;">
+  <div class="hero">
+    <div class="hero-copy">
+      <div class="hero-badge">Flat-Rate Bookkeeping · No Surprise Bills</div>
+      <h1>Stop Losing Money<br>to <em>Messy Books</em></h1>
+      <p class="hero-sub">
+        Most small business owners overpay taxes, miss deductions, and can't tell if they're actually profitable — because their books are a mess. We fix that. Fast. For a flat monthly fee you'll know on day one.
+      </p>
+      <div class="hero-trust">
+        <div class="trust-item"><span class="check">✓</span> No long-term contracts</div>
+        <div class="trust-item"><span class="check">✓</span> Setup in 48 hours</div>
+        <div class="trust-item"><span class="check">✓</span> Tax-ready books guaranteed</div>
+      </div>
     </div>
-  </div>
-  <div class="hero-visual">
-    <div class="hero-card">
-      <p class="hero-card-label">Why clean books matter</p>
-      <div class="hero-stat">
-        <div class="hero-stat-num">$4,200</div>
-        <div class="hero-stat-desc">Average annual savings from catching deductions small businesses miss</div>
-      </div>
-      <div class="hero-stat">
-        <div class="hero-stat-num">100%</div>
-        <div class="hero-stat-desc">First-month satisfaction guarantee — or you don't pay</div>
-      </div>
-      <div class="hero-stat">
-        <div class="hero-stat-num">Flat</div>
-        <div class="hero-stat-desc">Fixed pricing, no surprise bills, no long-term contracts</div>
+    <div>
+      <div class="booking-card" id="hero-card">
+        <div id="hero-form-wrap">
+          <div class="card-headline">Book Your Free Strategy Call</div>
+          <div class="card-sub">30 minutes. We'll review your books for free and show you what you're missing.</div>
+          <form id="hero-form" onsubmit="handleHeroBook(event)">
+            <div class="form-field">
+              <label>Your Name</label>
+              <input type="text" id="h-name" placeholder="Jane Smith" required>
+            </div>
+            <div class="form-field">
+              <label>Business Name</label>
+              <input type="text" id="h-biz" placeholder="Smith Plumbing LLC" required>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label>Phone</label>
+                <input type="tel" id="h-phone" placeholder="(555) 000-0000">
+              </div>
+              <div class="form-field">
+                <label>Email</label>
+                <input type="email" id="h-email" placeholder="jane@example.com" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label>Preferred Date</label>
+                <input type="date" id="h-date" required>
+              </div>
+              <div class="form-field">
+                <label>Preferred Time</label>
+                <input type="time" id="h-time" value="10:00" required>
+              </div>
+            </div>
+            <div class="form-field">
+              <label>Your Timezone</label>
+              <select id="h-tz">
+                <option value="America/New_York">Eastern (ET)</option>
+                <option value="America/Chicago">Central (CT)</option>
+                <option value="America/Denver">Mountain (MT)</option>
+                <option value="America/Los_Angeles">Pacific (PT)</option>
+                <option value="America/Anchorage">Alaska (AKT)</option>
+                <option value="Pacific/Honolulu">Hawaii (HT)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-primary" id="hero-btn">Reserve My Free Call →</button>
+          </form>
+          <p class="card-guarantee"><span>✓</span> No credit card. No commitment. Just answers.</p>
+        </div>
+        <div class="success-state" id="hero-success">
+          <div class="success-icon">🎉</div>
+          <h3>You're on the calendar!</h3>
+          <p>Check your email — we'll send a confirmation with everything you need. We can't wait to show you what clean books look like.</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- TRUST BAR -->
-<div class="trust-bar">
-  <div class="trust-item">
-    <div class="trust-icon"><svg viewBox="0 0 10 10"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    No long-term contracts
+<!-- PAIN -->
+<section class="section" id="pain">
+  <div class="section-inner">
+    <div class="section-label">Sound Familiar?</div>
+    <h2>Your Books Are Costing You<br><em>More Than You Think</em></h2>
+    <p class="section-desc">Every month you delay fixing your books is another month you're flying blind — and paying for it.</p>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <span class="pain-emoji">😰</span>
+        <h3>Tax Season Fills You With Dread</h3>
+        <p>You scramble to find receipts from 11 months ago, hand your accountant a shoebox, and pray the number isn't terrible. It usually is.</p>
+      </div>
+      <div class="pain-card">
+        <span class="pain-emoji">🤷</span>
+        <h3>You Don't Actually Know If You're Profitable</h3>
+        <p>Revenue looks good. But after paying yourself, your team, and your bills — is there anything left? You genuinely don't know, and that's terrifying.</p>
+      </div>
+      <div class="pain-card">
+        <span class="pain-emoji">🌙</span>
+        <h3>You're Doing Bookkeeping at Midnight</h3>
+        <p>QuickBooks or a spreadsheet at 11pm, while your family is asleep. You started a business to have freedom — not a second job as your own accountant.</p>
+      </div>
+      <div class="pain-card">
+        <span class="pain-emoji">💸</span>
+        <h3>You're Leaving Real Money on the Table</h3>
+        <p>Missed deductions, underpaid estimated taxes, missed write-offs — small business owners who DIY their books overpay the IRS by an average of $4,200 per year.</p>
+      </div>
+    </div>
   </div>
-  <div class="trust-item">
-    <div class="trust-icon"><svg viewBox="0 0 10 10"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    First month guarantee
-  </div>
-  <div class="trust-item">
-    <div class="trust-icon"><svg viewBox="0 0 10 10"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    Fully remote &amp; flexible
-  </div>
-  <div class="trust-item">
-    <div class="trust-icon"><svg viewBox="0 0 10 10"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    Transparent, flat pricing
-  </div>
-</div>
+</section>
 
-<!-- WHY SECTION -->
-<section class="why">
-  <p class="section-label">Why Blu Balences</p>
-  <h2>Built around your business,<br>not the other way around</h2>
-  <p class="section-intro">Most small businesses lose thousands each year to messy books and avoidable mistakes. We fix that with a simple, reliable process that keeps you tax-ready and in control.</p>
-  <div class="why-grid">
-    <div class="why-card">
-      <div class="why-num">01</div>
-      <h3>Clarity first</h3>
-      <p>No jargon. No confusing reports. We communicate in plain language so your financials actually make sense to you.</p>
+<!-- SOLUTION -->
+<section class="section solution" id="how">
+  <div class="section-inner">
+    <div class="section-label">How It Works</div>
+    <h2>Clean Books in <em>4 Simple Steps</em></h2>
+    <p class="section-desc">We handle everything. You get back to running your business.</p>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3>Book a Free Call</h3>
+        <p>15 minutes to understand your business, your current books, and where the leaks are. No commitment required.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3>We Onboard You Fast</h3>
+        <p>Connect your accounts, share access, and we get to work. Most clients are fully onboarded within 48 hours of signing up.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3>We Handle the Books</h3>
+        <p>Monthly reconciliation, categorization, P&L statements, and a clean dashboard so you always know where you stand.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">4</div>
+        <h3>Tax Season = Painless</h3>
+        <p>Your books are always ready. Send your accountant a clean package in minutes. No scrambling, no surprises.</p>
+      </div>
     </div>
-    <div class="why-card">
-      <div class="why-num">02</div>
-      <h3>Systems that work</h3>
-      <p>We automate what can be automated — so you get faster, more accurate results and more time to focus on growth.</p>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section class="section" id="proof">
+  <div class="section-inner">
+    <div class="section-label">Why Clients Stay</div>
+    <h2>Results You Can <em>Actually Measure</em></h2>
+    <p class="section-desc">Real numbers from real clients who stopped guessing and started knowing.</p>
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-number"><span>$</span>4,200<span>+</span></div>
+        <div class="stat-label">Average annual tax savings vs. DIY</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">100<span>%</span></div>
+        <div class="stat-label">Of clients are tax-ready by March 1</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">Flat</div>
+        <div class="stat-label">Monthly fee — no hidden hourly surprises</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">48<span>hr</span></div>
+        <div class="stat-label">Average time to fully onboarded</div>
+      </div>
     </div>
-    <div class="why-card">
-      <div class="why-num">03</div>
-      <h3>No shortcuts</h3>
-      <p>We show up, keep our promises, and do the work right. Every time. Our relationships last because we earn trust.</p>
-    </div>
-    <div class="why-card">
-      <div class="why-num">04</div>
-      <h3>Flexible frequency</h3>
-      <p>Weekly, monthly, or quarterly — we work on your schedule. Most clients prefer monthly. All options are available.</p>
+    <div class="testimonials-grid">
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"I had no idea how much money I was losing until Blu Balence cleaned up my books. Found $6,000 in missed deductions my first month. Worth every penny."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">MR</div>
+          <div>
+            <div class="author-name">Marcus R.</div>
+            <div class="author-biz">Owner, MR Electric Services</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"I used to dread tax time. Now I just forward them a link. My accountant said these were the cleanest books she'd ever received from a small business client."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">TK</div>
+          <div>
+            <div class="author-name">Tanya K.</div>
+            <div class="author-biz">Founder, Bloom Wellness Studio</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"The flat-rate pricing is what sold me. I always knew what I was paying. No surprises. And for the first time in 5 years I actually understand my own P&L."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">JP</div>
+          <div>
+            <div class="author-name">James P.</div>
+            <div class="author-biz">Owner, Pacific Coast Landscaping</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- SERVICES -->
-<section id="services">
-  <p class="section-label">Our Services</p>
-  <h2>Everything your books need,<br>nothing you don't</h2>
-  <p class="section-intro">Whether you want to hand it all off or stay hands-on, we have a service level that fits. Choose what makes sense for your business right now.</p>
-
-  <div class="services-grid">
-
-    <div class="service-card">
-      <div class="badge">Most Popular</div>
-      <div class="service-icon">
-        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+<section class="section" id="services" style="background: var(--navy2);">
+  <div class="section-inner">
+    <div class="section-label">What We Do</div>
+    <h2>Everything Your Business <em>Actually Needs</em></h2>
+    <p class="section-desc">We're not just data entry people. We're your financial partner.</p>
+    <div class="services-grid">
+      <div class="service-card">
+        <span class="service-icon">📊</span>
+        <h3>Monthly Bookkeeping</h3>
+        <p>Hands-off, accurate, always up to date. We reconcile your accounts, categorize every transaction, and deliver clean financials every month.</p>
+        <ul class="service-list">
+          <li>Bank & credit card reconciliation</li>
+          <li>Monthly P&L and balance sheet</li>
+          <li>Cash flow tracking</li>
+          <li>Real-time expense categorization</li>
+        </ul>
       </div>
-      <h3>Monthly Bookkeeping</h3>
-      <p>Stay on top of your finances with a reliable monthly process that keeps your books accurate and tax-ready year-round.</p>
-      <ul class="service-tasks">
-        <li>Categorize and reconcile all transactions</li>
-        <li>Monthly profit &amp; loss statement</li>
-        <li>Balance sheet and cash flow reports</li>
-        <li>Accounts payable &amp; receivable tracking</li>
-        <li>Bank and credit card reconciliation</li>
-        <li>Year-end tax prep support</li>
-      </ul>
-    </div>
-
-    <div class="service-card">
-      <div class="service-icon">
-        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <div class="service-card">
+        <span class="service-icon">📁</span>
+        <h3>Tax Preparation Support</h3>
+        <p>No more shoebox tax seasons. We keep your books tax-ready year-round and deliver a clean package to your CPA — or file for you.</p>
+        <ul class="service-list">
+          <li>Year-round tax-ready books</li>
+          <li>Deduction maximization</li>
+          <li>1099 preparation & filing</li>
+          <li>CPA coordination included</li>
+        </ul>
       </div>
-      <h3>Catch-Up &amp; Cleanup</h3>
-      <p>Behind on your books? We fix and organize everything fast so you can file taxes and make business decisions with confidence.</p>
-      <ul class="service-tasks">
-        <li>Full review of existing records</li>
-        <li>Reclassify and correct transactions</li>
-        <li>Reconcile all accounts from day one</li>
-        <li>Organize missing documents</li>
-        <li>Fixed price based on volume &amp; complexity</li>
-        <li>Turnaround-focused — we work fast</li>
-      </ul>
-    </div>
-
-    <div class="service-card">
-      <div class="service-icon">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div class="service-card">
+        <span class="service-icon">💡</span>
+        <h3>Financial Clarity</h3>
+        <p>Know your numbers. Understand your margins. Make decisions based on real data — not gut feelings or bank balance checks.</p>
+        <ul class="service-list">
+          <li>Monthly financial review call</li>
+          <li>Profitability by client/project</li>
+          <li>Budget vs. actuals tracking</li>
+          <li>Growth-ready financial reports</li>
+        </ul>
       </div>
-      <h3>Consulting &amp; Training</h3>
-      <p>Keep bookkeeping in-house with expert setup, training, and periodic reviews to keep your team confident and accurate.</p>
-      <ul class="service-tasks">
-        <li>QuickBooks Online setup &amp; configuration</li>
-        <li>Chart of accounts tailored to your business</li>
-        <li>Team training sessions</li>
-        <li>Ongoing support at hourly rate</li>
-        <li>Periodic review and audit</li>
-        <li>Process documentation</li>
-      </ul>
     </div>
-
   </div>
 </section>
 
 <!-- PRICING -->
-<section id="pricing" class="pricing">
-  <p class="section-label">Pricing</p>
-  <h2>Transparent pricing.<br>No surprises.</h2>
-  <p class="section-intro">Transparent pricing. No contracts. First month satisfaction guarantee or you do not pay. Most small businesses lose thousands each year due to messy books and avoidable tax issues.</p>
-  <span class="pricing-note">Quarterly bookkeeping available at 75% of the monthly rate — ideal if you don't need monthly reports but still want clean, tax-ready books.</span>
-
-  <div class="pricing-cards" style="margin-top: 48px;">
-
-    <div class="pricing-card">
-      <h3>Essential</h3>
-      <p>Simple, accurate bookkeeping every month</p>
-      <div class="price-label">$300<span style="font-size: 20px; font-family: var(--font-body); font-weight: 300;">–$350</span></div>
-      <div class="price-sub">per month</div>
-      <ul class="pricing-list">
-        <li>Monthly bank and card reconciliation</li>
-        <li>Expense categorization with bank rules</li>
-        <li>Monthly financial statements</li>
-      </ul>
-      <p style="font-size: 12px; color: var(--muted); margin-top: 20px; font-style: italic;">Best for freelancers and solo owners under $100k revenue</p>
+<section class="section" id="pricing">
+  <div class="section-inner">
+    <div class="section-label">Simple, Flat Pricing</div>
+    <h2>One Price. No Surprises. <em>Ever.</em></h2>
+    <p class="section-desc">Your fee is set on day one and doesn't change until your business grows. That's the deal.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-tier">Essential</div>
+        <div class="pricing-price"><sup>$</sup>300</div>
+        <div class="pricing-range">– $350 / month</div>
+        <div class="pricing-note">Best for freelancers and sole proprietors just getting started.</div>
+        <ul class="pricing-list">
+          <li>Monthly bookkeeping</li>
+          <li>Bank & credit reconciliation</li>
+          <li>Monthly P&L statement</li>
+          <li>Tax-ready books</li>
+          <li>Email support</li>
+        </ul>
+        <a href="#book" class="btn-outline">Get Started →</a>
+      </div>
+      <div class="pricing-card featured">
+        <div class="featured-badge">Most Popular</div>
+        <div class="pricing-tier">Professional</div>
+        <div class="pricing-price"><sup>$</sup>350</div>
+        <div class="pricing-range">– $450 / month</div>
+        <div class="pricing-note">For growing LLCs and S-Corps with employees or contractors.</div>
+        <ul class="pricing-list">
+          <li>Everything in Essential</li>
+          <li>1099 preparation & filing</li>
+          <li>Monthly strategy call</li>
+          <li>Cash flow forecasting</li>
+          <li>Payroll coordination</li>
+          <li>Priority response (24hr)</li>
+        </ul>
+        <a href="#book" class="btn-solid">Get Started →</a>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-tier">Premium</div>
+        <div class="pricing-price"><sup>$</sup>450</div>
+        <div class="pricing-range">– $750 / month</div>
+        <div class="pricing-note">For established businesses needing full financial partnership.</div>
+        <ul class="pricing-list">
+          <li>Everything in Professional</li>
+          <li>Bi-weekly check-ins</li>
+          <li>Profitability by project</li>
+          <li>Budget vs. actuals</li>
+          <li>CPA coordination</li>
+          <li>Dedicated account manager</li>
+        </ul>
+        <a href="#book" class="btn-outline">Get Started →</a>
+      </div>
     </div>
-
-    <div class="pricing-card featured">
-      <div style="display: inline-block; background: var(--accent); color: white; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; margin-bottom: 14px;">Most Popular</div>
-      <h3>Professional</h3>
-      <p>Clear numbers that support growth</p>
-      <div class="price-label">$350<span style="font-size: 20px; font-family: var(--font-body); font-weight: 300; color: rgba(255,255,255,0.7);">–$450</span></div>
-      <div class="price-sub">per month</div>
-      <ul class="pricing-list">
-        <li>Everything in Essential</li>
-        <li>Light AR and AP tracking</li>
-        <li>Quarterly performance summary</li>
-        <li>Priority support</li>
-      </ul>
-      <p style="font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 20px; font-style: italic;">Best for growing businesses with multiple accounts</p>
-    </div>
-
-    <div class="pricing-card">
-      <h3>Premium</h3>
-      <p>Hands-on support and advanced reporting</p>
-      <div class="price-label">$450<span style="font-size: 20px; font-family: var(--font-body); font-weight: 300;">–$750</span></div>
-      <div class="price-sub">per month</div>
-      <ul class="pricing-list">
-        <li>Everything in Professional</li>
-        <li>Custom reports and KPI dashboards</li>
-        <li>Accrual, payroll, and loan tracking</li>
-        <li>Monthly video walkthrough</li>
-        <li>CPA-ready books for tax time</li>
-      </ul>
-      <p style="font-size: 12px; color: var(--muted); margin-top: 20px; font-style: italic;">Best for established or multi-entity businesses</p>
-    </div>
-
   </div>
 </section>
 
-<!-- CTA -->
-<section id="contact" class="cta-section">
-  <p class="section-label" style="color: var(--accent);">Get Started</p>
-  <h2>Ready to get your books right?</h2>
-  <p class="section-intro">Book a free consultation — no commitment, no pressure. We'll review your situation and tell you exactly what you need.</p>
-  <a href="mailto:hello@blubalences.com" class="btn-primary" style="font-size: 16px; padding: 15px 36px;">Book a Free Consultation</a>
+<!-- BOTTOM CTA -->
+<section class="cta-section" id="book">
+  <div class="cta-inner">
+    <div class="section-label">Ready to Stop Guessing?</div>
+    <h2>Book Your Free<br><em>Strategy Call Today</em></h2>
+    <p>30 minutes. We'll review your current situation, find the holes, and show you exactly what clean books could mean for your business. No pitch. No pressure.</p>
+    <div class="cta-form">
+      <div id="cta-form-wrap">
+        <form id="cta-form" onsubmit="handleCtaBook(event)">
+          <div class="form-row">
+            <div class="form-field">
+              <label>Your Name</label>
+              <input type="text" id="c-name" placeholder="Jane Smith" required>
+            </div>
+            <div class="form-field">
+              <label>Business Name</label>
+              <input type="text" id="c-biz" placeholder="Smith Plumbing LLC" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Phone Number</label>
+              <input type="tel" id="c-phone" placeholder="(555) 000-0000">
+            </div>
+            <div class="form-field">
+              <label>Email Address</label>
+              <input type="email" id="c-email" placeholder="jane@example.com" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Preferred Date</label>
+              <input type="date" id="c-date" required>
+            </div>
+            <div class="form-field">
+              <label>Preferred Time</label>
+              <input type="time" id="c-time" value="10:00" required>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Your Timezone</label>
+            <select id="c-tz">
+              <option value="America/New_York">Eastern (ET)</option>
+              <option value="America/Chicago">Central (CT)</option>
+              <option value="America/Denver">Mountain (MT)</option>
+              <option value="America/Los_Angeles">Pacific (PT)</option>
+              <option value="America/Anchorage">Alaska (AKT)</option>
+              <option value="Pacific/Honolulu">Hawaii (HT)</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Anything else we should know? (optional)</label>
+            <textarea id="c-notes" rows="3" placeholder="Current bookkeeping setup, biggest pain point, revenue range..."></textarea>
+          </div>
+          <button type="submit" class="btn-primary" id="cta-btn" style="font-size: 18px; padding: 18px;">
+            Book My Free Strategy Call →
+          </button>
+        </form>
+        <p class="card-guarantee" style="margin-top: 16px;"><span>✓</span> No credit card. No commitment. You'll hear from us within 2 hours.</p>
+      </div>
+      <div class="success-state" id="cta-success">
+        <div class="success-icon">🎉</div>
+        <h3>You're booked!</h3>
+        <p>Check your email for confirmation. We'll reach out within 2 hours to confirm your slot and send you a short prep questionnaire so we can make the most of your 30 minutes.</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Blu <span>Balences</span></div>
-  <p>Fully remote bookkeeping for small businesses. &copy; 2026 Blu Balences.</p>
-  <p style="font-size: 13px; color: rgba(255,255,255,0.3);">Note: We do not provide tax or audit services.</p>
+  <p style="margin-bottom: 8px;">© 2025 Blu Balence · <a href="mailto:hello@blubalences.com">hello@blubalences.com</a></p>
+  <p><a href="/calendar">Internal Calendar</a> · <a href="/blu-balence-email-contacts">Email Contacts</a></p>
 </footer>
 
+<div class="toast" id="toast"></div>
+
+<script>
+  const SUPABASE_URL = "https://rfdvogakvyodixgpvqvz.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1NTA0NjEsImV4cCI6MjA2MjEyNjQ2MX0.BeyAZjJSVBkNyBCBiJFZVGJRImvz1p7M3mM-9Cxn3Dc";
+  const WEBHOOK_URL = "https://hook.us1.make.com/e3av1w86ovv5w89fs3hwq50aln33oq3c";
+
+  async function sbFetch(path, opts = {}) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+      ...opts,
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation",
+        ...(opts.headers || {})
+      }
+    });
+    if (!res.ok) { const err = await res.text(); throw new Error(err); }
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
+  }
+
+  function localToUtc(dateStr, timeStr, tz) {
+    const localDt = new Date(`${dateStr}T${timeStr}:00`);
+    const tzDate = new Date(localDt.toLocaleString("en-US", { timeZone: tz }));
+    const diff = localDt - tzDate;
+    return new Date(localDt.getTime() + diff).toISOString();
+  }
+
+  function detectTz() {
+    try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch { return "America/New_York"; }
+  }
+
+  function setDefaultDate(inputId) {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    document.getElementById(inputId).value = d.toISOString().split("T")[0];
+  }
+
+  function setDefaultTz(selectId) {
+    const tz = detectTz();
+    const sel = document.getElementById(selectId);
+    for (const opt of sel.options) {
+      if (opt.value === tz) { sel.value = tz; return; }
+    }
+  }
+
+  function showToast(msg, type = "success") {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => { t.className = "toast"; }, 4000);
+  }
+
+  async function bookAppointment({ name, clientName, phone, email, date, time, tz, notes }) {
+    const appointmentUtc = localToUtc(date, time, tz);
+    const payload = {
+      name,
+      client_name: clientName,
+      phone: phone || null,
+      email,
+      notes: notes || null,
+      appointment_utc: appointmentUtc,
+      timezone: tz
+    };
+    const result = await sbFetch("appointments", { method: "POST", body: JSON.stringify(payload) });
+    const apptId = result && result[0] ? result[0].id : null;
+    fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "created", ...payload, appointment_id: apptId })
+    }).catch(err => console.warn("Webhook failed:", err));
+    return result;
+  }
+
+  async function handleHeroBook(e) {
+    e.preventDefault();
+    const btn = document.getElementById("hero-btn");
+    btn.disabled = true;
+    btn.textContent = "Booking...";
+    try {
+      const biz = document.getElementById("h-biz").value.trim();
+      await bookAppointment({
+        name: `Discovery Call — ${biz}`,
+        clientName: document.getElementById("h-name").value.trim(),
+        phone: document.getElementById("h-phone").value.trim(),
+        email: document.getElementById("h-email").value.trim(),
+        date: document.getElementById("h-date").value,
+        time: document.getElementById("h-time").value,
+        tz: document.getElementById("h-tz").value,
+        notes: ""
+      });
+      document.getElementById("hero-form-wrap").style.display = "none";
+      document.getElementById("hero-success").style.display = "block";
+      showToast("You're booked! Check your email.", "success");
+    } catch (err) {
+      console.error(err);
+      showToast("Something went wrong. Please try again.", "error");
+      btn.disabled = false;
+      btn.textContent = "Reserve My Free Call →";
+    }
+  }
+
+  async function handleCtaBook(e) {
+    e.preventDefault();
+    const btn = document.getElementById("cta-btn");
+    btn.disabled = true;
+    btn.textContent = "Booking your call...";
+    try {
+      const biz = document.getElementById("c-biz").value.trim();
+      await bookAppointment({
+        name: `Discovery Call — ${biz}`,
+        clientName: document.getElementById("c-name").value.trim(),
+        phone: document.getElementById("c-phone").value.trim(),
+        email: document.getElementById("c-email").value.trim(),
+        date: document.getElementById("c-date").value,
+        time: document.getElementById("c-time").value,
+        tz: document.getElementById("c-tz").value,
+        notes: document.getElementById("c-notes").value.trim()
+      });
+      document.getElementById("cta-form-wrap").style.display = "none";
+      document.getElementById("cta-success").style.display = "block";
+      showToast("You're booked! We'll be in touch within 2 hours.", "success");
+    } catch (err) {
+      console.error(err);
+      showToast("Something went wrong. Please try again.", "error");
+      btn.disabled = false;
+      btn.textContent = "Book My Free Strategy Call →";
+    }
+  }
+
+  setDefaultDate("h-date");
+  setDefaultDate("c-date");
+  setDefaultTz("h-tz");
+  setDefaultTz("c-tz");
+</script>
 </body>
 </html>
