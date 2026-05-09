@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign Document | Blu Balence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
+<style>
+:root {
+  --bg: #0a0f1a;
+  --surface: #111827;
+  --surface-2: #1a2236;
+  --surface-3: #0d1424;
+  --border: rgba(255,255,255,0.07);
+  --border-strong: rgba(255,255,255,0.14);
+  --text: #f0f4ff;
+  --text-sub: #8b93a7;
+  --accent: #3b82f6;
+  --accent-dim: rgba(59,130,246,0.12);
+  --accent-border: rgba(59,130,246,0.35);
+  --accent-hover: #2563eb;
+  --green: #10b981;
+  --green-dim: rgba(16,185,129,0.1);
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.2);
+  --shadow-lg: 0 24px 64px rgba(0,0,0,0.5);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+@media (max-width: 768px) { html, body { overflow: auto; } }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.app { display: flex; flex-direction: column; height: 100dvh; }
+
+.header {
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+
+.header-brand { display: flex; align-items: center; gap: 10px; }
+
+.header-logo {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: white; letter-spacing: -0.5px;
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.4), 0 4px 12px rgba(59,130,246,0.25);
+}
+
+.header-name { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+.header-divider { width: 1px; height: 16px; background: var(--border-strong); margin: 0 4px; }
+.header-doc-title { font-size: 13px; color: var(--text-sub); font-weight: 400; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.header-right { display: flex; align-items: center; gap: 14px; }
+
+#pageInfo {
+  font-size: 12px; color: var(--text-sub); font-weight: 400;
+  background: var(--surface-2); padding: 4px 10px;
+  border-radius: 6px; border: 1px solid var(--border);
+}
+
+.btn-finish {
+  background: var(--accent); color: #fff; border: none;
+  padding: 9px 20px; border-radius: var(--radius);
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; letter-spacing: -0.01em;
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.5), 0 4px 14px rgba(59,130,246,0.3);
+}
+.btn-finish:hover:not(:disabled) { background: var(--accent-hover); box-shadow: 0 0 0 1px rgba(59,130,246,0.6), 0 6px 18px rgba(59,130,246,0.35); transform: translateY(-1px); }
+.btn-finish:active:not(:disabled) { transform: translateY(0); }
+.btn-finish:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; transform: none; }
+
+.main { flex: 1; display: grid; grid-template-columns: 1fr 272px; overflow: hidden; }
+
+@media (max-width: 768px) {
+  .main { grid-template-columns: 1fr; }
+  .side { display: none; }
+  .header { height: auto; padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
+  .btn-finish { width: 100%; justify-content: center; }
+}
+
+.pdf-panel { display: flex; flex-direction: column; background: #1c1c1e; overflow: hidden; }
+
+.pdf-toolbar {
+  padding: 10px 16px; background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; gap: 6px; align-items: center; justify-content: center;
+}
+
+.btn-zoom {
+  background: var(--surface-2); border: 1px solid var(--border-strong);
+  color: var(--text-sub); padding: 6px 14px; border-radius: 7px;
+  font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: all 0.12s; display: flex; align-items: center; gap: 5px;
+}
+.btn-zoom:hover { background: var(--surface-3); color: var(--text); }
+
+.viewer-wrap {
+  flex: 1; padding: 28px 20px; overflow-y: auto; overflow-x: hidden;
+  height: 100%; -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.viewer-wrap::-webkit-scrollbar { width: 5px; }
+.viewer-wrap::-webkit-scrollbar-track { background: transparent; }
+.viewer-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
+
+#viewer { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100%; }
+
+.side {
+  background: var(--surface); border-left: 1px solid var(--border);
+  padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
+}
+
+.side-section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text-sub); margin-bottom: 10px;
+}
+
+.signer-card { background: var(--surface-2); border-radius: var(--radius); padding: 14px; border: 1px solid var(--border); }
+
+.signer-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; margin-bottom: 10px;
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.3);
+}
+
+#signerName { font-weight: 600; font-size: 14px; color: var(--text); }
+#signerEmail { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+
+.status-pill {
+  display: inline-flex; align-items: center; gap: 5px; margin-top: 10px;
+  background: var(--green-dim); border: 1px solid rgba(16,185,129,0.2);
+  color: var(--green); font-size: 11px; font-weight: 600;
+  padding: 3px 9px; border-radius: 99px;
+}
+.status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+
+.side-tip {
+  font-size: 12px; color: var(--text-sub); line-height: 1.65;
+  padding: 12px 14px; background: var(--surface-2);
+  border-radius: var(--radius); border: 1px solid var(--border);
+}
+
+.progress-section { background: var(--surface-2); border-radius: var(--radius); padding: 14px; border: 1px solid var(--border); }
+.progress-label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 500; color: var(--text-sub); margin-bottom: 8px; }
+.progress-bar { height: 4px; background: var(--border-strong); border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+
+.footer {
+  height: 40px; padding: 0 24px; background: var(--surface);
+  border-top: 1px solid var(--border); display: flex; align-items: center;
+  justify-content: center; font-size: 11px; color: var(--text-sub);
+  letter-spacing: 0.02em; gap: 8px;
+}
+.footer-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border-strong); }
+
+.page-container {
+  position: relative; margin-bottom: 16px; background: #fff;
+  border-radius: 6px; box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 4px 24px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+
+.field { position: absolute; z-index: 1000; pointer-events: auto; }
+
+.field[data-type="signature"], .field[data-type="initials"] {
+  background: rgba(59,130,246,0.08); border: 1.5px dashed rgba(59,130,246,0.5);
+  overflow: hidden; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; border-radius: 6px; transition: all 0.15s;
+}
+.field[data-type="signature"]:hover, .field[data-type="initials"]:hover {
+  background: rgba(59,130,246,0.14); border-color: rgba(59,130,246,0.8);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+}
+.field[data-type="initials"], .field[data-type="name"], .field[data-type="date"] {
+  background: rgba(59,130,246,0.08); border: 1.5px dashed rgba(59,130,246,0.5);
+  overflow: hidden; display: flex; align-items: center; justify-content: center; border-radius: 6px;
+}
+
+.signature-display-img { position: absolute; inset: 0; margin: auto; max-width: 90%; max-height: 80%; object-fit: contain; display: none; }
+.signature-placeholder {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 10px; font-weight: 600; color: #3b82f6; opacity: 0.7;
+  pointer-events: none; white-space: nowrap; letter-spacing: 0.04em; text-transform: uppercase;
+}
+
+#esignModal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  z-index: 2147483646; display: flex; align-items: center;
+  justify-content: center; backdrop-filter: blur(8px);
+}
+
+.consent-card {
+  background: var(--surface); padding: 40px 36px; border-radius: 20px;
+  width: 90%; max-width: 420px; text-align: center;
+  box-shadow: var(--shadow-lg), 0 0 0 1px var(--border);
+  display: flex; flex-direction: column; gap: 20px; border: 1px solid var(--border-strong);
+}
+
+.consent-icon {
+  width: 52px; height: 52px; background: var(--accent-dim);
+  border: 1px solid var(--accent-border); border-radius: 14px;
+  display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 24px;
+}
+
+.consent-card h2 { font-size: 20px; font-weight: 700; color: var(--text); line-height: 1.25; letter-spacing: -0.02em; }
+.consent-card p { font-size: 13px; color: var(--text-sub); line-height: 1.65; }
+
+.consent-checkbox-row {
+  display: flex; gap: 10px; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer;
+  padding: 13px 16px; background: var(--surface-2);
+  border-radius: var(--radius); border: 1px solid var(--border-strong); transition: all 0.12s;
+}
+.consent-checkbox-row:hover { border-color: var(--accent-border); background: var(--accent-dim); }
+.consent-checkbox-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+
+.btn-start {
+  background: var(--accent); color: #fff; border: none; padding: 13px 24px;
+  border-radius: var(--radius); font-family: inherit; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; letter-spacing: -0.01em;
+  box-shadow: 0 4px 14px rgba(59,130,246,0.35);
+}
+.btn-start:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.45); }
+.btn-start:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
+
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2147483647; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+
+#sigModal { position: fixed !important; inset: 0 !important; z-index: 2147483647 !important; display: none; align-items: center; justify-content: center; }
+
+.modal-content {
+  background: var(--surface); width: 90%; max-width: 520px; padding: 28px;
+  border-radius: 18px; box-shadow: var(--shadow-lg), 0 0 0 1px var(--border-strong);
+  border: 1px solid var(--border-strong);
+}
+
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.modal-title { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+
+.modal-tabs {
+  display: flex; gap: 3px; background: var(--surface-2); padding: 3px;
+  border-radius: 8px; margin-bottom: 14px; border: 1px solid var(--border);
+}
+
+.tab-btn { flex: 1; padding: 7px 16px; border: none; background: transparent; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; color: var(--text-sub); border-radius: 6px; transition: all 0.15s; }
+.tab-btn.active { background: var(--surface-3); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+
+.sig-area {
+  border: 1.5px solid var(--border-strong); border-radius: var(--radius);
+  margin-bottom: 14px; height: 180px; position: relative; background: #ffffff; overflow: hidden;
+}
+.sig-area::after { content: ''; position: absolute; bottom: 40px; left: 8%; right: 8%; height: 1px; background: rgba(0,0,0,0.07); pointer-events: none; }
+
+#modal-canvas { width: 100%; height: 100%; cursor: crosshair; touch-action: none; -ms-touch-action: none; overscroll-behavior: contain; display: block; }
+
+#typed-sig-input { width: 100%; height: 100%; border: none; font-family: 'Dancing Script', cursive; font-size: 46px; text-align: center; outline: none; background: transparent; color: #0a0f1a; padding: 16px; }
+
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; }
+
+.btn-modal { background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text-sub); padding: 9px 16px; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.12s; }
+.btn-modal:hover { background: var(--surface-3); color: var(--text); }
+.btn-modal.primary { background: var(--accent); color: #fff; border-color: transparent; box-shadow: 0 2px 8px rgba(59,130,246,0.3); }
+.btn-modal.primary:hover { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(59,130,246,0.4); }
+
+@media (max-width: 768px) {
+  .modal-content { width: 100%; height: 100%; max-width: none; border-radius: 0; display: flex; flex-direction: column; justify-content: center; }
+  .sig-area { height: 52vh; }
+  #typed-sig-input { font-size: 36px; }
+}
+
+.field input[type="text"], .field input[type="number"] { width: 100%; height: 100%; border: none; background: transparent; padding: 4px 6px; font-family: inherit; font-size: 13px; color: #111; outline: none; }
+.field input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); }
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="header-brand">
+      <div class="header-logo">B</div>
+      <span class="header-name">Blu Balence</span>
+      <div class="header-divider"></div>
+      <span class="header-doc-title" id="headerDocTitle">Loading document…</span>
+    </div>
+    <div class="header-right">
+      <span id="pageInfo">—</span>
+      <button class="btn-finish" id="finishBtn" disabled>Finish &amp; Submit</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="pdf-panel">
+      <div class="pdf-toolbar">
+        <button class="btn-zoom" id="zoomOutBtn">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><rect y="5" width="12" height="2" rx="1"/></svg>Zoom Out
+        </button>
+        <button class="btn-zoom" id="zoomInBtn">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><rect y="5" width="12" height="2" rx="1"/><rect x="5" width="2" height="12" rx="1"/></svg>Zoom In
+        </button>
+      </div>
+      <div class="viewer-wrap"><div id="viewer"></div></div>
+    </div>
+
+    <aside class="side">
+      <div>
+        <div class="side-section-label">Signer</div>
+        <div class="signer-card">
+          <div class="signer-avatar" id="signerAvatar">—</div>
+          <div id="signerName"></div>
+          <div id="signerEmail"></div>
+          <div class="status-pill"><span class="status-dot"></span> Pending Signature</div>
+        </div>
+      </div>
+      <div>
+        <div class="side-section-label">Progress</div>
+        <div class="progress-section">
+          <div class="progress-label"><span>Fields completed</span><span id="progressText">0 / 0</span></div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="side-section-label">Instructions</div>
+        <p class="side-tip">Click any highlighted field to add your signature, initials, or information. All required fields must be completed before you can submit.</p>
+      </div>
+    </aside>
+  </div>
+
+  <div class="footer">
+    <span>Secured by Blu Balence</span>
+    <span class="footer-dot"></span>
+    <span>Electronic Signature System</span>
+    <span class="footer-dot"></span>
+    <span>256-bit Encrypted</span>
+  </div>
+
+</div>
+
+<div id="esignModal">
+  <div class="consent-card">
+    <div class="consent-icon">✍️</div>
+    <h2>Electronic Signature Consent</h2>
+    <p>By proceeding, you agree to sign this document electronically. Your electronic signature is legally binding and has the same validity as a handwritten signature.</p>
+    <label class="consent-checkbox-row">
+      <input type="checkbox" id="esignCheckbox">
+      I agree to sign this document electronically
+    </label>
+    <button id="startSigningBtn" class="btn-start" disabled>Continue to Document</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="sigModal">
+  <div class="modal-content">
+    <div class="modal-header"><span class="modal-title" id="modalTitle">Add Signature</span></div>
+    <div class="modal-tabs">
+      <button class="tab-btn active" onclick="switchTab('draw', event)">Draw</button>
+      <button class="tab-btn" onclick="switchTab('type', event)">Type</button>
+    </div>
+    <div id="draw-view" class="sig-area"><canvas id="modal-canvas"></canvas></div>
+    <div id="type-view" class="sig-area" style="display:none;"><input type="text" id="typed-sig-input" placeholder="Type your signature…"></div>
+    <div class="modal-footer">
+      <button class="btn-modal" onclick="closeModal()">Cancel</button>
+      <button class="btn-modal" onclick="clearModal()">Clear</button>
+      <button class="btn-modal primary" id="insertSigBtn">Insert</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://rfdvogakvyodixgpvqvz.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E";
+const AUDIT_EVENT_WEBHOOK = "https://rfdvogakvyodixgpvqvz.supabase.co/functions/v1/log-audit-event";
+
+async function sendAuditEvent(eventType) {
+  try {
+    await fetch(AUDIT_EVENT_WEBHOOK, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": SUPABASE_ANON, "Authorization": `Bearer ${SUPABASE_ANON}` },
+      body: JSON.stringify({ event_type: eventType, ip_address: null, doc_id: record?.doc_id || null, signer_id: record?.id || null, signer_email: record?.email || null, user_agent: navigator.userAgent })
+    });
+  } catch (err) { console.warn("Audit event failed:", err); }
+}
+
+let pdfDoc = null, currentScale = 1, currentPdfUrl = null, fields = [], record = null, jiraCode = null, activeFieldEl = null, esignAccepted = false;
+const sigModal = document.getElementById('sigModal');
+const modalCanvas = document.getElementById('modal-canvas');
+const mCtx = modalCanvas.getContext('2d');
+let isDrawing = false, currentTab = 'draw';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+async function renderAllPages(url) {
+  currentPdfUrl = url;
+  pdfDoc = await pdfjsLib.getDocument(url).promise;
+  const viewer = document.getElementById("viewer");
+  viewer.innerHTML = "";
+  if (currentScale === 1) {
+    const firstPage = await pdfDoc.getPage(1);
+    const viewport = firstPage.getViewport({ scale: 1 });
+    const availableWidth = document.querySelector(".pdf-panel").clientWidth - 40;
+    currentScale = availableWidth / viewport.width;
+  }
+  for (let p = 1; p <= pdfDoc.numPages; p++) {
+    const page = await pdfDoc.getPage(p);
+    const viewport = page.getViewport({ scale: currentScale });
+    const wrap = document.createElement("div");
+    wrap.className = "page-container";
+    wrap.style.width = viewport.width + "px";
+    wrap.style.height = viewport.height + "px";
+    const canvas = document.createElement("canvas");
+    canvas.width = viewport.width; canvas.height = viewport.height;
+    await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+    wrap.appendChild(canvas);
+    viewer.appendChild(wrap);
+    const signerId = Number(record.signer_order || 1);
+    fields.filter(f => f.page === p).forEach(f => {
+      if (Number(f.signer_order) !== signerId) return;
+      const el = document.createElement("div");
+      el.style.pointerEvents = "auto"; el.className = "field";
+      el.dataset.type = f.type; el.dataset.fieldId = f.id;
+      const pageW = viewport.width, pageH = viewport.height;
+      if (!pageW || !pageH) return;
+      el.style.left   = (Number(f.xPct ?? 0) * pageW) + "px";
+      el.style.top    = (Number(f.yPct ?? 0) * pageH) + "px";
+      el.style.width  = (Number(f.wPct ?? 0.15) * pageW) + "px";
+      el.style.height = (Number(f.hPct ?? 0.04) * pageH) + "px";
+      if (f.type === "signature" || f.type === "initials") {
+        el.innerHTML = `<div class="signature-placeholder">${f.type === "initials" ? "Initials" : "Sign here"}</div><img class="signature-display-img" style="display:none;width:100%;height:100%;object-fit:contain;pointer-events:none;" />`;
+        el.addEventListener("pointerdown", (e) => { e.preventDefault(); e.stopPropagation(); openModal(el); }, true);
+      } else if (f.type === "text" || f.type === "address") {
+        el.innerHTML = `<input type="text" style="width:100%;height:100%;border:none;padding:4px 6px;font-size:13px;background:transparent;font-family:inherit;">`;
+      } else if (f.type === "ssn") {
+        el.innerHTML = `<input type="text" pattern="[0-9]*" inputmode="numeric" maxlength="11" placeholder="XXX-XX-XXXX" style="width:100%;height:100%;border:none;padding:4px 6px;font-size:13px;background:transparent;font-family:inherit;">`;
+        el.querySelector("input").addEventListener("input", (e) => { let v = e.target.value.replace(/\D/g,""); if(v.length>3&&v.length<=5)v=v.slice(0,3)+"-"+v.slice(3); else if(v.length>5)v=v.slice(0,3)+"-"+v.slice(3,5)+"-"+v.slice(5,9); e.target.value=v.slice(0,11); validateAllFields(); });
+      } else if (f.type === "ein") {
+        el.innerHTML = `<input type="text" pattern="[0-9]*" inputmode="numeric" maxlength="10" placeholder="XX-XXXXXXX" style="width:100%;height:100%;border:none;padding:4px 6px;font-size:13px;background:transparent;font-family:inherit;">`;
+        el.querySelector("input").addEventListener("input", (e) => { let v = e.target.value.replace(/\D/g,""); if(v.length>2)v=v.slice(0,2)+"-"+v.slice(2,9); e.target.value=v.slice(0,10); validateAllFields(); });
+      } else if (f.type === "checkbox") {
+        el.innerHTML = `<input type="checkbox" style="width:18px;height:18px;cursor:pointer;accent-color:var(--accent);">`;
+      } else if (f.type === "date") {
+        el.innerHTML = `<input type="text" inputmode="numeric" maxlength="10" placeholder="MM/DD/YYYY" style="width:100%;height:100%;border:none;text-align:center;font-size:13px;background:transparent;font-family:inherit;">`;
+        el.querySelector("input").addEventListener("input", (e) => { let v = e.target.value.replace(/\D/g,""); if(v.length>2&&v.length<=4)v=v.slice(0,2)+"/"+v.slice(2); else if(v.length>4)v=v.slice(0,2)+"/"+v.slice(2,4)+"/"+v.slice(4,8); e.target.value=v.slice(0,10); validateAllFields(); });
+      } else if (f.type === "name") {
+        el.innerHTML = `<input type="text" value="${record?.name||""}" style="width:100%;height:100%;border:none;text-align:center;font-weight:500;font-size:13px;background:transparent;font-family:inherit;">`;
+      }
+      wrap.appendChild(el);
+      const input = el.querySelector("input");
+      if (input) input.addEventListener("input", validateAllFields);
+    });
+  }
+  document.getElementById("pageInfo").textContent = `${pdfDoc.numPages} page${pdfDoc.numPages!==1?'s':''}`;
+  setTimeout(validateAllFields, 200);
+}
+
+function openModal(fieldEl) {
+  if (!esignAccepted) return;
+  document.body.style.overflow = "hidden"; document.documentElement.style.overflow = "hidden";
+  activeFieldEl = fieldEl; sigModal.style.display = 'flex'; resizeModalCanvas();
+  mCtx.lineWidth = 2.5; mCtx.lineJoin = "round"; mCtx.lineCap = "round"; mCtx.strokeStyle = "#0a0f1a";
+  const isInitials = activeFieldEl?.dataset?.type === "initials";
+  const typedInput = document.getElementById('typed-sig-input');
+  if (isInitials) {
+    document.getElementById('modalTitle').textContent = "Add Initials";
+    currentTab = "type";
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-btn')[1]?.classList.add('active');
+    document.getElementById('draw-view').style.display = 'none';
+    document.getElementById('type-view').style.display = 'block';
+    const parts = (record?.name||"").trim().split(/\s+/).filter(Boolean);
+    typedInput.value = parts.length>=2 ? (parts[0][0]||"").toUpperCase()+(parts[parts.length-1][0]||"").toUpperCase() : (parts[0]?.[0]||"").toUpperCase();
+  } else {
+    document.getElementById('modalTitle').textContent = "Add Signature";
+    typedInput.placeholder = "Type your name…";
+    if (record?.name) typedInput.value = record.name;
+  }
+}
+
+function closeModal() { document.body.style.overflow=""; document.documentElement.style.overflow=""; sigModal.style.display='none'; clearModal(); }
+function clearModal() { mCtx.clearRect(0,0,modalCanvas.width,modalCanvas.height); document.getElementById('typed-sig-input').value=""; }
+
+function switchTab(tab, event) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(event?.target) event.target.classList.add('active');
+  document.getElementById('draw-view').style.display = tab==='draw'?'block':'none';
+  document.getElementById('type-view').style.display = tab==='type'?'block':'none';
+  if(tab==="type"){ const input=document.getElementById('typed-sig-input'); if(!input.value&&record?.name)input.value=record.name; setTimeout(()=>input.focus(),50); }
+}
+
+function applySignature() {
+  const imgEl = activeFieldEl.querySelector('.signature-display-img');
+  const placeholder = activeFieldEl.querySelector('.signature-placeholder');
+  const isInitials = activeFieldEl?.dataset?.type === "initials";
+  const tmpCanvas = document.createElement('canvas');
+  if (isInitials) {
+    tmpCanvas.width=300; tmpCanvas.height=150;
+    const tCtx=tmpCanvas.getContext('2d'); tCtx.font="italic 80px 'Dancing Script'"; tCtx.textAlign="center"; tCtx.textBaseline="middle"; tCtx.fillStyle="#0a0f1a";
+    tCtx.fillText((document.getElementById('typed-sig-input').value||"").toUpperCase().slice(0,2),150,75);
+    imgEl.src=tmpCanvas.toDataURL();
+  } else if (currentTab==='draw') {
+    imgEl.src=modalCanvas.toDataURL();
+  } else {
+    tmpCanvas.width=600; tmpCanvas.height=200;
+    const tCtx=tmpCanvas.getContext('2d'); tCtx.font="italic 72px 'Dancing Script'"; tCtx.textAlign="center"; tCtx.textBaseline="middle"; tCtx.fillStyle="#0a0f1a";
+    tCtx.fillText(document.getElementById('typed-sig-input').value,300,100);
+    imgEl.src=tmpCanvas.toDataURL();
+  }
+  imgEl.style.display='block';
+  if(placeholder) placeholder.style.display='none';
+  activeFieldEl.style.background="rgba(16,185,129,0.06)";
+  activeFieldEl.style.border="1.5px solid rgba(16,185,129,0.4)";
+  closeModal(); validateAllFields(); sendAuditEvent("added_signature");
+}
+
+function resizeModalCanvas() {
+  const rect=modalCanvas.getBoundingClientRect(); modalCanvas.width=rect.width; modalCanvas.height=rect.height;
+  mCtx.lineWidth=2.5; mCtx.lineCap="round"; mCtx.lineJoin="round"; mCtx.strokeStyle="#0a0f1a";
+}
+function getPointerPos(e) { const rect=modalCanvas.getBoundingClientRect(); return { x:(e.clientX-rect.left)*(modalCanvas.width/rect.width), y:(e.clientY-rect.top)*(modalCanvas.height/rect.height) }; }
+
+modalCanvas.addEventListener("pointerdown",(e)=>{e.preventDefault();isDrawing=true;mCtx.beginPath();const pos=getPointerPos(e);mCtx.moveTo(pos.x,pos.y);});
+modalCanvas.addEventListener("pointermove",(e)=>{if(!isDrawing)return;e.preventDefault();const pos=getPointerPos(e);mCtx.lineTo(pos.x,pos.y);mCtx.stroke();});
+modalCanvas.addEventListener("pointerup",()=>{isDrawing=false;validateAllFields();});
+modalCanvas.addEventListener("pointerleave",()=>{isDrawing=false;});
+
+async function applyFieldsToPdfNative(pdfUrl,completedFields){const pdfBytes=await fetch(pdfUrl).then(r=>r.arrayBuffer());const doc=await PDFLib.PDFDocument.load(pdfBytes);const pages=doc.getPages();const font=await doc.embedFont(PDFLib.StandardFonts.Helvetica);for(const f of completedFields){if(!f.page)continue;const page=pages[f.page-1];const{width,height}=page.getSize();const x=f.xPct*width;const y=height-(f.yPct*height)-(f.hPct*height);if(f.image){const base64=String(f.image).split(",")[1];if(base64){const imgBytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));const img=await doc.embedPng(imgBytes);page.drawImage(img,{x,y,width:f.wPct*width,height:f.hPct*height});}}if(f.value)page.drawText(String(f.value),{x:x+2,y:y+4,size:12,font,color:PDFLib.rgb(0,0,0)});}return await doc.save();}
+async function flattenPdfWithSignatures(pdfUrl,completedFields){const pdfBytes=await fetch(pdfUrl).then(r=>r.arrayBuffer());const doc=await PDFLib.PDFDocument.load(pdfBytes);const pages=doc.getPages();const font=await doc.embedFont(PDFLib.StandardFonts.Helvetica);for(const field of completedFields){if(!field.page)continue;const page=pages[field.page-1];const{width,height}=page.getSize();const x=field.xPct*width;const y=height-(field.yPct*height)-(field.hPct*height);if(field.image){const base64=field.image.split(",")[1];const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));const img=await doc.embedPng(bytes);page.drawImage(img,{x,y,width:field.wPct*width,height:field.hPct*height});}if(field.value)page.drawText(String(field.value),{x:x+2,y:y+4,size:14,font,color:PDFLib.rgb(0,0,0)});}return await doc.save();}
+async function sha256HexFromBytes(bytes){const hashBuf=await crypto.subtle.digest("SHA-256",bytes);return Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,"0")).join("");}
+
+const token = new URLSearchParams(location.search).get("token");
+function isW9Document(){const w9=/w[\s\-_]*9/i;return w9.test(String(record?.title||""))||w9.test(String(record?.pdf_url||""))||w9.test(String(record?.current_pdf_url||""))||w9.test(String(record?.final_pdf_url||""));}
+
+async function boot() {
+  if (!token) { document.getElementById("pageInfo").textContent="Missing token."; return; }
+  try {
+    const signerData = await fetch(`${SUPABASE_URL}/rest/v1/signers?token=eq.${token}&select=*`,{headers:{apikey:SUPABASE_ANON,Authorization:`Bearer ${SUPABASE_ANON}`}}).then(r=>r.json());
+    if (!signerData||signerData.length===0) { document.getElementById("pageInfo").textContent="Invalid or expired link."; return; }
+    record = signerData[0];
+    if (record.status==="signed"||record.status==="completed") document.getElementById("finishBtn").style.display="none";
+    record.all_signers = await fetch(`${SUPABASE_URL}/rest/v1/signers?doc_id=eq.${record.doc_id}&select=id,name,email,token,signer_order`,{headers:{apikey:SUPABASE_ANON,Authorization:`Bearer ${SUPABASE_ANON}`}}).then(r=>r.json())||[];
+    const docData = await fetch(`${SUPABASE_URL}/rest/v1/signer_documents?doc_id=eq.${record.doc_id}&select=*`,{headers:{apikey:SUPABASE_ANON,Authorization:`Bearer ${SUPABASE_ANON}`}}).then(r=>r.json());
+    if (!docData||docData.length===0) { document.getElementById("pageInfo").textContent="Document not found."; return; }
+    const documentRow = docData[0];
+    jiraCode = documentRow.jira_code||null;
+    record.title = documentRow.title||"Untitled Document";
+    record.pdf_url = documentRow.pdf_url;
+    record.template = documentRow.template||null;
+    record.current_pdf_url = documentRow.current_pdf_url||null;
+    record.final_pdf_url = documentRow.final_pdf_url||null;
+    document.getElementById("headerDocTitle").textContent = record.title;
+    document.title = `Sign – ${record.title} | Blu Balence`;
+    const rawFields = await fetch(`${SUPABASE_URL}/rest/v1/document_fields?doc_id=eq.${record.doc_id}&select=*`,{headers:{apikey:SUPABASE_ANON,Authorization:`Bearer ${SUPABASE_ANON}`}}).then(r=>r.json());
+    const toRatio=(v)=>{const n=Number(v??0);return n>1?n/100:n;};
+    fields = rawFields.map(f=>({id:String(f.id),signer_order:Number(f.signer_order??1),type:String(f.field_type||f.type||"").toLowerCase(),page:Number(f.page??1),xPct:toRatio(f.xpct??f.x_pct),yPct:toRatio(f.ypct??f.y_pct),wPct:toRatio(f.wpct??f.w_pct??15),hPct:toRatio(f.hpct??f.h_pct??4),value:f.value||""}));
+    document.getElementById("signerName").textContent = record.name||"";
+    document.getElementById("signerEmail").textContent = record.email||"";
+    document.getElementById("signerAvatar").textContent = (record.name||"?").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+    const pdfUrl = documentRow.current_pdf_url||documentRow.final_pdf_url||documentRow.pdf_url;
+    if (!pdfUrl) { document.getElementById("pageInfo").textContent="Missing PDF."; return; }
+    await renderAllPages(pdfUrl);
+    await sendAuditEvent("viewed_document");
+    setTimeout(validateAllFields, 200);
+  } catch(err) { console.error("BOOT ERROR:",err); document.getElementById("pageInfo").textContent="Connection error."; }
+}
+
+const tokenParam = new URLSearchParams(window.location.search).get("token");
+const errorPage=(title,msg)=>`<div style="position:fixed;inset:0;background:#0a0f1a;color:white;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Inter',system-ui;padding:40px;"><div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:52px 44px;max-width:440px;"><div style="width:48px;height:48px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:20px;">✕</div><h2 style="font-size:22px;font-weight:700;margin-bottom:10px;letter-spacing:-0.02em;">${title}</h2><p style="opacity:.55;font-size:13px;line-height:1.65;">${msg}</p></div></div>`;
+
+if (!tokenParam) {
+  document.body.innerHTML = errorPage("Invalid Document Link","Please contact Blu Balence for a valid signing link.");
+} else {
+  fetch(`${SUPABASE_URL}/rest/v1/signers?token=eq.${tokenParam}&select=created_at,status`,{headers:{apikey:SUPABASE_ANON,Authorization:`Bearer ${SUPABASE_ANON}`}})
+  .then(r=>r.json())
+  .then(data=>{
+    if(!data||(Array.isArray(data)&&data.length===0)){document.body.innerHTML=errorPage("Document Not Found","This link is no longer valid.");return;}
+    const signer=data[0];
+    if((Date.now()-new Date(signer.created_at).getTime())>48*60*60*1000||signer.status==="completed"){document.body.innerHTML=errorPage("Link Expired","This signing session is no longer available. Please contact Blu Balence for a new link.");return;}
+    document.getElementById("zoomInBtn")?.addEventListener("click",async()=>{if(!pdfDoc||!currentPdfUrl)return;currentScale*=1.15;await renderAllPages(currentPdfUrl);});
+    document.getElementById("zoomOutBtn")?.addEventListener("click",async()=>{if(!pdfDoc||!currentPdfUrl)return;currentScale/=1.15;await renderAllPages(currentPdfUrl);});
+    boot();
+  })
+  .catch(()=>{ document.body.innerHTML=errorPage("Connection Error","Please try again or contact Blu Balence."); });
+}
+
+document.getElementById("esignCheckbox")?.addEventListener("change",(e)=>{document.getElementById("startSigningBtn").disabled=!e.target.checked;});
+document.getElementById("startSigningBtn")?.addEventListener("click",()=>{esignAccepted=true;document.getElementById("esignModal").style.display="none";setTimeout(()=>validateAllFields(),50);});
+
+function validateAllFields(){
+  let total=0,completed=0;
+  const signerId=Number(record?.signer_order??1);
+  document.querySelectorAll('.field').forEach(field=>{
+    const original=fields.find(f=>f.id===field.dataset.fieldId);
+    if(!original||Number(original.signer_order)!==signerId)return;
+    const type=field.dataset.type;
+    if(type==='checkbox')return;
+    total++;
+    const input=field.querySelector('input');
+    if(type==='signature'||type==='initials'){const img=field.querySelector('.signature-display-img');if(img&&img.src&&img.style.display!=="none")completed++;}
+    else if(type==='name'){if(input&&input.value.trim().length>=2)completed++;}
+    else if(type==='date'){if(input&&input.value.replace(/\D/g,"").length===8)completed++;}
+    else{if(input&&input.value.trim())completed++;}
+  });
+  const pct=total>0?Math.round((completed/total)*100):0;
+  document.getElementById("progressFill").style.width=pct+"%";
+  document.getElementById("progressText").textContent=`${completed} / ${total}`;
+  document.getElementById("finishBtn").disabled=!(esignAccepted&&(total===0||completed===total));
+}
+
+document.getElementById("finishBtn")?.addEventListener("click",async()=>{
+  const completedFields=[];
+  document.querySelectorAll(".field").forEach(field=>{
+    const type=field.dataset.type;
+    const original=fields.find(f=>f.id===field.dataset.fieldId);
+    if(!original)return;
+    const data={...original};
+    if(type==="signature"||type==="initials"){const img=field.querySelector(".signature-display-img");if(img?.src&&img.style.display!=="none")data.image=img.src;}
+    else{const input=field.querySelector("input");if(!input)return;if(input.type==="checkbox"){data.value=input.checked?"true":"";}else{if(input.value.trim())data.value=input.value.trim();}}
+    if(data.image||data.value)completedFields.push(data);
+  });
+  const basePdfUrl=record.current_pdf_url||record.final_pdf_url||record.pdf_url;
+  if(!basePdfUrl){alert("Missing base PDF.");return;}
+  let finalPdfBytes=isW9Document()?await applyFieldsToPdfNative(basePdfUrl,completedFields):await flattenPdfWithSignatures(basePdfUrl,completedFields);
+  const pdfSha256=await sha256HexFromBytes(finalPdfBytes);
+  let pdfBase64=null;
+  if(!isW9Document())pdfBase64=btoa(new Uint8Array(finalPdfBytes).reduce((s,b)=>s+String.fromCharCode(b),""));
+  const flattenedSigners={};
+  if(record.all_signers?.length)record.all_signers.forEach(s=>{flattenedSigners[`signer_${s.signer_order}_id`]=s.id;flattenedSigners[`signer_${s.signer_order}_name`]=s.name;flattenedSigners[`signer_${s.signer_order}_email`]=s.email;flattenedSigners[`signer_${s.signer_order}_token`]=s.token;});
+  const isLastSigner=record.all_signers&&record.signer_order===record.all_signers.length;
+  await sendAuditEvent("signed_document");
+  await fetch("https://hook.us1.make.com/nlj9t13xg4yhsmelk2a0eapchcpy7k76",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({signed_at:new Date().toISOString(),user_agent:navigator.userAgent,pdf_sha256:pdfSha256,title:record.title,status:isLastSigner?"completed":"signed",template:record.template,esign_consent:esignAccepted,esign_consent_at:esignAccepted?new Date().toISOString():null,token,doc_id:record.doc_id,signer_id:record.id,signer_order:record.signer_order,signer:record?.name||"unknown",email:record?.email||"unknown",jira:jiraCode||"UNSET",...flattenedSigners,fields:completedFields,w9_mode:isW9Document(),base_pdf_url:basePdfUrl,pdf_base64:pdfBase64})});
+  document.body.innerHTML=`<div style="position:fixed;inset:0;background:#0a0f1a;color:white;display:flex;align-items:center;justify-content:center;font-family:'Inter',system-ui;z-index:999999;padding:40px;"><div style="text-align:center;max-width:440px;"><div style="width:64px;height:64px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:28px;">✓</div><h1 style="font-size:26px;font-weight:700;margin-bottom:12px;letter-spacing:-0.02em;">Document Signed</h1><p style="color:rgba(255,255,255,0.5);font-size:14px;line-height:1.7;">This document has been securely completed and recorded by Blu Balence. For your protection, the signed document is no longer viewable on this device.</p></div></div>`;
+  document.documentElement.style.overflow="hidden"; document.body.style.overflow="hidden";
+});
+
+window.addEventListener("DOMContentLoaded",()=>{ document.getElementById("insertSigBtn")?.addEventListener("click",applySignature); });
+</script>
+</body>
+</html>
