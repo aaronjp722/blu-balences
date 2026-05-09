@@ -399,6 +399,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
+const WEBHOOK_URL = "https://hook.us1.make.com/e3av1w86ovv5w89fs3hwq50aln33oq3c";
 const SUPABASE_URL = "https://rfdvogakvyodixgpvqvz.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E";
 
@@ -489,6 +490,21 @@ async function saveAppointment() {
       await sbFetch("appointments", { method: "POST", body: JSON.stringify(payload) });
       showToast("Appointment created", "success");
     }
+    fetch(WEBHOOK_URL, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    action: id ? "updated" : "created",
+    name: payload.name,
+    client_name: payload.client_name,
+    phone: payload.phone,
+    email: payload.email,
+    notes: payload.notes,
+    appointment_utc: payload.appointment_utc,
+    timezone: payload.timezone,
+    appointment_id: id || null
+  })
+}).catch(err => console.warn("Webhook failed:", err));
     closeModal("appt-modal");
     await loadAppointments();
   } catch (e) { console.error(e); showToast("Failed to save appointment", "error"); }
