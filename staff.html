@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Dashboard | Blu Balence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0a1628; --navy2: #0f1f3d; --navy3: #162444;
+      --blue: #2563eb; --blue-light: #3b82f6; --blue-glow: rgba(37,99,235,0.18);
+      --green: #16a34a; --amber: #d97706; --red: #dc2626;
+      --purple: #7c3aed; --teal: #0d9488;
+      --text: #e2e8f0; --text-sub: #94a3b8; --text-dim: #64748b;
+      --border: rgba(255,255,255,0.08); --white: #ffffff;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      background: rgba(10,22,40,0.97);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { font-size: 18px; font-weight: 800; color: var(--white); letter-spacing: -0.5px; }
+    .logo span { color: var(--blue-light); }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 100px;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+    }
+
+    .page-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.8px;
+      margin-bottom: 6px;
+    }
+    .page-sub {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 40px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .link-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-decoration: none;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      cursor: pointer;
+    }
+    .link-card:hover {
+      border-color: rgba(59,130,246,0.4);
+      box-shadow: 0 0 24px var(--blue-glow);
+      transform: translateY(-2px);
+    }
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .card-body { flex: 1; min-width: 0; }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+    .card-desc {
+      font-size: 12px;
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+    .card-url {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 10px;
+      font-family: monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .icon-blue   { background: rgba(37,99,235,0.15);  color: #60a5fa; }
+    .icon-green  { background: rgba(22,163,74,0.15);  color: #4ade80; }
+    .icon-amber  { background: rgba(217,119,6,0.15);  color: #fbbf24; }
+    .icon-red    { background: rgba(220,38,38,0.15);  color: #f87171; }
+    .icon-purple { background: rgba(124,58,237,0.15); color: #a78bfa; }
+    .icon-teal   { background: rgba(13,148,136,0.15); color: #2dd4bf; }
+    .icon-slate  { background: rgba(100,116,139,0.15);color: #94a3b8; }
+
+    @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 580px) {
+      .grid { grid-template-columns: 1fr; }
+      main { padding: 32px 20px 60px; }
+      header { padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">Blu <span>Balence</span></div>
+    <div class="badge">Staff Only</div>
+  </div>
+</header>
+
+<main>
+  <div class="page-title">Staff Dashboard</div>
+  <div class="page-sub">Internal links — not for clients</div>
+
+  <!-- CLIENT-FACING -->
+  <div class="section-label">Client-Facing Pages</div>
+  <div class="grid">
+
+    <a href="/index.html" class="link-card">
+      <div class="card-icon icon-blue">&#127968;</div>
+      <div class="card-body">
+        <div class="card-title">Homepage</div>
+        <div class="card-desc">Main sales funnel with booking forms and pricing.</div>
+        <div class="card-url">/index.html</div>
+      </div>
+    </a>
+
+    <a href="/pricing.html" class="link-card">
+      <div class="card-icon icon-green">&#36;</div>
+      <div class="card-body">
+        <div class="card-title">Pricing</div>
+        <div class="card-desc">Standalone pricing page for sharing with prospects.</div>
+        <div class="card-url">/pricing.html</div>
+      </div>
+    </a>
+
+    <a href="/cancel.html" class="link-card">
+      <div class="card-icon icon-red">&#10005;</div>
+      <div class="card-body">
+        <div class="card-title">Cancel Appointment</div>
+        <div class="card-desc">Linked from confirmation emails. Deletes appointment from Supabase.</div>
+        <div class="card-url">/cancel.html</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- OPERATIONS -->
+  <div class="section-label">Operations & Documents</div>
+  <div class="grid">
+
+    <a href="/calendar.html" class="link-card">
+      <div class="card-icon icon-blue">&#128197;</div>
+      <div class="card-body">
+        <div class="card-title">Appointment Calendar</div>
+        <div class="card-desc">View and manage all scheduled discovery calls.</div>
+        <div class="card-url">/calendar.html</div>
+      </div>
+    </a>
+
+    <a href="/document-creation.html" class="link-card">
+      <div class="card-icon icon-amber">&#128196;</div>
+      <div class="card-body">
+        <div class="card-title">Document Creation</div>
+        <div class="card-desc">Generate client documents and agreements.</div>
+        <div class="card-url">/document-creation.html</div>
+      </div>
+    </a>
+
+    <a href="/contract-template.html" class="link-card">
+      <div class="card-icon icon-amber">&#128221;</div>
+      <div class="card-body">
+        <div class="card-title">Contract Template</div>
+        <div class="card-desc">Standard service agreement template for new clients.</div>
+        <div class="card-url">/contract-template.html</div>
+      </div>
+    </a>
+
+    <a href="/sign-document.html" class="link-card">
+      <div class="card-icon icon-purple">&#9998;</div>
+      <div class="card-body">
+        <div class="card-title">Sign Document</div>
+        <div class="card-desc">Client-facing e-signature page for contracts.</div>
+        <div class="card-url">/sign-document.html</div>
+      </div>
+    </a>
+
+    <a href="/blu_balence_email_contacts.html" class="link-card">
+      <div class="card-icon icon-teal">&#9993;</div>
+      <div class="card-body">
+        <div class="card-title">Email Contacts</div>
+        <div class="card-desc">Client email list and contact management.</div>
+        <div class="card-url">/blu_balence_email_contacts.html</div>
+      </div>
+    </a>
+
+    <a href="/blu-balence-calculator.html" class="link-card">
+      <div class="card-icon icon-green">&#128200;</div>
+      <div class="card-body">
+        <div class="card-title">Pricing Calculator</div>
+        <div class="card-desc">Internal tool for estimating client monthly rates.</div>
+        <div class="card-url">/blu-balence-calculator.html</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- ACCOUNT -->
+  <div class="section-label">Account</div>
+  <div class="grid">
+
+    <a href="/Login.html" class="link-card">
+      <div class="card-icon icon-slate">&#128274;</div>
+      <div class="card-body">
+        <div class="card-title">Login</div>
+        <div class="card-desc">Staff login portal connected to Supabase authentication.</div>
+        <div class="card-url">/Login.html</div>
+      </div>
+    </a>
+
+  </div>
+</main>
+
+</body>
+</html>
