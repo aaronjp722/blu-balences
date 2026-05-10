@@ -83,6 +83,26 @@
     .loading-overlay.show { display: flex; }
     .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── IMPORT MODAL ── */
+    .import-modal { max-width: 540px; }
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 36px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      margin-bottom: 18px;
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--primary); background: rgba(59,130,246,.05); }
+    .drop-zone p { font-size: 13px; color: var(--text-sub); margin-top: 8px; }
+    .drop-zone strong { font-size: 14px; color: var(--text); }
+    .import-preview { background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; font-size: 12px; color: var(--text-sub); line-height: 1.7; margin-bottom: 16px; max-height: 160px; overflow-y: auto; }
+    .import-preview strong { color: var(--success); }
+    .col-hint { font-size: 11px; color: var(--text-dim); margin-top: 10px; line-height: 1.6; }
+    .col-hint code { background: var(--surface2); padding: 1px 5px; border-radius: 4px; color: var(--text-sub); font-size: 11px; }
+
     ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     @media (max-width: 700px) { .form-row { grid-template-columns: 1fr; } .main { padding: 20px 14px; } table { font-size: 12px; } thead th, tbody td { padding: 10px 10px; } }
   </style>
@@ -94,6 +114,7 @@
   <div class="logo-sep"></div>
   <span class="topbar-title">Email System</span>
   <div class="topbar-spacer"></div>
+  <button class="btn btn-ghost" onclick="openImportModal()">&#8613; Import CSV</button>
   <button class="btn btn-primary" onclick="openNewModal()">+ Add Contact</button>
 </div>
 
@@ -170,6 +191,36 @@
   </div>
 </div>
 
+<!-- IMPORT MODAL -->
+<div class="modal-backdrop" id="import-modal">
+  <div class="modal import-modal">
+    <div class="modal-header">
+      <span class="modal-title">Import Contacts</span>
+      <button class="modal-close" onclick="closeImportModal()">&#215;</button>
+    </div>
+
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('csv-file').click()">
+      <div style="font-size:28px;color:var(--primary);">&#8613;</div>
+      <strong>Click to select a CSV file</strong>
+      <p>or drag and drop it here</p>
+      <input type="file" id="csv-file" accept=".csv,text/csv" style="display:none" onchange="handleFileSelect(event)">
+    </div>
+
+    <div class="col-hint">
+      Expected columns (header row required):<br>
+      <code>contact_name</code> &nbsp;<code>email</code> &nbsp;<code>company_name</code> &nbsp;<code>stage</code> &nbsp;<code>notes</code><br>
+      Only <code>contact_name</code> and <code>email</code> are required. Column order doesn't matter.
+    </div>
+
+    <div id="import-preview" class="import-preview" style="display:none;margin-top:16px;"></div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeImportModal()">Cancel</button>
+      <button class="btn btn-primary" id="import-btn" onclick="runImport()" disabled>Import Contacts</button>
+    </div>
+  </div>
+</div>
+
 <div class="loading-overlay" id="loading"><div class="spinner"></div></div>
 <div class="toast" id="toast"></div>
 
@@ -194,7 +245,11 @@ async function sbFetch(path, opts = {}) {
 }
 
 let contacts = [];
+let parsedRows = [];
 
+/* ================================
+   CONTACTS
+================================ */
 function stageBadge(stage) {
   return stage ? `<span class="stage-badge">${esc(stage)}</span>` : `<span style="color:var(--text-dim);font-size:12px;">—</span>`;
 }
@@ -216,7 +271,6 @@ async function loadContacts() {
 function renderTable() {
   const q = document.getElementById("search-input").value.toLowerCase();
   const stageFilter = document.getElementById("stage-filter").value.toLowerCase();
-
   const filtered = contacts.filter(c => {
     const matchQ = !q ||
       (c.contact_name || "").toLowerCase().includes(q) ||
@@ -225,13 +279,11 @@ function renderTable() {
     const matchStage = !stageFilter || (c.stage || "").toLowerCase().includes(stageFilter);
     return matchQ && matchStage;
   });
-
   const tbody = document.getElementById("contact-tbody");
-  if (filtered.length === 0) {
+  if (!filtered.length) {
     tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><strong>No contacts found</strong><p>Add a contact or adjust your filters.</p></div></td></tr>`;
     return;
   }
-
   tbody.innerHTML = filtered.map(c => `
     <tr>
       <td class="td-name">${esc(c.contact_name || "—")}</td>
@@ -259,7 +311,6 @@ async function saveContact() {
   const name = document.getElementById("f-name").value.trim();
   const email = document.getElementById("f-email").value.trim();
   if (!name || !email) { showToast("Name and email are required", "error"); return; }
-
   const payload = {
     contact_name: name,
     company_name: document.getElementById("f-company").value.trim() || null,
@@ -267,7 +318,6 @@ async function saveContact() {
     stage: document.getElementById("f-stage").value.trim() || null,
     notes: document.getElementById("f-notes").value.trim() || null
   };
-
   showLoading(true);
   try {
     if (id) {
@@ -299,11 +349,7 @@ async function deleteContact() {
 function openNewModal() {
   document.getElementById("modal-title").textContent = "Add Contact";
   document.getElementById("edit-id").value = "";
-  document.getElementById("f-name").value = "";
-  document.getElementById("f-company").value = "";
-  document.getElementById("f-email").value = "";
-  document.getElementById("f-stage").value = "";
-  document.getElementById("f-notes").value = "";
+  ["f-name","f-company","f-email","f-stage","f-notes"].forEach(id => document.getElementById(id).value = "");
   document.getElementById("delete-btn").style.display = "none";
   document.getElementById("contact-modal").classList.add("open");
 }
@@ -328,6 +374,139 @@ document.getElementById("contact-modal").addEventListener("click", e => {
   if (e.target === document.getElementById("contact-modal")) closeModal();
 });
 
+/* ================================
+   CSV IMPORT
+================================ */
+function openImportModal() {
+  parsedRows = [];
+  document.getElementById("csv-file").value = "";
+  document.getElementById("import-preview").style.display = "none";
+  document.getElementById("import-preview").innerHTML = "";
+  document.getElementById("import-btn").disabled = true;
+  document.getElementById("import-modal").classList.add("open");
+}
+
+function closeImportModal() {
+  document.getElementById("import-modal").classList.remove("open");
+}
+
+document.getElementById("import-modal").addEventListener("click", e => {
+  if (e.target === document.getElementById("import-modal")) closeImportModal();
+});
+
+/* Drag & drop */
+const dropZone = document.getElementById("drop-zone");
+dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("drag-over"); });
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
+dropZone.addEventListener("drop", e => {
+  e.preventDefault();
+  dropZone.classList.remove("drag-over");
+  const file = e.dataTransfer.files[0];
+  if (file) parseCSV(file);
+});
+
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) parseCSV(file);
+}
+
+function parseCSV(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const text = e.target.result;
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    if (lines.length < 2) { showToast("CSV must have a header row and at least one data row", "error"); return; }
+
+    /* Parse header — normalize to lowercase, trim spaces */
+    const headers = lines[0].split(",").map(h => h.trim().toLowerCase().replace(/\s+/g,"_").replace(/[^a-z_]/g,""));
+
+    const nameIdx    = headers.findIndex(h => h.includes("contact_name") || h === "name");
+    const emailIdx   = headers.findIndex(h => h.includes("email"));
+    const companyIdx = headers.findIndex(h => h.includes("company"));
+    const stageIdx   = headers.findIndex(h => h.includes("stage"));
+    const notesIdx   = headers.findIndex(h => h.includes("note"));
+
+    if (nameIdx === -1 || emailIdx === -1) {
+      showToast("CSV must have contact_name and email columns", "error");
+      return;
+    }
+
+    parsedRows = [];
+    const skipped = [];
+
+    lines.slice(1).forEach((line, i) => {
+      /* Handle quoted fields with commas inside */
+      const cols = line.match(/(".*?"|[^",]+|(?<=,)(?=,)|(?<=,)$|^(?=,))/g) || line.split(",");
+      const clean = cols.map(c => c.replace(/^"|"$/g,"").trim());
+
+      const name  = clean[nameIdx]  || "";
+      const email = clean[emailIdx] || "";
+
+      if (!name || !email || !email.includes("@")) {
+        skipped.push(i + 2);
+        return;
+      }
+
+      parsedRows.push({
+        contact_name: name,
+        email,
+        company_name: companyIdx >= 0 ? (clean[companyIdx] || null) : null,
+        stage:        stageIdx   >= 0 ? (clean[stageIdx]   || null) : null,
+        notes:        notesIdx   >= 0 ? (clean[notesIdx]   || null) : null,
+      });
+    });
+
+    const preview = document.getElementById("import-preview");
+    preview.style.display = "block";
+
+    if (!parsedRows.length) {
+      preview.innerHTML = `<span style="color:var(--danger)">No valid rows found. Check that contact_name and email columns are present and filled.</span>`;
+      document.getElementById("import-btn").disabled = true;
+      return;
+    }
+
+    const sample = parsedRows.slice(0, 3).map(r =>
+      `<strong>${esc(r.contact_name)}</strong> &lt;${esc(r.email)}&gt;${r.company_name ? " · " + esc(r.company_name) : ""}`
+    ).join("<br>");
+
+    preview.innerHTML =
+      `<strong style="color:var(--success)">&#10003; ${parsedRows.length} contact${parsedRows.length !== 1 ? "s" : ""} ready to import</strong>` +
+      (skipped.length ? `<br><span style="color:var(--danger)">&#9888; ${skipped.length} row${skipped.length !== 1 ? "s" : ""} skipped (missing name or email)</span>` : "") +
+      `<br><br>${sample}` +
+      (parsedRows.length > 3 ? `<br><span style="color:var(--text-dim)">…and ${parsedRows.length - 3} more</span>` : "");
+
+    document.getElementById("import-btn").disabled = false;
+  };
+  reader.readAsText(file);
+}
+
+async function runImport() {
+  if (!parsedRows.length) return;
+  showLoading(true);
+  try {
+    /* Insert in batches of 50 to avoid payload limits */
+    const batchSize = 50;
+    for (let i = 0; i < parsedRows.length; i += batchSize) {
+      await sbFetch("blu_balence_email_contacts", {
+        method: "POST",
+        prefer: "return=minimal",
+        body: JSON.stringify(parsedRows.slice(i, i + batchSize))
+      });
+    }
+    showToast(`${parsedRows.length} contacts imported`, "success");
+    closeImportModal();
+    await loadContacts();
+  } catch (e) {
+    console.error(e);
+    showToast("Import failed — check console", "error");
+  } finally {
+    showLoading(false);
+  }
+}
+
+/* ================================
+   UTILS
+================================ */
 function esc(str) {
   return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
@@ -342,6 +521,5 @@ function showLoading(v) { document.getElementById("loading").classList.toggle("s
 
 loadContacts();
 </script>
-
 </body>
 </html>
