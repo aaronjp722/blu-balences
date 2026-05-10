@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Contract | Blu Balances</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>Create Contract | Blu Balence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #0b1220;
       --card: #111827;
+      --navy: #0a1628;
       --text-main: #e5e7eb;
       --text-sub: #9ca3af;
-      --border: rgba(255,255,255,.12);
-      --primary: #3b82f6;
+      --border: rgba(255,255,255,.10);
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
       --success: #22c55e;
       --input-bg: #020617;
     }
-
-    * { box-sizing: border-box; }
-
+    *, *::before, *::after { box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
       background: var(--bg);
@@ -26,150 +26,195 @@
       margin: 0;
       padding: 40px 20px;
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
+    .container { max-width: 720px; margin: 0 auto; }
 
-    .container { max-width: 680px; margin: 0 auto; }
-    .header { margin-bottom: 32px; }
-    .header h1 { margin: 0 0 6px; font-size: 28px; font-weight: 700; }
-    .header p { margin: 0; color: var(--text-sub); font-size: 14px; }
+    .page-header { margin-bottom: 32px; }
+    .page-header .logo { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -.5px; margin-bottom: 12px; }
+    .page-header .logo span { color: var(--primary-light); }
+    .page-header h1 { margin: 0 0 4px; font-size: 26px; font-weight: 800; letter-spacing: -.5px; }
+    .page-header p { margin: 0; color: var(--text-sub); font-size: 14px; }
 
     .card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 32px;
-      margin-bottom: 24px;
-    }
-
-    .section-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--primary);
-      text-transform: uppercase;
-      letter-spacing: .06em;
+      padding: 28px 32px;
       margin-bottom: 20px;
     }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary-light);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 20px;
     }
-
-    .form-group { margin-bottom: 20px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .form-group { margin-bottom: 18px; }
     .form-group:last-child { margin-bottom: 0; }
 
     label {
       display: block;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--text-sub);
       text-transform: uppercase;
-      letter-spacing: .05em;
-      margin-bottom: 8px;
+      letter-spacing: .6px;
+      margin-bottom: 7px;
     }
 
     input[type="text"],
     input[type="email"],
     input[type="tel"],
     input[type="number"],
-    input[type="date"] {
+    input[type="date"],
+    select {
       width: 100%;
-      padding: 12px 14px;
+      padding: 10px 13px;
       background: var(--input-bg);
       border: 1px solid var(--border);
       border-radius: 8px;
       color: var(--text-main);
       font-family: 'Inter', sans-serif;
       font-size: 14px;
-      transition: border-color .15s;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      appearance: none;
     }
-
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(0.6);
-      cursor: pointer;
+    input:focus, select:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.15);
     }
+    input::placeholder { color: #374151; }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(.5); cursor: pointer; }
+    select option { background: #0f172a; color: var(--text-main); }
 
-    input:focus { outline: none; border-color: var(--primary); }
-    input::placeholder { color: #4b5563; }
-
-    .prefix-input { position: relative; }
-    .prefix-input span {
-      position: absolute;
-      left: 13px;
-      top: 50%;
+    .prefix-wrap { position: relative; }
+    .prefix-wrap .prefix {
+      position: absolute; left: 12px; top: 50%;
       transform: translateY(-50%);
-      color: var(--text-sub);
-      font-size: 14px;
-      pointer-events: none;
+      color: var(--text-sub); font-size: 14px; pointer-events: none;
     }
-    .prefix-input input { padding-left: 26px; }
+    .prefix-wrap input { padding-left: 24px; }
 
-    hr { border: 0; border-top: 1px solid var(--border); margin: 24px 0; }
+    hr { border: 0; border-top: 1px solid var(--border); margin: 22px 0; }
 
-    .cleanup-toggle {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      user-select: none;
+    .toggle-row {
+      display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none;
     }
-
-    .cleanup-toggle input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--primary);
-      cursor: pointer;
-      flex-shrink: 0;
+    .toggle-row input[type="checkbox"] {
+      width: 17px; height: 17px; accent-color: var(--primary-light); cursor: pointer; flex-shrink: 0;
     }
+    .toggle-label { font-size: 14px; font-weight: 600; color: var(--text-main); }
+    .collapsible { display: none; margin-top: 22px; }
+    .collapsible.open { display: block; }
 
-    .cleanup-toggle-label { font-size: 14px; font-weight: 600; color: var(--text-main); }
-
-    .cleanup-fields { display: none; margin-top: 24px; }
-    .cleanup-fields.visible { display: block; }
-
-    .btn-create {
-      width: 100%;
-      padding: 16px;
+    .btn-primary {
+      width: 100%; padding: 15px;
       background: var(--primary);
-      color: #fff;
-      border: none;
+      color: #fff; border: none;
       border-radius: 12px;
       font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background .15s, transform .1s;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: background .15s, transform .1s;
       letter-spacing: .02em;
     }
+    .btn-primary:hover  { background: var(--primary-light); }
+    .btn-primary:active { transform: scale(.99); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
 
-    .btn-create:hover  { background: #2563eb; }
-    .btn-create:active { transform: scale(.99); }
-    .btn-create:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-outline {
+      flex: 1; padding: 13px;
+      background: transparent;
+      color: var(--primary-light);
+      border: 1px solid rgba(59,130,246,.4);
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      text-align: center; transition: all .15s;
+      display: block;
+    }
+    .btn-outline:hover { background: rgba(59,130,246,.1); border-color: var(--primary-light); }
+
+    .btn-dl {
+      flex: 1; padding: 13px;
+      background: var(--primary);
+      color: #fff; border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+      text-align: center; transition: background .15s;
+      display: block;
+    }
+    .btn-dl:hover { background: var(--primary-light); }
+
+    /* ================================
+       SUCCESS STATE
+    ================================ */
+    #success-panel { display: none; }
+
+    .success-header {
+      text-align: center;
+      padding: 32px 0 24px;
+    }
+    .success-icon {
+      width: 56px; height: 56px;
+      background: rgba(34,197,94,.12);
+      border: 1px solid rgba(34,197,94,.25);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 22px; color: var(--success);
+    }
+    .success-header h2 { margin: 0 0 6px; font-size: 20px; font-weight: 800; }
+    .success-header p  { margin: 0; color: var(--text-sub); font-size: 14px; }
+
+    .doc-action-row { display: flex; gap: 12px; margin-top: 20px; }
+
+    /* Google Doc iframe embed */
+    .doc-embed-wrap {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 20px;
+      background: #fff;
+    }
+    .doc-embed-wrap iframe {
+      width: 100%; height: 680px; border: none; display: block;
+    }
+    .embed-label {
+      font-size: 11px; font-weight: 700; color: var(--text-sub);
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
 
     .toast {
-      position: fixed;
-      bottom: 28px;
-      left: 50%;
+      position: fixed; bottom: 28px; left: 50%;
       transform: translateX(-50%) translateY(80px);
       background: #1e293b;
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 14px 24px;
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 14px; font-weight: 600;
       color: var(--text-main);
       box-shadow: 0 20px 40px rgba(0,0,0,.5);
       transition: transform .3s ease;
-      z-index: 100;
+      z-index: 999;
+      white-space: nowrap;
     }
-
     .toast.show    { transform: translateX(-50%) translateY(0); }
     .toast.success { border-color: var(--success); color: var(--success); }
     .toast.error   { border-color: #ef4444; color: #ef4444; }
 
-    @media (max-width: 560px) {
-      .form-row { grid-template-columns: 1fr; }
+    @media (max-width: 580px) {
+      .form-row, .form-row-3 { grid-template-columns: 1fr; }
+      .card { padding: 22px 20px; }
     }
   </style>
 </head>
@@ -177,19 +222,28 @@
 
 <div class="container">
 
-  <div class="header">
+  <div class="page-header">
+    <div class="logo">Blu <span>Balence</span></div>
     <h1>Create Contract</h1>
-    <p>Blu Balances | Contract Management</p>
+    <p>Bookkeeping Service Agreement Generator</p>
   </div>
 
+  <!-- FORM -->
   <form id="contract-form" autocomplete="off">
 
+    <!-- CLIENT INFO -->
     <div class="card">
       <div class="section-title">Client Information</div>
 
-      <div class="form-group">
-        <label>Business Name</label>
-        <input type="text" id="business_name" placeholder="Acme Corp" required>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Business Name</label>
+          <input type="text" id="business_name" placeholder="Acme Corp" required>
+        </div>
+        <div class="form-group">
+          <label>Client Title</label>
+          <input type="text" id="client_title" placeholder="Owner, CEO, CFO...">
+        </div>
       </div>
 
       <div class="form-row">
@@ -209,44 +263,89 @@
       </div>
     </div>
 
+    <!-- PRICING -->
     <div class="card">
       <div class="section-title">Pricing</div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Monthly Service Price</label>
-          <div class="prefix-input">
-            <span>$</span>
+          <div class="prefix-wrap">
+            <span class="prefix">$</span>
             <input type="number" id="monthly_price" placeholder="0.00" min="0" step="0.01" required>
           </div>
         </div>
         <div class="form-group" style="margin-bottom:0;">
           <label>Additional Services Price</label>
-          <div class="prefix-input">
-            <span>$</span>
+          <div class="prefix-wrap">
+            <span class="prefix">$</span>
             <input type="number" id="additional_services_price" placeholder="0.00" min="0" step="0.01">
           </div>
         </div>
       </div>
+
+      <div class="form-row" style="margin-bottom:0;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Billing Day of Month</label>
+          <input type="number" id="billing_day" placeholder="e.g. 1, 15, 28" min="1" max="28" required>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Completion Time Estimate</label>
+          <input type="text" id="completion_estimate" placeholder="e.g. 3–5 business days">
+        </div>
+      </div>
     </div>
 
+    <!-- CONTRACT TERMS -->
     <div class="card">
-      <div class="section-title">Contract Dates</div>
+      <div class="section-title">Contract Terms</div>
 
-      <div class="form-group">
-        <label>Contract Effective Date</label>
-        <input type="date" id="effective_date" required>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Contract Effective Date</label>
+          <input type="date" id="effective_date" required>
+        </div>
+        <div class="form-group">
+          <label>Days to Terminate Contract</label>
+          <input type="number" id="termination_days" placeholder="e.g. 30" min="1" required>
+        </div>
       </div>
 
-      <hr>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>Dispute Resolution State</label>
+        <select id="dispute_state" required>
+          <option value="">— Select State —</option>
+          <option>Alabama</option><option>Alaska</option><option>Arizona</option>
+          <option>Arkansas</option><option>California</option><option>Colorado</option>
+          <option>Connecticut</option><option>Delaware</option><option>Florida</option>
+          <option>Georgia</option><option>Hawaii</option><option>Idaho</option>
+          <option>Illinois</option><option>Indiana</option><option>Iowa</option>
+          <option>Kansas</option><option>Kentucky</option><option>Louisiana</option>
+          <option>Maine</option><option>Maryland</option><option>Massachusetts</option>
+          <option>Michigan</option><option>Minnesota</option><option>Mississippi</option>
+          <option>Missouri</option><option>Montana</option><option>Nebraska</option>
+          <option>Nevada</option><option>New Hampshire</option><option>New Jersey</option>
+          <option>New Mexico</option><option>New York</option><option>North Carolina</option>
+          <option>North Dakota</option><option>Ohio</option><option>Oklahoma</option>
+          <option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option>
+          <option>South Carolina</option><option>South Dakota</option><option>Tennessee</option>
+          <option>Texas</option><option>Utah</option><option>Vermont</option>
+          <option>Virginia</option><option>Washington</option><option>West Virginia</option>
+          <option>Wisconsin</option><option>Wyoming</option>
+        </select>
+      </div>
+    </div>
 
-      <label class="cleanup-toggle">
+    <!-- CLEANUP PERIOD -->
+    <div class="card">
+      <div class="section-title">Cleanup Period</div>
+
+      <label class="toggle-row">
         <input type="checkbox" id="cleanup_toggle" onchange="toggleCleanup(this)">
-        <span class="cleanup-toggle-label">Include Cleanup Period</span>
+        <span class="toggle-label">Include Cleanup Period</span>
       </label>
 
-      <div class="cleanup-fields" id="cleanup-fields">
-
+      <div class="collapsible" id="cleanup-fields">
         <div class="form-row">
           <div class="form-group">
             <label>Start of Cleanup Period</label>
@@ -257,32 +356,58 @@
             <input type="date" id="cleanup_end">
           </div>
         </div>
-
         <div class="form-row" style="margin-bottom:0;">
           <div class="form-group" style="margin-bottom:0;">
-            <label>Clean Up Price</label>
-            <div class="prefix-input">
-              <span>$</span>
+            <label>Cleanup Price</label>
+            <div class="prefix-wrap">
+              <span class="prefix">$</span>
               <input type="number" id="cleanup_price" placeholder="0.00" min="0" step="0.01">
             </div>
           </div>
           <div class="form-group" style="margin-bottom:0;">
             <label>Upfront Cleanup Price</label>
-            <div class="prefix-input">
-              <span>$</span>
+            <div class="prefix-wrap">
+              <span class="prefix">$</span>
               <input type="number" id="upfront_cleanup_price" placeholder="0.00" min="0" step="0.01">
             </div>
           </div>
         </div>
-
       </div>
     </div>
 
-    <button type="submit" class="btn-create" id="submit-btn">
-      Create Contract
-    </button>
+    <button type="submit" class="btn-primary" id="submit-btn">Create Contract</button>
 
   </form>
+
+  <!-- SUCCESS PANEL (shown after contract is created) -->
+  <div id="success-panel">
+    <div class="card">
+      <div class="success-header">
+        <div class="success-icon">&#10003;</div>
+        <h2>Contract Created</h2>
+        <p>Your Google Doc is ready. Edit it below or download as PDF.</p>
+      </div>
+
+      <div class="doc-action-row">
+        <a id="edit-btn" href="#" target="_blank" class="btn-outline">&#9998; Open in Google Docs</a>
+        <a id="pdf-btn"  href="#" target="_blank" class="btn-dl">&#8659; Download PDF</a>
+      </div>
+
+      <div style="margin-top:24px;">
+        <div class="embed-label">Live Document Preview</div>
+        <div class="doc-embed-wrap">
+          <iframe id="doc-iframe" src="" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <hr style="margin-top:28px;">
+
+      <button type="button" class="btn-outline" onclick="resetForm()" style="margin-top:4px;">
+        &#43; Create Another Contract
+      </button>
+    </div>
+  </div>
+
 </div>
 
 <div class="toast" id="toast"></div>
@@ -291,14 +416,32 @@
 const WEBHOOK_URL = "https://hook.us1.make.com/gtsp4m0n8bli6trnew1d6ctxuqx8bngp";
 
 function toggleCleanup(cb) {
-  document.getElementById("cleanup-fields").classList.toggle("visible", cb.checked);
+  document.getElementById("cleanup-fields").classList.toggle("open", cb.checked);
 }
 
 function showToast(msg, type = "success") {
   const t = document.getElementById("toast");
   t.textContent = msg;
   t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove("show"), 3500);
+  setTimeout(() => t.classList.remove("show"), 4000);
+}
+
+function setDocLinks(docId) {
+  const editUrl    = `https://docs.google.com/document/d/${docId}/edit`;
+  const pdfUrl     = `https://docs.google.com/document/d/${docId}/export?format=pdf`;
+  const embedUrl   = `https://docs.google.com/document/d/${docId}/preview`;
+
+  document.getElementById("edit-btn").href  = editUrl;
+  document.getElementById("pdf-btn").href   = pdfUrl;
+  document.getElementById("doc-iframe").src = embedUrl;
+}
+
+function resetForm() {
+  document.getElementById("contract-form").reset();
+  document.getElementById("cleanup-fields").classList.remove("open");
+  document.getElementById("success-panel").style.display = "none";
+  document.getElementById("contract-form").style.display = "block";
+  document.getElementById("doc-iframe").src = "";
 }
 
 document.getElementById("contract-form").addEventListener("submit", async (e) => {
@@ -306,22 +449,27 @@ document.getElementById("contract-form").addEventListener("submit", async (e) =>
 
   const btn = document.getElementById("submit-btn");
   btn.disabled = true;
-  btn.textContent = "Sending…";
+  btn.textContent = "Creating…";
 
   const includeCleanup = document.getElementById("cleanup_toggle").checked;
 
   const payload = {
     business_name:             document.getElementById("business_name").value.trim(),
+    client_title:              document.getElementById("client_title").value.trim(),
     contact_name:              document.getElementById("contact_name").value.trim(),
     email:                     document.getElementById("email").value.trim(),
     phone:                     document.getElementById("phone").value.trim(),
     monthly_price:             parseFloat(document.getElementById("monthly_price").value) || 0,
     additional_services_price: parseFloat(document.getElementById("additional_services_price").value) || 0,
+    billing_day:               parseInt(document.getElementById("billing_day").value) || 1,
+    completion_estimate:       document.getElementById("completion_estimate").value.trim(),
     effective_date:            document.getElementById("effective_date").value,
+    termination_days:          parseInt(document.getElementById("termination_days").value) || 30,
+    dispute_state:             document.getElementById("dispute_state").value,
     include_cleanup_period:    includeCleanup,
     cleanup_start:             includeCleanup ? document.getElementById("cleanup_start").value : null,
     cleanup_end:               includeCleanup ? document.getElementById("cleanup_end").value   : null,
-    cleanup_price:             includeCleanup ? (parseFloat(document.getElementById("cleanup_price").value) || 0)         : null,
+    cleanup_price:             includeCleanup ? (parseFloat(document.getElementById("cleanup_price").value) || 0) : null,
     upfront_cleanup_price:     includeCleanup ? (parseFloat(document.getElementById("upfront_cleanup_price").value) || 0) : null,
   };
 
@@ -334,9 +482,24 @@ document.getElementById("contract-form").addEventListener("submit", async (e) =>
 
     if (!res.ok) throw new Error("Webhook returned " + res.status);
 
-    showToast("Contract created successfully!", "success");
-    e.target.reset();
-    document.getElementById("cleanup-fields").classList.remove("visible");
+    /* Make.com should return JSON: { "doc_id": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms" } */
+    let docId = null;
+    try {
+      const json = await res.json();
+      docId = json.doc_id || json.documentId || json.id || null;
+    } catch (_) { /* Make.com returned plain text — that's ok */ }
+
+    if (docId) {
+      setDocLinks(docId);
+      document.getElementById("contract-form").style.display = "none";
+      document.getElementById("success-panel").style.display = "block";
+      showToast("Contract created — document ready!", "success");
+    } else {
+      /* Webhook succeeded but no doc_id came back yet */
+      showToast("Contract sent — check Make.com for the document.", "success");
+      e.target.reset();
+      document.getElementById("cleanup-fields").classList.remove("open");
+    }
 
   } catch (err) {
     console.error(err);
