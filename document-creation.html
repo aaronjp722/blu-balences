@@ -4,17 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Document Dispatch | Internal Sign</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
   :root {
   --bg: #0b1220;
   --card: #111827;
   --text-main: #e5e7eb;
   --text-sub: #9ca3af;
-  --border: rgba(255,255,255,.12);
+  --border: rgba(255,255,255,.10);
   --primary: #3b82f6;
   --success: #22c55e;
+  /* Signer palette */
+  --s1: #3b82f6; --s1-bg: rgba(59,130,246,.12);
+  --s2: #22c55e; --s2-bg: rgba(34,197,94,.12);
+  --s3: #f59e0b; --s3-bg: rgba(245,158,11,.12);
+  --s4: #a855f7; --s4-bg: rgba(168,85,247,.12);
 }
+
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
   font-family: 'Inter', sans-serif;
@@ -22,540 +29,494 @@ body {
   color: var(--text-main);
   margin: 0;
   padding: 40px 20px;
+  -webkit-font-smoothing: antialiased;
 }
 
+.container { max-width: 1060px; margin: 0 auto; }
 
-  .container {
-    max-width: 1000px;
-    margin: 0 auto;
-  }
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+}
 
-  .dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 24px;
-  }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 20px;
+}
 
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 32px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    margin-bottom: 24px;
-  }
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: var(--primary);
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-  .section-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+.form-group { margin-bottom: 18px; }
 
-  .form-group {
-    margin-bottom: 20px;
-  }
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-sub);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
 
-  label {
-    display: block;
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 8px;
-  }
-
-  input,
-select {
+input, select, textarea {
   width: 100%;
-  padding: 12px;
+  padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 14px;
+  font-family: 'Inter', sans-serif;
   background: #020617;
   color: var(--text-main);
+  outline: none;
+  transition: border-color .15s;
 }
-
-input::placeholder {
-  color: #64748b;
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
 }
+input::placeholder { color: #475569; }
+select option { background: #020617; color: var(--text-main); }
 
-select option {
-  background: #020617;
-  color: var(--text-main);
-}
-
-
-  .file-upload-zone {
-    border: 2px dashed var(--border);
-    border-radius: 12px;
-    padding: 30px;
-    text-align: center;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-
-  .file-upload-zone:hover {
-    border-color: var(--primary);
-    background: #f0f7ff;
-  }
-
-  /* ================================
-   DARK TOOL BUTTONS
+/* ================================
+   TOOL BUTTONS
 ================================ */
-
 .tool-btn {
-  background: #020617;
-  color: #e5e7eb;
-  border: 1px solid rgba(255,255,255,.12);
+  background: #0f172a;
+  color: #94a3b8;
+  border: 1px solid rgba(255,255,255,.10);
   border-radius: 8px;
-  padding: 10px 16px;
-  font-size: 13px;
+  padding: 8px 14px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all .15s ease;
+  white-space: nowrap;
 }
-
 .tool-btn:hover {
-  background: #020617;
   border-color: #3b82f6;
-  color: #ffffff;
+  color: #e2e8f0;
+  background: rgba(59,130,246,.08);
 }
-
-/* Active state (Signature selected, active signer, etc.) */
 .tool-btn.active {
-  background: linear-gradient(180deg,#2563eb,#1d4ed8);
-  border-color: #2563eb;
-  color: #ffffff;
+  background: #2563eb;
+  border-color: #3b82f6;
+  color: #fff;
   box-shadow: 0 0 0 1px rgba(59,130,246,.4);
 }
+.tool-btn:disabled { opacity: .4; cursor: not-allowed; }
 
-/* Disabled look (optional but clean) */
-.tool-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
+/* Signer buttons inherit their color when active */
+#btn-signer1.active { background:#2563eb; border-color:#60a5fa; }
+#btn-signer2.active { background:#16a34a; border-color:#4ade80; }
+#btn-signer3.active { background:#d97706; border-color:#fbbf24; }
+#btn-signer4.active { background:#7c3aed; border-color:#c084fc; }
+
+/* ================================
+   FILE UPLOAD ZONE
+================================ */
+.file-upload-zone {
+  border: 2px dashed rgba(255,255,255,.14);
+  border-radius: 12px;
+  padding: 28px;
+  text-align: center;
+  cursor: pointer;
+  transition: .2s;
+  color: var(--text-sub);
+  font-size: 14px;
+}
+.file-upload-zone:hover {
+  border-color: var(--primary);
+  background: rgba(59,130,246,.05);
+  color: var(--text-main);
 }
 
-
-  #pdf-page-mock {
-    width: 100%;
-    height: 800px;
-    background: white;
-    position: relative;
-    cursor: crosshair;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  }
-
-  .dropped-field {
-    position: absolute;
-    padding: 6px 12px;
-    background: var(--primary);
-    color: white;
-    font-size: 10px;
-    font-weight: bold;
-    border-radius: 4px;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    text-transform: uppercase;
-  }
-
-  .btn-send {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 16px;
-    border-radius: 12px;
-    font-weight: 700;
-    width: 100%;
-    cursor: pointer;
-    margin-top: 20px;
-  }
-
-  hr {
-    border: 0;
-    border-top: 1px solid var(--border);
-    margin: 24px 0;
-  }
-  
-  #overlay-layer { pointer-events: none; }
-  
-  /* Draggable signature fields */
-.signature-box {
-  position: absolute;
-  min-width: 20px;
-  min-height: 10px;
-  padding: 6px 10px;
-  background: rgba(37, 99, 235, 0.15);
-  border: 2px dashed #2563eb;
-  color: #2563eb;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  cursor: move;
-  user-select: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 20px 0;
 }
 
+/* ================================
+   PDF CONTAINER
+================================ */
+#pdf-container {
+  background: #3d3d3d;
+  padding: 20px;
+  border-radius: 12px;
+  height: 640px;
+  overflow-y: auto;
+}
 #pdf-viewer {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
-
-.signature-box.selected {
-  outline: 2px solid #2563eb;
-  background: rgba(37,99,235,0.25);
+.page-container {
+  position: relative;
+  box-shadow: 0 4px 24px rgba(0,0,0,.5);
 }
-
+.page-container canvas { display: block; }
 
 /* ================================
-   RESIZE HANDLES (8 directions)
+   DOCUSIGN-STYLE SIGNATURE FIELDS
 ================================ */
+.signature-box {
+  position: absolute;
+  min-width: 140px;
+  min-height: 42px;
+  cursor: move;
+  user-select: none;
+  z-index: 10;
+  border-radius: 4px;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  font-family: 'Inter', sans-serif;
+  transition: opacity .15s;
+}
 
+/* Inner layout wrapper */
+.sig-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  padding: 0 10px;
+  border-radius: 4px;
+  border: 1.5px solid;
+  position: relative;
+  pointer-events: none;
+}
+
+/* Signer colors */
+.signature-box[data-signer="1"] .sig-inner {
+  background: var(--s1-bg);
+  border-color: var(--s1);
+  border-left: 4px solid var(--s1);
+  color: var(--s1);
+}
+.signature-box[data-signer="2"] .sig-inner {
+  background: var(--s2-bg);
+  border-color: var(--s2);
+  border-left: 4px solid var(--s2);
+  color: var(--s2);
+}
+.signature-box[data-signer="3"] .sig-inner {
+  background: var(--s3-bg);
+  border-color: var(--s3);
+  border-left: 4px solid var(--s3);
+  color: var(--s3);
+}
+.signature-box[data-signer="4"] .sig-inner {
+  background: var(--s4-bg);
+  border-color: var(--s4);
+  border-left: 4px solid var(--s4);
+  color: var(--s4);
+}
+
+/* Icon */
+.sig-icon {
+  font-size: 15px;
+  flex-shrink: 0;
+  opacity: .9;
+}
+
+/* Label */
+.sig-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Signer tag in top-right corner */
+.sig-tag {
+  position: absolute;
+  top: -10px;
+  right: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  padding: 2px 6px;
+  border-radius: 100px;
+  color: #fff;
+  white-space: nowrap;
+}
+.signature-box[data-signer="1"] .sig-tag { background: var(--s1); }
+.signature-box[data-signer="2"] .sig-tag { background: var(--s2); }
+.signature-box[data-signer="3"] .sig-tag { background: var(--s3); }
+.signature-box[data-signer="4"] .sig-tag { background: var(--s4); }
+
+/* Selected state */
+.signature-box.selected .sig-inner {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3b82f6;
+}
+
+/* Dimmed when not active signer */
+.signature-box[style*="opacity: 0.4"] { filter: saturate(.4); }
+
+/* ================================
+   RESIZE HANDLES — clean dots
+================================ */
 .signature-box .resize-handle {
   position: absolute;
-  width: 10px;
-  height: 10px;
-  background: #2563eb;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border: 2px solid #3b82f6;
+  border-radius: 50%;
   z-index: 20;
+  transition: transform .1s;
 }
+.resize-handle:hover { transform: scale(1.4); }
 
-.resize-t { top: -5px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
-.resize-b { bottom: -5px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
-.resize-l { left: -5px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
-.resize-r { right: -5px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
-
-.resize-tl { top: -5px; left: -5px; cursor: nwse-resize; }
-.resize-tr { top: -5px; right: -5px; cursor: nesw-resize; }
-.resize-bl { bottom: -5px; left: -5px; cursor: nesw-resize; }
-.resize-br { bottom: -5px; right: -5px; cursor: nwse-resize; }
-
-.signature-box[data-signer="1"] { border-color:#2563eb; color:#2563eb; }
-.signature-box[data-signer="2"] { border-color:#16a34a; color:#16a34a; }
-.signature-box[data-signer="3"] { border-color:#d97706; color:#d97706; }
-.signature-box[data-signer="4"] { border-color:#dc2626; color:#dc2626; }
-
-.signature-box[data-signer="1"] { border-color:#2563eb; color:#2563eb; }
-.signature-box[data-signer="2"] { border-color:#16a34a; color:#16a34a; }
-.signature-box[data-signer="3"] { border-color:#ea580c; color:#ea580c; }
-.signature-box[data-signer="4"] { border-color:#7c3aed; color:#7c3aed; }
-
-.signature-box[data-signer="2"] { background:rgba(22,163,74,.15); }
-.signature-box[data-signer="3"] { background:rgba(234,88,12,.15); }
-.signature-box[data-signer="4"] { background:rgba(124,58,237,.15); }
+.resize-t  { top:-4px;    left:50%;  transform:translateX(-50%); cursor:ns-resize; }
+.resize-b  { bottom:-4px; left:50%;  transform:translateX(-50%); cursor:ns-resize; }
+.resize-l  { left:-4px;   top:50%;   transform:translateY(-50%); cursor:ew-resize; }
+.resize-r  { right:-4px;  top:50%;   transform:translateY(-50%); cursor:ew-resize; }
+.resize-tl { top:-4px;    left:-4px; cursor:nwse-resize; }
+.resize-tr { top:-4px;    right:-4px;cursor:nesw-resize; }
+.resize-bl { bottom:-4px; left:-4px; cursor:nesw-resize; }
+.resize-br { bottom:-4px; right:-4px;cursor:nwse-resize; }
 
 /* ================================
-   DARK CANDIDATE DROPDOWN
+   SEND BUTTON
 ================================ */
+.btn-send {
+  background: linear-gradient(135deg,#2563eb,#1d4ed8);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  width: 100%;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: opacity .2s;
+}
+.btn-send:hover { opacity: .88; }
 
+/* ================================
+   CANDIDATE DROPDOWN
+================================ */
 .candidate-dropdown {
   position: absolute;
-  background: #020617; /* deep dark */
+  background: #0f172a;
   border: 1px solid rgba(255,255,255,.12);
   border-radius: 10px;
-  margin-top: 6px;
-  max-height: 280px; /* ~10 items */
+  margin-top: 4px;
+  max-height: 260px;
   overflow-y: auto;
   width: 100%;
   z-index: 50;
-  box-shadow: 0 20px 40px rgba(0,0,0,.55);
+  box-shadow: 0 20px 40px rgba(0,0,0,.6);
 }
-
-/* Scrollbar (WebKit) */
-.candidate-dropdown::-webkit-scrollbar {
-  width: 8px;
-}
-.candidate-
-
+.candidate-dropdown::-webkit-scrollbar { width: 6px; }
+.candidate-dropdown::-webkit-scrollbar-track { background: transparent; }
+.candidate-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 3px; }
 
 .candidate-item {
-  padding: 10px 12px;
+  padding: 10px 14px;
   cursor: pointer;
   font-size: 13px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  transition: background .1s;
 }
+.candidate-item:last-child { border-bottom: none; }
+.candidate-item:hover { background: rgba(59,130,246,.12); }
 
-.candidate-item:hover {
-  background: #f1f5f9;
+.hidden { display: none; }
+
+/* Field toolbar row */
+.field-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+  align-items: center;
 }
-
-.hidden {
-  display: none;
+.toolbar-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
+  margin: 0 4px;
 }
-
-</style>
-
+    </style>
 </head>
 <body>
 
 <div class="container">
-    <div style="margin-bottom: 30px;">
-        <h1 style="margin:0;">Prepare Signature Request</h1>
-        <p style="color: var(--text-sub);">Neat Necessary Cleaning | Internal HR Portal</p>
+    <div style="margin-bottom: 28px;">
+        <h1 style="margin:0; font-size:22px; font-weight:800; letter-spacing:-.5px;">Prepare Signature Request</h1>
+        <p style="color: var(--text-sub); margin-top:4px; font-size:14px;">Neat Necessary Cleaning | Internal HR Portal</p>
     </div>
 
     <form id="hr-dispatch-form">
         <div class="dashboard-grid">
             <div class="main-col">
                 <div class="card">
-                   
-   
 
-<div class="section-title">Quick Resources</div>
-<div style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
-    <button type="button" class="tool-btn" onclick="requestResourceDoc('Insurance')">Insurance</button>
-    <button type="button" class="tool-btn" onclick="requestResourceDoc('Supply List')">Supply List</button>
-    <button type="button" class="tool-btn" onclick="requestResourceDoc('Login Instructions')">Login Instr.</button>
-    <button type="button" class="tool-btn" onclick="requestResourceDoc('Schedule Instructions')">Schedule Instr.</button>
-</div>
-<hr>                
+                  <div class="section-title">Quick Resources</div>
+                  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+                    <button type="button" class="tool-btn" onclick="requestResourceDoc('Insurance')">Insurance</button>
+                    <button type="button" class="tool-btn" onclick="requestResourceDoc('Supply List')">Supply List</button>
+                    <button type="button" class="tool-btn" onclick="requestResourceDoc('Login Instructions')">Login Instr.</button>
+                    <button type="button" class="tool-btn" onclick="requestResourceDoc('Schedule Instructions')">Schedule Instr.</button>
+                  </div>
+                  <hr>
 
-<div class="section-title">Signers</div>
+                  <div class="section-title">Signers</div>
 
+                  <div class="form-group" style="max-width:220px;">
+                    <label>Number of Signers</label>
+                    <select id="signer_count" onchange="updateSignerVisibility()">
+                      <option value="1">1 Signer</option>
+                      <option value="2">2 Signers</option>
+                      <option value="3">3 Signers</option>
+                      <option value="4">4 Signers</option>
+                    </select>
+                  </div>
 
-
-<!-- Signer Count -->
-<div class="form-group" style="max-width:240px;">
-  <label>Number of Signers</label>
-  <select id="signer_count" onchange="updateSignerVisibility()">
-    <option value="1">1 Signer</option>
-    <option value="2">2 Signers</option>
-    <option value="3">3 Signers</option>
-    <option value="4">4 Signers</option>
-  </select>
-</div>
-
-<!-- Signer 1 (Candidate) + Jira -->
-<div
-  class="form-group"
-  style="display:grid; grid-template-columns: auto 1fr 1fr 1fr; gap:12px; align-items:end;"
->
-
-  <!-- GET BUTTON -->
-  <div>
-    <label>&nbsp;</label>
-    <button
-      type="button"
-      class="tool-btn"
-      style="
-        width:42px;
-        height:42px;
-        padding:0;
-        font-weight:700;
-      "
-      onclick="fetchCandidates()"
-      title="Load candidates"
-    >
-      Get
-    </button>
-  </div>
-
-  <!-- SIGNER NAME -->
-  <div style="position:relative;">
-    <label>Signer 1 Name</label>
-    <input
-      type="text"
-      id="signer1_name"
-      placeholder="Start typing or select"
-      oninput="filterCandidates(this.value)"
-    >
-    <div
-      id="candidate-dropdown"
-      class="candidate-dropdown hidden"
-    ></div>
-  </div>
-
-  <!-- EMAIL -->
-  <div>
-    <label>Signer 1 Email</label>
-    <input type="email" id="signer1_email">
-  </div>
-
-  <!-- JIRA -->
-  <div>
-    <label>Jira Ticket / Job Code</label>
-    <input type="text" id="jira_code" placeholder="HR-1245">
-  </div>
-
-</div>
-
-
-
-<!-- Signer 2 -->
-<div id="signer2_row" style="display:none; margin-top:15px;">
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-    <div class="form-group">
-      <label>Signer 2 Name</label>
-      <input type="text" id="signer2_name">
-    </div>
-    <div class="form-group">
-      <label>Signer 2 Email</label>
-      <input type="email" id="signer2_email">
-    </div>
-  </div>
-</div>
-
-<!-- Signer 3 -->
-<div id="signer3_row" style="display:none; margin-top:15px;">
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-    <div class="form-group">
-      <label>Signer 3 Name</label>
-      <input type="text" id="signer3_name">
-    </div>
-    <div class="form-group">
-      <label>Signer 3 Email</label>
-      <input type="email" id="signer3_email">
-    </div>
-  </div>
-</div>
-
-<!-- Signer 4 -->
-<div id="signer4_row" style="display:none; margin-top:15px;">
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-    <div class="form-group">
-      <label>Signer 4 Name</label>
-      <input type="text" id="signer4_name">
-    </div>
-    <div class="form-group">
-      <label>Signer 4 Email</label>
-      <input type="email" id="signer4_email">
-    </div>
-  </div>
-</div>
-
-
-<div class="form-group">
-  <label>Document Title</label>
-  <input
-    type="text"
-    id="document_title"
-    placeholder="Title Text"
-  >
-</div>
-
-
-<div class="form-group">
-  <label>Select Template</label>
-<select name="template" id="template-select">
-  <option value="">— Select a template —</option>
-  <option value="Contractor Agreement">Contractor Agreement</option>
-  <option value="Background Check Agreement">Background Check Agreement</option>
-  <option value="W-9">W-9</option>
-</select>
-
-</div>
-
-<div class="section-title" style="margin-top:28px;">
-  Custom Email Message
-</div>
-
-<div class="form-group">
-  <label>Email Message (optional)</label>
-  <textarea
-    id="custom_email_message"
-    rows="6"
-    placeholder="Hi {{first_name}}, please review and sign the attached document."
-    style="
-      width:100%;
-      padding:12px;
-      border-radius:8px;
-      background:#020617;
-      border:1px solid var(--border);
-      color:var(--text-main);
-      resize:vertical;
-      font-family:Inter;
-      font-size:14px;
-    "
-  ></textarea>
-</div>
-
-<hr>
-
-                    <div class="file-upload-zone" id="drop-zone">
-                        <div style="font-size: 20px;">📄</div>
-                        <div id="upload-text">Click to upload custom PDF</div>
-                        <input type="file" id="file-input" style="display:none" accept=".pdf">
+                  <div class="form-group" style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;align-items:end;">
+                    <div>
+                      <label>&nbsp;</label>
+                      <button type="button" class="tool-btn" style="width:42px;height:38px;padding:0;font-weight:700;" onclick="fetchCandidates()" title="Load candidates">Get</button>
                     </div>
+                    <div style="position:relative;">
+                      <label>Signer 1 Name</label>
+                      <input type="text" id="signer1_name" placeholder="Start typing or select" oninput="filterCandidates(this.value)">
+                      <div id="candidate-dropdown" class="candidate-dropdown hidden"></div>
+                    </div>
+                    <div>
+                      <label>Signer 1 Email</label>
+                      <input type="email" id="signer1_email">
+                    </div>
+                    <div>
+                      <label>Jira / Job Code</label>
+                      <input type="text" id="jira_code" placeholder="HR-1245">
+                    </div>
+                  </div>
+
+                  <div id="signer2_row" style="display:none;margin-top:12px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                      <div class="form-group"><label>Signer 2 Name</label><input type="text" id="signer2_name"></div>
+                      <div class="form-group"><label>Signer 2 Email</label><input type="email" id="signer2_email"></div>
+                    </div>
+                  </div>
+                  <div id="signer3_row" style="display:none;margin-top:12px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                      <div class="form-group"><label>Signer 3 Name</label><input type="text" id="signer3_name"></div>
+                      <div class="form-group"><label>Signer 3 Email</label><input type="email" id="signer3_email"></div>
+                    </div>
+                  </div>
+                  <div id="signer4_row" style="display:none;margin-top:12px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                      <div class="form-group"><label>Signer 4 Name</label><input type="text" id="signer4_name"></div>
+                      <div class="form-group"><label>Signer 4 Email</label><input type="email" id="signer4_email"></div>
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="margin-top:8px;">
+                    <label>Document Title</label>
+                    <input type="text" id="document_title" placeholder="Title Text">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Select Template</label>
+                    <select name="template" id="template-select">
+                      <option value="">— Select a template —</option>
+                      <option value="Contractor Agreement">Contractor Agreement</option>
+                      <option value="Background Check Agreement">Background Check Agreement</option>
+                      <option value="W-9">W-9</option>
+                    </select>
+                  </div>
+
+                  <div class="section-title" style="margin-top:24px;">Custom Email Message</div>
+                  <div class="form-group">
+                    <label>Message (optional)</label>
+                    <textarea id="custom_email_message" rows="5" placeholder="Hi {{first_name}}, please review and sign the attached document."></textarea>
+                  </div>
+
+                  <hr>
+
+                  <div class="file-upload-zone" id="drop-zone">
+                    <div style="font-size:22px;margin-bottom:6px;">&#128196;</div>
+                    <div id="upload-text">Click to upload custom PDF</div>
+                    <input type="file" id="file-input" style="display:none" accept=".pdf">
+                  </div>
                 </div>
 
+                <!-- ANNOTATION ZONE -->
                 <div id="annotation-zone" class="card">
-                    <div class="section-title">2. Place Required Fields</div>
-                    <div class="field-toolbar" style="display: flex; gap: 10px; margin-bottom: 20px;">
-                        <button type="button" class="tool-btn active" id="btn-sig" onclick="setFieldType('signature', this)">Signature</button>
-                        <button type="button" class="tool-btn" id="btn-init" onclick="setFieldType('initials', this)">Initials</button>
-                        <button type="button" class="tool-btn" id="btn-date" onclick="setFieldType('date', this)">Date</button>
-                        <button
-                          type="button"
-  												class="tool-btn"
-                          id="btn-text"
-  												onclick="setFieldType('text', this)"                
-														>Text
-                         </button>
+                  <div class="section-title">Place Required Fields</div>
 
-<button
-  type="button"
-  class="tool-btn"
-  id="btn-name"
-  onclick="setFieldType('name', this)"
->
-  Name
-</button>
-													<!-- SIGNER SELECTOR (1–4) -->
-<div style="display:flex; gap:6px; margin-left:auto;">
-  <button
-    type="button"
-    class="tool-btn active"
-    id="btn-signer1"
-    onclick="setSigner(1, this)"
-  >Signer 1</button>
+                  <div class="field-toolbar">
+                    <!-- Field type buttons -->
+                    <button type="button" class="tool-btn active" id="btn-sig"   onclick="setFieldType('signature', this)">&#9998; Signature</button>
+                    <button type="button" class="tool-btn"        id="btn-init"  onclick="setFieldType('initials', this)">Initials</button>
+                    <button type="button" class="tool-btn"        id="btn-date"  onclick="setFieldType('date', this)">&#128197; Date</button>
+                    <button type="button" class="tool-btn"        id="btn-text"  onclick="setFieldType('text', this)">Text</button>
+                    <button type="button" class="tool-btn"        id="btn-name"  onclick="setFieldType('name', this)">Name</button>
 
-  <button
-    type="button"
-    class="tool-btn"
-    id="btn-signer2"
-    onclick="setSigner(2, this)"
-  >Signer 2</button>
+                    <div class="toolbar-divider"></div>
 
-  <button
-    type="button"
-    class="tool-btn"
-    id="btn-signer3"
-    onclick="setSigner(3, this)"
-  >Signer 3</button>
+                    <!-- Signer selector -->
+                    <button type="button" class="tool-btn active" id="btn-signer1" onclick="setSigner(1,this)">Signer 1</button>
+                    <button type="button" class="tool-btn"        id="btn-signer2" onclick="setSigner(2,this)">Signer 2</button>
+                    <button type="button" class="tool-btn"        id="btn-signer3" onclick="setSigner(3,this)">Signer 3</button>
+                    <button type="button" class="tool-btn"        id="btn-signer4" onclick="setSigner(4,this)">Signer 4</button>
+                  </div>
 
-  <button
-    type="button"
-    class="tool-btn"
-    id="btn-signer4"
-    onclick="setSigner(4, this)"
-  >Signer 4</button>
-</div>
-
+                  <div id="pdf-container" style="background:#3a3a3a;padding:20px;border-radius:12px;height:640px;overflow-y:auto;">
+                    <div id="pdf-viewer">
+                      <div id="overlay-layer" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></div>
+                      <p style="text-align:center;color:#999;margin-top:120px;font-size:14px;">Select a template or upload a PDF to begin</p>
                     </div>
-
-                    <div id="pdf-container" style="background: #525659; padding: 20px; border-radius: 12px; height: 600px; overflow-y: auto;">
-                        <div id="pdf-viewer">
-                            <div id="overlay-layer" style="position: absolute; top:0; left:0; width:100%; height:100%;"></div>
-                            <p style="text-align: center; color: #ccc; margin-top: 100px;">Click here to place tags</p>
-                        </div>
-                    </div>
-                    <input type="hidden" name="coordinates" id="coord-data">
+                  </div>
+                  <input type="hidden" name="coordinates" id="coord-data">
                 </div>
             </div>
 
             <div class="side-col">
-                <div class="card" style="position: sticky; top: 20px;">
-                    <div class="section-title">Final Review</div>
-                    <div style="font-size: 13px; color: var(--text-sub);">
-                        <p>Status: <b style="color: var(--success)">Ready</b></p>
-                        <p>Method: <b>Secure Digital</b></p>
-                    </div>
-                    <hr>
-                    <label>Link Expiry</label>
-                    <select><option>48 Hours</option><option>7 Days</option></select>
-                    <button type="button" class="btn-send" onclick="submitData()">Send for Signature</button>
+              <div class="card" style="position:sticky;top:20px;">
+                <div class="section-title">Final Review</div>
+                <div style="font-size:13px;color:var(--text-sub);line-height:1.8;">
+                  <p>Status: <b style="color:var(--success)">Ready</b></p>
+                  <p>Method: <b style="color:var(--text-main)">Secure Digital</b></p>
                 </div>
+                <hr>
+                <div class="form-group">
+                  <label>Link Expiry</label>
+                  <select>
+                    <option>48 Hours</option>
+                    <option>7 Days</option>
+                  </select>
+                </div>
+                <button type="button" class="btn-send" onclick="submitData()">Send for Signature</button>
+              </div>
             </div>
         </div>
     </form>
@@ -565,1003 +526,567 @@ select option {
 <script>
 const SUPABASE_URL = "https://rfdvogakvyodixgpvqvz.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E";
-
-const sb = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
-
 <script>
-
 const TEMPLATE_PDFS = {
-  "Contractor Agreement":
-    "https://cdn.prod.website-files.com/69304921ad4eb233dbdc0a22/6956f001423a4b377eca1168_Independent_Contractor_Agreement%202025%20(1)%20(2).pdf",
-
-  "W-9":
-    "https://cdn.prod.website-files.com/69304921ad4eb233dbdc0a22/6956ef4c44c9c6130a98b9ab_fw9%20(1)%20(3).pdf",
-
-  "Background Check Agreement":
-    "https://cdn.prod.website-files.com/69304921ad4eb233dbdc0a22/6956effd35fb3e3b041f3208_Neat_Necessary_Cleaning_Background_Check_Form%20(2)%20(2).pdf"
+  "Contractor Agreement": "https://cdn.prod.website-files.com/69304921ad4eb233dbdc0a22/6956f001423a4b377eca1168_Independent_Contractor_Agreement%202025%20(1)%20(2).pdf",
+  "W-9": "https://cdn.prod.website-files.com/69304921ad4eb233dbdc0a22/6956ef4c44c9c6130a98b9ab_fw9%20(1)%20(3).pdf",
+  "Background Check Agreement": "https://cdn.prod.website-files.com/69304921ad4eb233dbdc0a22/6956effd35fb3e3b041f3208_Neat_Necessary_Cleaning_Background_Check_Form%20(2)%20(2).pdf"
 };
 
-
-
-
-const MAKE_WEBHOOK_URL = "https://hook.us1.make.com/nzft5pdep4ndl9kxhmw6nakhidje3p77";
-
-/* ===============================
-   SIGN FLOW HELPERS (NEW)
-=============================== */
-
-const SIGN_PAGE_BASE =
-  "https://neatnecessarycleaning.com/sign-document";
-
-function generateToken() {
-  return crypto.randomUUID().replace(/-/g, "");
-}
-
-function generateDocId() {
-  return "doc_" + Date.now();
-}
-
-const RESOURCE_WEBHOOK_URL = "https://hook.us1.make.com/4ht70jpe4reumtxoj61c2khktdk3gt1v";
+const MAKE_WEBHOOK_URL      = "https://hook.us1.make.com/nzft5pdep4ndl9kxhmw6nakhidje3p77";
+const RESOURCE_WEBHOOK_URL  = "https://hook.us1.make.com/4ht70jpe4reumtxoj61c2khktdk3gt1v";
+const CANDIDATE_LOOKUP_WEBHOOK = "https://hook.us1.make.com/sg30vwpdf5tywoykjmyj3nj0vuyph5bl";
+const SIGN_PAGE_BASE = "https://neatnecessarycleaning.com/sign-document";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-let selectedBox = null;
-let currentSigner = 1; // default signer
+/* ================================
+   FIELD TYPE → ICON + LABEL
+================================ */
+const FIELD_META = {
+  signature: { icon: "✍", label: "Signature" },
+  initials:  { icon: "✏", label: "Initials"  },
+  date:      { icon: "📅", label: "Date"      },
+  text:      { icon: "T",  label: "Text"      },
+  name:      { icon: "👤", label: "Name"      }
+};
 
+let selectedBox    = null;
+let currentSigner  = 1;
+let currentFieldType = 'signature';
+let fieldList      = [];
+let activeDrag     = null;
+let resizeTarget   = null, resizeDir = null;
+let startX, startY, startW, startH, startLeft, startTop;
+let candidates     = [];
+let activeTemplateBlobUrl = null;
 
-// ================================
-// 🔥 SUPABASE FILE UPLOAD
-// ================================
+/* ================================
+   SUPABASE UPLOAD
+================================ */
 async function uploadPdfToSupabase(file) {
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${crypto.randomUUID()}.${fileExt}`;
-  const filePath = `uploads/${fileName}`;
-
-  const { error } = await sb.storage
-    .from("documents")
-    .upload(filePath, file, {
-      cacheControl: "3600",
-      upsert: false
-    });
-
+  const ext      = file.name.split('.').pop();
+  const filePath = `uploads/${crypto.randomUUID()}.${ext}`;
+  const { error } = await sb.storage.from("documents").upload(filePath, file, { cacheControl: "3600", upsert: false });
   if (error) throw error;
-
-  // 🔑 Get public URL
-  const { data } = sb.storage
-    .from("documents")
-    .getPublicUrl(filePath);
-
+  const { data } = sb.storage.from("documents").getPublicUrl(filePath);
   return data.publicUrl;
 }
 
-
-
-/*RENDER PDF */
+/* ================================
+   RENDER PDF
+================================ */
 async function renderPDF(url) {
   const viewer = document.getElementById("pdf-viewer");
   viewer.innerHTML = "";
-
   const pdf = await pdfjsLib.getDocument(url).promise;
-
   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-    const page = await pdf.getPage(pageNum);
+    const page     = await pdf.getPage(pageNum);
     const viewport = page.getViewport({ scale: 1.2 });
-
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-
-    await page.render({
-      canvasContext: ctx,
-      viewport
-    }).promise;
-
-    const pageWrap = document.createElement("div");
-pageWrap.className = "page-container";
-pageWrap.dataset.page = pageNum;
-pageWrap.style.position = "relative";
-pageWrap.style.width = canvas.width + "px";
-pageWrap.style.height = canvas.height + "px";
-
-pageWrap.appendChild(canvas);
-viewer.appendChild(pageWrap);
-
+    const canvas   = document.createElement("canvas");
+    canvas.width   = viewport.width;
+    canvas.height  = viewport.height;
+    await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+    const wrap = document.createElement("div");
+    wrap.className    = "page-container";
+    wrap.dataset.page = pageNum;
+    wrap.style.cssText = `position:relative;width:${canvas.width}px;height:${canvas.height}px;`;
+    wrap.appendChild(canvas);
+    viewer.appendChild(wrap);
   }
 }
 
-// 🔑 REQUIRED: wire upload elements
+/* ================================
+   FILE UPLOAD
+================================ */
 const fileInput = document.getElementById('file-input');
-const dropZone = document.getElementById('drop-zone');
+const dropZone  = document.getElementById('drop-zone');
+dropZone.addEventListener('click', () => fileInput.click());
 
-dropZone.addEventListener('click', () => {
-  fileInput.click();
-});
-
-    let currentFieldType = 'signature';
-    let fieldList = [];
-
-function resetDocumentState() {
-  // 1️⃣ Remove all placed fields from DOM
-  document.querySelectorAll(".signature-box").forEach(el => el.remove());
-
-  // 2️⃣ Clear field data
-  fieldList = [];
-
-  // 3️⃣ Reset selection + drag state
-  selectedBox = null;
-  activeDrag = null;
-  resizeTarget = null;
-  resizeDir = null;
-
-  // 4️⃣ Optional: reset signer to 1 (safe default)
-  currentSigner = 1;
-
-  console.log("🧹 Document state reset");
-}
-
-
-  // File Upload Handler
 fileInput.onchange = async () => {
   resetDocumentState();
-
   const file = fileInput.files[0];
   if (!file) return;
-
-  // ================================
-  // 🔥 UPLOAD TO SUPABASE STORAGE
-  // ================================
-  let publicUrl = null;
-
   try {
-    publicUrl = await uploadPdfToSupabase(file);
-    console.log("Uploaded to Supabase:", publicUrl);
+    const url = await uploadPdfToSupabase(file);
+    window.UPLOADED_PDF_URL = url;
+    document.getElementById("upload-text").innerHTML = "✓ " + file.name;
+    const titleInput = document.getElementById("document_title");
+    if (titleInput && !titleInput.dataset.manual) {
+      titleInput.dataset.uploadName = file.name.replace(/\.pdf$/i, "");
+      titleInput.value = titleInput.dataset.uploadName;
+    }
+    renderPDF(url);
   } catch (err) {
     console.error("Upload failed:", err);
     alert("Failed to upload file to Supabase");
-    return;
   }
-
-  // Store URL globally so submitData can use it
-  window.UPLOADED_PDF_URL = publicUrl;
-
-  // Show filename in UI
-  document.getElementById("upload-text").innerHTML = "✓ " + file.name;
-
-  // ================================
-  // 🔥 AUTO TITLE FROM FILE
-  // ================================
-  const titleInput = document.getElementById("document_title");
-
-  if (titleInput && !titleInput.dataset.manual) {
-    const cleanName = file.name.replace(/\.pdf$/i, "");
-    titleInput.dataset.uploadName = cleanName;
-    titleInput.value = cleanName;
-  }
-
-  // Render PDF using PUBLIC URL (not blob)
-  renderPDF(publicUrl);
 };
 
-
-
-
-
-    
-    // Field Selector Handler
-    function setFieldType(type, btn) {
-        currentFieldType = type;
-        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-    
-let activeDrag = null;
-const pdfViewer = document.getElementById('pdf-viewer');
-
-// Create a draggable box
-function createSignatureBox(type) {
-  const box = document.createElement('div');
-  box.className = 'signature-box';
-  box.dataset.type = type;
-  box.dataset.signer = currentSigner;
-box.addEventListener('click', (e) => {
-  e.stopPropagation();
-  selectBox(box);
-});
-
-/*Helper*/
-function selectBox(box) {
-  document.querySelectorAll('.signature-box')
-    .forEach(b => b.classList.remove('selected'));
-
-  selectedBox = box;
-  box.classList.add('selected');
-}
-
-
-  if (type === 'text') {
-  box.innerText = `Text – Signer ${currentSigner}`;
-  box.contentEditable = true;
-  box.style.minWidth = '160px';
-}
-
-if (type === 'name') {
-  const nameInput = document.getElementById(`signer${currentSigner}_name`);
-  box.innerText = nameInput?.value || `Name – Signer ${currentSigner}`;
-  box.contentEditable = false; // 🔒 names are locked
-  box.style.minWidth = '160px';
-}
-
-if (type !== 'text' && type !== 'name') {
-  box.innerText = type.toUpperCase();
-}
-
-
-  // Drag logic
-  box.addEventListener('mousedown', (e) => {
-  // ❌ If clicking resize handle, DO NOT drag
-  if (e.target.classList.contains('resize-handle')) return;
-
-  e.stopPropagation();
-  activeDrag = box;
-
-  const rect = box.getBoundingClientRect();
-  box.dataset.offsetX = e.clientX - rect.left;
-  box.dataset.offsetY = e.clientY - rect.top;
-});
-
-  /* ================================
-   ADD RESIZE HANDLES TO BOX
+/* ================================
+   STATE RESET
 ================================ */
-const handles = [
-  't','b','l','r',
-  'tl','tr','bl','br'
-];
+function resetDocumentState() {
+  document.querySelectorAll(".signature-box").forEach(el => el.remove());
+  fieldList = [];
+  selectedBox = null;
+  activeDrag = resizeTarget = resizeDir = null;
+  currentSigner = 1;
+}
 
-handles.forEach(pos => {
-  const h = document.createElement('div');
-  h.className = `resize-handle resize-${pos}`;
-  h.dataset.direction = pos;
-  box.appendChild(h);
-});
+/* ================================
+   FIELD TYPE SELECTOR
+================================ */
+function setFieldType(type, btn) {
+  currentFieldType = type;
+  document.querySelectorAll('.field-toolbar .tool-btn').forEach(b => {
+    if (!b.id.startsWith('btn-signer')) b.classList.remove('active');
+  });
+  btn.classList.add('active');
+}
+
+/* ================================
+   CREATE DOCUSIGN-STYLE BOX
+================================ */
+function createSignatureBox(type, signerNum) {
+  const meta = FIELD_META[type] || { icon: "?", label: type };
+
+  const box = document.createElement('div');
+  box.className       = 'signature-box';
+  box.dataset.type    = type;
+  box.dataset.signer  = signerNum;
+  box.style.cssText   = 'min-width:140px;min-height:42px;';
+
+  /* Inner wrapper */
+  const inner = document.createElement('div');
+  inner.className = 'sig-inner';
+
+  /* Icon */
+  const icon = document.createElement('span');
+  icon.className   = 'sig-icon';
+  icon.textContent = meta.icon;
+
+  /* Label */
+  const label = document.createElement('span');
+  label.className = 'sig-label';
+
+  if (type === 'name') {
+    const nameEl = document.getElementById(`signer${signerNum}_name`);
+    label.textContent = nameEl?.value || `Name – Signer ${signerNum}`;
+  } else {
+    label.textContent = meta.label;
+  }
+
+  /* Signer tag */
+  const tag = document.createElement('span');
+  tag.className   = 'sig-tag';
+  tag.textContent = `Signer ${signerNum}`;
+
+  inner.appendChild(icon);
+  inner.appendChild(label);
+  inner.appendChild(tag);
+  box.appendChild(inner);
+
+  /* Resize handles */
+  ['t','b','l','r','tl','tr','bl','br'].forEach(pos => {
+    const h = document.createElement('div');
+    h.className       = `resize-handle resize-${pos}`;
+    h.dataset.direction = pos;
+    box.appendChild(h);
+  });
+
+  /* Select on click */
+  box.addEventListener('click', e => {
+    e.stopPropagation();
+    selectBox(box);
+  });
+
+  /* Drag start */
+  box.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('resize-handle')) return;
+    e.stopPropagation();
+    activeDrag = box;
+    const rect = box.getBoundingClientRect();
+    box.dataset.offsetX = e.clientX - rect.left;
+    box.dataset.offsetY = e.clientY - rect.top;
+  });
 
   return box;
 }
 
+function selectBox(box) {
+  document.querySelectorAll('.signature-box').forEach(b => b.classList.remove('selected'));
+  selectedBox = box;
+  box.classList.add('selected');
+}
 
-
-
-  /* ================================
-   GLOBAL DRAG RELEASE & MOVE HANDLERS
-   Controls dragging of placed fields
+/* ================================
+   CLICK ON PDF TO PLACE FIELD
 ================================ */
+const pdfViewer = document.getElementById('pdf-viewer');
 
-document.addEventListener('mouseup', () => {
-  if (activeDrag && activeDrag.__field) {
-    const f = activeDrag.__field;
-const pageEl = activeDrag.closest(".page-container");
-const pageW = pageEl.offsetWidth;
-const pageH = pageEl.offsetHeight;
-
-f.xPct = activeDrag.offsetLeft / pageW;
-f.yPct = activeDrag.offsetTop / pageH;
-f.wPct = activeDrag.offsetWidth / pageW;
-f.hPct = activeDrag.offsetHeight / pageH;
-
-  }
-  activeDrag = null;
-});
-
-
-document.addEventListener('mousemove', (e) => {
-  if (!activeDrag) return;
-
-  const pageEl = activeDrag.closest(".page-container");
+pdfViewer.addEventListener('click', e => {
+  if (e.target.closest('.signature-box')) return;
+  if (!currentFieldType) return;
+  const pageEl = e.target.closest(".page-container");
   if (!pageEl) return;
 
   const pageRect = pageEl.getBoundingClientRect();
+  const x = e.clientX - pageRect.left;
+  const y = e.clientY - pageRect.top;
+  const pageW = pageEl.offsetWidth;
+  const pageH = pageEl.offsetHeight;
 
-  const x =
-    e.clientX -
-    pageRect.left -
-    Number(activeDrag.dataset.offsetX);
+  const box = createSignatureBox(currentFieldType, currentSigner);
+  box.style.left = (x / pageW * 100) + "%";
+  box.style.top  = (y / pageH * 100) + "%";
+  pageEl.appendChild(box);
 
-  const y =
-    e.clientY -
-    pageRect.top -
-    Number(activeDrag.dataset.offsetY);
+  enforceSignerLock();
 
-  activeDrag.style.left = (x / pageEl.offsetWidth * 100) + "%";
-  activeDrag.style.top  = (y / pageEl.offsetHeight * 100) + "%";
+  const field = {
+    id: crypto.randomUUID(),
+    signer: currentSigner,
+    type: currentFieldType,
+    value: currentFieldType === 'name'
+      ? document.getElementById(`signer${currentSigner}_name`)?.value || ''
+      : '',
+    page: Number(pageEl.dataset.page),
+    xPct: x / pageW,
+    yPct: y / pageH,
+    wPct: box.offsetWidth / pageW,
+    hPct: box.offsetHeight / pageH
+  };
+  box.__field = field;
+  fieldList.push(field);
 });
 
 /* ================================
-   GLOBAL MULTI-DIRECTION RESIZE STATE
+   DRAG MOVE & RELEASE
 ================================ */
-let resizeTarget = null;
-let resizeDir = null;
-let startX, startY, startW, startH, startLeft, startTop;
-
-document.addEventListener('mousedown', (e) => {
-  const handle = e.target.closest('.resize-handle');
-  if (!handle) return;
-
-  e.stopPropagation();
-
-  resizeTarget = handle.parentElement;
-  resizeDir = handle.dataset.direction;
-
-  activeDrag = null; // 🔑 stop dragging
-
-  startX = e.clientX;
-  startY = e.clientY;
-  startW = resizeTarget.offsetWidth;
-  startH = resizeTarget.offsetHeight;
-  startLeft = resizeTarget.offsetLeft;
-  startTop = resizeTarget.offsetTop;
-});
-
-
-document.addEventListener('mousemove', (e) => {
-  if (!resizeTarget) return;
-
-  const dx = e.clientX - startX;
-  const dy = e.clientY - startY;
-
-  const minW = 20;
-  const minH = 10;
-
-  if (resizeDir.includes('r')) {
-    resizeTarget.style.width =
-      Math.max(minW, startW + dx) + 'px';
+document.addEventListener('mousemove', e => {
+  if (activeDrag) {
+    const pageEl = activeDrag.closest(".page-container");
+    if (!pageEl) return;
+    const rect = pageEl.getBoundingClientRect();
+    const x = e.clientX - rect.left - Number(activeDrag.dataset.offsetX);
+    const y = e.clientY - rect.top  - Number(activeDrag.dataset.offsetY);
+    activeDrag.style.left = (x / pageEl.offsetWidth  * 100) + "%";
+    activeDrag.style.top  = (y / pageEl.offsetHeight * 100) + "%";
   }
-
-  if (resizeDir.includes('l')) {
-    const newW = Math.max(minW, startW - dx);
-    resizeTarget.style.width = newW + 'px';
-    resizeTarget.style.left = startLeft + (startW - newW) + 'px';
-  }
-
-  if (resizeDir.includes('b')) {
-    resizeTarget.style.height =
-      Math.max(minH, startH + dy) + 'px';
-  }
-
-  if (resizeDir.includes('t')) {
-    const newH = Math.max(minH, startH - dy);
-    resizeTarget.style.height = newH + 'px';
-    resizeTarget.style.top = startTop + (startH - newH) + 'px';
+  if (resizeTarget) {
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    const minW = 80, minH = 30;
+    if (resizeDir.includes('r')) resizeTarget.style.width  = Math.max(minW, startW + dx) + 'px';
+    if (resizeDir.includes('l')) {
+      const nw = Math.max(minW, startW - dx);
+      resizeTarget.style.width = nw + 'px';
+      resizeTarget.style.left  = startLeft + (startW - nw) + 'px';
+    }
+    if (resizeDir.includes('b')) resizeTarget.style.height = Math.max(minH, startH + dy) + 'px';
+    if (resizeDir.includes('t')) {
+      const nh = Math.max(minH, startH - dy);
+      resizeTarget.style.height = nh + 'px';
+      resizeTarget.style.top    = startTop + (startH - nh) + 'px';
+    }
   }
 });
-
 
 document.addEventListener('mouseup', () => {
-  if (resizeTarget && resizeTarget.__field) {
-    const f = resizeTarget.__field;
-    const pageEl = resizeTarget.closest(".page-container");
-const pageW = pageEl.offsetWidth;
-const pageH = pageEl.offsetHeight;
-
-f.xPct = resizeTarget.offsetLeft / pageW;
-f.yPct = resizeTarget.offsetTop / pageH;
-f.wPct = resizeTarget.offsetWidth / pageW;
-f.hPct = resizeTarget.offsetHeight / pageH;
-;
-  }
-  resizeTarget = null;
-  resizeDir = null;
-});
-
-
-
-
-
-
-pdfViewer.addEventListener('click', (e) => {
-  // ❌ If clicking an existing box, do nothing
-  if (e.target.closest('.signature-box')) return;
-
-  if (!currentFieldType) return;
-
-  const pageEl = e.target.closest(".page-container");
-if (!pageEl) return;
-
-const pageRect = pageEl.getBoundingClientRect();
-
-const x = e.clientX - pageRect.left;
-const y = e.clientY - pageRect.top;
-
-const pageW = pageEl.offsetWidth;
-const pageH = pageEl.offsetHeight;
-
-
-
-  const box = createSignatureBox(currentFieldType);
-box.style.left = (x / pageW * 100) + "%";
-box.style.top = (y / pageH * 100) + "%";
-
-
-    pageEl.appendChild(box);
-
-
-  enforceSignerLock(); // ✅ FIX 2 — ENFORCE LOCK AFTER BOX CREATION
-
-  const field = {
-  id: crypto.randomUUID(),
-  signer: currentSigner,
-  type: currentFieldType,
-
- value:
-    currentFieldType === 'name'
-      ? document.getElementById(`signer${currentSigner}_name`)?.value || ''
-      : '',
-
-  page: Number(pageEl.dataset.page),
-
-  xPct: x / pageW,
-  yPct: y / pageH,
-  wPct: box.offsetWidth / pageW,
-  hPct: box.offsetHeight / pageH
-};
-
-
-box.__field = field;
-fieldList.push(field);
-
-
-
-
-});
-
-
-
-    // Click-to-Drop Logic
-    const overlay = document.getElementById('overlay-layer');
-    
-
-/* RESOURCE BUTTON LOGIC (Webhook #2) */
-async function requestResourceDoc(docType) {
-  const jiraCode =
-    document.getElementById("jira_code")?.value?.trim();
-
-  const requestorEmail =
-    document.getElementById("signer1_email")?.value || "Internal HR Request";
-
-  const requestorName =
-    document.getElementById("signer1_name")?.value || "Internal Staff";
-
-  // 🔒 Hard validation
-  if (!jiraCode) {
-    alert("Jira code is required before requesting this document.");
-    return;
-  }
-
-  try {
-    await fetch(RESOURCE_WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "request_document",
-        document_type: docType,
-        jira_code: jiraCode,
-        requestor_name: requestorName,
-        requestor_email: requestorEmail,
-        timestamp: new Date().toISOString()
-      })
-    });
-
-    alert(`${docType} requested successfully for ${jiraCode}!`);
-  } catch (err) {
-    console.error("Resource request failed:", err);
-    alert("Request failed.");
-  }
-}
-
-
-async function submitData() {
-  try {
-    const selectedTemplate = templateSelect.value;
-
-    const basePayload = {
-      jira: document.getElementById("jira_code")?.value || "",
-      template: selectedTemplate,
-      pdf_url: TEMPLATE_PDFS[selectedTemplate],
-      custom_email: document.getElementById("custom_email_message")?.value || ""
-    };
-
-    const signers = [
-      { signer_order: 1, name: signer1_name.value, email: signer1_email.value },
-      { signer_order: 2, name: signer2_name.value, email: signer2_email.value },
-      { signer_order: 3, name: signer3_name.value, email: signer3_email.value },
-      { signer_order: 4, name: signer4_name.value, email: signer4_email.value }
-    ].filter(s => s.email);
-
-    /* =========================
-       1️⃣ CREATE DOCUMENT (PARENT)
-    ========================= */
-    const { data: doc, error: docError } = await sb
-      .from("signer_documents")
-      .insert({
-  jira_code: basePayload.jira,
-  title:
-    document.getElementById("document_title")?.value ||
-    generateDocumentTitle(),
-  template_name: basePayload.template,
-  pdf_url: window.UPLOADED_PDF_URL || basePayload.pdf_url,
-  custom_email: basePayload.custom_email
-})
-
-      .select()
-      .single();
-
-    if (docError) throw docError;
-
-    const docId = doc.doc_id;
-
- /* =========================
-   2.5 INSERT SIGNERS
-========================= */
-
-let signerRows = []; // 🔑 MUST exist outside IF
-
-if (signers.length) {
-  signerRows = signers.map(s => ({
-    doc_id: docId,
-    signer_order: s.signer_order,
-    name: s.name,
-    email: s.email,
-    token: crypto.randomUUID()
-  }));
-
-  const { error: signerError } = await sb
-    .from("signers")
-    .insert(signerRows);
-
-  if (signerError) throw signerError;
-}
-
-/* =========================
-   2.7 INSERT DOCUMENT FIELDS   ← ADD THIS
-========================= */
-if (fieldList.length) {
-  const fieldRows = fieldList.map(f => ({
-    doc_id: docId,
-    signer_order: f.signer,
-    field_type: f.type,
-    value: f.value || "",
-    page: f.page,
-    x_pct: f.xPct,
-    y_pct: f.yPct,
-    w_pct: f.wPct,
-    h_pct: f.hPct
-  }));
-
-  const { error: fieldError } = await sb
-    .from("document_fields")
-    .insert(fieldRows);
-
-  if (fieldError) throw fieldError;
-}
-
-   /* =========================
-   3️⃣ TRIGGER MAKE EMAIL (FLAT PAYLOAD)
-========================= */
-await fetch(MAKE_WEBHOOK_URL, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    doc_id: docId,
-  title:
-    document.getElementById("document_title")?.value ||
-    generateDocumentTitle(),
-
-    template: basePayload.template,
-    pdf_url: basePayload.pdf_url,
-    custom_email: basePayload.custom_email,
-
-    // 🔥 FLAT SIGNER FIELDS (no arrays)
-    signer1_name: signerRows[0]?.name || null,
-    signer1_email: signerRows[0]?.email || null,
-    signer1_token: signerRows[0]?.token || null,
-
-    signer2_name: signerRows[1]?.name || null,
-    signer2_email: signerRows[1]?.email || null,
-    signer2_token: signerRows[1]?.token || null,
-
-    signer3_name: signerRows[2]?.name || null,
-    signer3_email: signerRows[2]?.email || null,
-    signer3_token: signerRows[2]?.token || null,
-
-    signer4_name: signerRows[3]?.name || null,
-    signer4_email: signerRows[3]?.email || null,
-    signer4_token: signerRows[3]?.token || null
-  })
-});
-
-alert("Document sent successfully for signature.");
-
-} catch (err) {
-  console.error("Submit failed:", err);
-  alert("Failed to send document. Check console.");
-}
-}
-  
-  
-
-
-
-
-
-
-    
-    /* DELETE FIELD — REMOVE FROM UI + DATA */
-document.addEventListener('keydown', (e) => {
-  if (!selectedBox) return;
-
-  if (e.key === 'Delete' || e.key === 'Backspace') {
-    const fieldId = selectedBox.__field?.id;
-
-    // remove DOM
-    selectedBox.remove();
-
-    // remove from data model
-    if (fieldId) {
-      fieldList = fieldList.filter(f => f.id !== fieldId);
+  if (activeDrag?.__field) {
+    const f = activeDrag.__field, el = activeDrag;
+    const pageEl = el.closest(".page-container");
+    if (pageEl) {
+      f.xPct = el.offsetLeft / pageEl.offsetWidth;
+      f.yPct = el.offsetTop  / pageEl.offsetHeight;
     }
+  }
+  activeDrag = null;
+  if (resizeTarget?.__field) {
+    const f = resizeTarget.__field, el = resizeTarget;
+    const pageEl = el.closest(".page-container");
+    if (pageEl) {
+      f.xPct = el.offsetLeft / pageEl.offsetWidth;
+      f.yPct = el.offsetTop  / pageEl.offsetHeight;
+      f.wPct = el.offsetWidth  / pageEl.offsetWidth;
+      f.hPct = el.offsetHeight / pageEl.offsetHeight;
+    }
+  }
+  resizeTarget = resizeDir = null;
+});
 
+/* ================================
+   RESIZE HANDLE MOUSEDOWN
+================================ */
+document.addEventListener('mousedown', e => {
+  const handle = e.target.closest('.resize-handle');
+  if (!handle) return;
+  e.stopPropagation();
+  resizeTarget = handle.parentElement;
+  resizeDir    = handle.dataset.direction;
+  activeDrag   = null;
+  startX    = e.clientX; startY    = e.clientY;
+  startW    = resizeTarget.offsetWidth;  startH    = resizeTarget.offsetHeight;
+  startLeft = resizeTarget.offsetLeft;   startTop  = resizeTarget.offsetTop;
+});
+
+/* ================================
+   DELETE SELECTED FIELD
+================================ */
+document.addEventListener('keydown', e => {
+  if (!selectedBox) return;
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    const id = selectedBox.__field?.id;
+    selectedBox.remove();
+    if (id) fieldList = fieldList.filter(f => f.id !== id);
     selectedBox = null;
   }
 });
 
-
+/* ================================
+   SIGNER SELECTOR
+================================ */
 function setSigner(n, btn) {
   currentSigner = n;
-
-  // toggle active UI
-  document
-    .querySelectorAll('#btn-signer1, #btn-signer2, #btn-signer3, #btn-signer4')
+  document.querySelectorAll('#btn-signer1,#btn-signer2,#btn-signer3,#btn-signer4')
     .forEach(b => b.classList.remove('active'));
-
   btn.classList.add('active');
   enforceSignerLock();
 }
 
 function enforceSignerLock() {
   document.querySelectorAll('.signature-box').forEach(box => {
-    const signer = Number(box.dataset.signer);
-    box.style.pointerEvents =
-      signer === currentSigner ? 'auto' : 'none';
-    box.style.opacity =
-      signer === currentSigner ? '1' : '0.4';
+    const active = Number(box.dataset.signer) === currentSigner;
+    box.style.pointerEvents = active ? 'auto' : 'none';
+    box.style.opacity       = active ? '1'    : '0.35';
   });
 }
 
-
 function updateSignerVisibility() {
   const count = Number(document.getElementById('signer_count').value);
-
   for (let i = 2; i <= 4; i++) {
     const row = document.getElementById(`signer${i}_row`);
-    if (!row) continue;
-    row.style.display = i <= count ? 'block' : 'none';
+    if (row) row.style.display = i <= count ? 'block' : 'none';
   }
 }
 
-const CANDIDATE_LOOKUP_WEBHOOK =
-  "https://hook.us1.make.com/sg30vwpdf5tywoykjmyj3nj0vuyph5bl";
-
-let candidates = [];
-
-// Fetch from Make
+/* ================================
+   CANDIDATE LOOKUP
+================================ */
 async function fetchCandidates() {
   try {
-    const res = await fetch(CANDIDATE_LOOKUP_WEBHOOK, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "get_signers" })
-    });
-
+    const res  = await fetch(CANDIDATE_LOOKUP_WEBHOOK, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ action:"get_signers" }) });
     if (!res.ok) throw new Error("Lookup failed");
-
     const data = await res.json();
-
-// 🔑 Make returns an ARRAY directly
-candidates = Array.isArray(data) ? data : [];
-
-showDropdown(candidates);
-
-
+    candidates = Array.isArray(data) ? data : [];
+    showDropdown(candidates);
   } catch (err) {
     console.error("Candidate lookup error:", err);
     alert("Could not load candidates");
   }
 }
 
-
-// Filter as you type
 function filterCandidates(query) {
   if (!candidates.length) return;
-
   const q = query.toLowerCase();
-
-  const filtered = candidates
-    .filter(c =>
-      c.name?.toLowerCase().includes(q) ||
-      c.email?.toLowerCase().includes(q) ||
-      c.jira_code?.toLowerCase().includes(q)
-    )
-    .slice(0, 10);
-
-  showDropdown(filtered);
+  showDropdown(candidates.filter(c =>
+    c.name?.toLowerCase().includes(q) ||
+    c.email?.toLowerCase().includes(q) ||
+    c.jira_code?.toLowerCase().includes(q)
+  ).slice(0, 10));
 }
 
-
-// Render dropdown
 function showDropdown(list) {
   const dropdown = document.getElementById("candidate-dropdown");
   dropdown.innerHTML = "";
-
-  if (!list.length) {
-    dropdown.classList.add("hidden");
-    return;
-  }
-
+  if (!list.length) { dropdown.classList.add("hidden"); return; }
   list.forEach(c => {
     const div = document.createElement("div");
     div.className = "candidate-item";
-    div.innerHTML = `
-      <strong>${c.name}</strong><br>
-      <span style="color:#64748b">
-        ${c.email} • ${c.jira_code || ""}
-      </span>
-    `;
-
+    div.innerHTML = `<strong style="color:#e2e8f0">${c.name}</strong><br><span style="color:#64748b;font-size:12px;">${c.email} · ${c.jira_code||""}</span>`;
     div.onclick = () => applyCandidate(c);
     dropdown.appendChild(div);
   });
-
   dropdown.classList.remove("hidden");
 }
 
-
-// Apply selection
 function applyCandidate(c) {
-  document.getElementById("signer1_name").value = c.name || "";
+  document.getElementById("signer1_name").value  = c.name  || "";
   document.getElementById("signer1_email").value = c.email || "";
-  document.getElementById("jira_code").value = c.jira_code || "";
-
+  document.getElementById("jira_code").value     = c.jira_code || "";
   document.getElementById("candidate-dropdown").classList.add("hidden");
 }
 
-
-// Click-away close
-// Click-away close (SAFE VERSION)
 document.addEventListener("click", e => {
-  if (
-    e.target.closest("#candidate-dropdown") ||
-    e.target.closest("#signer1_name") ||
-    e.target.closest(".tool-btn") // 🔑 allows Get button
-  ) {
-    return;
-  }
-
-  document
-    .getElementById("candidate-dropdown")
-    ?.classList.add("hidden");
+  if (e.target.closest("#candidate-dropdown") || e.target.closest("#signer1_name") || e.target.closest(".tool-btn")) return;
+  document.getElementById("candidate-dropdown")?.classList.add("hidden");
 });
 
-
-const templateSelect = document.getElementById("template-select");
-const titleInput = document.getElementById("document_title");
-const emailBox = document.getElementById("custom_email_message");
-const signer1NameInput = document.getElementById("signer1_name");
-
-// ================================
-// AUTO DOCUMENT TITLE SYSTEM
-// ================================
-function generateDocumentTitle() {
-  const titleInput = document.getElementById("document_title");
-
-  // 🔹 If HR manually edited → respect it
-  if (titleInput?.dataset.manual) return titleInput.value;
-
-  // 🔹 Base title priority
-  let baseTitle = "";
-
-  // 1️⃣ Uploaded file name (stored on title input)
-  if (titleInput?.dataset.uploadName) {
-    baseTitle = titleInput.dataset.uploadName;
-  }
-
-  // 2️⃣ Template name
-  else if (templateSelect.value) {
-    baseTitle = templateSelect.value;
-  }
-
-  // 3️⃣ Fallback
-  else {
-    baseTitle = "Document";
-  }
-
-  // 🔹 Append signer name if exists
-  const signerName =
-    document.getElementById("signer1_name")?.value?.trim() || "";
-
-  return signerName ? `${baseTitle} – ${signerName}` : baseTitle;
-}
-
-
-
-
-// 🔁 Sync Name fields when signer name changes
+/* ================================
+   NAME SYNC
+================================ */
 function attachNameSync(signerNum) {
   const input = document.getElementById(`signer${signerNum}_name`);
   if (!input) return;
-
   input.addEventListener("input", () => {
     document.querySelectorAll('.signature-box').forEach(box => {
-      if (
-        box.dataset.type === 'name' &&
-        Number(box.dataset.signer) === signerNum
-      ) {
-        box.innerText = input.value || `Name – Signer ${signerNum}`;
+      if (box.dataset.type === 'name' && Number(box.dataset.signer) === signerNum) {
+        box.querySelector('.sig-label').textContent = input.value || `Name – Signer ${signerNum}`;
       }
     });
-
-    fieldList.forEach(f => {
-      if (f.type === 'name' && f.signer === signerNum) {
-        f.value = input.value || '';
-      }
-    });
+    fieldList.forEach(f => { if (f.type === 'name' && f.signer === signerNum) f.value = input.value || ''; });
   });
 }
+[1,2,3,4].forEach(attachNameSync);
 
-// 🔑 attach for all possible signers
-[1, 2, 3, 4].forEach(attachNameSync);
-
-
-
+/* ================================
+   TEMPLATE EMAILS
+================================ */
 const TEMPLATE_EMAILS = {
-  "Contractor Agreement": (name) => `
-Hi ${name || "there"},
-
-Attached is the Independent Contractor Agreement for your review.
-
-Please read through the document and sign where indicated.
-If you have any questions, let us know before signing.
-
-Thank you,
-Neat & Necessary Cleaning
-`.trim(),
-
-  "Background Check Agreement": (name) => `
-Hi ${name || "there"},
-
-This email contains the Background Check Authorization form required to proceed.
-
-Please review and sign the document at your earliest convenience.
-Once completed, we can move forward with the next steps.
-
-Thank you,
-Neat & Necessary Cleaning
-`.trim(),
-
-  "W-9": (name) => `
-Hi ${name || "there"},
-
-Please complete and sign the attached W-9 form.
-
-This is required for payment and onboarding purposes.
-Let us know if you have any questions.
-
-Thank you,
-Neat & Necessary Cleaning
-`.trim()
+  "Contractor Agreement": name => `Hi ${name||"there"},\n\nAttached is the Independent Contractor Agreement for your review.\n\nPlease read through and sign where indicated.\n\nThank you,\nNeat & Necessary Cleaning`,
+  "Background Check Agreement": name => `Hi ${name||"there"},\n\nThis email contains the Background Check Authorization form required to proceed.\n\nPlease review and sign at your earliest convenience.\n\nThank you,\nNeat & Necessary Cleaning`,
+  "W-9": name => `Hi ${name||"there"},\n\nPlease complete and sign the attached W-9 form.\n\nThis is required for payment and onboarding.\n\nThank you,\nNeat & Necessary Cleaning`
 };
 
-let activeTemplateBlobUrl = null;
+/* ================================
+   AUTO TITLE
+================================ */
+function generateDocumentTitle() {
+  const titleInput = document.getElementById("document_title");
+  if (titleInput?.dataset.manual) return titleInput.value;
+  let base = titleInput?.dataset.uploadName || templateSelect.value || "Document";
+  const name = document.getElementById("signer1_name")?.value?.trim() || "";
+  return name ? `${base} – ${name}` : base;
+}
 
-async function loadPdfFromGoogleDrive(driveUrl) {
-  // Clean up previous blob
-  if (activeTemplateBlobUrl) {
-    URL.revokeObjectURL(activeTemplateBlobUrl);
-    activeTemplateBlobUrl = null;
-  }
-
-  const res = await fetch(driveUrl, {
-    method: "GET",
-    credentials: "omit",
-    cache: "no-store"
-  });
-
-  if (!res.ok) {
-    throw new Error("Fetch failed: " + res.status);
-  }
-
+/* ================================
+   TEMPLATE LOAD
+================================ */
+async function loadPdfFromUrl(url) {
+  if (activeTemplateBlobUrl) { URL.revokeObjectURL(activeTemplateBlobUrl); activeTemplateBlobUrl = null; }
+  const res  = await fetch(url, { method:"GET", credentials:"omit", cache:"no-store" });
+  if (!res.ok) throw new Error("Fetch failed: " + res.status);
   const blob = await res.blob();
-
-  // 🔑 HARD GUARD — prevents silent Drive HTML failures
-  if (blob.type !== "application/pdf") {
-    console.error("Google returned:", blob.type);
-    throw new Error("Not a PDF");
-  }
-
+  if (blob.type !== "application/pdf") throw new Error("Not a PDF");
   activeTemplateBlobUrl = URL.createObjectURL(blob);
   return activeTemplateBlobUrl;
 }
 
+const templateSelect    = document.getElementById("template-select");
+const titleInput        = document.getElementById("document_title");
+const emailBox          = document.getElementById("custom_email_message");
+const signer1NameInput  = document.getElementById("signer1_name");
 
 templateSelect.addEventListener("change", async () => {
-  resetDocumentState(); // 🔥 REQUIRED
-
+  resetDocumentState();
   const template = templateSelect.value;
-// Auto-generate title if HR hasn't manually changed it
-if (titleInput && !titleInput.dataset.manual) {
-  titleInput.value = generateDocumentTitle();
-}
-
-
-  /* --------------------
-     EMAIL (unchanged)
-  -------------------- */
-
-
-  /* --------------------
-     EMAIL (unchanged)
-  -------------------- */
+  if (titleInput && !titleInput.dataset.manual) titleInput.value = generateDocumentTitle();
+  emailBox.value = template ? (TEMPLATE_EMAILS[template]?.(signer1NameInput.value?.trim()) || "") : "";
   if (!template) {
-    emailBox.value = "";
-  } else {
-    const signerName = signer1NameInput.value?.trim();
-    const generator = TEMPLATE_EMAILS[template];
-    if (generator) {
-      emailBox.value = generator(signerName);
-    }
-  }
-
-  /* --------------------
-     PDF (Google-safe)
-  -------------------- */
-  if (!template) {
-    document.getElementById("pdf-viewer").innerHTML = `
-      <p style="text-align:center;color:#ccc;margin-top:100px;">
-        Select a template or upload a PDF
-      </p>
-    `;
+    document.getElementById("pdf-viewer").innerHTML = `<p style="text-align:center;color:#999;margin-top:120px;font-size:14px;">Select a template or upload a PDF</p>`;
     return;
   }
-
-  const driveUrl = TEMPLATE_PDFS[template];
-  if (!driveUrl) return;
-
-  document.getElementById("upload-text").innerHTML =
-    `✓ Template Loaded: ${template}`;
-
   try {
-    const blobUrl = await loadPdfFromGoogleDrive(driveUrl);
+    const blobUrl = await loadPdfFromUrl(TEMPLATE_PDFS[template]);
+    document.getElementById("upload-text").innerHTML = `✓ Template: ${template}`;
     await renderPDF(blobUrl);
   } catch (err) {
     console.error("Template PDF load failed:", err);
     alert("Could not load template PDF");
   }
-
-
-
-
-enforceSignerLock();
-updateSignerVisibility(); // ensure signer rows match dropdown on load
+  enforceSignerLock();
+  updateSignerVisibility();
 });
 
-</script>
+/* ================================
+   RESOURCE BUTTON
+================================ */
+async function requestResourceDoc(docType) {
+  const jiraCode = document.getElementById("jira_code")?.value?.trim();
+  if (!jiraCode) { alert("Jira code is required before requesting this document."); return; }
+  try {
+    await fetch(RESOURCE_WEBHOOK_URL, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        action:"request_document", document_type:docType, jira_code:jiraCode,
+        requestor_name:  document.getElementById("signer1_name")?.value  || "Internal Staff",
+        requestor_email: document.getElementById("signer1_email")?.value || "Internal HR Request",
+        timestamp: new Date().toISOString()
+      })
+    });
+    alert(`${docType} requested for ${jiraCode}.`);
+  } catch (err) { console.error(err); alert("Request failed."); }
+}
 
+/* ================================
+   SUBMIT
+================================ */
+async function submitData() {
+  try {
+    const selectedTemplate = templateSelect.value;
+    const basePayload = {
+      jira:         document.getElementById("jira_code")?.value || "",
+      template:     selectedTemplate,
+      pdf_url:      TEMPLATE_PDFS[selectedTemplate],
+      custom_email: document.getElementById("custom_email_message")?.value || ""
+    };
+
+    const signers = [
+      { signer_order:1, name:signer1_name.value, email:signer1_email.value },
+      { signer_order:2, name:signer2_name.value, email:signer2_email.value },
+      { signer_order:3, name:signer3_name.value, email:signer3_email.value },
+      { signer_order:4, name:signer4_name.value, email:signer4_email.value }
+    ].filter(s => s.email);
+
+    const { data: doc, error: docError } = await sb.from("signer_documents").insert({
+      jira_code:    basePayload.jira,
+      title:        document.getElementById("document_title")?.value || generateDocumentTitle(),
+      template_name:basePayload.template,
+      pdf_url:      window.UPLOADED_PDF_URL || basePayload.pdf_url,
+      custom_email: basePayload.custom_email
+    }).select().single();
+    if (docError) throw docError;
+
+    const docId = doc.doc_id;
+    let signerRows = [];
+    if (signers.length) {
+      signerRows = signers.map(s => ({ doc_id:docId, signer_order:s.signer_order, name:s.name, email:s.email, token:crypto.randomUUID() }));
+      const { error: signerError } = await sb.from("signers").insert(signerRows);
+      if (signerError) throw signerError;
+    }
+
+    if (fieldList.length) {
+      const { error: fieldError } = await sb.from("document_fields").insert(
+        fieldList.map(f => ({ doc_id:docId, signer_order:f.signer, field_type:f.type, value:f.value||"", page:f.page, x_pct:f.xPct, y_pct:f.yPct, w_pct:f.wPct, h_pct:f.hPct }))
+      );
+      if (fieldError) throw fieldError;
+    }
+
+    await fetch(MAKE_WEBHOOK_URL, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        doc_id:docId,
+        title: document.getElementById("document_title")?.value || generateDocumentTitle(),
+        template:basePayload.template, pdf_url:basePayload.pdf_url, custom_email:basePayload.custom_email,
+        signer1_name:signerRows[0]?.name||null,  signer1_email:signerRows[0]?.email||null,  signer1_token:signerRows[0]?.token||null,
+        signer2_name:signerRows[1]?.name||null,  signer2_email:signerRows[1]?.email||null,  signer2_token:signerRows[1]?.token||null,
+        signer3_name:signerRows[2]?.name||null,  signer3_email:signerRows[2]?.email||null,  signer3_token:signerRows[2]?.token||null,
+        signer4_name:signerRows[3]?.name||null,  signer4_email:signerRows[3]?.email||null,  signer4_token:signerRows[3]?.token||null
+      })
+    });
+
+    alert("Document sent successfully for signature.");
+  } catch (err) {
+    console.error("Submit failed:", err);
+    alert("Failed to send document. Check console.");
+  }
+}
+</script>
 </body>
 </html>
