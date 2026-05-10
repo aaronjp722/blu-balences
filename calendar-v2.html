@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Free Call | Blu Balence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .booking-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+      display: flex;
+      max-width: 860px;
+      width: 100%;
+      min-height: 580px;
+      overflow: hidden;
+    }
+
+    /* ── LEFT PANEL ── */
+    .left-panel {
+      width: 300px;
+      flex-shrink: 0;
+      border-right: 1px solid #e2e8f0;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand { font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 10px; }
+    .brand span { color: #2563eb; }
+
+    .event-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -.4px;
+      margin-bottom: 16px;
+      line-height: 1.25;
+    }
+
+    .event-meta {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+
+    .meta-icon { font-size: 14px; }
+
+    .divider { height: 1px; background: #e2e8f0; margin: 20px 0; }
+
+    /* ── CALENDAR ── */
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .cal-month-label { font-size: 14px; font-weight: 700; color: #0f172a; }
+
+    .cal-nav {
+      width: 28px; height: 28px;
+      border: none; background: transparent;
+      border-radius: 6px; cursor: pointer;
+      color: #64748b; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .1s, color .1s;
+    }
+    .cal-nav:hover { background: #f1f5f9; color: #0f172a; }
+    .cal-nav:disabled { opacity: .25; cursor: not-allowed; }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .cal-dow {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #94a3b8;
+      padding: 2px 0 8px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .cal-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all .12s;
+      cursor: default;
+      user-select: none;
+    }
+
+    .cal-day.past   { color: #e2e8f0; }
+    .cal-day.weekend { color: #cbd5e1; }
+
+    .cal-day.available {
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .cal-day.available:hover { background: #dbeafe; }
+
+    .cal-day.full {
+      color: #cbd5e1;
+      text-decoration: line-through;
+    }
+
+    .cal-day.today:not(.selected) {
+      outline: 2px solid #2563eb;
+      color: #2563eb;
+    }
+
+    .cal-day.selected {
+      background: #2563eb !important;
+      color: #fff !important;
+      font-weight: 700;
+    }
+
+    /* Timezone */
+    .tz-wrap {
+      margin-top: auto;
+      padding-top: 18px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .tz-select {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      cursor: pointer;
+      outline: none;
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .right-panel {
+      flex: 1;
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* Placeholder */
+    .placeholder {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      text-align: center;
+      gap: 10px;
+    }
+    .placeholder-arrow { font-size: 32px; opacity: .3; }
+    .placeholder p { font-size: 14px; max-width: 200px; line-height: 1.5; }
+
+    /* Slots view */
+    .slots-view { display: none; flex-direction: column; height: 100%; }
+    .slots-view.active { display: flex; }
+
+    .panel-date { font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 2px; }
+    .panel-tz   { font-size: 11px; color: #94a3b8; margin-bottom: 18px; }
+
+    .slots-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 4px;
+    }
+    .slots-list::-webkit-scrollbar { width: 4px; }
+    .slots-list::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
+
+    .slot-btn {
+      width: 100%;
+      padding: 12px;
+      background: #fff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1d4ed8;
+      cursor: pointer;
+      text-align: center;
+      transition: all .12s;
+      flex-shrink: 0;
+    }
+    .slot-btn:hover:not(:disabled) { border-color: #2563eb; background: #eff6ff; }
+    .slot-btn:disabled {
+      color: #cbd5e1;
+      border-color: #f8fafc;
+      background: #f8fafc;
+      cursor: default;
+      font-weight: 400;
+      text-decoration: line-through;
+    }
+    .slot-btn.selected { background: #2563eb; border-color: #2563eb; color: #fff; }
+
+    .slots-loading { text-align: center; color: #94a3b8; font-size: 13px; padding: 40px 0; }
+
+    /* Form view */
+    .form-view { display: none; flex-direction: column; height: 100%; }
+    .form-view.active { display: flex; }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      color: #64748b;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 16px;
+      transition: color .12s;
+    }
+    .back-btn:hover { color: #0f172a; }
+
+    .selected-badge {
+      display: inline-block;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      border-radius: 8px;
+      padding: 7px 13px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .form-fields { display: flex; flex-direction: column; gap: 13px; flex: 1; overflow-y: auto; }
+
+    .field-group { display: flex; flex-direction: column; gap: 5px; }
+    .field-label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .6px; }
+
+    .field-input {
+      padding: 10px 12px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: #0f172a;
+      outline: none;
+      transition: border-color .12s, box-shadow .12s;
+      width: 100%;
+    }
+    .field-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.10); }
+    .field-input::placeholder { color: #94a3b8; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .submit-btn {
+      width: 100%;
+      padding: 13px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 14px;
+      transition: background .12s;
+      flex-shrink: 0;
+    }
+    .submit-btn:hover { background: #1d4ed8; }
+    .submit-btn:disabled { opacity: .55; cursor: not-allowed; }
+
+    /* Success */
+    .success-view { display: none; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; padding: 20px; }
+    .success-view.active { display: flex; }
+
+    .success-icon {
+      width: 60px; height: 60px;
+      background: #f0fdf4;
+      border: 2px solid #86efac;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; color: #16a34a;
+      margin-bottom: 18px;
+    }
+    .success-view h2 { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    .success-view p  { font-size: 14px; color: #64748b; line-height: 1.65; max-width: 280px; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1e293b; border-radius: 10px;
+      padding: 12px 22px; font-size: 14px; font-weight: 600;
+      color: #e5e7eb; box-shadow: 0 16px 40px rgba(0,0,0,.3);
+      transition: transform .3s ease; z-index: 999; white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { border: 1px solid #ef4444; color: #fca5a5; }
+
+    @media (max-width: 680px) {
+      body { padding: 0; align-items: flex-start; }
+      .booking-card { flex-direction: column; border-radius: 0; min-height: 100vh; box-shadow: none; max-width: 100%; }
+      .left-panel { width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; padding: 24px 20px; }
+      .right-panel { padding: 24px 20px; }
+      .field-row { grid-template-columns: 1fr; }
+      .tz-wrap { margin-top: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="booking-card">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="brand">Blu <span>Balence</span></div>
+    <div class="event-title">Free 30-Minute Discovery Call</div>
+
+    <div class="event-meta">
+      <span class="meta-icon">&#128337;</span>
+      <span>30 minutes</span>
+    </div>
+    <div class="event-meta">
+      <span class="meta-icon">&#128222;</span>
+      <span>Phone call</span>
+    </div>
+    <div class="event-meta">
+      <span class="meta-icon">&#128197;</span>
+      <span>Mon – Fri, 9 AM – 5 PM</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="cal-header">
+      <button class="cal-nav" id="prev-month">&#8592;</button>
+      <span class="cal-month-label" id="cal-month-label"></span>
+      <button class="cal-nav" id="next-month">&#8594;</button>
+    </div>
+
+    <div class="cal-grid" id="cal-grid"></div>
+
+    <div class="tz-wrap">
+      <span>&#127758;</span>
+      <select class="tz-select" id="tz-select">
+        <option value="America/New_York">Eastern (ET)</option>
+        <option value="America/Chicago">Central (CT)</option>
+        <option value="America/Denver">Mountain (MT)</option>
+        <option value="America/Los_Angeles">Pacific (PT)</option>
+        <option value="America/Anchorage">Alaska (AKT)</option>
+        <option value="Pacific/Honolulu">Hawaii (HT)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- Placeholder -->
+    <div class="placeholder" id="placeholder">
+      <div class="placeholder-arrow">&#8592;</div>
+      <p>Select a date to see available times</p>
+    </div>
+
+    <!-- Slots -->
+    <div class="slots-view" id="slots-view">
+      <div class="panel-date" id="panel-date"></div>
+      <div class="panel-tz"   id="panel-tz"></div>
+      <div class="slots-list" id="slots-list"></div>
+    </div>
+
+    <!-- Booking form -->
+    <div class="form-view" id="form-view">
+      <button class="back-btn" id="back-btn">&#8592; Back</button>
+      <div class="selected-badge" id="selected-badge"></div>
+
+      <div class="form-fields" id="form-fields">
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">Full Name <span style="color:#ef4444">*</span></label>
+            <input class="field-input" type="text" id="f-name" placeholder="Jane Smith" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Business Name <span style="color:#ef4444">*</span></label>
+            <input class="field-input" type="text" id="f-biz" placeholder="Acme LLC" required>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">Email <span style="color:#ef4444">*</span></label>
+            <input class="field-input" type="email" id="f-email" placeholder="jane@acme.com" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Phone <span style="color:#ef4444">*</span></label>
+            <input class="field-input" type="tel" id="f-phone" placeholder="(555) 000-0000" required>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Anything we should know? (optional)</label>
+          <input class="field-input" type="text" id="f-notes" placeholder="Current bookkeeping setup, questions…">
+        </div>
+      </div>
+
+      <button class="submit-btn" id="submit-btn">Confirm Appointment</button>
+    </div>
+
+    <!-- Success -->
+    <div class="success-view" id="success-view">
+      <div class="success-icon">&#10003;</div>
+      <h2>You're on the calendar</h2>
+      <p>A confirmation has been sent to your email. We look forward to speaking with you.</p>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const supabase = createClient(
+  "https://rfdvogakvyodixgpvqvz.supabase.co",
+  "sb_publishable_zJJjwZoMP0N9dod1KIxLEQ_h7hWDLuv"
+);
+
+const WEBHOOK_URL = "https://hook.us1.make.com/e3av1w86ovv5w89fs3hwq50aln33oq3c";
+
+const ALL_SLOTS = [
+  { label: "9:00 AM",  value: "09:00" },
+  { label: "10:00 AM", value: "10:00" },
+  { label: "11:00 AM", value: "11:00" },
+  { label: "12:00 PM", value: "12:00" },
+  { label: "1:00 PM",  value: "13:00" },
+  { label: "2:00 PM",  value: "14:00" },
+  { label: "3:00 PM",  value: "15:00" },
+  { label: "4:00 PM",  value: "16:00" },
+  { label: "5:00 PM",  value: "17:00" },
+];
+
+/* ── STATE ── */
+const today      = new Date();
+today.setHours(0,0,0,0);
+let viewYear     = today.getFullYear();
+let viewMonth    = today.getMonth();
+let selectedDate = null;
+let selectedTime = null;
+let bookedMap    = {}; // "YYYY-MM-DD" → Set of booked hour numbers
+let userTz       = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+/* ── UTILS ── */
+function localToUtc(dateStr, timeStr, tz) {
+  const local = new Date(`${dateStr}T${timeStr}:00`);
+  const tzRef = new Date(local.toLocaleString("en-US", { timeZone: tz }));
+  return new Date(local.getTime() + (local - tzRef)).toISOString();
+}
+
+function utcToLocalHour(utcStr, tz) {
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone: tz, hour: "numeric", hour12: false })
+    .formatToParts(new Date(utcStr));
+  return parseInt(parts.find(p => p.type === "hour").value, 10);
+}
+
+function dateKey(y, m, d) {
+  return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+}
+
+function showToast(msg, type = "") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove("show"), 4000);
+}
+
+/* ── TIMEZONE SELECT ── */
+const tzSelect = document.getElementById("tz-select");
+// Set to detected timezone if in list
+for (const opt of tzSelect.options) {
+  if (opt.value === userTz) { tzSelect.value = userTz; break; }
+}
+tzSelect.addEventListener("change", () => {
+  userTz = tzSelect.value;
+  bookedMap = {};
+  loadMonthBookings().then(() => {
+    renderCalendar();
+    if (selectedDate) loadSlots(selectedDate);
+  });
+});
+
+/* ── LOAD MONTH BOOKINGS ── */
+async function loadMonthBookings() {
+  const start = new Date(viewYear, viewMonth, 1).toISOString();
+  const end   = new Date(viewYear, viewMonth + 1, 0, 23, 59, 59).toISOString();
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("appointment_utc")
+    .gte("appointment_utc", start)
+    .lte("appointment_utc", end);
+
+  if (error) { console.error(error); return; }
+
+  bookedMap = {};
+  (data || []).forEach(row => {
+    const d   = new Date(row.appointment_utc);
+    const key = dateKey(
+      parseInt(new Intl.DateTimeFormat("en-US",{timeZone:userTz,year:"numeric"}).format(d)),
+      parseInt(new Intl.DateTimeFormat("en-US",{timeZone:userTz,month:"numeric"}).format(d)) - 1,
+      parseInt(new Intl.DateTimeFormat("en-US",{timeZone:userTz,day:"numeric"}).format(d))
+    );
+    if (!bookedMap[key]) bookedMap[key] = new Set();
+    bookedMap[key].add(utcToLocalHour(row.appointment_utc, userTz));
+  });
+}
+
+/* ── RENDER CALENDAR ── */
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DOWS   = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+
+function renderCalendar() {
+  document.getElementById("cal-month-label").textContent = `${MONTHS[viewMonth]} ${viewYear}`;
+
+  const prevBtn = document.getElementById("prev-month");
+  const nowMonth = today.getMonth(), nowYear = today.getFullYear();
+  prevBtn.disabled = (viewYear < nowYear) || (viewYear === nowYear && viewMonth <= nowMonth);
+
+  const grid = document.getElementById("cal-grid");
+  grid.innerHTML = "";
+
+  // Day of week headers
+  DOWS.forEach(d => {
+    const el = document.createElement("div");
+    el.className = "cal-dow";
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+  // Blank cells
+  for (let i = 0; i < firstDay; i++) {
+    const el = document.createElement("div");
+    el.className = "cal-day empty";
+    grid.appendChild(el);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const el  = document.createElement("div");
+    const key = dateKey(viewYear, viewMonth, d);
+    const dow = new Date(viewYear, viewMonth, d).getDay();
+    const date = new Date(viewYear, viewMonth, d);
+
+    let cls = "cal-day";
+
+    if (date < today) {
+      cls += " past";
+    } else if (dow === 0 || dow === 6) {
+      cls += " weekend";
+    } else {
+      const booked = bookedMap[key];
+      const fullyBooked = booked && booked.size >= ALL_SLOTS.length;
+      if (fullyBooked) {
+        cls += " full";
+      } else {
+        cls += " available";
+        el.addEventListener("click", () => selectDate(key, d));
+      }
+    }
+
+    if (date.getTime() === today.getTime()) cls += " today";
+    if (key === selectedDate) cls += " selected";
+
+    el.className = cls;
+    el.textContent = d;
+    grid.appendChild(el);
+  }
+}
+
+/* ── SELECT DATE ── */
+function selectDate(key, d) {
+  selectedDate = key;
+  selectedTime = null;
+  renderCalendar();
+  showSlots(key);
+}
+
+/* ── SHOW SLOTS ── */
+async function showSlots(key) {
+  document.getElementById("placeholder").style.display = "none";
+  document.getElementById("form-view").classList.remove("active");
+  document.getElementById("success-view").classList.remove("active");
+  document.getElementById("slots-view").classList.add("active");
+
+  const [y, m, d] = key.split("-").map(Number);
+  const dateObj = new Date(y, m - 1, d);
+  const formatted = dateObj.toLocaleDateString("en-US", { weekday:"long", month:"long", day:"numeric" });
+  document.getElementById("panel-date").textContent = formatted;
+  document.getElementById("panel-tz").textContent   = userTz.replace(/_/g," ");
+
+  const list = document.getElementById("slots-list");
+  list.innerHTML = `<div class="slots-loading">Checking availability…</div>`;
+
+  const dayStart = localToUtc(key, "00:00", userTz);
+  const dayEnd   = localToUtc(key, "23:59", userTz);
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("appointment_utc")
+    .gte("appointment_utc", dayStart)
+    .lte("appointment_utc", dayEnd);
+
+  const bookedHours = new Set((data || []).map(r => utcToLocalHour(r.appointment_utc, userTz)));
+
+  list.innerHTML = "";
+  ALL_SLOTS.forEach(slot => {
+    const hour = parseInt(slot.value.split(":")[0], 10);
+    const btn  = document.createElement("button");
+    btn.className = "slot-btn";
+    btn.textContent = slot.label;
+    if (bookedHours.has(hour)) {
+      btn.disabled = true;
+      btn.textContent += "  —  Unavailable";
+    } else {
+      btn.addEventListener("click", () => selectSlot(slot));
+    }
+    list.appendChild(btn);
+  });
+}
+
+/* ── SELECT SLOT ── */
+function selectSlot(slot) {
+  selectedTime = slot;
+
+  document.querySelectorAll(".slot-btn").forEach(b => b.classList.remove("selected"));
+  event.currentTarget.classList.add("selected");
+
+  const [y, m, d] = selectedDate.split("-").map(Number);
+  const dateObj = new Date(y, m - 1, d);
+  const formatted = dateObj.toLocaleDateString("en-US", { weekday:"long", month:"long", day:"numeric" });
+
+  document.getElementById("selected-badge").textContent = `${formatted} at ${slot.label} (${userTz.replace(/_/g," ")})`;
+
+  setTimeout(() => {
+    document.getElementById("slots-view").classList.remove("active");
+    document.getElementById("form-view").classList.add("active");
+  }, 180);
+}
+
+/* ── BACK BUTTON ── */
+document.getElementById("back-btn").addEventListener("click", () => {
+  document.getElementById("form-view").classList.remove("active");
+  document.getElementById("slots-view").classList.add("active");
+  selectedTime = null;
+});
+
+/* ── SUBMIT ── */
+document.getElementById("submit-btn").addEventListener("click", async () => {
+  const name  = document.getElementById("f-name").value.trim();
+  const biz   = document.getElementById("f-biz").value.trim();
+  const email = document.getElementById("f-email").value.trim();
+  const phone = document.getElementById("f-phone").value.trim();
+  const notes = document.getElementById("f-notes").value.trim();
+
+  if (!name || !biz || !email || !phone) {
+    showToast("Please fill in all required fields.", "error");
+    return;
+  }
+  if (!selectedDate || !selectedTime) {
+    showToast("Please select a date and time.", "error");
+    return;
+  }
+
+  const btn = document.getElementById("submit-btn");
+  btn.disabled = true;
+  btn.textContent = "Booking…";
+
+  const appointmentUtc = localToUtc(selectedDate, selectedTime.value, userTz);
+
+  const payload = {
+    name:            `Discovery Call — ${biz}`,
+    client_name:     name,
+    phone,
+    email,
+    notes:           notes || null,
+    appointment_utc: appointmentUtc,
+    timezone:        userTz,
+  };
+
+  try {
+    const { data, error } = await supabase.from("appointments").insert([payload]).select();
+    if (error) throw error;
+
+    const apptId = data?.[0]?.id || null;
+    fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "created", ...payload, appointment_id: apptId })
+    }).catch(console.warn);
+
+    document.getElementById("form-view").classList.remove("active");
+    document.getElementById("success-view").classList.add("active");
+
+  } catch (err) {
+    console.error(err);
+    showToast("Something went wrong. Please try again.", "error");
+    btn.disabled = false;
+    btn.textContent = "Confirm Appointment";
+  }
+});
+
+/* ── MONTH NAV ── */
+document.getElementById("prev-month").addEventListener("click", async () => {
+  viewMonth--;
+  if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+  selectedDate = null;
+  await loadMonthBookings();
+  renderCalendar();
+  document.getElementById("slots-view").classList.remove("active");
+  document.getElementById("form-view").classList.remove("active");
+  document.getElementById("placeholder").style.display = "";
+});
+
+document.getElementById("next-month").addEventListener("click", async () => {
+  viewMonth++;
+  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+  selectedDate = null;
+  await loadMonthBookings();
+  renderCalendar();
+  document.getElementById("slots-view").classList.remove("active");
+  document.getElementById("form-view").classList.remove("active");
+  document.getElementById("placeholder").style.display = "";
+});
+
+/* ── INIT ── */
+await loadMonthBookings();
+renderCalendar();
+</script>
+
+</body>
+</html>
