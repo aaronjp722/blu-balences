@@ -12,4 +12,4 @@
     { "source": "/staff", "destination": "/staff.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
-}calendar-v2.html
+}
