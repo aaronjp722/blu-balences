@@ -7,23 +7,67 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b1220; --surface: #111827; --surface2: #1a2336;
-      --border: rgba(255,255,255,.10); --border2: rgba(255,255,255,.06);
-      --text: #e5e7eb; --text-sub: #9ca3af; --text-dim: #4b5563;
-      --primary: #3b82f6; --primary-dark: #2563eb;
-      --success: #22c55e; --danger: #ef4444;
+      --bg: #0b1220;
+      --surface: #111827;
+      --surface2: #1a2336;
+      --border: rgba(255,255,255,.10);
+      --border2: rgba(255,255,255,.06);
+      --text: #e5e7eb;
+      --text-sub: #9ca3af;
+      --text-dim: #4b5563;
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
       --input-bg: #020617;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
-    .topbar { display: flex; align-items: center; gap: 16px; padding: 12px 24px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; position: sticky; top: 0; z-index: 100; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
     .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
     .logo-mark { width: 34px; height: 34px; background: var(--primary); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: #fff; flex-shrink: 0; }
     .logo-text { font-size: 16px; font-weight: 700; color: var(--text); }
     .logo-sep { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
     .topbar-title { font-size: 15px; font-weight: 600; color: var(--text); }
     .topbar-spacer { flex: 1; }
-    .btn { padding: 8px 16px; border-radius: 8px; border: none; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s, transform .1s; display: inline-flex; align-items: center; gap: 6px; }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
     .btn:active { transform: scale(.98); }
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-primary:hover { background: var(--primary-dark); }
@@ -32,107 +76,400 @@
     .btn-danger { background: var(--danger); color: #fff; }
     .btn-danger:hover { background: #dc2626; }
     .btn-sm { padding: 5px 10px; font-size: 12px; }
-    .main { flex: 1; padding: 28px 24px; max-width: 1100px; width: 100%; margin: 0 auto; }
-    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
-    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; }
-    .stat-label { font-size: 11px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
-    .stat-value { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; }
-    .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-    .search-wrap { position: relative; flex: 1; min-width: 200px; }
-    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 14px; pointer-events: none; }
-    .search-input { width: 100%; padding: 9px 12px 9px 34px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; }
+
+    /* ── MAIN ── */
+    .main {
+      flex: 1;
+      padding: 28px 24px;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ── STATS ROW ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 9px 12px 9px 34px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+    }
+
     .search-input:focus { outline: none; border-color: var(--primary); }
     .search-input::placeholder { color: var(--text-dim); }
-    .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
-    table { width: 100%; border-collapse: collapse; }
-    thead th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border); background: var(--surface2); white-space: nowrap; }
-    tbody tr { border-bottom: 1px solid var(--border2); transition: background .1s; }
+
+    .filter-select {
+      padding: 9px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .filter-select:focus { outline: none; border-color: var(--primary); }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border2);
+      transition: background .1s;
+    }
+
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: var(--surface2); }
-    tbody td { padding: 14px 16px; font-size: 13px; color: var(--text); vertical-align: middle; }
+
+    tbody td {
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--text);
+      vertical-align: middle;
+    }
+
     .td-name { font-weight: 600; }
     .td-company { color: var(--text-sub); }
     .td-email { color: var(--primary); font-size: 12px; }
-    .td-actions { display: flex; gap: 6px; justify-content: flex-end; }
-    .stage-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; background: rgba(59,130,246,.12); color: #60a5fa; }
-    .empty-state { padding: 60px 20px; text-align: center; color: var(--text-sub); }
-    .empty-state p { margin-top: 8px; font-size: 13px; }
-    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
-    .modal-backdrop.open { display: flex; }
-    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
-    .modal::-webkit-scrollbar { width: 4px; }
-    .modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-    .modal-title { font-size: 18px; font-weight: 700; }
-    .modal-close { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 7px; border: 1px solid var(--border); background: transparent; color: var(--text-sub); cursor: pointer; font-size: 18px; line-height: 1; }
-    .modal-close:hover { background: var(--surface2); color: var(--text); }
-    .form-group { margin-bottom: 18px; }
-    .form-group:last-of-type { margin-bottom: 0; }
-    label { display: block; font-size: 12px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 7px; }
-    input[type="text"], input[type="email"], textarea { width: 100%; padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; transition: border-color .15s; }
-    input:focus, textarea:focus { outline: none; border-color: var(--primary); }
-    input::placeholder, textarea::placeholder { color: var(--text-dim); }
-    textarea { resize: vertical; min-height: 90px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .modal-footer { display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end; }
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1e293b; border: 1px solid var(--border); border-radius: 10px; padding: 12px 22px; font-size: 14px; font-weight: 600; color: var(--text); box-shadow: 0 16px 40px rgba(0,0,0,.5); transition: transform .3s ease; z-index: 9999; white-space: nowrap; }
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast.success { border-color: var(--success); color: var(--success); }
-    .toast.error { border-color: var(--danger); color: var(--danger); }
-    .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(11,18,32,.6); z-index: 2000; align-items: center; justify-content: center; }
-    .loading-overlay.show { display: flex; }
-    .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .7s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── IMPORT MODAL ── */
-    .import-modal { max-width: 540px; }
-    .drop-zone {
+    .td-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    /* ── CSV DROP ZONE ── */
+    .csv-drop {
       border: 2px dashed var(--border);
       border-radius: 12px;
       padding: 36px 20px;
       text-align: center;
       cursor: pointer;
-      transition: border-color .2s, background .2s;
-      margin-bottom: 18px;
+      transition: border-color .15s, background .15s;
+      color: var(--text-sub);
+      font-size: 14px;
     }
-    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--primary); background: rgba(59,130,246,.05); }
-    .drop-zone p { font-size: 13px; color: var(--text-sub); margin-top: 8px; }
-    .drop-zone strong { font-size: 14px; color: var(--text); }
-    .import-preview { background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; font-size: 12px; color: var(--text-sub); line-height: 1.7; margin-bottom: 16px; max-height: 160px; overflow-y: auto; }
-    .import-preview strong { color: var(--success); }
-    .col-hint { font-size: 11px; color: var(--text-dim); margin-top: 10px; line-height: 1.6; }
-    .col-hint code { background: var(--surface2); padding: 1px 5px; border-radius: 4px; color: var(--text-sub); font-size: 11px; }
 
-    ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-    @media (max-width: 700px) { .form-row { grid-template-columns: 1fr; } .main { padding: 20px 14px; } table { font-size: 12px; } thead th, tbody td { padding: 10px 10px; } }
+    .csv-drop:hover, .csv-drop.drag-over {
+      border-color: var(--primary);
+      background: rgba(59,130,246,.05);
+    }
+
+    .csv-drop input[type="file"] { display: none; }
+
+    .col-hint {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    .col-hint code {
+      background: var(--surface2);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 11px;
+      color: var(--primary);
+    }
+
+    .csv-preview {
+      margin-top: 16px;
+      font-size: 13px;
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 14px 16px;
+      max-height: 180px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .csv-preview .row-ok { color: var(--success); }
+    .csv-preview .row-skip { color: var(--warning); }
+
+    /* ── STAGE BADGE ── */
+    .stage-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      background: rgba(59,130,246,.12);
+      color: #60a5fa;
+    }
+
+    .empty-state {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-sub);
+    }
+
+    .empty-state p { margin-top: 8px; font-size: 13px; }
+
+    /* ── MODAL ── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal::-webkit-scrollbar { width: 4px; }
+    .modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .modal-title { font-size: 18px; font-weight: 700; }
+
+    .modal-close {
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 7px; border: 1px solid var(--border);
+      background: transparent; color: var(--text-sub);
+      cursor: pointer; font-size: 18px; line-height: 1;
+    }
+
+    .modal-close:hover { background: var(--surface2); color: var(--text); }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group:last-of-type { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 7px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      transition: border-color .15s;
+    }
+
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); }
+    input::placeholder, textarea::placeholder { color: var(--text-dim); }
+    textarea { resize: vertical; min-height: 90px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+      justify-content: flex-end;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1e293b;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      box-shadow: 0 16px 40px rgba(0,0,0,.5);
+      transition: transform .3s ease;
+      z-index: 9999;
+      white-space: nowrap;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--success); color: var(--success); }
+    .toast.error { border-color: var(--danger); color: var(--danger); }
+
+    /* ── LOADING ── */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(11,18,32,.6);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading-overlay.show { display: flex; }
+
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    @media (max-width: 700px) {
+      .form-row { grid-template-columns: 1fr; }
+      .main { padding: 20px 14px; }
+      table { font-size: 12px; }
+      thead th, tbody td { padding: 10px 10px; }
+    }
   </style>
 </head>
 <body>
 
+<!-- TOP BAR -->
 <div class="topbar">
-  <a class="logo" href="/"><div class="logo-mark">B</div><span class="logo-text">Blu Balence</span></a>
+  <a class="logo" href="/">
+    <div class="logo-mark">B</div>
+    <span class="logo-text">Blu Balence</span>
+  </a>
   <div class="logo-sep"></div>
   <span class="topbar-title">Email System</span>
   <div class="topbar-spacer"></div>
-  <button class="btn btn-ghost" onclick="openImportModal()">&#8613; Import CSV</button>
+  <button class="btn btn-ghost" onclick="openImportModal()">&#8645; Import CSV</button>
   <button class="btn btn-primary" onclick="openNewModal()">+ Add Contact</button>
 </div>
 
 <div class="main">
 
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-label">Total Contacts</div><div class="stat-value" id="stat-total">—</div></div>
-    <div class="stat-card"><div class="stat-label">Added This Month</div><div class="stat-value" id="stat-month">—</div></div>
+  <!-- STATS -->
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" id="stat-total">—</div></div>
+    <div class="stat-card"><div class="stat-label">New Leads</div><div class="stat-value" id="stat-leads">—</div></div>
+    <div class="stat-card"><div class="stat-label">Outreach Sent</div><div class="stat-value" id="stat-outreach">—</div></div>
+    <div class="stat-card"><div class="stat-label">Responded</div><div class="stat-value" id="stat-responded">—</div></div>
+    <div class="stat-card"><div class="stat-label">Closed Won</div><div class="stat-value" id="stat-won">—</div></div>
   </div>
 
+  <!-- TOOLBAR -->
   <div class="toolbar">
     <div class="search-wrap">
       <span class="search-icon">&#9906;</span>
       <input class="search-input" id="search-input" type="text" placeholder="Search by name, company, or email…" oninput="renderTable()">
     </div>
-    <input class="search-input" id="stage-filter" type="text" placeholder="Filter by stage…" oninput="renderTable()" style="min-width:160px;flex:unset;padding-left:12px;">
+    <input class="filter-select search-input" id="stage-filter" type="text" placeholder="Filter by stage…" oninput="renderTable()" style="min-width:160px;flex:unset;">
   </div>
 
+  <!-- TABLE -->
   <div class="table-wrap">
     <table>
       <thead>
@@ -160,7 +497,9 @@
       <span class="modal-title" id="modal-title">Add Contact</span>
       <button class="modal-close" onclick="closeModal()">&#215;</button>
     </div>
+
     <input type="hidden" id="edit-id">
+
     <div class="form-row">
       <div class="form-group" style="margin-bottom:0;">
         <label>Contact Name</label>
@@ -171,18 +510,22 @@
         <input type="text" id="f-company" placeholder="Acme Corp">
       </div>
     </div>
+
     <div class="form-group" style="margin-top:18px;">
       <label>Email Address</label>
       <input type="email" id="f-email" placeholder="jane@acme.com" required>
     </div>
+
     <div class="form-group">
       <label>Stage</label>
       <input type="text" id="f-stage" placeholder="e.g. Outreach Sent, Responded…">
     </div>
+
     <div class="form-group">
       <label>Notes</label>
       <textarea id="f-notes" placeholder="Any additional details…"></textarea>
     </div>
+
     <div class="modal-footer">
       <button class="btn btn-danger btn-sm" id="delete-btn" style="display:none;margin-right:auto;" onclick="deleteContact()">Delete</button>
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
@@ -191,32 +534,29 @@
   </div>
 </div>
 
-<!-- IMPORT MODAL -->
+<!-- CSV IMPORT MODAL -->
 <div class="modal-backdrop" id="import-modal">
-  <div class="modal import-modal">
+  <div class="modal" style="max-width:520px;">
     <div class="modal-header">
-      <span class="modal-title">Import Contacts</span>
+      <span class="modal-title">Import Contacts via CSV</span>
       <button class="modal-close" onclick="closeImportModal()">&#215;</button>
     </div>
 
-    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('csv-file').click()">
-      <div style="font-size:28px;color:var(--primary);">&#8613;</div>
-      <strong>Click to select a CSV file</strong>
-      <p>or drag and drop it here</p>
-      <input type="file" id="csv-file" accept=".csv,text/csv" style="display:none" onchange="handleFileSelect(event)">
+    <div class="csv-drop" id="csv-drop" onclick="document.getElementById('csv-file').click()" ondragover="csvDragOver(event)" ondragleave="csvDragLeave(event)" ondrop="csvDrop(event)">
+      <input type="file" id="csv-file" accept=".csv,text/csv" onchange="handleCSVFile(this.files[0])">
+      <div style="font-size:28px;margin-bottom:8px;">&#128196;</div>
+      <strong>Click or drag a CSV file here</strong>
+      <div class="col-hint">
+        Only <code>email</code> is required.<br>
+        Optional columns: <code>contact_name</code> &nbsp; <code>company_name</code> &nbsp; <code>stage</code> &nbsp; <code>notes</code>
+      </div>
     </div>
 
-    <div class="col-hint">
-      Expected columns (header row required):<br>
-      <code>contact_name</code> &nbsp;<code>email</code> &nbsp;<code>company_name</code> &nbsp;<code>stage</code> &nbsp;<code>notes</code><br>
-      Only <code>contact_name</code> and <code>email</code> are required. Column order doesn't matter.
-    </div>
-
-    <div id="import-preview" class="import-preview" style="display:none;margin-top:16px;"></div>
+    <div class="csv-preview" id="csv-preview"></div>
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeImportModal()">Cancel</button>
-      <button class="btn btn-primary" id="import-btn" onclick="runImport()" disabled>Import Contacts</button>
+      <button class="btn btn-primary" id="import-btn" onclick="importContacts()" disabled>Import</button>
     </div>
   </div>
 </div>
@@ -245,15 +585,12 @@ async function sbFetch(path, opts = {}) {
 }
 
 let contacts = [];
-let parsedRows = [];
 
-/* ================================
-   CONTACTS
-================================ */
 function stageBadge(stage) {
   return stage ? `<span class="stage-badge">${esc(stage)}</span>` : `<span style="color:var(--text-dim);font-size:12px;">—</span>`;
 }
 
+// ── LOAD ─────────────────────────────────────────────────────────────────────
 async function loadContacts() {
   showLoading(true);
   try {
@@ -268,9 +605,11 @@ async function loadContacts() {
   }
 }
 
+// ── RENDER TABLE ─────────────────────────────────────────────────────────────
 function renderTable() {
   const q = document.getElementById("search-input").value.toLowerCase();
   const stageFilter = document.getElementById("stage-filter").value.toLowerCase();
+
   const filtered = contacts.filter(c => {
     const matchQ = !q ||
       (c.contact_name || "").toLowerCase().includes(q) ||
@@ -279,11 +618,14 @@ function renderTable() {
     const matchStage = !stageFilter || (c.stage || "").toLowerCase().includes(stageFilter);
     return matchQ && matchStage;
   });
+
   const tbody = document.getElementById("contact-tbody");
-  if (!filtered.length) {
+
+  if (filtered.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><strong>No contacts found</strong><p>Add a contact or adjust your filters.</p></div></td></tr>`;
     return;
   }
+
   tbody.innerHTML = filtered.map(c => `
     <tr>
       <td class="td-name">${esc(c.contact_name || "—")}</td>
@@ -291,33 +633,39 @@ function renderTable() {
       <td class="td-email">${esc(c.email || "—")}</td>
       <td>${stageBadge(c.stage)}</td>
       <td style="color:var(--text-sub);font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(c.notes || "")}">${esc(c.notes || "—")}</td>
-      <td><div class="td-actions"><button class="btn btn-ghost btn-sm" onclick="openEditModal('${c.id}')">Edit</button></div></td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-ghost btn-sm" onclick="openEditModal('${c.id}')">Edit</button>
+        </div>
+      </td>
     </tr>
   `).join("");
 }
 
 function renderStats() {
   document.getElementById("stat-total").textContent = contacts.length;
-  const now = new Date();
-  const thisMonth = contacts.filter(c => {
-    const d = new Date(c.created_at);
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  }).length;
-  document.getElementById("stat-month").textContent = thisMonth;
+  document.getElementById("stat-leads").textContent = contacts.filter(c => c.stage === "New Lead").length;
+  document.getElementById("stat-outreach").textContent = contacts.filter(c => c.stage === "Outreach Sent").length;
+  document.getElementById("stat-responded").textContent = contacts.filter(c => c.stage === "Responded").length;
+  document.getElementById("stat-won").textContent = contacts.filter(c => c.stage === "Closed Won").length;
 }
 
+// ── SAVE ─────────────────────────────────────────────────────────────────────
 async function saveContact() {
   const id = document.getElementById("edit-id").value;
   const name = document.getElementById("f-name").value.trim();
   const email = document.getElementById("f-email").value.trim();
+
   if (!name || !email) { showToast("Name and email are required", "error"); return; }
+
   const payload = {
     contact_name: name,
     company_name: document.getElementById("f-company").value.trim() || null,
     email,
-    stage: document.getElementById("f-stage").value.trim() || null,
+    stage: document.getElementById("f-stage").value,
     notes: document.getElementById("f-notes").value.trim() || null
   };
+
   showLoading(true);
   try {
     if (id) {
@@ -329,10 +677,15 @@ async function saveContact() {
     }
     closeModal();
     await loadContacts();
-  } catch (e) { console.error(e); showToast("Failed to save contact", "error"); }
-  finally { showLoading(false); }
+  } catch (e) {
+    console.error(e);
+    showToast("Failed to save contact", "error");
+  } finally {
+    showLoading(false);
+  }
 }
 
+// ── DELETE ────────────────────────────────────────────────────────────────────
 async function deleteContact() {
   const id = document.getElementById("edit-id").value;
   if (!id || !confirm("Delete this contact?")) return;
@@ -342,14 +695,23 @@ async function deleteContact() {
     showToast("Contact deleted", "success");
     closeModal();
     await loadContacts();
-  } catch (e) { console.error(e); showToast("Failed to delete contact", "error"); }
-  finally { showLoading(false); }
+  } catch (e) {
+    console.error(e);
+    showToast("Failed to delete contact", "error");
+  } finally {
+    showLoading(false);
+  }
 }
 
+// ── MODALS ────────────────────────────────────────────────────────────────────
 function openNewModal() {
   document.getElementById("modal-title").textContent = "Add Contact";
   document.getElementById("edit-id").value = "";
-  ["f-name","f-company","f-email","f-stage","f-notes"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("f-name").value = "";
+  document.getElementById("f-company").value = "";
+  document.getElementById("f-email").value = "";
+  document.getElementById("f-stage").value = "";
+  document.getElementById("f-notes").value = "";
   document.getElementById("delete-btn").style.display = "none";
   document.getElementById("contact-modal").classList.add("open");
 }
@@ -368,20 +730,42 @@ function openEditModal(id) {
   document.getElementById("contact-modal").classList.add("open");
 }
 
-function closeModal() { document.getElementById("contact-modal").classList.remove("open"); }
+function closeModal() {
+  document.getElementById("contact-modal").classList.remove("open");
+}
 
 document.getElementById("contact-modal").addEventListener("click", e => {
   if (e.target === document.getElementById("contact-modal")) closeModal();
 });
 
-/* ================================
-   CSV IMPORT
-================================ */
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function esc(str) {
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove("show"), 3200);
+}
+
+function showLoading(v) {
+  document.getElementById("loading").classList.toggle("show", v);
+}
+
+// ── CSV IMPORT ────────────────────────────────────────────────────────────────
+let csvRows = [];
+
+function validEmail(e) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e).trim());
+}
+
 function openImportModal() {
-  parsedRows = [];
+  csvRows = [];
   document.getElementById("csv-file").value = "";
-  document.getElementById("import-preview").style.display = "none";
-  document.getElementById("import-preview").innerHTML = "";
+  document.getElementById("csv-preview").style.display = "none";
+  document.getElementById("csv-preview").innerHTML = "";
   document.getElementById("import-btn").disabled = true;
   document.getElementById("import-modal").classList.add("open");
 }
@@ -394,106 +778,95 @@ document.getElementById("import-modal").addEventListener("click", e => {
   if (e.target === document.getElementById("import-modal")) closeImportModal();
 });
 
-/* Drag & drop */
-const dropZone = document.getElementById("drop-zone");
-dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("drag-over"); });
-dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
-dropZone.addEventListener("drop", e => {
+function csvDragOver(e) {
   e.preventDefault();
-  dropZone.classList.remove("drag-over");
-  const file = e.dataTransfer.files[0];
-  if (file) parseCSV(file);
-});
-
-function handleFileSelect(e) {
-  const file = e.target.files[0];
-  if (file) parseCSV(file);
+  document.getElementById("csv-drop").classList.add("drag-over");
 }
 
-function parseCSV(file) {
+function csvDragLeave() {
+  document.getElementById("csv-drop").classList.remove("drag-over");
+}
+
+function csvDrop(e) {
+  e.preventDefault();
+  document.getElementById("csv-drop").classList.remove("drag-over");
+  const file = e.dataTransfer.files[0];
+  if (file) handleCSVFile(file);
+}
+
+function handleCSVFile(file) {
+  if (!file) return;
   const reader = new FileReader();
-  reader.onload = (e) => {
-    const text = e.target.result;
-    const lines = text.split(/\r?\n/).filter(l => l.trim());
-    if (lines.length < 2) { showToast("CSV must have a header row and at least one data row", "error"); return; }
-
-    /* Parse header — normalize to lowercase, trim spaces */
-    const headers = lines[0].split(",").map(h => h.trim().toLowerCase().replace(/\s+/g,"_").replace(/[^a-z_]/g,""));
-
-    const nameIdx    = headers.findIndex(h => h.includes("contact_name") || h === "name");
-    const emailIdx   = headers.findIndex(h => h.includes("email"));
-    const companyIdx = headers.findIndex(h => h.includes("company"));
-    const stageIdx   = headers.findIndex(h => h.includes("stage"));
-    const notesIdx   = headers.findIndex(h => h.includes("note"));
-
-    if (nameIdx === -1 || emailIdx === -1) {
-      showToast("CSV must have contact_name and email columns", "error");
-      return;
-    }
-
-    parsedRows = [];
-    const skipped = [];
-
-    lines.slice(1).forEach((line, i) => {
-      /* Handle quoted fields with commas inside */
-      const cols = line.match(/(".*?"|[^",]+|(?<=,)(?=,)|(?<=,)$|^(?=,))/g) || line.split(",");
-      const clean = cols.map(c => c.replace(/^"|"$/g,"").trim());
-
-      const name  = clean[nameIdx]  || "";
-      const email = clean[emailIdx] || "";
-
-      if (!name || !email || !email.includes("@")) {
-        skipped.push(i + 2);
-        return;
-      }
-
-      parsedRows.push({
-        contact_name: name,
-        email,
-        company_name: companyIdx >= 0 ? (clean[companyIdx] || null) : null,
-        stage:        stageIdx   >= 0 ? (clean[stageIdx]   || null) : null,
-        notes:        notesIdx   >= 0 ? (clean[notesIdx]   || null) : null,
-      });
-    });
-
-    const preview = document.getElementById("import-preview");
-    preview.style.display = "block";
-
-    if (!parsedRows.length) {
-      preview.innerHTML = `<span style="color:var(--danger)">No valid rows found. Check that contact_name and email columns are present and filled.</span>`;
-      document.getElementById("import-btn").disabled = true;
-      return;
-    }
-
-    const sample = parsedRows.slice(0, 3).map(r =>
-      `<strong>${esc(r.contact_name)}</strong> &lt;${esc(r.email)}&gt;${r.company_name ? " · " + esc(r.company_name) : ""}`
-    ).join("<br>");
-
-    preview.innerHTML =
-      `<strong style="color:var(--success)">&#10003; ${parsedRows.length} contact${parsedRows.length !== 1 ? "s" : ""} ready to import</strong>` +
-      (skipped.length ? `<br><span style="color:var(--danger)">&#9888; ${skipped.length} row${skipped.length !== 1 ? "s" : ""} skipped (missing name or email)</span>` : "") +
-      `<br><br>${sample}` +
-      (parsedRows.length > 3 ? `<br><span style="color:var(--text-dim)">…and ${parsedRows.length - 3} more</span>` : "");
-
-    document.getElementById("import-btn").disabled = false;
-  };
+  reader.onload = ev => parseCSV(ev.target.result);
   reader.readAsText(file);
 }
 
-async function runImport() {
-  if (!parsedRows.length) return;
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) { showToast("CSV file appears empty", "error"); return; }
+
+  const headers = lines[0].split(",").map(h => h.trim().toLowerCase().replace(/^"|"$/g, ""));
+  const emailIdx = headers.indexOf("email");
+
+  if (emailIdx === -1) {
+    showToast("CSV must have an email column", "error");
+    return;
+  }
+
+  const nameIdx    = headers.indexOf("contact_name");
+  const companyIdx = headers.indexOf("company_name");
+  const stageIdx   = headers.indexOf("stage");
+  const notesIdx   = headers.indexOf("notes");
+
+  const ok = [], skipped = [];
+  csvRows = [];
+
+  lines.slice(1).forEach((line, i) => {
+    const cols = line.split(",").map(c => c.trim().replace(/^"|"$/g, ""));
+    const email = (cols[emailIdx] || "").trim();
+
+    if (!validEmail(email)) {
+      skipped.push(i + 2);
+      return;
+    }
+
+    csvRows.push({
+      email,
+      contact_name:  nameIdx    >= 0 ? (cols[nameIdx]    || null) : null,
+      company_name:  companyIdx >= 0 ? (cols[companyIdx] || null) : null,
+      stage:         stageIdx   >= 0 ? (cols[stageIdx]   || null) : null,
+      notes:         notesIdx   >= 0 ? (cols[notesIdx]   || null) : null,
+    });
+    ok.push(email);
+  });
+
+  const preview = document.getElementById("csv-preview");
+  preview.style.display = "block";
+  let html = `<strong style="color:var(--text)">${ok.length} row(s) ready to import</strong>`;
+  if (skipped.length) html += `<br><span class="row-skip">${skipped.length} row(s) skipped (invalid or missing email): lines ${skipped.join(", ")}</span>`;
+  html += "<hr style='border:none;border-top:1px solid var(--border);margin:10px 0;'>";
+  html += ok.slice(0, 10).map(e => `<div class="row-ok">&#10003; ${esc(e)}</div>`).join("");
+  if (ok.length > 10) html += `<div style="color:var(--text-dim);margin-top:4px;">…and ${ok.length - 10} more</div>`;
+  preview.innerHTML = html;
+
+  document.getElementById("import-btn").disabled = csvRows.length === 0;
+}
+
+async function importContacts() {
+  if (csvRows.length === 0) return;
   showLoading(true);
   try {
-    /* Insert in batches of 50 to avoid payload limits */
     const batchSize = 50;
-    for (let i = 0; i < parsedRows.length; i += batchSize) {
+    for (let i = 0; i < csvRows.length; i += batchSize) {
+      const batch = csvRows.slice(i, i + batchSize);
       await sbFetch("blu_balence_email_contacts", {
         method: "POST",
         prefer: "return=minimal",
-        body: JSON.stringify(parsedRows.slice(i, i + batchSize))
+        body: JSON.stringify(batch),
+        headers: { "Prefer": "resolution=ignore-duplicates,return=minimal" }
       });
     }
-    showToast(`${parsedRows.length} contacts imported`, "success");
+    showToast(`Imported ${csvRows.length} contact(s)`, "success");
     closeImportModal();
     await loadContacts();
   } catch (e) {
@@ -504,22 +877,8 @@ async function runImport() {
   }
 }
 
-/* ================================
-   UTILS
-================================ */
-function esc(str) {
-  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
-
-function showToast(msg, type = "success") {
-  const t = document.getElementById("toast");
-  t.textContent = msg; t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove("show"), 3200);
-}
-
-function showLoading(v) { document.getElementById("loading").classList.toggle("show", v); }
-
 loadContacts();
 </script>
+
 </body>
 </html>
