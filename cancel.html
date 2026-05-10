@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cancel Appointment | Blu Balence</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f4f6f9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      max-width: 480px;
+      width: 100%;
+      padding: 48px 40px;
+      text-align: center;
+    }
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a2a4a;
+      letter-spacing: -0.5px;
+      margin-bottom: 32px;
+    }
+    .logo span { color: #2563eb; }
+    .icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 28px;
+    }
+    .icon-pending  { background: #eff6ff; }
+    .icon-success  { background: #f0fdf4; }
+    .icon-error    { background: #fef2f2; }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a2a4a;
+      margin-bottom: 12px;
+    }
+    p {
+      font-size: 15px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 28px;
+      padding: 12px 28px;
+      background: #2563eb;
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #1d4ed8; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Blu <span>Balence</span></div>
+
+    <div id="state-pending">
+      <div class="icon icon-pending">&#9203;</div>
+      <h1>Cancelling your appointment...</h1>
+      <p>Please wait a moment.</p>
+    </div>
+
+    <div id="state-success" style="display:none">
+      <div class="icon icon-success">&#10003;</div>
+      <h1>Appointment Cancelled</h1>
+      <p>Your appointment has been successfully cancelled. If you'd like to reschedule, you're welcome to book a new time.</p>
+      <a href="/" class="btn">Book a New Call</a>
+    </div>
+
+    <div id="state-error" style="display:none">
+      <div class="icon icon-error">&#10005;</div>
+      <h1 id="error-title">Something went wrong</h1>
+      <p id="error-msg">We couldn't cancel your appointment. This link may have already been used or may be invalid.</p>
+      <a href="/" class="btn">Go to Homepage</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+    const supabase = createClient(
+      "https://rfdvogakvyodixgpvqvz.supabase.co",
+      "sb_publishable_zJJjwZoMP0N9dod1KIxLEQ_h7hWDLuv"
+    );
+
+    function show(id) {
+      ["state-pending","state-success","state-error"].forEach(s => {
+        document.getElementById(s).style.display = s === id ? "block" : "none";
+      });
+    }
+
+    async function cancel() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+
+      if (!id) {
+        document.getElementById("error-title").textContent = "Invalid Link";
+        document.getElementById("error-msg").textContent = "No appointment ID was found in this link.";
+        show("state-error");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("appointments")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        document.getElementById("error-title").textContent = "Cancellation Failed";
+        document.getElementById("error-msg").textContent =
+          "We couldn't cancel your appointment. The link may be expired or already used.";
+        show("state-error");
+        return;
+      }
+
+      show("state-success");
+    }
+
+    cancel();
+  </script>
+</body>
+</html>
