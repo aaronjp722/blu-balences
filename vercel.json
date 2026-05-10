@@ -6,6 +6,7 @@
     { "source": "/sign-document", "destination": "/sign-document.html" },
     { "source": "/calendar", "destination": "/calendar.html" },
     { "source": "/blu-balence-email-contacts", "destination": "/blu_balence_email_contacts.html" },
+    { "source": "/cancel", "destination": "/cancel.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
