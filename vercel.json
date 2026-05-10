@@ -6,9 +6,10 @@
     { "source": "/sign-document", "destination": "/sign-document.html" },
     { "source": "/sign", "destination": "/sign-document.html" },
     { "source": "/calendar", "destination": "/calendar.html" },
+    { "source": "/calendar-v2", "destination": "/calendar-v2.html" },
     { "source": "/blu-balence-email-contacts", "destination": "/blu_balence_email_contacts.html" },
     { "source": "/cancel", "destination": "/cancel.html" },
     { "source": "/staff", "destination": "/staff.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
-}
+}calendar-v2.html
