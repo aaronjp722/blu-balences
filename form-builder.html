@@ -1,0 +1,943 @@
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body {
+  font-family: Inter, sans-serif;
+  background: #f8fafc;
+  padding: 40px;
+  margin: 0;
+}
+
+.admin-container {
+  max-width: 1100px;
+  margin: auto;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+select, input, textarea, button {
+  font-family: Inter, sans-serif;
+}
+
+select {
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  min-width: 220px;
+  background: #fff;
+}
+
+.builder-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.panel h2 {
+  font-size: 20px;
+  margin: 0 0 14px;
+  color: #0f172a;
+}
+
+.panel h3 {
+  font-size: 15px;
+  margin: 18px 0 10px;
+  color: #334155;
+}
+
+.status {
+  display: none;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.status.show { display: block; }
+.status.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+.status.success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+.status.info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+}
+
+.form-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-meta .full {
+  grid-column: 1 / -1;
+}
+
+.form-meta input,
+.form-meta textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.form-meta textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+.add-row {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1fr auto;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.add-row input,
+.add-row select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn:hover { background: #1d4ed8; }
+
+.btn-secondary {
+  background: #0f172a;
+}
+.btn-secondary:hover {
+  background: #020617;
+}
+
+.field-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.field-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+}
+
+.field-top {
+  display: grid;
+  grid-template-columns: 1.1fr 0.7fr auto auto auto auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.field-top input,
+.field-top select,
+.field-options textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.field-options {
+  margin-top: 10px;
+}
+
+.field-options textarea {
+  min-height: 64px;
+  resize: vertical;
+}
+
+.inline-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #334155;
+  white-space: nowrap;
+}
+
+.icon-btn {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 8px;
+  padding: 9px 10px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.icon-btn:hover {
+  background: #f8fafc;
+}
+
+.delete-btn {
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.preview-wrap {
+  position: sticky;
+  top: 20px;
+}
+
+.preview-box {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #fff;
+  padding: 22px;
+}
+
+.preview-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 18px;
+  line-height: 1.1;
+}
+
+.preview-field {
+  margin-bottom: 14px;
+}
+
+.preview-field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #0f172a;
+}
+
+.preview-field input,
+.preview-field select,
+.preview-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.preview-field textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.preview-submit {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  padding: 13px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.empty-note {
+  color: #64748b;
+  font-size: 14px;
+  padding: 14px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  text-align: center;
+  background: #fff;
+}
+
+@media (max-width: 900px) {
+  .builder-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-wrap {
+    position: static;
+  }
+
+  .add-row,
+  .field-top,
+  .form-meta {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<div class="admin-container">
+
+  <div id="statusBar" class="status"></div>
+
+  <div class="controls">
+    <select id="companyFilter"></select>
+    <select id="reqFilter"></select>
+  </div>
+
+  <div class="builder-grid">
+    <div class="panel">
+      <h2>Application Form Builder</h2>
+
+      <div class="form-meta">
+        <div>
+          <label style="display:block;font-size:13px;font-weight:700;margin-bottom:6px;">Form Title</label>
+          <input id="formTitle" placeholder="Application Form Title">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:13px;font-weight:700;margin-bottom:6px;">Submit Button Text</label>
+          <input id="submitButtonText" placeholder="Submit Application">
+        </div>
+
+        <div class="full">
+          <label style="display:block;font-size:13px;font-weight:700;margin-bottom:6px;">Success Message</label>
+          <textarea id="successMessage" placeholder="Thanks, your application has been submitted."></textarea>
+        </div>
+      </div>
+
+      <h3>Add Field</h3>
+
+      <div class="add-row">
+        <input id="newLabel" placeholder="Field Label">
+        <select id="newType">
+          <option value="text">Text</option>
+          <option value="email">Email</option>
+          <option value="phone">Phone</option>
+          <option value="textarea">Textarea</option>
+          <option value="select">Dropdown</option>
+          <option value="file">File</option>
+        </select>
+        <input id="newOptions" placeholder="Dropdown options comma separated">
+        <button id="addFieldBtn" class="btn" type="button">Add Field</button>
+      </div>
+
+      <h3>Fields</h3>
+      <div id="fieldList" class="field-list">
+        <div class="empty-note">Select a company and requisition to load a form.</div>
+      </div>
+
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+        <button id="saveFormBtn" class="btn btn-secondary" type="button">Save Form</button>
+      </div>
+    </div>
+
+    <div class="preview-wrap">
+      <div class="panel">
+        <h2>View</h2>
+        <div id="previewBox" class="preview-box">
+          <div class="empty-note">No form selected yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  if (!window.brandSupabase) {
+    window.brandSupabase = window.supabase.createClient(
+      "https://rfdvogakvyodixgpvqvz.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E"
+    );
+  }
+
+  const sb = window.brandSupabase;
+
+  let jobs = [];
+  let selectedJobId = null;
+  let currentFormId = null;
+  let fieldsState = [];
+
+  const companyFilter = document.getElementById("companyFilter");
+  const reqFilter = document.getElementById("reqFilter");
+  const fieldList = document.getElementById("fieldList");
+  const previewBox = document.getElementById("previewBox");
+  const statusBar = document.getElementById("statusBar");
+
+  const formTitle = document.getElementById("formTitle");
+  const submitButtonText = document.getElementById("submitButtonText");
+  const successMessage = document.getElementById("successMessage");
+
+  const newLabel = document.getElementById("newLabel");
+  const newType = document.getElementById("newType");
+  const newOptions = document.getElementById("newOptions");
+
+  function showStatus(message, type) {
+    statusBar.className = "status show " + (type || "info");
+    statusBar.textContent = message;
+  }
+
+  function clearStatus() {
+    statusBar.className = "status";
+    statusBar.textContent = "";
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function slugify(value) {
+    return String(value || "")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "");
+  }
+
+  function parseOptions(value) {
+  if (!value) return [];
+
+  if (Array.isArray(value)) return value;
+
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map(v => v.trim())
+      .filter(v => v.length > 0);
+  }
+
+  return [];
+}
+
+  async function loadJobs() {
+    clearStatus();
+
+    const { data, error } = await sb
+      .from("job_postings")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      showStatus("Could not load jobs: " + error.message, "error");
+      return;
+    }
+
+    jobs = data || [];
+    renderFilters();
+    handleSelection();
+  }
+
+  function renderFilters() {
+    const companies = [...new Set(jobs.map(j => j.company).filter(Boolean))];
+
+    companyFilter.innerHTML = '<option value="">All Companies</option>';
+
+    companies.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c;
+      companyFilter.appendChild(opt);
+    });
+
+    updateReqs();
+  }
+
+  function updateReqs() {
+    const company = companyFilter.value;
+
+    const filtered = company
+      ? jobs.filter(j => j.company === company)
+      : jobs;
+
+    const reqs = [...new Set(filtered.map(j => j.requisition_name).filter(Boolean))];
+
+    reqFilter.innerHTML = '<option value="">All Requisitions</option>';
+
+    reqs.forEach(r => {
+      const opt = document.createElement("option");
+      opt.value = r;
+      opt.textContent = r;
+      reqFilter.appendChild(opt);
+    });
+  }
+
+  async function ensureForm(jobId) {
+    const { data: existing, error: existingError } = await sb
+      .from("application_forms")
+      .select("*")
+      .eq("job_posting_id", jobId)
+      .maybeSingle();
+
+    if (existingError) {
+      throw existingError;
+    }
+
+    if (existing) {
+      return existing;
+    }
+
+    const { data: created, error: createError } = await sb
+      .from("application_forms")
+      .insert({
+        job_posting_id: jobId,
+        title: "Application Form",
+        submit_button_text: "Submit Application",
+        success_message: "Thanks, your application has been submitted."
+      })
+      .select()
+      .single();
+
+    if (createError) {
+      throw createError;
+    }
+
+    return created;
+  }
+
+  async function handleSelection() {
+    const company = companyFilter.value;
+    const req = reqFilter.value;
+
+    const job = jobs.find(j =>
+      (!company || j.company === company) &&
+      (!req || j.requisition_name === req)
+    );
+
+    if (!job) {
+      selectedJobId = null;
+      currentFormId = null;
+      fieldsState = [];
+      renderFieldList();
+      renderPreview();
+      return;
+    }
+
+    selectedJobId = job.id;
+    localStorage.setItem("selected_job_id", job.id);
+
+    await loadFormBuilder(job.id);
+  }
+
+  async function loadFormBuilder(jobId) {
+    clearStatus();
+    showStatus("Loading form...", "info");
+
+    try {
+      const form = await ensureForm(jobId);
+      currentFormId = form.id;
+
+      formTitle.value = form.form_title || form.title || "Application Form";
+      submitButtonText.value = form.submit_button_text || "Submit Application";
+      successMessage.value = form.success_message || "";
+
+      const { data: mapRows, error: mapError } = await sb
+        .from("form_field_map")
+        .select("id, form_id, field_id, enabled, required, sort_order")
+        .eq("form_id", currentFormId)
+        .order("sort_order", { ascending: true });
+
+      if (mapError) {
+        throw mapError;
+      }
+
+      if (!mapRows || !mapRows.length) {
+        fieldsState = [];
+        renderFieldList();
+        renderPreview();
+        showStatus("Form loaded. No fields yet.", "success");
+        return;
+      }
+
+      const fieldIds = mapRows.map(row => row.field_id);
+
+      const { data: libraryRows, error: libraryError } = await sb
+        .from("field_library")
+        .select("*")
+        .in("id", fieldIds);
+
+      if (libraryError) {
+        throw libraryError;
+      }
+
+      const libMap = {};
+      (libraryRows || []).forEach(row => {
+        libMap[row.id] = row;
+      });
+
+      fieldsState = mapRows.map(row => {
+        const lib = libMap[row.field_id] || {};
+        return {
+          map_id: row.id,
+          field_id: row.field_id,
+          label: lib.field_label || "",
+          field_name: lib.field_name || "",
+          type: lib.field_type || "text",
+          options: lib.options || [],
+          enabled: row.enabled !== false,
+          required: !!row.required,
+          sort_order: row.sort_order || 0
+        };
+      });
+
+      renderFieldList();
+      renderPreview();
+      showStatus("Form loaded.", "success");
+    } catch (err) {
+      showStatus("Could not load form: " + (err.message || err), "error");
+    }
+  }
+
+  function renderFieldList() {
+    if (!selectedJobId) {
+      fieldList.innerHTML = '<div class="empty-note">Select a company and requisition to load a form.</div>';
+      return;
+    }
+
+    if (!fieldsState.length) {
+      fieldList.innerHTML = '<div class="empty-note">No fields yet. Add one above.</div>';
+      return;
+    }
+
+    fieldList.innerHTML = fieldsState.map((field, index) => {
+      return `
+        <div class="field-card">
+          <div class="field-top">
+            <input value="${escapeHtml(field.label)}" onchange="window.formBuilderUI.updateField(${index}, 'label', this.value)" placeholder="Field Label">
+
+            <select onchange="window.formBuilderUI.updateField(${index}, 'type', this.value)">
+              <option value="text" ${field.type === 'text' ? 'selected' : ''}>Text</option>
+              <option value="email" ${field.type === 'email' ? 'selected' : ''}>Email</option>
+              <option value="phone" ${field.type === 'phone' ? 'selected' : ''}>Phone</option>
+              <option value="textarea" ${field.type === 'textarea' ? 'selected' : ''}>Textarea</option>
+              <option value="select" ${field.type === 'select' ? 'selected' : ''}>Dropdown</option>
+              <option value="file" ${field.type === 'file' ? 'selected' : ''}>File</option>
+            </select>
+
+            <label class="inline-check">
+              <input type="checkbox" ${field.enabled ? 'checked' : ''} onchange="window.formBuilderUI.updateField(${index}, 'enabled', this.checked)">
+              On
+            </label>
+
+            <label class="inline-check">
+              <input type="checkbox" ${field.required ? 'checked' : ''} onchange="window.formBuilderUI.updateField(${index}, 'required', this.checked)">
+              Req
+            </label>
+
+            <button class="icon-btn" type="button" onclick="window.formBuilderUI.moveUp(${index})">↑</button>
+            <button class="icon-btn delete-btn" type="button" onclick="window.formBuilderUI.removeField(${index})">Delete</button>
+          </div>
+
+          ${field.type === 'select' ? `
+            <div class="field-options">
+              <textarea onchange="window.formBuilderUI.updateField(${index}, 'options', this.value)" placeholder="Yes, No, Maybe">${escapeHtml((field.options || []).join(', '))}</textarea>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderPreview() {
+    if (!selectedJobId) {
+      previewBox.innerHTML = '<div class="empty-note">No form selected yet.</div>';
+      return;
+    }
+
+    const activeFields = fieldsState
+      .filter(f => f.enabled)
+      .sort((a, b) => a.sort_order - b.sort_order);
+
+    let html = `
+      <div class="preview-title">${escapeHtml(formTitle.value || "Application Form")}</div>
+    `;
+
+    if (!activeFields.length) {
+      html += '<div class="empty-note">No active fields.</div>';
+      previewBox.innerHTML = html;
+      return;
+    }
+
+    activeFields.forEach(field => {
+      html += `<div class="preview-field"><label>${escapeHtml(field.label)}${field.required ? ' *' : ''}</label>`;
+
+      if (field.type === "textarea") {
+        html += `<textarea placeholder="${escapeHtml(field.label)}"></textarea>`;
+      } else if (field.type === "select") {
+        html += `<select><option value="">Select one</option>`;
+        (field.options || []).forEach(opt => {
+          html += `<option>${escapeHtml(opt)}</option>`;
+        });
+        html += `</select>`;
+      } else if (field.type === "file") {
+        html += `<input type="file">`;
+      } else {
+        const inputType = field.type === "email" ? "email" : "text";
+        html += `<input type="${inputType}" placeholder="${escapeHtml(field.label)}">`;
+      }
+
+      html += `</div>`;
+    });
+
+    html += `<button class="preview-submit" type="button">${escapeHtml(submitButtonText.value || "Submit Application")}</button>`;
+
+    previewBox.innerHTML = html;
+  }
+
+  async function addField() {
+    if (!currentFormId || !selectedJobId) {
+      showStatus("Select a company and requisition first.", "error");
+      return;
+    }
+
+    const label = newLabel.value.trim();
+    const type = newType.value;
+    const options = parseOptions(newOptions.value);
+
+    if (!label) {
+      showStatus("Enter a field label first.", "error");
+      return;
+    }
+
+    try {
+      clearStatus();
+      showStatus("Adding field...", "info");
+
+      const fieldName = slugify(label) + "_" + Date.now();
+
+      const { data: libraryRow, error: libraryError } = await sb
+        .from("field_library")
+        .insert({
+          field_name: fieldName,
+          field_label: label,
+          field_type: type,
+          options: type === "select" ? options : null
+        })
+        .select()
+        .single();
+
+      if (libraryError) {
+        throw libraryError;
+      }
+
+      if (!libraryRow || !libraryRow.id) {
+        throw new Error("Field insert returned no row. Check RLS on field_library.");
+      }
+
+      const nextSort = fieldsState.length;
+
+      const { data: mapRow, error: mapError } = await sb
+        .from("form_field_map")
+        .insert({
+          form_id: currentFormId,
+          field_id: libraryRow.id,
+          enabled: true,
+          required: false,
+          sort_order: nextSort
+        })
+        .select()
+        .single();
+
+      if (mapError) {
+        throw mapError;
+      }
+
+      fieldsState.push({
+        map_id: mapRow.id,
+        field_id: libraryRow.id,
+        label: libraryRow.field_label,
+        field_name: libraryRow.field_name,
+        type: libraryRow.field_type,
+        options: libraryRow.options || [],
+        enabled: true,
+        required: false,
+        sort_order: nextSort
+      });
+
+      newLabel.value = "";
+      newOptions.value = "";
+      newType.value = "text";
+
+      renderFieldList();
+      renderPreview();
+      showStatus("Field added.", "success");
+    } catch (err) {
+      showStatus("Could not add field: " + (err.message || err), "error");
+    }
+  }
+
+  function updateField(index, key, value) {
+    if (key === "options") {
+  const existing = fieldsState[index].options || [];
+  const incoming = parseOptions(value);
+
+  // merge + dedupe
+  const merged = [...existing, ...incoming].filter(
+    (v, i, arr) => arr.indexOf(v) === i
+  );
+
+  fieldsState[index].options = merged;
+} else {
+      fieldsState[index][key] = value;
+    }
+    renderFieldList();
+    renderPreview();
+  }
+
+  function moveUp(index) {
+    if (index <= 0) return;
+    const temp = fieldsState[index - 1];
+    fieldsState[index - 1] = fieldsState[index];
+    fieldsState[index] = temp;
+    normalizeSort();
+    renderFieldList();
+    renderPreview();
+  }
+
+  function removeField(index) {
+    fieldsState.splice(index, 1);
+    normalizeSort();
+    renderFieldList();
+    renderPreview();
+  }
+
+  function normalizeSort() {
+    fieldsState.forEach((field, i) => {
+      field.sort_order = i;
+    });
+  }
+
+  async function saveForm() {
+    if (!currentFormId || !selectedJobId) {
+      showStatus("Select a company and requisition first.", "error");
+      return;
+    }
+
+    try {
+      clearStatus();
+      showStatus("Saving form...", "info");
+
+      const { error: formError } = await sb
+        .from("application_forms")
+        .update({
+          title: formTitle.value || "Application Form",
+          form_title: formTitle.value || "Application Form",
+          submit_button_text: submitButtonText.value || "Submit Application",
+          success_message: successMessage.value || ""
+        })
+        .eq("id", currentFormId);
+
+      if (formError) {
+        const fallbackUpdate = await sb
+          .from("application_forms")
+          .update({
+            title: formTitle.value || "Application Form",
+            submit_button_text: submitButtonText.value || "Submit Application",
+            success_message: successMessage.value || ""
+          })
+          .eq("id", currentFormId);
+
+        if (fallbackUpdate.error) {
+          throw fallbackUpdate.error;
+        }
+      }
+
+      for (const field of fieldsState) {
+        const { error: libError } = await sb
+          .from("field_library")
+          .update({
+            field_label: field.label,
+            field_type: field.type,
+            options: field.type === "select" ? field.options : null
+          })
+          .eq("id", field.field_id);
+
+        if (libError) {
+          throw libError;
+        }
+      }
+
+      const { error: deleteError } = await sb
+        .from("form_field_map")
+        .delete()
+        .eq("form_id", currentFormId);
+
+      if (deleteError) {
+        throw deleteError;
+      }
+
+      if (fieldsState.length) {
+        const inserts = fieldsState.map((field, index) => ({
+          form_id: currentFormId,
+          field_id: field.field_id,
+          enabled: field.enabled,
+          required: field.required,
+          sort_order: index
+        }));
+
+        const { error: insertError } = await sb
+          .from("form_field_map")
+          .insert(inserts);
+
+        if (insertError) {
+          throw insertError;
+        }
+      }
+
+      await loadFormBuilder(selectedJobId);
+      showStatus("Form saved.", "success");
+    } catch (err) {
+      showStatus("Could not save form: " + (err.message || err), "error");
+    }
+  }
+
+  companyFilter.onchange = async () => {
+    updateReqs();
+    await handleSelection();
+  };
+
+  reqFilter.onchange = async () => {
+    await handleSelection();
+  };
+
+  formTitle.addEventListener("input", renderPreview);
+  submitButtonText.addEventListener("input", renderPreview);
+
+  document.getElementById("addFieldBtn").addEventListener("click", addField);
+  document.getElementById("saveFormBtn").addEventListener("click", saveForm);
+
+  window.formBuilderUI = {
+    updateField,
+    moveUp,
+    removeField
+  };
+
+  loadJobs();
+})();
+</script>
