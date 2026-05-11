@@ -1,0 +1,106 @@
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  .role-section {
+    max-width: 850px;
+    margin: 60px auto;
+    padding: 40px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    font-family: Inter, sans-serif;
+    line-height: 1.6;
+  }
+
+  .role-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    text-align: center;
+    color: #0b1220;
+  }
+
+  .role-section h1,
+  .role-section h2,
+  .role-section h3 {
+    color: #0b1220;
+    margin-top: 20px;
+    text-align: left !important;
+  }
+
+  .role-section p {
+    font-size: 15px;
+    color: #475569;
+    text-align: left !important;
+  }
+
+  .apply-btn {
+    display: inline-block;
+    margin-top: 35px;
+    background: #2563eb;
+    color: #fff;
+    padding: 14px 26px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 10px;
+  }
+</style>
+
+<div class="role-section">
+  <div class="role-title" id="jobTitle">Loading...</div>
+
+  <div id="jobContent">
+    Loading job details...
+  </div>
+
+  <a id="applyBtn" href="#" class="apply-btn">
+    Go to Job Application
+  </a>
+</div>
+
+<script>
+(async () => {
+
+  // ✅ INIT SUPABASE HERE (FIX)
+  const SUPABASE_URL = 'https://rfdvogakvyodixgpvqvz.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E';
+
+  const supabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+  // 🔥 GET SLUG
+  const slug = window.location.pathname.split('/').pop()?.toLowerCase();
+
+  const { data, error } = await supabase
+    .from('job_postings')
+    .select('*')
+    .eq('slug', slug)
+    .eq('is_active', true)
+    .single();
+
+  console.log("JOB:", data);
+
+  if (error || !data) {
+    document.querySelector('.role-section').innerHTML = "Job not found";
+    return;
+  }
+
+  // TITLE
+  document.getElementById('jobTitle').innerText = data.title;
+
+  // ✅ FULL DESCRIPTION (HTML)
+  if (data.full_description) {
+    document.getElementById('jobContent').innerHTML = data.full_description;
+  } else {
+    document.getElementById('jobContent').innerHTML = `<p>${data.description || ''}</p>`;
+  }
+
+  // APPLY LINK
+  document.getElementById('applyBtn').href = data.apply_link || '#';
+
+})();
+</script>
