@@ -1,0 +1,635 @@
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  body {
+    font-family: Inter, sans-serif;
+    background: #f8fafc;
+    padding: 40px;
+    margin: 0;
+  }
+
+  .admin-container {
+    max-width: 1000px;
+    margin: auto;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #0f172a;
+  }
+
+  .status-bar {
+    display: none;
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .status-bar.show {
+    display: block;
+  }
+
+  .status-bar.error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+  }
+
+  .status-bar.success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+  }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  select, input {
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: Inter, sans-serif;
+    box-sizing: border-box;
+  }
+
+  select {
+    min-width: 220px;
+    background: #fff;
+  }
+
+  .job-form {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .job-form input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .btn {
+    background: #2563eb;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    font-size: 14px;
+    font-family: Inter, sans-serif;
+    font-weight: 600;
+  }
+
+  .btn:hover {
+    background: #1d4ed8;
+  }
+
+  .delete-btn {
+    background: #dc2626;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    font-size: 13px;
+    margin-left: 8px;
+    font-family: Inter, sans-serif;
+    font-weight: 600;
+  }
+
+  .delete-btn:hover {
+    background: #b91c1c;
+  }
+
+  .job-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .job-row {
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+
+  .job-row:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+  }
+
+  .job-row.selected {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.08);
+  }
+
+  .job-left {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .job-left strong {
+    display: block;
+    font-size: 16px;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+
+  .job-left small {
+    color: #64748b;
+    line-height: 1.5;
+  }
+
+  .job-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 10px;
+  }
+
+  .empty-state {
+    background: white;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    color: #64748b;
+  }
+
+  .loading-state {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    color: #64748b;
+  }
+
+  @media (max-width: 768px) {
+    body {
+      padding: 20px;
+    }
+
+    .job-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .job-actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .controls {
+      flex-direction: column;
+    }
+
+    select {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="admin-container">
+  <h1>Job Post Manager</h1>
+
+  <div id="statusBar" class="status-bar"></div>
+
+  <div class="controls">
+    <select id="companyFilter">
+      <option value="">All Companies</option>
+    </select>
+
+    <select id="reqFilter">
+      <option value="">All Requisitions</option>
+    </select>
+  </div>
+
+  <div class="job-form">
+    <input id="title" placeholder="Job Title">
+    <input id="description" placeholder="Description">
+    <input id="url" placeholder="URL">
+    <input id="company" placeholder="Company">
+    <input id="requisition" placeholder="Requisition Name">
+    <button id="addJobBtn" class="btn" type="button">Add Job</button>
+  </div>
+
+  <div class="job-list" id="jobList">
+    <div class="loading-state">Loading jobs...</div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://rfdvogakvyodixgpvqvz.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E';
+
+  let supabaseClient = null;
+  let allJobs = [];
+  let currentJobId = null;
+
+  function showStatus(message, type = 'error') {
+    const bar = document.getElementById('statusBar');
+    bar.className = `status-bar show ${type}`;
+    bar.textContent = message;
+  }
+
+  function clearStatus() {
+    const bar = document.getElementById('statusBar');
+    bar.className = 'status-bar';
+    bar.textContent = '';
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function getSupabaseClient() {
+    if (window.brandSupabase) return window.brandSupabase;
+
+    if (!window.supabase || !window.supabase.createClient) {
+      throw new Error('Supabase library did not load.');
+    }
+
+    if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL') {
+      throw new Error('Missing SUPABASE_URL.');
+    }
+
+    if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+      throw new Error('Missing SUPABASE_ANON_KEY.');
+    }
+
+    window.brandSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    return window.brandSupabase;
+  }
+
+  function resetForm() {
+    document.getElementById('title').value = '';
+    document.getElementById('description').value = '';
+    document.getElementById('url').value = '';
+    document.getElementById('company').value = '';
+    document.getElementById('requisition').value = '';
+  }
+
+  function populateForm(job) {
+    document.getElementById('title').value = job.title || '';
+    document.getElementById('description').value = job.description || '';
+    document.getElementById('url').value = job.url || '';
+    document.getElementById('company').value = job.company || '';
+    document.getElementById('requisition').value = job.requisition_name || '';
+
+    currentJobId = job.id;
+
+    console.log('SELECTED JOB ID:', job.id);
+    console.log('SELECTED JOB ROW:', job);
+
+    document.getElementById('addJobBtn').textContent = 'Update Job';
+    highlightSelectedRow();
+    showStatus(`Editing job: ${job.title}`, 'success');
+  }
+
+  function clearSelectedJob() {
+    currentJobId = null;
+    document.getElementById('addJobBtn').textContent = 'Add Job';
+    highlightSelectedRow();
+  }
+
+  function highlightSelectedRow() {
+    document.querySelectorAll('.job-row').forEach(row => {
+      if (row.getAttribute('data-job-id') === String(currentJobId)) {
+        row.classList.add('selected');
+      } else {
+        row.classList.remove('selected');
+      }
+    });
+  }
+
+  function renderFilters() {
+    const companySelect = document.getElementById('companyFilter');
+    const currentCompany = companySelect.value;
+
+    const companies = [...new Set(allJobs.map(job => (job.company || '').trim()).filter(Boolean))];
+
+    companySelect.innerHTML = '<option value="">All Companies</option>';
+
+    companies.forEach(company => {
+      const option = document.createElement('option');
+      option.value = company;
+      option.textContent = company;
+      companySelect.appendChild(option);
+    });
+
+    companySelect.value = companies.includes(currentCompany) ? currentCompany : '';
+    updateRequisitionDropdown();
+  }
+
+  function updateRequisitionDropdown() {
+    const selectedCompany = document.getElementById('companyFilter').value;
+    const reqSelect = document.getElementById('reqFilter');
+    const currentReq = reqSelect.value;
+
+    const filteredJobs = selectedCompany
+      ? allJobs.filter(job => (job.company || '') === selectedCompany)
+      : allJobs;
+
+    const reqs = [
+      ...new Set(
+        filteredJobs
+          .map(job => (job.requisition_name || '').trim())
+          .filter(Boolean)
+      )
+    ];
+
+    reqSelect.innerHTML = '<option value="">All Requisitions</option>';
+
+    reqs.forEach(req => {
+      const option = document.createElement('option');
+      option.value = req;
+      option.textContent = req;
+      reqSelect.appendChild(option);
+    });
+
+    reqSelect.value = reqs.includes(currentReq) ? currentReq : '';
+  }
+
+  function renderJobs() {
+    const company = document.getElementById('companyFilter').value;
+    const req = document.getElementById('reqFilter').value;
+    const list = document.getElementById('jobList');
+
+    list.innerHTML = '';
+
+    const filtered = allJobs.filter(job => {
+      const matchesCompany = !company || job.company === company;
+      const matchesReq = !req || job.requisition_name === req;
+      return matchesCompany && matchesReq;
+    });
+
+    if (!filtered.length) {
+      list.innerHTML = '<div class="empty-state">No job posts found for this selection.</div>';
+      return;
+    }
+
+    filtered.forEach(job => {
+      const row = document.createElement('div');
+      row.className = 'job-row';
+      row.setAttribute('data-job-id', job.id);
+
+      row.innerHTML = `
+        <div class="job-left">
+          <strong>${escapeHtml(job.title)}</strong>
+          <small>
+            ${escapeHtml(job.company || '')}${job.company && job.requisition_name ? ' • ' : ''}${escapeHtml(job.requisition_name || '')}
+            ${job.description ? `<br>${escapeHtml(job.description)}` : ''}
+          </small>
+        </div>
+
+        <div class="job-actions">
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px;color:#334155;">
+            <input type="checkbox" ${job.is_active ? 'checked' : ''} data-job-id="${job.id}" class="job-toggle">
+            Active
+          </label>
+
+          <button class="delete-btn" data-delete-id="${job.id}" type="button">Delete</button>
+        </div>
+      `;
+
+      row.addEventListener('click', function (e) {
+        if (e.target.closest('.job-toggle') || e.target.closest('[data-delete-id]')) {
+          return;
+        }
+
+        populateForm(job);
+      });
+
+      list.appendChild(row);
+    });
+
+    bindDynamicButtons();
+    highlightSelectedRow();
+  }
+
+  function bindDynamicButtons() {
+    document.querySelectorAll('.job-toggle').forEach(toggle => {
+      toggle.addEventListener('change', async function (e) {
+        e.stopPropagation();
+        const id = this.getAttribute('data-job-id');
+        const checked = this.checked;
+        await toggleJob(id, checked);
+      });
+
+      toggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
+    });
+
+    document.querySelectorAll('[data-delete-id]').forEach(btn => {
+      btn.addEventListener('click', async function (e) {
+        e.stopPropagation();
+        const id = this.getAttribute('data-delete-id');
+        await deleteJob(id);
+      });
+    });
+  }
+
+  async function loadJobs() {
+    clearStatus();
+
+    try {
+      const { data, error } = await supabaseClient
+        .from('job_postings')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      allJobs = data || [];
+      renderFilters();
+      renderJobs();
+
+      if (currentJobId) {
+        const selected = allJobs.find(job => String(job.id) === String(currentJobId));
+        if (selected) {
+          populateForm(selected);
+        } else {
+          clearSelectedJob();
+          resetForm();
+        }
+      }
+    } catch (err) {
+      console.error('Error loading jobs:', err);
+      document.getElementById('jobList').innerHTML = '<div class="empty-state">Could not load jobs.</div>';
+      showStatus(`Could not load jobs: ${err.message || err}`);
+    }
+  }
+
+  async function addJob() {
+    clearStatus();
+
+    const title = document.getElementById('title').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const url = document.getElementById('url').value.trim();
+    const company = document.getElementById('company').value.trim();
+    const requisition = document.getElementById('requisition').value.trim();
+
+    if (!title || !description || !url || !company || !requisition) {
+      showStatus('Please fill out all fields.');
+      return;
+    }
+
+    try {
+      if (currentJobId) {
+        const { error } = await supabaseClient
+          .from('job_postings')
+          .update({
+            title,
+            description,
+            url,
+            company,
+            requisition_name: requisition
+          })
+          .eq('id', currentJobId);
+
+        if (error) {
+          throw error;
+        }
+
+        console.log('UPDATED JOB ID:', currentJobId);
+        showStatus('Job updated successfully.', 'success');
+      } else {
+        const { data, error } = await supabaseClient
+          .from('job_postings')
+          .insert([{
+            title,
+            description,
+            url,
+            company,
+            requisition_name: requisition,
+            is_active: true
+          }])
+          .select()
+          .single();
+
+        if (error) {
+          throw error;
+        }
+
+        if (data?.id) {
+          currentJobId = data.id;
+          console.log('NEW JOB ID:', data.id);
+        }
+
+        showStatus('Job added successfully.', 'success');
+      }
+
+      await loadJobs();
+    } catch (err) {
+      console.error('Error saving job:', err);
+      showStatus(`Could not save job: ${err.message || err}`);
+    }
+  }
+
+  async function toggleJob(id, value) {
+    clearStatus();
+
+    try {
+      const { data, error } = await supabaseClient
+        .from('job_postings')
+        .update({ is_active: value })
+        .eq('id', id)
+        .select();
+
+      if (error) throw error;
+
+      console.log('UPDATED ROW:', data);
+
+      await loadJobs();
+
+      showStatus(
+        value ? 'Job is now LIVE (true)' : 'Job is now HIDDEN (false)',
+        'success'
+      );
+    } catch (err) {
+      console.error('UPDATE ERROR:', err);
+      showStatus(`Update failed: ${err.message}`);
+    }
+  }
+
+  async function deleteJob(id) {
+    clearStatus();
+
+    const confirmed = window.confirm('Delete this job post?');
+    if (!confirmed) return;
+
+    try {
+      const { error } = await supabaseClient
+        .from('job_postings')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        throw error;
+      }
+
+      if (String(currentJobId) === String(id)) {
+        clearSelectedJob();
+        resetForm();
+      }
+
+      showStatus('Job deleted.', 'success');
+      await loadJobs();
+    } catch (err) {
+      console.error('Error deleting job:', err);
+      showStatus(`Could not delete job: ${err.message || err}`);
+    }
+  }
+
+  async function initPage() {
+    try {
+      supabaseClient = getSupabaseClient();
+    } catch (err) {
+      console.error('Supabase init error:', err);
+      showStatus(`Supabase is not configured: ${err.message || err}`);
+      document.getElementById('jobList').innerHTML = '<div class="empty-state">Supabase is not configured.</div>';
+      return;
+    }
+
+    document.getElementById('companyFilter').addEventListener('change', () => {
+      updateRequisitionDropdown();
+      renderJobs();
+    });
+
+    document.getElementById('reqFilter').addEventListener('change', renderJobs);
+    document.getElementById('addJobBtn').addEventListener('click', addJob);
+
+    await loadJobs();
+  }
+
+  document.addEventListener('DOMContentLoaded', initPage);
+</script>
