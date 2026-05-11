@@ -1,0 +1,219 @@
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body {
+  font-family: Inter, sans-serif;
+  background: #f8fafc;
+  padding: 40px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+</style>
+
+<div class="container">
+  <h2 id="title">Loading...</h2>
+  <form id="form"></form>
+</div>
+
+<script>
+(async function(){
+
+/* SUPABASE */
+if (!window.brandSupabase) {
+  window.brandSupabase = window.supabase.createClient(
+    "https://rfdvogakvyodixgpvqvz.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E"
+  );
+}
+const sb = window.brandSupabase;
+
+/* ✅ FIXED: GET SLUG INSTEAD OF job_id */
+let slug = new URLSearchParams(window.location.search).get("slug");
+
+// ✅ fallback for /application/graphic-designer
+if (!slug) {
+  const pathParts = window.location.pathname.split("/");
+  slug = pathParts[pathParts.length - 1];
+}
+
+if (!slug) {
+  document.getElementById("title").textContent = "No job selected";
+  return;
+}
+
+/* ✅ FIXED: GET JOB FIRST */
+const { data: job } = await sb
+  .from("job_postings")
+  .select("*")
+  .eq("slug", slug)
+  .single();
+
+if (!job) {
+  document.getElementById("title").textContent = "Job not found";
+  return;
+}
+
+/* LOAD FORM (using job.id now) */
+const { data: form } = await sb
+  .from("application_forms")
+  .select("*")
+  .eq("job_posting_id", job.id)
+  .maybeSingle();
+
+if (!form) {
+  document.getElementById("title").textContent = "No form found";
+  return;
+}
+
+document.getElementById("title").textContent =
+  form.form_title || "Application Form";
+
+/* LOAD FIELDS */
+const { data: map } = await sb
+  .from("form_field_map")
+  .select("*")
+  .eq("form_id", form.id)
+  .order("sort_order");
+
+const ids = map.map(m => m.field_id);
+
+const { data: fieldsRaw } = await sb
+  .from("field_library")
+  .select("*")
+  .in("id", ids);
+
+/* MERGE */
+const fieldMap = {};
+fieldsRaw.forEach(f => fieldMap[f.id] = f);
+
+const fields = map
+  .filter(m => m.enabled)
+  .map(m => ({
+    ...fieldMap[m.field_id],
+    required: m.required
+  }));
+
+/* RENDER */
+const formEl = document.getElementById("form");
+
+fields.forEach(f => {
+
+  const div = document.createElement("div");
+  div.className = "field";
+
+  let input;
+
+  if (f.field_type === "textarea") {
+    input = `<textarea name="${f.field_name}"></textarea>`;
+  }
+  else if (f.field_type === "select") {
+    const opts = (f.options || []).map(o => `<option>${o}</option>`).join("");
+    input = `<select name="${f.field_name}">
+      <option value="">Select</option>${opts}
+    </select>`;
+  }
+  else if (f.field_type === "file") {
+    input = `<input type="file" name="${f.field_name}" accept=".pdf,.doc,.docx,.odt">`;
+  }
+  else {
+    const type = f.field_type === "email" ? "email" : "text";
+    input = `<input type="${type}" name="${f.field_name}">`;
+  }
+
+  div.innerHTML = `
+    <label>${f.field_label} ${f.required ? "*" : ""}</label>
+    ${input}
+  `;
+
+  formEl.appendChild(div);
+});
+
+/* SUBMIT BUTTON */
+const btn = document.createElement("button");
+btn.textContent = form.submit_button_text || "Submit";
+formEl.appendChild(btn);
+
+/* SUBMIT */
+formEl.onsubmit = async (e) => {
+  e.preventDefault();
+
+  const fd = new FormData(formEl);
+  const data = {};
+
+  for (let f of fields) {
+    let val = fd.get(f.field_name);
+
+    if (f.field_type === "file" && val && val.size > 0) {
+
+      const path = `applications/${Date.now()}_${val.name}`;
+
+      const { error } = await sb.storage
+        .from("applications")
+        .upload(path, val);
+
+      if (error) return alert("Upload failed");
+
+      const { data: url } = sb.storage
+        .from("applications")
+        .getPublicUrl(path);
+
+      val = url.publicUrl;
+    }
+
+    if (f.required && !val) {
+      return alert(f.field_label + " is required");
+    }
+
+    data[f.field_name] = val;
+  }
+
+  const { error } = await sb
+    .from("application_submissions")
+    .insert({
+      job_posting_id: job.id, /* ✅ FIXED */
+      form_id: form.id,
+      responses: data
+    });
+
+  if (error) return alert("Submission failed");
+
+  formEl.reset();
+  alert(form.success_message || "Submitted");
+};
+
+})();
+</script>
