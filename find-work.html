@@ -1,0 +1,224 @@
+<style>
+  :root {
+    --primary: #2563eb;
+    --navy: #0f172a;
+    --slate: #64748b;
+    --bg: #f8fafc;
+    --border: #e2e8f0;
+  }
+
+  .rp-container {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 0 20px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--navy);
+  }
+
+  /* --- HEADER & SEARCH --- */
+  .rp-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .rp-section-title {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .rp-subtitle {
+    font-size: 16px;
+    color: var(--slate);
+    margin-bottom: 32px;
+  }
+
+  .search-wrapper {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  #rp-search {
+    width: 100%;
+    padding: 14px 20px;
+    padding-left: 45px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 16px;
+    background: #fff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  #rp-search:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--slate);
+    pointer-events: none;
+  }
+
+  /* --- JOB LIST --- */
+  .rp-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* REMOVE UNDERLINE GLOBALLY */
+  .rp-list a, 
+  .job-item, 
+  .job-item:hover {
+    text-decoration: none !important;
+    color: inherit;
+    display: block;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .rp-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .rp-card:hover {
+    border-color: var(--primary);
+    background: #fbfdff;
+    transform: translateX(4px);
+    text-decoration: none;
+  }
+
+  .card-content {
+    flex: 1;
+    text-align: left;
+  }
+
+  .rp-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 6px 0;
+    color: var(--navy);
+    text-decoration: none;
+  }
+
+  .rp-card p {
+    font-size: 14px;
+    color: var(--slate);
+    margin: 0;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+
+  .apply-tag {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: rgba(37, 99, 235, 0.05);
+    margin-left: 20px;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  /* Hidden state for search */
+  .hidden {
+    display: none !important;
+  }
+</style>
+
+<div class="rp-container">
+  <header class="rp-header">
+    <h1 class="rp-section-title">Careers</h1>
+    <p class="rp-subtitle"></p>
+
+    <div class="search-wrapper">
+      <svg class="search-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="M21 21l-4.35-4.35"></path>
+      </svg>
+      <input type="text" id="rp-search" placeholder="Search roles (e.g. Sales, Designer)...">
+    </div>
+  </header>
+
+  <div class="rp-list" id="job-list"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const supabaseUrl = "https://rfdvogakvyodixgpvqvz.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E"; // same one as admin page
+
+window.brandSupabase = supabase.createClient(supabaseUrl, supabaseKey);
+</script>
+  
+<script>
+(async () => {
+  const { data, error } = await window.brandSupabase
+    .from('job_postings')
+    .select('*')
+    .eq('is_active', true)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const container = document.getElementById('job-list');
+  container.innerHTML = '';
+
+  data.forEach(job => {
+    const el = document.createElement('a');
+    el.href = job.url.startsWith('http')
+  ? job.url
+  : `https://${job.url}`;
+    el.className = 'job-item';
+
+    el.innerHTML = `
+      <div class="rp-card">
+        <div class="card-content">
+          <h3>${job.title}</h3>
+          <p>${job.description}</p>
+        </div>
+        <span class="apply-tag">View Position →</span>
+      </div>
+    `;
+
+    container.appendChild(el);
+  });
+})();
+</script>
+
+<script>
+  document.getElementById('rp-search').addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase();
+    const jobs = document.querySelectorAll('.job-item');
+
+    jobs.forEach(job => {
+      const title = job.querySelector('h3').innerText.toLowerCase();
+      const desc = job.querySelector('p').innerText.toLowerCase();
+
+      if (title.includes(term) || desc.includes(term)) {
+        job.classList.remove('hidden');
+      } else {
+        job.classList.add('hidden');
+      }
+    });
+  });
+</script>
