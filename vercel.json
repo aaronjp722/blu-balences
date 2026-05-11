@@ -10,6 +10,7 @@
     { "source": "/blu-balence-email-contacts", "destination": "/blu_balence_email_contacts.html" },
     { "source": "/cancel", "destination": "/cancel.html" },
     { "source": "/staff", "destination": "/staff.html" },
+    { "source": "/find-work", "destination": "/find-work.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
