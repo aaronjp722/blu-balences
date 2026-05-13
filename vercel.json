@@ -11,6 +11,7 @@
     { "source": "/cancel", "destination": "/cancel.html" },
     { "source": "/staff", "destination": "/staff.html" },
     { "source": "/find-work", "destination": "/find-work.html" },
+    { "source": "/crm", "destination": "/crm.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
