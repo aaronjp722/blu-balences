@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1069,6 +1069,9 @@ function parseRow(cols, format) {
   };
 }
 
+Find this function in your file and replace the entire thing:
+
+```javascript
 async function importCSV(text) {
   const status = document.getElementById("import-status");
   status.innerHTML = "Parsing CSV...";
@@ -1092,20 +1095,31 @@ async function importCSV(text) {
 
   if (!parsed.length) { status.textContent = "No valid rows found."; return; }
 
-  const csvPhones = [...new Set(parsed.map(r => normalizePhone(r.phone)).filter(p => p.length >= 7))];
   status.innerHTML = `Found ${parsed.length} rows. Checking for existing records...`;
 
+  // Fetch ALL existing leads with pagination (Supabase default limit is 1000)
   const existingByPhone = {};
-  if (csvPhones.length) {
-    const res = await fetch(db("crm_leads?select=*"), { headers: hdr() });
-    if (res.ok) {
-      const all = await res.json();
-      all.forEach(l => {
-        const n = normalizePhone(l.phone);
-        if (n.length >= 7) existingByPhone[n] = l;
-      });
-    }
+  let page = 0;
+  const PAGE_SIZE = 1000;
+  while (true) {
+    const res = await fetch(
+      db(`crm_leads?select=id,phone&limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`),
+      { headers: hdr() }
+    );
+    if (!res.ok) break;
+    const batch = await res.json();
+    if (!batch.length) break;
+    batch.forEach(l => {
+      const n = normalizePhone(l.phone);
+      if (n.length >= 7) existingByPhone[n] = l.id;
+    });
+    if (batch.length < PAGE_SIZE) break;
+    page++;
   }
+
+  const fillable = ["business_name","contact_name","email","address","city","state","county",
+    "website","rating","reviews","industry","google_maps_link","notes",
+    "follow_up_date","appointment_date","last_called_date","dispo"];
 
   let inserted = 0, updated = 0, skipped = 0, errors = 0;
   const toInsert = [];
@@ -1113,31 +1127,24 @@ async function importCSV(text) {
 
   for (const row of parsed) {
     const nPhone = normalizePhone(row.phone);
-    const existing = nPhone.length >= 7 ? existingByPhone[nPhone] : null;
+    const existingId = nPhone.length >= 7 ? existingByPhone[nPhone] : null;
 
-    if (existing) {
+    if (existingId) {
       const patch = {};
-      const fillable = ["business_name","contact_name","email","address","city","state","county",
-        "website","rating","reviews","industry","google_maps_link","notes",
-        "follow_up_date","appointment_date","last_called_date","dispo"];
       let changed = false;
       for (const f of fillable) {
-        const newVal = row[f];
-        const existVal = existing[f];
-        if (newVal != null && newVal !== "" && (existVal == null || existVal === "")) {
-          patch[f] = newVal;
-          changed = true;
-        }
+        if (row[f] != null && row[f] !== "") { patch[f] = row[f]; changed = true; }
       }
-      if (changed) toUpdate.push({ id: existing.id, patch });
+      if (changed) toUpdate.push({ id: existingId, patch });
       else skipped++;
     } else {
       toInsert.push({ ...row, source: "csv_import" });
     }
   }
 
-  status.innerHTML = `${toInsert.length} new · ${toUpdate.length} to update · ${skipped} already complete<br>Processing...`;
+  status.innerHTML = `${toInsert.length} new · ${toUpdate.length} to update · ${skipped} skipped<br>Inserting...`;
 
+  // Batch insert new leads
   const BATCH = 50;
   for (let i = 0; i < toInsert.length; i += BATCH) {
     const batch = toInsert.slice(i, i + BATCH);
@@ -1149,22 +1156,29 @@ async function importCSV(text) {
       });
       if (!res.ok) { errors += batch.length; } else { inserted += batch.length; }
     } catch { errors += batch.length; }
+    status.innerHTML = `Inserted ${inserted}/${toInsert.length} new · ${toUpdate.length} to update...`;
   }
 
-  for (const { id, patch } of toUpdate) {
-    try {
-      const res = await fetch(db(`crm_leads?id=eq.${id}`), {
-        method: "PATCH", headers: hdr(), body: JSON.stringify(patch)
-      });
-      if (!res.ok) errors++; else updated++;
-    } catch { errors++; }
+  // Patch updates in parallel batches of 15
+  const PARALLEL = 15;
+  for (let i = 0; i < toUpdate.length; i += PARALLEL) {
+    const chunk = toUpdate.slice(i, i + PARALLEL);
+    const results = await Promise.allSettled(chunk.map(({ id, patch }) =>
+      fetch(db(`crm_leads?id=eq.${id}`), {
+        method: "PATCH",
+        headers: { ...hdr(), "Prefer": "return=minimal" },
+        body: JSON.stringify(patch)
+      })
+    ));
+    results.forEach(r => { if (r.status === "fulfilled" && r.value.ok) updated++; else errors++; });
+    status.innerHTML = `Inserted ${inserted} new · Updated ${updated}/${toUpdate.length}...`;
   }
 
   const parts = [];
-  if (inserted)  parts.push(`✅ ${inserted} inserted`);
-  if (updated)   parts.push(`🔄 ${updated} updated with missing fields`);
-  if (skipped)   parts.push(`⏭ ${skipped} skipped (already complete)`);
-  if (errors)    parts.push(`❌ ${errors} errors`);
+  if (inserted) parts.push(`✅ ${inserted} inserted`);
+  if (updated)  parts.push(`🔄 ${updated} updated`);
+  if (skipped)  parts.push(`⏭ ${skipped} skipped`);
+  if (errors)   parts.push(`❌ ${errors} errors`);
   status.innerHTML = parts.join(" &nbsp;·&nbsp; ");
   await loadLeads();
 }
