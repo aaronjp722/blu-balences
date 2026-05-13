@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CRM | Blu Balence</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #202124; --surface: #292a2d; --surface2: #35363a; --surface3: #3c3d42;
+  --border: rgba(255,255,255,.10); --border2: rgba(255,255,255,.06);
+  --text: #e8eaed; --text-sub: #9aa0a6; --text-dim: #5f6368;
+  --primary: #1a73e8; --primary-light: #4285f4;
+  --success: #0f9d58; --danger: #d93025;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; }
+
+/* TOPBAR */
+.topbar { background: var(--surface); border-bottom: 1px solid var(--border); height: 56px; display: flex; align-items: center; padding: 0 20px; gap: 12px; flex-shrink: 0; z-index: 200; }
+.topbar-logo { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.topbar-name { font-size: 18px; font-weight: 400; }
+.topbar-sep { width: 1px; height: 20px; background: var(--border); }
+.topbar-title { font-size: 14px; color: var(--text-sub); }
+.flex1 { flex: 1; }
+
+/* STATS BAR */
+.stats-bar { display: flex; gap: 6px; padding: 8px 20px; background: var(--surface); border-bottom: 1px solid var(--border); overflow-x: auto; flex-shrink: 0; }
+.stats-bar::-webkit-scrollbar { display: none; }
+.stat-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 20px; font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap; border: 1px solid var(--border); background: var(--surface2); color: var(--text-sub); transition: all .15s; user-select: none; }
+.stat-pill:hover { color: var(--text); }
+.stat-pill.active { color: #fff; border-color: transparent; }
+.stat-count { font-size: 10px; opacity: .75; }
+
+/* TOOLBAR */
+.toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 20px; border-bottom: 1px solid var(--border2); flex-shrink: 0; }
+.search-wrap { position: relative; flex: 1; max-width: 300px; }
+.search-wrap input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 7px 14px 7px 34px; color: var(--text); font-size: 13px; font-family: inherit; outline: none; }
+.search-wrap input:focus { border-color: var(--primary); }
+.search-wrap input::placeholder { color: var(--text-dim); }
+.search-ico { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--text-dim); pointer-events: none; }
+.btn { padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface2); color: var(--text-sub); font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s; white-space: nowrap; }
+.btn:hover { color: var(--text); border-color: rgba(255,255,255,.2); }
+.btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn.primary:hover { background: var(--primary-light); }
+.btn.danger { background: rgba(217,48,37,.15); border-color: rgba(217,48,37,.3); color: #f87171; }
+#countLabel { font-size: 12px; color: var(--text-dim); }
+
+/* APP BODY */
+.app-body { display: flex; flex: 1; overflow: hidden; }
+
+/* TABLE */
+.table-wrap { flex: 1; overflow: auto; }
+.table-wrap::-webkit-scrollbar { width: 5px; height: 5px; }
+.table-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 3px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead { position: sticky; top: 0; z-index: 10; }
+th { background: var(--surface2); padding: 9px 14px; text-align: left; font-size: 10px; font-weight: 500; color: var(--text-sub); text-transform: uppercase; letter-spacing: .07em; border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; }
+th:hover { color: var(--text); }
+td { padding: 9px 14px; border-bottom: 1px solid var(--border2); vertical-align: middle; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+tr.data-row { cursor: pointer; transition: background .1s; }
+tr.data-row:hover td { background: var(--surface2); }
+tr.data-row.selected td { background: rgba(26,115,232,.08); }
+
+.dispo-pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+.rating-star { color: #f9ab00; }
+
+/* DETAIL PANEL */
+.detail-panel { width: 0; min-width: 0; border-left: 1px solid transparent; background: var(--surface); display: flex; flex-direction: column; overflow: hidden; transition: width .25s ease, min-width .25s ease; flex-shrink: 0; }
+.detail-panel.open { width: 420px; min-width: 420px; border-color: var(--border); }
+.panel-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.panel-title { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 300px; }
+.panel-close { width: 26px; height: 26px; background: var(--surface2); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: var(--text-sub); flex-shrink: 0; }
+.panel-close:hover { color: var(--text); }
+
+.panel-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.panel-tab { flex: 1; padding: 9px 6px; text-align: center; font-size: 12px; font-weight: 500; color: var(--text-sub); cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; }
+.panel-tab.active { color: var(--primary-light); border-color: var(--primary); }
+.panel-tab:hover { color: var(--text); }
+
+.panel-body { flex: 1; overflow-y: auto; padding: 16px 18px; }
+.panel-body::-webkit-scrollbar { width: 4px; }
+.panel-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+.panel-footer { padding: 10px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-shrink: 0; }
+
+.sec-label { font-size: 10px; font-weight: 500; color: var(--primary-light); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; margin-top: 16px; }
+.sec-label:first-child { margin-top: 0; }
+
+.field-row { margin-bottom: 11px; }
+.field-row label { display: block; font-size: 10px; font-weight: 500; color: var(--text-sub); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
+.field-row input, .field-row textarea, .field-row select { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border); padding: 5px 0; color: var(--text); font-family: inherit; font-size: 13px; outline: none; transition: border-color .15s; }
+.field-row input:focus, .field-row textarea:focus, .field-row select:focus { border-color: var(--primary); }
+.field-row textarea { resize: vertical; min-height: 70px; }
+.field-row select option { background: var(--surface2); }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* DISPO GRID */
+.dispo-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+.dispo-btn { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1.5px solid transparent; opacity: .5; transition: all .15s; }
+.dispo-btn:hover { opacity: .8; }
+.dispo-btn.active { opacity: 1; }
+
+/* ACTION ROW */
+.action-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.action-btn { flex: 1; min-width: 90px; padding: 8px 6px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text-sub); font-family: inherit; font-size: 11px; font-weight: 500; cursor: pointer; text-align: center; transition: all .15s; white-space: nowrap; }
+.action-btn:hover { color: var(--text); }
+.action-btn.green { border-color: rgba(15,157,88,.3); color: #34d399; }
+.action-btn.green:hover { background: rgba(15,157,88,.1); }
+.action-btn.blue  { border-color: rgba(26,115,232,.3); color: #60a5fa; }
+.action-btn.blue:hover  { background: rgba(26,115,232,.1); }
+.action-btn.amber { border-color: rgba(249,171,0,.3); color: #fcd34d; }
+.action-btn.amber:hover { background: rgba(249,171,0,.1); }
+
+/* NOTES */
+.notes-ta { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: inherit; font-size: 13px; resize: vertical; min-height: 140px; outline: none; }
+.notes-ta:focus { border-color: var(--primary); }
+
+/* ACTIVITY */
+.activity-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border2); }
+.activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.activity-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+.activity-time { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+/* EMAIL COMPOSE */
+.email-field { margin-bottom: 10px; }
+.email-field label { display: block; font-size: 10px; font-weight: 500; color: var(--text-sub); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+.email-field input, .email-field select, .email-field textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; color: var(--text); font-family: inherit; font-size: 13px; outline: none; }
+.email-field input:focus, .email-field select:focus, .email-field textarea:focus { border-color: var(--primary); }
+.email-field textarea { resize: vertical; min-height: 150px; }
+.email-field select option { background: var(--surface2); }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; width: 90%; max-width: 520px; max-height: 90vh; overflow-y: auto; padding: 24px; }
+.modal::-webkit-scrollbar { width: 4px; }
+.modal::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+.modal-title { font-size: 16px; font-weight: 500; margin-bottom: 18px; }
+.modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modal-grid .full { grid-column: 1 / -1; }
+.modal-field { display: flex; flex-direction: column; gap: 4px; }
+.modal-field label { font-size: 10px; font-weight: 500; color: var(--text-sub); text-transform: uppercase; letter-spacing: .06em; }
+.modal-field input, .modal-field select, .modal-field textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; color: var(--text); font-family: inherit; font-size: 13px; outline: none; width: 100%; }
+.modal-field input:focus, .modal-field select:focus { border-color: var(--primary); }
+.modal-field textarea { resize: vertical; min-height: 80px; }
+.modal-field select option { background: var(--surface2); }
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+
+/* CAL MODAL date/time */
+input[type="date"], input[type="time"] { color-scheme: dark; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 18px; font-size: 13px; z-index: 9999; transform: translateY(60px); opacity: 0; transition: all .25s; pointer-events: none; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-color: rgba(15,157,88,.4); color: #34d399; }
+.toast.error   { border-color: rgba(217,48,37,.4); color: #f87171; }
+
+/* EMPTY STATE */
+.empty-state { padding: 60px 20px; text-align: center; color: var(--text-dim); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo">B</div>
+  <span class="topbar-name">Blu Balence</span>
+  <div class="topbar-sep"></div>
+  <span class="topbar-title">CRM</span>
+  <div class="flex1"></div>
+  <button class="btn" onclick="openImportModal()">📂 Import CSV</button>
+  <button class="btn primary" onclick="openAddModal()">+ Add Lead</button>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar" id="statsBar"></div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="search-wrap">
+    <span class="search-ico">🔍</span>
+    <input type="text" id="searchInput" placeholder="Search business, phone, address…" oninput="applyFilter()">
+  </div>
+  <button class="btn" id="clearBtn" onclick="clearFilter()" style="display:none;">✕ Filter</button>
+  <div class="flex1"></div>
+  <span id="countLabel"></span>
+</div>
+
+<!-- APP BODY -->
+<div class="app-body">
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortBy('dispo')">Dispo</th>
+          <th onclick="sortBy('business_name')">Business</th>
+          <th onclick="sortBy('phone')">Phone</th>
+          <th onclick="sortBy('rating')">Rating</th>
+          <th onclick="sortBy('reviews')">Reviews</th>
+          <th onclick="sortBy('industry')">Industry</th>
+          <th onclick="sortBy('address')">Address</th>
+          <th>Quick</th>
+        </tr>
+      </thead>
+      <tbody id="leadsBody">
+        <tr><td colspan="8" class="empty-state">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- DETAIL PANEL -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="panel-header">
+      <span class="panel-title" id="panelTitle">Lead Details</span>
+      <div class="panel-close" onclick="closePanel()">✕</div>
+    </div>
+    <div class="panel-tabs">
+      <div class="panel-tab active" data-tab="info"     onclick="switchTab('info',this)">Info</div>
+      <div class="panel-tab"        data-tab="notes"    onclick="switchTab('notes',this)">Notes</div>
+      <div class="panel-tab"        data-tab="activity" onclick="switchTab('activity',this)">Activity</div>
+      <div class="panel-tab"        data-tab="email"    onclick="switchTab('email',this)">Email</div>
+    </div>
+    <div class="panel-body" id="panelBody"></div>
+    <div class="panel-footer">
+      <button class="btn primary" style="flex:1;" onclick="saveCurrentLead()">Save Changes</button>
+      <button class="btn danger" onclick="deleteLead()">Delete</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD / EDIT LEAD MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-title" id="addModalTitle">Add New Lead</div>
+    <div class="modal-grid">
+      <div class="full modal-field"><label>Business Name *</label><input id="m_business_name" type="text" placeholder="e.g. Polished Detailing"></div>
+      <div class="modal-field"><label>Contact Name</label><input id="m_contact_name" type="text" placeholder="Owner name"></div>
+      <div class="modal-field"><label>Phone</label><input id="m_phone" type="text" placeholder="(513) 000-0000"></div>
+      <div class="modal-field"><label>Email</label><input id="m_email" type="email" placeholder="email@example.com"></div>
+      <div class="modal-field"><label>Industry</label><input id="m_industry" type="text" placeholder="Car detailing service"></div>
+      <div class="modal-field"><label>Dispo</label>
+        <select id="m_dispo">
+          <option value="new">New Lead</option>
+          <option value="no_pick_up">No Pick Up</option>
+          <option value="voicemail">Voicemail</option>
+          <option value="call_back">Call Back</option>
+          <option value="gate_keeper">Gate Keeper</option>
+          <option value="follow_up">Follow Up</option>
+          <option value="email">Email Sent</option>
+          <option value="text">Text Sent</option>
+          <option value="appointment">Appointment</option>
+          <option value="not_interested">Not Interested</option>
+          <option value="dnc">DNC</option>
+          <option value="bad_number">Bad Number</option>
+        </select>
+      </div>
+      <div class="modal-field"><label>Rating</label><input id="m_rating" type="number" step="0.1" min="0" max="5" placeholder="4.9"></div>
+      <div class="modal-field"><label>Reviews</label><input id="m_reviews" type="number" placeholder="150"></div>
+      <div class="full modal-field"><label>Address</label><input id="m_address" type="text" placeholder="123 Main St, Cincinnati OH"></div>
+      <div class="full modal-field"><label>Website</label><input id="m_website" type="url" placeholder="https://"></div>
+      <div class="full modal-field"><label>Google Maps Link</label><input id="m_google_maps_link" type="url" placeholder="https://google.com/maps/…"></div>
+      <div class="full modal-field"><label>Notes</label><textarea id="m_notes" placeholder="Notes about this lead…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeAddModal()">Cancel</button>
+      <button class="btn primary" onclick="saveLeadModal()">Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- PUSH TO CALENDAR MODAL -->
+<div class="modal-overlay" id="calModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-title">📅 Push to Calendar</div>
+    <div class="modal-field" style="margin-bottom:10px;"><label>Client / Business</label><input id="cal_name" type="text"></div>
+    <div class="modal-field" style="margin-bottom:10px;"><label>Phone</label><input id="cal_phone" type="text"></div>
+    <div class="modal-field" style="margin-bottom:10px;"><label>Email</label><input id="cal_email" type="email"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+      <div class="modal-field"><label>Date</label><input id="cal_date" type="date"></div>
+      <div class="modal-field"><label>Time</label><input id="cal_time" type="time"></div>
+    </div>
+    <div class="modal-field" style="margin-bottom:10px;"><label>Notes</label><textarea id="cal_notes" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-family:inherit;font-size:13px;width:100%;resize:vertical;min-height:60px;outline:none;" placeholder="Appointment notes…"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('calModal').classList.remove('open')">Cancel</button>
+      <button class="btn primary" onclick="confirmPushToCalendar()">Create Appointment</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMPORT CSV MODAL -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-title">📂 Import CSV</div>
+    <p style="font-size:13px;color:var(--text-sub);margin-bottom:14px;line-height:1.6;">Expected columns: <code style="background:var(--surface2);padding:1px 4px;border-radius:4px;font-size:12px;">Title, Rating, Reviews, Phone, Industry, Address, Website, Google Maps Link</code></p>
+    <div id="dropZone" style="border:2px dashed rgba(255,255,255,.15);border-radius:10px;padding:28px;text-align:center;cursor:pointer;background:var(--surface2);transition:.2s;" onclick="document.getElementById('csvFile').click()" ondragover="event.preventDefault();this.style.borderColor='var(--primary)'" ondragleave="this.style.borderColor=''" ondrop="handleDrop(event)">
+      <div style="font-size:28px;margin-bottom:8px;">📂</div>
+      <div style="font-size:13px;color:var(--text-sub);" id="csvLabel">Click to select or drag &amp; drop a CSV</div>
+      <input type="file" id="csvFile" accept=".csv" style="display:none;" onchange="handleCSVFile(this.files[0])">
+    </div>
+    <div id="csvPreview" style="margin-top:10px;font-size:12px;color:var(--text-sub);"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('importModal').classList.remove('open')">Cancel</button>
+      <button class="btn primary" id="importBtn" onclick="importCSV()" disabled>Import</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── CONFIG ── */
+const SUPABASE_URL = "https://rfdvogakvyodixgpvqvz.supabase.co";
+const SUPABASE
