@@ -4,237 +4,263 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Contract | Blu Balence</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b1220;
-      --card: #111827;
-      --navy: #0a1628;
-      --text-main: #e5e7eb;
-      --text-sub: #9ca3af;
+      --bg: #202124;
+      --surface: #292a2d;
+      --surface2: #35363a;
+      --surface3: #3c3d42;
       --border: rgba(255,255,255,.10);
-      --primary: #2563eb;
-      --primary-light: #3b82f6;
-      --success: #22c55e;
-      --input-bg: #020617;
+      --border2: rgba(255,255,255,.06);
+      --text: #e8eaed;
+      --text-sub: #9aa0a6;
+      --text-dim: #5f6368;
+      --primary: #1a73e8;
+      --primary-light: #4285f4;
+      --success: #0f9d58;
+      --danger: #d93025;
+      --input-bg: #1a1b1e;
     }
+
     *, *::before, *::after { box-sizing: border-box; }
+
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Roboto', sans-serif;
       background: var(--bg);
-      color: var(--text-main);
+      color: var(--text);
       margin: 0;
-      padding: 40px 20px;
+      padding: 32px 20px 60px;
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }
-    .container { max-width: 720px; margin: 0 auto; }
 
-    .page-header { margin-bottom: 32px; }
-    .page-header .logo { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -.5px; margin-bottom: 12px; }
-    .page-header .logo span { color: var(--primary-light); }
-    .page-header h1 { margin: 0 0 4px; font-size: 26px; font-weight: 800; letter-spacing: -.5px; }
-    .page-header p { margin: 0; color: var(--text-sub); font-size: 14px; }
+    .container { max-width: 700px; margin: 0 auto; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      margin: -32px -20px 32px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .logo-mark {
+      width: 32px; height: 32px;
+      background: var(--primary); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; color: #fff;
+    }
+    .logo-text { font-size: 20px; font-weight: 400; color: var(--text); letter-spacing: -.3px; }
+    .topbar-sep { width: 1px; height: 24px; background: var(--border); }
+    .topbar-title { font-size: 18px; font-weight: 400; color: var(--text); }
+
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { margin: 0 0 4px; font-size: 24px; font-weight: 400; letter-spacing: -.3px; }
+    .page-header p  { margin: 0; color: var(--text-sub); font-size: 14px; }
 
     .card {
-      background: var(--card);
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 28px 32px;
-      margin-bottom: 20px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
     }
+
     .section-title {
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 11px; font-weight: 500;
       color: var(--primary-light);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin-bottom: 20px;
+      text-transform: uppercase; letter-spacing: .08em;
+      margin-bottom: 18px;
     }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-    .form-group { margin-bottom: 18px; }
+
+    .type-selector {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 8px;
+    }
+    .type-btn {
+      padding: 14px 10px; border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text-sub);
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all .15s; text-align: center; line-height: 1.3;
+    }
+    .type-btn:hover { background: var(--surface3); color: var(--text); }
+    .type-btn.active { background: rgba(26,115,232,.15); border-color: var(--primary); color: var(--primary-light); }
+    .type-btn .type-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+
+    .client-picker-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 500; color: var(--text-sub); margin-bottom: 6px;
+    }
+    .client-picker-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+    .form-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .form-group { margin-bottom: 16px; }
     .form-group:last-child { margin-bottom: 0; }
 
     label {
-      display: block;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-sub);
-      text-transform: uppercase;
-      letter-spacing: .6px;
-      margin-bottom: 7px;
+      display: block; font-size: 11px; font-weight: 500;
+      color: var(--text-sub); text-transform: uppercase;
+      letter-spacing: .06em; margin-bottom: 6px;
     }
 
-    input[type="text"],
-    input[type="email"],
-    input[type="tel"],
-    input[type="number"],
-    input[type="date"],
-    select {
-      width: 100%;
-      padding: 10px 13px;
-      background: var(--input-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-main);
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      outline: none;
-      transition: border-color .15s, box-shadow .15s;
-      appearance: none;
+    input[type="text"], input[type="email"], input[type="tel"],
+    input[type="number"], input[type="date"], select {
+      width: 100%; padding: 9px 0;
+      background: transparent; border: none;
+      border-bottom: 1px solid var(--border); border-radius: 0;
+      color: var(--text); font-family: inherit; font-size: 14px;
+      outline: none; transition: border-color .15s; appearance: none;
     }
-    input:focus, select:focus {
-      border-color: var(--primary-light);
-      box-shadow: 0 0 0 3px rgba(59,130,246,.15);
-    }
-    input::placeholder { color: #374151; }
+    input:focus, select:focus { border-color: var(--primary); }
+    input::placeholder { color: var(--text-dim); }
     input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(.5); cursor: pointer; }
-    select option { background: #0f172a; color: var(--text-main); }
+
+    #calendar-client {
+      padding: 9px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 8px; cursor: pointer;
+    }
+    #calendar-client:focus { border-color: var(--primary); }
+    select option { background: var(--surface2); color: var(--text); }
 
     .prefix-wrap { position: relative; }
     .prefix-wrap .prefix {
-      position: absolute; left: 12px; top: 50%;
-      transform: translateY(-50%);
+      position: absolute; left: 0; bottom: 10px;
       color: var(--text-sub); font-size: 14px; pointer-events: none;
     }
-    .prefix-wrap input { padding-left: 24px; }
+    .prefix-wrap input { padding-left: 14px; }
 
-    hr { border: 0; border-top: 1px solid var(--border); margin: 22px 0; }
-
-    .toggle-row {
-      display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none;
-    }
-    .toggle-row input[type="checkbox"] {
-      width: 17px; height: 17px; accent-color: var(--primary-light); cursor: pointer; flex-shrink: 0;
-    }
-    .toggle-label { font-size: 14px; font-weight: 600; color: var(--text-main); }
-    .collapsible { display: none; margin-top: 22px; }
-    .collapsible.open { display: block; }
+    hr { border: 0; border-top: 1px solid var(--border2); margin: 20px 0; }
 
     .btn-primary {
-      width: 100%; padding: 15px;
-      background: var(--primary);
-      color: #fff; border: none;
-      border-radius: 12px;
-      font-family: 'Inter', sans-serif;
-      font-size: 15px; font-weight: 700;
-      cursor: pointer; transition: background .15s, transform .1s;
-      letter-spacing: .02em;
+      width: 100%; padding: 14px;
+      background: var(--primary); color: #fff; border: none;
+      border-radius: 20px; font-family: inherit;
+      font-size: 15px; font-weight: 500; cursor: pointer;
+      transition: background .15s; letter-spacing: .25px;
     }
-    .btn-primary:hover  { background: var(--primary-light); }
+    .btn-primary:hover { background: var(--primary-light); }
     .btn-primary:active { transform: scale(.99); }
     .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
 
     .btn-outline {
-      flex: 1; padding: 13px;
-      background: transparent;
-      color: var(--primary-light);
-      border: 1px solid rgba(59,130,246,.4);
-      border-radius: 10px;
-      font-family: 'Inter', sans-serif;
-      font-size: 14px; font-weight: 600;
-      cursor: pointer; text-decoration: none;
-      text-align: center; transition: all .15s;
-      display: block;
+      flex: 1; padding: 12px; background: transparent;
+      color: var(--primary-light); border: 1px solid rgba(66,133,244,.4);
+      border-radius: 20px; font-family: inherit; font-size: 14px; font-weight: 500;
+      cursor: pointer; text-decoration: none; text-align: center;
+      transition: all .15s; display: block;
     }
-    .btn-outline:hover { background: rgba(59,130,246,.1); border-color: var(--primary-light); }
+    .btn-outline:hover { background: rgba(26,115,232,.12); border-color: var(--primary-light); }
 
     .btn-dl {
-      flex: 1; padding: 13px;
-      background: var(--primary);
-      color: #fff; border: none;
-      border-radius: 10px;
-      font-family: 'Inter', sans-serif;
-      font-size: 14px; font-weight: 700;
-      cursor: pointer; text-decoration: none;
-      text-align: center; transition: background .15s;
-      display: block;
+      flex: 1; padding: 12px; background: var(--primary);
+      color: #fff; border: none; border-radius: 20px;
+      font-family: inherit; font-size: 14px; font-weight: 500;
+      cursor: pointer; text-decoration: none; text-align: center;
+      transition: background .15s; display: block;
     }
     .btn-dl:hover { background: var(--primary-light); }
 
-    /* ================================
-       SUCCESS STATE
-    ================================ */
     #success-panel { display: none; }
-
-    .success-header {
-      text-align: center;
-      padding: 32px 0 24px;
-    }
+    .success-header { text-align: center; padding: 28px 0 20px; }
     .success-icon {
-      width: 56px; height: 56px;
-      background: rgba(34,197,94,.12);
-      border: 1px solid rgba(34,197,94,.25);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 16px;
-      font-size: 22px; color: var(--success);
+      width: 52px; height: 52px;
+      background: rgba(15,157,88,.12); border: 1px solid rgba(15,157,88,.3);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px; font-size: 22px; color: var(--success);
     }
-    .success-header h2 { margin: 0 0 6px; font-size: 20px; font-weight: 800; }
+    .success-header h2 { margin: 0 0 6px; font-size: 20px; font-weight: 400; }
     .success-header p  { margin: 0; color: var(--text-sub); font-size: 14px; }
-
-    .doc-action-row { display: flex; gap: 12px; margin-top: 20px; }
-
-    /* Google Doc iframe embed */
+    .doc-action-row { display: flex; gap: 10px; margin-top: 18px; }
     .doc-embed-wrap {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 20px;
-      background: #fff;
+      width: 100%; border: 1px solid var(--border); border-radius: 10px;
+      overflow: hidden; margin-top: 18px; background: #fff;
     }
-    .doc-embed-wrap iframe {
-      width: 100%; height: 680px; border: none; display: block;
-    }
+    .doc-embed-wrap iframe { width: 100%; height: 680px; border: none; display: block; }
     .embed-label {
-      font-size: 11px; font-weight: 700; color: var(--text-sub);
-      text-transform: uppercase; letter-spacing: 1px;
-      margin-bottom: 8px;
+      font-size: 11px; font-weight: 500; color: var(--text-sub);
+      text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px;
     }
 
     .toast {
-      position: fixed; bottom: 28px; left: 50%;
+      position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(80px);
-      background: #1e293b;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 24px;
-      font-size: 14px; font-weight: 600;
-      color: var(--text-main);
-      box-shadow: 0 20px 40px rgba(0,0,0,.5);
-      transition: transform .3s ease;
-      z-index: 999;
-      white-space: nowrap;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 24px;
+      font-size: 14px; font-weight: 500; color: var(--text);
+      box-shadow: 0 8px 30px rgba(0,0,0,.5);
+      transition: transform .25s ease; z-index: 999; white-space: nowrap;
     }
     .toast.show    { transform: translateX(-50%) translateY(0); }
-    .toast.success { border-color: var(--success); color: var(--success); }
-    .toast.error   { border-color: #ef4444; color: #ef4444; }
+    .toast.success { border-color: var(--success); }
+    .toast.error   { border-color: var(--danger); color: #ff6b6b; }
 
     @media (max-width: 580px) {
-      .form-row, .form-row-3 { grid-template-columns: 1fr; }
-      .card { padding: 22px 20px; }
+      .form-row, .form-row-3, .type-selector { grid-template-columns: 1fr; }
+      .card { padding: 20px; }
     }
   </style>
 </head>
 <body>
 
+<div class="topbar">
+  <a class="logo" href="/">
+    <div class="logo-mark">B</div>
+    <span class="logo-text">Blu Balence</span>
+  </a>
+  <div class="topbar-sep"></div>
+  <span class="topbar-title">Create Contract</span>
+</div>
+
 <div class="container">
 
   <div class="page-header">
-    <div class="logo">Blu <span>Balence</span></div>
-    <h1>Create Contract</h1>
-    <p>Bookkeeping Service Agreement Generator</p>
+    <h1>Bookkeeping Agreement</h1>
+    <p>Select a contract type, then fill in the details below.</p>
   </div>
 
-  <!-- FORM -->
   <form id="contract-form" autocomplete="off">
 
-    <!-- CLIENT INFO -->
+    <!-- ① CONTRACT TYPE -->
+    <div class="card">
+      <div class="section-title">Contract Type</div>
+      <div class="type-selector">
+        <button type="button" class="type-btn active" data-type="monthly" onclick="setContractType('monthly')">
+          <span class="type-icon">📅</span>Monthly Service
+        </button>
+        <button type="button" class="type-btn" data-type="cleanup" onclick="setContractType('cleanup')">
+          <span class="type-icon">🧹</span>Cleanup Service
+        </button>
+        <button type="button" class="type-btn" data-type="both" onclick="setContractType('both')">
+          <span class="type-icon">📦</span>Monthly + Cleanup
+        </button>
+      </div>
+    </div>
+
+    <!-- ② CLIENT SELECTOR FROM CALENDAR -->
+    <div class="card">
+      <div class="section-title">Auto-fill from Calendar</div>
+      <div class="form-group" style="margin-bottom:0;">
+        <div class="client-picker-badge">
+          <span class="dot"></span>
+          <span id="clients-loaded-label">Loading appointments…</span>
+        </div>
+        <select id="calendar-client" onchange="fillFromCalendar()">
+          <option value="">— Select a client to auto-fill —</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ③ CLIENT INFO -->
     <div class="card">
       <div class="section-title">Client Information</div>
-
       <div class="form-row">
         <div class="form-group">
           <label>Business Name</label>
@@ -242,10 +268,9 @@
         </div>
         <div class="form-group">
           <label>Client Title</label>
-          <input type="text" id="client_title" placeholder="Owner, CEO, CFO...">
+          <input type="text" id="client_title" placeholder="Owner, CEO, CFO…">
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label>Contact Name</label>
@@ -256,26 +281,24 @@
           <input type="email" id="email" placeholder="jane@acme.com" required>
         </div>
       </div>
-
       <div class="form-group" style="margin-bottom:0;">
         <label>Phone Number</label>
         <input type="tel" id="phone" placeholder="(555) 000-0000" required>
       </div>
     </div>
 
-    <!-- PRICING -->
-    <div class="card">
-      <div class="section-title">Pricing</div>
-
+    <!-- ④ MONTHLY PRICING -->
+    <div class="card" id="pricing-card">
+      <div class="section-title">Monthly Pricing</div>
       <div class="form-row">
         <div class="form-group">
           <label>Monthly Service Price</label>
           <div class="prefix-wrap">
             <span class="prefix">$</span>
-            <input type="number" id="monthly_price" placeholder="0.00" min="0" step="0.01" required>
+            <input type="number" id="monthly_price" placeholder="0.00" min="0" step="0.01">
           </div>
         </div>
-        <div class="form-group" style="margin-bottom:0;">
+        <div class="form-group">
           <label>Additional Services Price</label>
           <div class="prefix-wrap">
             <span class="prefix">$</span>
@@ -283,11 +306,10 @@
           </div>
         </div>
       </div>
-
       <div class="form-row" style="margin-bottom:0;">
         <div class="form-group" style="margin-bottom:0;">
           <label>Billing Day of Month</label>
-          <input type="number" id="billing_day" placeholder="e.g. 1, 15, 28" min="1" max="28" required>
+          <input type="number" id="billing_day" value="1" min="1" max="28">
         </div>
         <div class="form-group" style="margin-bottom:0;">
           <label>Completion Time Estimate</label>
@@ -296,10 +318,40 @@
       </div>
     </div>
 
-    <!-- CONTRACT TERMS -->
+    <!-- ⑤ CLEANUP -->
+    <div class="card" id="cleanup-card" style="display:none;">
+      <div class="section-title">Cleanup Period</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Start of Cleanup Period</label>
+          <input type="date" id="cleanup_start">
+        </div>
+        <div class="form-group">
+          <label>End of Cleanup Period</label>
+          <input type="date" id="cleanup_end">
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:0;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Cleanup Price</label>
+          <div class="prefix-wrap">
+            <span class="prefix">$</span>
+            <input type="number" id="cleanup_price" placeholder="0.00" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Upfront Cleanup Price</label>
+          <div class="prefix-wrap">
+            <span class="prefix">$</span>
+            <input type="number" id="upfront_cleanup_price" placeholder="0.00" min="0" step="0.01">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑥ CONTRACT TERMS -->
     <div class="card">
       <div class="section-title">Contract Terms</div>
-
       <div class="form-row">
         <div class="form-group">
           <label>Contract Effective Date</label>
@@ -307,10 +359,9 @@
         </div>
         <div class="form-group">
           <label>Days to Terminate Contract</label>
-          <input type="number" id="termination_days" placeholder="e.g. 30" min="1" required>
+          <input type="number" id="termination_days" value="30" min="1" required>
         </div>
       </div>
-
       <div class="form-group" style="margin-bottom:0;">
         <label>Dispute Resolution State</label>
         <select id="dispute_state" required>
@@ -336,50 +387,11 @@
       </div>
     </div>
 
-    <!-- CLEANUP PERIOD -->
-    <div class="card">
-      <div class="section-title">Cleanup Period</div>
-
-      <label class="toggle-row">
-        <input type="checkbox" id="cleanup_toggle" onchange="toggleCleanup(this)">
-        <span class="toggle-label">Include Cleanup Period</span>
-      </label>
-
-      <div class="collapsible" id="cleanup-fields">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Start of Cleanup Period</label>
-            <input type="date" id="cleanup_start">
-          </div>
-          <div class="form-group">
-            <label>End of Cleanup Period</label>
-            <input type="date" id="cleanup_end">
-          </div>
-        </div>
-        <div class="form-row" style="margin-bottom:0;">
-          <div class="form-group" style="margin-bottom:0;">
-            <label>Cleanup Price</label>
-            <div class="prefix-wrap">
-              <span class="prefix">$</span>
-              <input type="number" id="cleanup_price" placeholder="0.00" min="0" step="0.01">
-            </div>
-          </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label>Upfront Cleanup Price</label>
-            <div class="prefix-wrap">
-              <span class="prefix">$</span>
-              <input type="number" id="upfront_cleanup_price" placeholder="0.00" min="0" step="0.01">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <button type="submit" class="btn-primary" id="submit-btn">Create Contract</button>
 
   </form>
 
-  <!-- SUCCESS PANEL (shown after contract is created) -->
+  <!-- SUCCESS PANEL -->
   <div id="success-panel">
     <div class="card">
       <div class="success-header">
@@ -387,21 +399,17 @@
         <h2>Contract Created</h2>
         <p>Your Google Doc is ready. Edit it below or download as PDF.</p>
       </div>
-
       <div class="doc-action-row">
         <a id="edit-btn" href="#" target="_blank" class="btn-outline">&#9998; Open in Google Docs</a>
         <a id="pdf-btn"  href="#" target="_blank" class="btn-dl">&#8659; Download PDF</a>
       </div>
-
       <div style="margin-top:24px;">
         <div class="embed-label">Live Document Preview</div>
         <div class="doc-embed-wrap">
           <iframe id="doc-iframe" src="" allowfullscreen></iframe>
         </div>
       </div>
-
       <hr style="margin-top:28px;">
-
       <button type="button" class="btn-outline" onclick="resetForm()" style="margin-top:4px;">
         &#43; Create Another Contract
       </button>
@@ -409,107 +417,162 @@
   </div>
 
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-const WEBHOOK_URL = "https://hook.us1.make.com/gtsp4m0n8bli6trnew1d6ctxuqx8bngp";
+const WEBHOOK_URL  = "https://hook.us1.make.com/gtsp4m0n8bli6trnew1d6ctxuqx8bngp";
+const SUPABASE_URL = "https://rfdvogakvyodixgpvqvz.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E";
 
-function toggleCleanup(cb) {
-  document.getElementById("cleanup-fields").classList.toggle("open", cb.checked);
+let contractType = "monthly";
+
+function setContractType(type) {
+  contractType = type;
+  document.querySelectorAll(".type-btn").forEach(b => b.classList.toggle("active", b.dataset.type === type));
+  document.getElementById("pricing-card").style.display = (type === "monthly" || type === "both") ? "block" : "none";
+  document.getElementById("cleanup-card").style.display = (type === "cleanup"  || type === "both") ? "block" : "none";
+}
+
+async function sbFetch(path) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const t = await res.text();
+  return t ? JSON.parse(t) : [];
+}
+
+async function loadCalendarClients() {
+  try {
+    const appts  = await sbFetch("appointments?select=*&order=appointment_utc.asc") || [];
+    const now    = new Date();
+    const todayS = now.toDateString();
+
+    const todays  = appts.filter(a => new Date(a.appointment_utc).toDateString() === todayS);
+    const futures = appts.filter(a => new Date(a.appointment_utc) > now && new Date(a.appointment_utc).toDateString() !== todayS);
+    const pasts   = appts.filter(a => new Date(a.appointment_utc) < now && new Date(a.appointment_utc).toDateString() !== todayS).reverse();
+    const sorted  = [...todays, ...futures, ...pasts];
+    const sel     = document.getElementById("calendar-client");
+
+    let count = 0;
+    sorted.forEach(appt => {
+      if (!appt.client_name && !appt.phone && !appt.email) return;
+      const isToday   = new Date(appt.appointment_utc).toDateString() === todayS;
+      const dateLabel = isToday ? "Today" : new Date(appt.appointment_utc).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      const opt = document.createElement("option");
+      opt.value = appt.id;
+      opt.textContent = `${appt.client_name || appt.name} — ${dateLabel}${appt.phone ? " · " + appt.phone : ""}`;
+      opt.dataset.clientName = appt.client_name || "";
+      opt.dataset.phone      = appt.phone       || "";
+      opt.dataset.email      = appt.email       || "";
+      opt.dataset.apptName   = appt.name        || "";
+      sel.appendChild(opt);
+      count++;
+    });
+
+    document.getElementById("clients-loaded-label").textContent =
+      count > 0 ? `${count} client${count !== 1 ? "s" : ""} from calendar` : "No clients in calendar yet";
+  } catch (e) {
+    console.warn("Could not load calendar clients:", e);
+    document.getElementById("clients-loaded-label").textContent = "Could not load calendar";
+  }
+}
+
+function fillFromCalendar() {
+  const sel = document.getElementById("calendar-client");
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt || !opt.value) return;
+  if (opt.dataset.clientName) document.getElementById("contact_name").value  = opt.dataset.clientName;
+  if (opt.dataset.phone)      document.getElementById("phone").value          = opt.dataset.phone;
+  if (opt.dataset.email)      document.getElementById("email").value          = opt.dataset.email;
+  if (opt.dataset.apptName && !document.getElementById("business_name").value)
+    document.getElementById("business_name").value = opt.dataset.apptName;
+}
+
+function setDefaults() {
+  document.getElementById("effective_date").value   = new Date().toISOString().split("T")[0];
+  document.getElementById("termination_days").value = "30";
+  document.getElementById("billing_day").value      = "1";
+  const sel = document.getElementById("dispute_state");
+  for (const opt of sel.options) { if (opt.text === "Ohio") { sel.value = opt.value; break; } }
 }
 
 function showToast(msg, type = "success") {
   const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.className = `toast ${type} show`;
+  t.textContent = msg; t.className = `toast ${type} show`;
   setTimeout(() => t.classList.remove("show"), 4000);
 }
 
 function setDocLinks(docId) {
-  const editUrl    = `https://docs.google.com/document/d/${docId}/edit`;
-  const pdfUrl     = `https://docs.google.com/document/d/${docId}/export?format=pdf`;
-  const embedUrl   = `https://docs.google.com/document/d/${docId}/preview`;
-
-  document.getElementById("edit-btn").href  = editUrl;
-  document.getElementById("pdf-btn").href   = pdfUrl;
-  document.getElementById("doc-iframe").src = embedUrl;
+  document.getElementById("edit-btn").href  = `https://docs.google.com/document/d/${docId}/edit`;
+  document.getElementById("pdf-btn").href   = `https://docs.google.com/document/d/${docId}/export?format=pdf`;
+  document.getElementById("doc-iframe").src = `https://docs.google.com/document/d/${docId}/preview`;
 }
 
 function resetForm() {
   document.getElementById("contract-form").reset();
-  document.getElementById("cleanup-fields").classList.remove("open");
-  document.getElementById("success-panel").style.display = "none";
-  document.getElementById("contract-form").style.display = "block";
+  document.getElementById("calendar-client").selectedIndex = 0;
+  document.getElementById("success-panel").style.display  = "none";
+  document.getElementById("contract-form").style.display  = "block";
   document.getElementById("doc-iframe").src = "";
+  setDefaults();
+  setContractType("monthly");
 }
 
 document.getElementById("contract-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const btn = document.getElementById("submit-btn");
-  btn.disabled = true;
-  btn.textContent = "Creating…";
+  btn.disabled = true; btn.textContent = "Creating…";
 
-  const includeCleanup = document.getElementById("cleanup_toggle").checked;
+  const hasMonthly = contractType === "monthly" || contractType === "both";
+  const hasCleanup = contractType === "cleanup"  || contractType === "both";
 
   const payload = {
+    contract_type:             contractType,   // "monthly" | "cleanup" | "both"
     business_name:             document.getElementById("business_name").value.trim(),
     client_title:              document.getElementById("client_title").value.trim(),
     contact_name:              document.getElementById("contact_name").value.trim(),
     email:                     document.getElementById("email").value.trim(),
     phone:                     document.getElementById("phone").value.trim(),
-    monthly_price:             parseFloat(document.getElementById("monthly_price").value) || 0,
-    additional_services_price: parseFloat(document.getElementById("additional_services_price").value) || 0,
-    billing_day:               parseInt(document.getElementById("billing_day").value) || 1,
-    completion_estimate:       document.getElementById("completion_estimate").value.trim(),
+    monthly_price:             hasMonthly ? (parseFloat(document.getElementById("monthly_price").value) || 0) : null,
+    additional_services_price: hasMonthly ? (parseFloat(document.getElementById("additional_services_price").value) || 0) : null,
+    billing_day:               hasMonthly ? (parseInt(document.getElementById("billing_day").value) || 1) : null,
+    completion_estimate:       hasMonthly ? document.getElementById("completion_estimate").value.trim() : null,
+    include_cleanup_period:    hasCleanup,
+    cleanup_start:             hasCleanup ? document.getElementById("cleanup_start").value   : null,
+    cleanup_end:               hasCleanup ? document.getElementById("cleanup_end").value     : null,
+    cleanup_price:             hasCleanup ? (parseFloat(document.getElementById("cleanup_price").value) || 0) : null,
+    upfront_cleanup_price:     hasCleanup ? (parseFloat(document.getElementById("upfront_cleanup_price").value) || 0) : null,
     effective_date:            document.getElementById("effective_date").value,
     termination_days:          parseInt(document.getElementById("termination_days").value) || 30,
     dispute_state:             document.getElementById("dispute_state").value,
-    include_cleanup_period:    includeCleanup,
-    cleanup_start:             includeCleanup ? document.getElementById("cleanup_start").value : null,
-    cleanup_end:               includeCleanup ? document.getElementById("cleanup_end").value   : null,
-    cleanup_price:             includeCleanup ? (parseFloat(document.getElementById("cleanup_price").value) || 0) : null,
-    upfront_cleanup_price:     includeCleanup ? (parseFloat(document.getElementById("upfront_cleanup_price").value) || 0) : null,
   };
 
   try {
     const res = await fetch(WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
     });
-
     if (!res.ok) throw new Error("Webhook returned " + res.status);
-
-    /* Make.com should return JSON: { "doc_id": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms" } */
     let docId = null;
-    try {
-      const json = await res.json();
-      docId = json.doc_id || json.documentId || json.id || null;
-    } catch (_) { /* Make.com returned plain text — that's ok */ }
-
+    try { const json = await res.json(); docId = json.doc_id || json.documentId || json.id || null; } catch (_) {}
     if (docId) {
       setDocLinks(docId);
       document.getElementById("contract-form").style.display = "none";
       document.getElementById("success-panel").style.display = "block";
       showToast("Contract created — document ready!", "success");
     } else {
-      /* Webhook succeeded but no doc_id came back yet */
       showToast("Contract sent — check Make.com for the document.", "success");
-      e.target.reset();
-      document.getElementById("cleanup-fields").classList.remove("open");
+      e.target.reset(); setDefaults();
     }
-
   } catch (err) {
-    console.error(err);
-    showToast("Failed to create contract. Try again.", "error");
+    console.error(err); showToast("Failed to create contract. Try again.", "error");
   } finally {
-    btn.disabled = false;
-    btn.textContent = "Create Contract";
+    btn.disabled = false; btn.textContent = "Create Contract";
   }
 });
-</script>
 
+setDefaults();
+loadCalendarClients();
+</script>
 </body>
 </html>
