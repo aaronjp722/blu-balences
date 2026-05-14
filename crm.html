@@ -25,6 +25,8 @@ body{font-family:'Roboto',sans-serif;background:#202124;color:#e8eaed;min-height
 .btn-ghost:hover{background:#3c4043;color:#e8eaed}
 .btn-warn{background:#d97706;color:#fff}
 .btn-warn:hover{background:#b45309}
+.btn-green{background:#0f9d58;color:#fff}
+.btn-green:hover{background:#0b8044}
 
 .stats-bar{background:#292a2d;border-bottom:1px solid #3c4043;padding:12px 20px;display:flex;gap:20px;overflow-x:auto;flex-shrink:0}
 .stat-pill{display:flex;align-items:center;gap:8px;background:#35363a;border-radius:16px;padding:6px 14px;cursor:pointer;transition:all .2s;white-space:nowrap;border:2px solid transparent}
@@ -131,12 +133,59 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 
+/* ─── AUTO DIALER ─────────────────────────────────────────────────────────── */
+#dialer-overlay{position:fixed;inset:0;background:#1a1b1e;z-index:900;display:none;flex-direction:column;overflow:hidden}
+#dialer-overlay.open{display:flex}
+.d-header{background:#292a2d;border-bottom:1px solid #3c4043;padding:0 16px;height:52px;display:flex;align-items:center;gap:10px;flex-shrink:0;overflow:hidden}
+.d-logo{font-size:14px;font-weight:500;color:#9aa0a6;white-space:nowrap}
+.d-sep{color:#3c4043;font-size:18px}
+.d-progress-text{font-size:13px;color:#e8eaed;font-weight:500;white-space:nowrap}
+.d-stats-bar{display:flex;gap:6px;flex:1;overflow-x:auto;padding:0 4px}
+.d-stat{display:flex;align-items:center;gap:5px;background:#35363a;border-radius:12px;padding:3px 10px;font-size:12px;white-space:nowrap;flex-shrink:0}
+.d-stat-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.d-body{display:flex;flex:1;overflow:hidden}
+.d-lead{flex:0 0 360px;padding:20px;overflow-y:auto;border-right:1px solid #3c4043;background:#202124}
+.d-controls{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:18px;min-width:0}
+.d-biz-name{font-size:22px;font-weight:500;color:#e8eaed;line-height:1.2;margin-bottom:4px}
+.d-contact{font-size:14px;color:#9aa0a6;margin-bottom:10px}
+.d-phone-big{font-size:26px;font-weight:300;color:#8ab4f8;margin:8px 0 16px;letter-spacing:.5px}
+.d-info-row{display:flex;align-items:flex-start;gap:8px;padding:3px 0;font-size:13px;color:#c0c4cc}
+.d-info-icon{color:#9aa0a6;font-size:13px;width:18px;text-align:center;flex-shrink:0;margin-top:1px}
+.d-section-label{font-size:10px;color:#9aa0a6;font-weight:500;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.d-call-btn{width:100%;padding:18px;border-radius:14px;border:none;font-size:17px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Roboto',sans-serif}
+.d-call-btn.ready{background:#0f9d58;color:#fff}
+.d-call-btn.ready:hover{background:#0b8044;transform:translateY(-1px)}
+.d-call-btn.calling{background:#35363a;color:#9aa0a6;cursor:default}
+.d-call-btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.d-timer{font-size:30px;font-weight:300;color:#5f6368;text-align:center;font-family:monospace;letter-spacing:3px;margin-top:8px;transition:color .3s}
+.d-timer.active{color:#fbbc04}
+.d-dispo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.d-dispo-btn{padding:10px 4px;border-radius:10px;border:2px solid transparent;font-size:12px;font-weight:500;cursor:pointer;text-align:center;transition:all .2s;color:#fff;opacity:.75;font-family:'Roboto',sans-serif}
+.d-dispo-btn:hover{opacity:1;transform:translateY(-1px)}
+.d-dispo-btn.set{opacity:1;border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+.d-auto-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.d-toggle{width:38px;height:22px;border-radius:11px;border:none;cursor:pointer;position:relative;transition:background .2s;background:#3c4043;flex-shrink:0}
+.d-toggle.on{background:#1a73e8}
+.d-toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s}
+.d-toggle.on::after{left:19px}
+.d-countdown{font-size:12px;color:#fbbc04;min-height:18px;text-align:center;margin-top:4px}
+.d-footer{background:#292a2d;border-top:1px solid #3c4043;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.d-prog-bar{flex:1;height:5px;background:#3c4043;border-radius:3px;overflow:hidden}
+.d-prog-fill{height:100%;background:#1a73e8;border-radius:3px;transition:width .3s}
+.d-notes-box{background:#35363a;border-radius:8px;padding:10px;font-size:13px;color:#9aa0a6;line-height:1.5;max-height:100px;overflow-y:auto;word-break:break-word}
+.d-quick-note{width:100%;background:#35363a;border:1px solid #5f6368;border-radius:8px;padding:8px;color:#e8eaed;font-family:'Roboto',sans-serif;font-size:13px;outline:none;resize:none;min-height:68px;transition:border-color .2s}
+.d-quick-note:focus{border-color:#1a73e8}
+.d-delay-input{width:38px;background:#35363a;border:1px solid #5f6368;border-radius:6px;color:#e8eaed;text-align:center;padding:3px 4px;font-size:12px;outline:none}
+.d-end-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:16px;color:#9aa0a6;text-align:center;padding:40px}
+
 @media(max-width:768px){
   .side-panel.open{width:100vw;position:fixed;inset:0;z-index:200}
   .stats-bar{display:none}
   .table-area{padding:0 8px 80px}
   td:nth-child(4),td:nth-child(5),td:nth-child(6),th:nth-child(4),th:nth-child(5),th:nth-child(6){display:none}
   .nav-actions .btn-outline:not(:last-child){display:none}
+  .d-body{flex-direction:column}
+  .d-lead{flex:0 0 auto;border-right:none;border-bottom:1px solid #3c4043;max-height:40vh}
 }
 </style>
 </head>
@@ -145,6 +194,10 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
 <nav class="nav">
   <div class="nav-logo"><span>Blu</span> Balances CRM</div>
   <div class="nav-actions">
+    <button class="btn btn-green btn-sm" onclick="openDialerSetup()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.12 1.18 2 2 0 012.1 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.1v2.82z"/></svg>
+      Auto Dialer
+    </button>
     <button class="btn btn-outline btn-sm" onclick="openDedupModal()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
       Deduplicate
@@ -357,6 +410,57 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
   </div>
 </div>
 
+<!-- DIALER SETUP MODAL -->
+<div class="modal-backdrop" id="dialer-setup-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.12 1.18 2 2 0 012.1 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.1v2.82z"/></svg>
+        Auto Dialer Setup
+      </div>
+      <button class="btn-ghost" onclick="document.getElementById('dialer-setup-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:#9aa0a6;margin-bottom:14px">Select which leads to queue for this calling session:</p>
+      <div id="dialer-dispo-checks"></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid #3c4043">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;color:#9aa0a6">
+          <input type="checkbox" id="dialer-use-filter" style="width:14px;height:14px;cursor:pointer" onchange="updateDialerCount()">
+          Use current table filter instead (respects search + dispo filter)
+        </label>
+      </div>
+      <div style="margin-top:14px;font-size:13px;color:#9aa0a6;display:flex;align-items:center;gap:8px">
+        Queue size: <strong id="dialer-queue-count" style="color:#e8eaed;font-size:15px">0</strong> leads
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('dialer-setup-modal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-green" onclick="startDialerSession()" id="dialer-start-btn" disabled>Start Session</button>
+    </div>
+  </div>
+</div>
+
+<!-- DIALER OVERLAY -->
+<div id="dialer-overlay">
+  <div class="d-header">
+    <div class="d-logo">📞 Auto Dialer</div>
+    <div class="d-sep">|</div>
+    <div class="d-progress-text" id="d-progress-text">—</div>
+    <div class="d-stats-bar" id="d-stats-bar"></div>
+    <button class="btn btn-danger btn-sm" onclick="endDialerSession()">End Session</button>
+  </div>
+  <div class="d-body">
+    <div class="d-lead" id="d-lead-panel"></div>
+    <div class="d-controls" id="d-controls-panel"></div>
+  </div>
+  <div class="d-footer">
+    <button class="btn btn-ghost btn-sm" onclick="dialerPrev()">← Prev</button>
+    <button class="btn btn-ghost btn-sm" onclick="dialerSkip()">Skip →</button>
+    <div class="d-prog-bar"><div class="d-prog-fill" id="d-prog-fill" style="width:0%"></div></div>
+    <span id="d-footer-remaining" style="font-size:12px;color:#9aa0a6;white-space:nowrap"></span>
+  </div>
+</div>
+
 <div class="toast-container" id="toast-container"></div>
 
 <script>
@@ -366,6 +470,7 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const GHL_WEBHOOK      = "https://hook.us1.make.com/YOUR_GHL_WEBHOOK";
 const EMAIL_WEBHOOK    = "https://hook.us1.make.com/YOUR_EMAIL_WEBHOOK";
 const CALENDAR_WEBHOOK = "https://hook.us1.make.com/YOUR_CALENDAR_WEBHOOK";
+const QUO_API_KEY      = "3845462ba2868731cad1e93bd94a023b93e9d940df5bd3881ad649810fbc4146";
 
 const DISPOS = {
   new:           { label: "New Lead",       color: "#5f6368" },
@@ -468,7 +573,6 @@ function mergeLeads(group) {
   return { winner, duplicates: sorted.slice(1) };
 }
 
-// ─── LOAD ────────────────────────────────────────────────────────────────────
 async function loadLeads() {
   try {
     const res = await fetch(db("crm_leads?select=*&order=created_at.desc"), { headers: hdr() });
@@ -482,7 +586,6 @@ async function loadLeads() {
   }
 }
 
-// ─── STATS ───────────────────────────────────────────────────────────────────
 function buildStats() {
   const bar = document.getElementById("stats-bar");
   const counts = {};
@@ -518,7 +621,6 @@ function clearFilter() {
   applyFilter();
 }
 
-// ─── FILTER ──────────────────────────────────────────────────────────────────
 function applyFilter() {
   const q = (document.getElementById("search-input").value || "").toLowerCase();
   const sort = document.getElementById("sort-select").value;
@@ -541,7 +643,6 @@ function applyFilter() {
   renderTable();
 }
 
-// ─── TABLE ───────────────────────────────────────────────────────────────────
 function renderTable() {
   const area = document.getElementById("table-area");
   if (!filteredLeads.length) {
@@ -575,7 +676,6 @@ function renderTable() {
   </table>`;
 }
 
-// ─── PANEL ───────────────────────────────────────────────────────────────────
 async function openLead(id) {
   const lead = allLeads.find(l => l.id === id);
   if (!lead) return;
@@ -617,14 +717,12 @@ async function renderTab() {
   else if (currentTab === "activity") await renderActivityTab();
 }
 
-// INFO TAB
 function renderInfoTab() {
   const l = currentLead;
   const mapsLink = l.google_maps_link
     ? `<a href="${esc(l.google_maps_link)}" target="_blank" style="color:#8ab4f8;font-size:12px;text-decoration:none">📍 Maps</a>` : "";
   const webLink = l.website
     ? `<a href="${esc(l.website)}" target="_blank" style="color:#8ab4f8;font-size:12px;text-decoration:none">🌐 Website</a>` : "";
-
   document.getElementById("panel-body").innerHTML = `
     <div class="field-group"><label class="field-label">Business Name</label>
       <input class="field-input" id="e-business_name" value="${esc(l.business_name)}"></div>
@@ -665,7 +763,6 @@ function renderInfoTab() {
     <div class="field-group"><label class="field-label">Google Maps Link</label>
       <input class="field-input" id="e-google_maps_link" value="${esc(l.google_maps_link||'')}"></div>
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">${mapsLink}${webLink}</div>`;
-
   document.getElementById("panel-footer").innerHTML = `
     <button class="btn btn-primary btn-sm" onclick="saveCurrentLead()">Save Changes</button>
     <button class="btn btn-outline btn-sm" onclick="openCalModal()">📅 Calendar</button>
@@ -673,7 +770,6 @@ function renderInfoTab() {
     <button class="btn btn-danger btn-sm" onclick="deleteLead()">Delete</button>`;
 }
 
-// DISPO TAB
 function renderDispoTab() {
   const btns = Object.entries(DISPOS).map(([key, d]) => `
     <button class="dispo-btn ${currentLead.dispo===key?'active':''}"
@@ -688,7 +784,6 @@ function renderDispoTab() {
   document.getElementById("panel-footer").innerHTML = "";
 }
 
-// NOTES TAB
 function renderNotesTab() {
   document.getElementById("panel-body").innerHTML = `
     <div class="field-group">
@@ -700,7 +795,6 @@ function renderNotesTab() {
     <button class="btn btn-primary btn-sm" onclick="saveNotes()">Save Notes</button>`;
 }
 
-// EMAIL TAB
 function renderEmailTab() {
   const tplBtns = Object.entries(EMAIL_TEMPLATES).map(([key, t]) =>
     `<button class="tpl-btn" onclick="applyTemplate('${key}')">${t.label}</button>`).join("");
@@ -725,7 +819,6 @@ function renderEmailTab() {
     <button class="btn btn-primary btn-sm" onclick="sendEmail()">Send Email</button>`;
 }
 
-// ACTIVITY TAB
 async function renderActivityTab() {
   document.getElementById("panel-body").innerHTML = `<div class="spinner"></div>`;
   document.getElementById("panel-footer").innerHTML = `
@@ -756,7 +849,6 @@ async function renderActivityTab() {
   }
 }
 
-// ─── ACTIONS ─────────────────────────────────────────────────────────────────
 async function setDispo(newDispo) {
   if (!currentLead) return;
   const oldDispo = currentLead.dispo;
@@ -867,7 +959,6 @@ async function deleteLead() {
   } catch(e) { showToast("Delete failed", "error"); }
 }
 
-// ─── ADD MODAL ───────────────────────────────────────────────────────────────
 function openAddModal() {
   editingLead = null;
   document.getElementById("add-modal-title").textContent = "Add Lead";
@@ -925,7 +1016,6 @@ async function saveLeadModal() {
   } catch(e) { showToast("Failed to add lead: " + e.message, "error"); }
 }
 
-// ─── CALENDAR ────────────────────────────────────────────────────────────────
 function openCalModal() {
   if (!currentLead) return;
   document.getElementById("cal-biz-name").textContent = currentLead.business_name;
@@ -958,7 +1048,6 @@ async function confirmPushToCalendar() {
   } catch(e) { showToast("Calendar push failed", "error"); }
 }
 
-// ─── GHL ─────────────────────────────────────────────────────────────────────
 async function quickGHL() {
   if (!currentLead) return;
   try {
@@ -976,7 +1065,6 @@ async function quickGHL() {
   } catch(e) { showToast("GHL send failed", "error"); }
 }
 
-// ─── EMAIL ────────────────────────────────────────────────────────────────────
 function applyTemplate(key) {
   const tpl = EMAIL_TEMPLATES[key];
   if (!tpl || !currentLead) return;
@@ -1010,7 +1098,6 @@ async function sendEmail() {
   } catch(e) { showToast("Email send failed", "error"); }
 }
 
-// ─── CSV IMPORT ───────────────────────────────────────────────────────────────
 function openImportModal() {
   document.getElementById("import-modal").classList.add("open");
   document.getElementById("import-status").textContent = "";
@@ -1057,7 +1144,6 @@ function detectColumns(headerCols) {
 function parseDate(s) {
   if (!s || !s.trim()) return null;
   const t = s.trim();
-  // Convert M/D/YYYY or MM/DD/YYYY → YYYY-MM-DD for Postgres DATE columns
   const parts = t.split('/');
   if (parts.length === 3) {
     const [m, d, y] = parts;
@@ -1079,9 +1165,6 @@ function parseRow(cols, format) {
       google_maps_link: cols[7] || null,
     };
   }
-  // New format: Title(0) Rating(1) Reviews(2) Industry(3) Phone(4) Notes(5) Dispo(6)
-  // Call Back Date(7) Name(8) Email(9) Last Called Date(10) Appointment Date(11)
-  // Address(12) Website(13) City(14) State(15) County(16)
   const dispoParsed = cols[6] ? cols[6].toLowerCase().replace(/\s+/g,"_") : null;
   const validDispo = dispoParsed && DISPOS[dispoParsed] ? dispoParsed : null;
   return {
@@ -1110,13 +1193,11 @@ async function importCSV(text) {
   status.innerHTML = "Parsing CSV...";
   const lines = text.split(/\r?\n/).filter(l => l.trim());
   if (!lines.length) { status.textContent = "Empty file."; return; }
-
   const firstCols = parseCSVLine(lines[0]);
   const firstLower = firstCols[0].toLowerCase();
   const hasHeader = firstLower === "title" || firstLower === "business" || firstLower === "business_name" || firstLower === "name";
   const format = hasHeader ? detectColumns(firstCols) : "new";
   const dataLines = hasHeader ? lines.slice(1) : lines;
-
   const parsed = [];
   for (const line of dataLines) {
     if (!line.trim()) continue;
@@ -1125,20 +1206,13 @@ async function importCSV(text) {
     if (!row.business_name) continue;
     parsed.push(row);
   }
-
   if (!parsed.length) { status.textContent = "No valid rows found."; return; }
-
   status.innerHTML = `Found ${parsed.length} rows. Checking for existing records...`;
-
-  // Fetch ALL existing leads with pagination (Supabase default limit is 1000)
   const existingByPhone = {};
   let page = 0;
   const PAGE_SIZE = 1000;
   while (true) {
-    const res = await fetch(
-      db(`crm_leads?select=id,phone&limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`),
-      { headers: hdr() }
-    );
+    const res = await fetch(db(`crm_leads?select=id,phone&limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`), { headers: hdr() });
     if (!res.ok) break;
     const batch = await res.json();
     if (!batch.length) break;
@@ -1149,22 +1223,16 @@ async function importCSV(text) {
     if (batch.length < PAGE_SIZE) break;
     page++;
   }
-
   const fillable = ["business_name","contact_name","email","address","city","state","county",
     "website","rating","reviews","industry","google_maps_link","notes",
     "follow_up_date","appointment_date","last_called_date","dispo"];
-
   let inserted = 0, updated = 0, skipped = 0, errors = 0;
-  const toInsert = [];
-  const toUpdate = [];
-
+  const toInsert = [], toUpdate = [];
   for (const row of parsed) {
     const nPhone = normalizePhone(row.phone);
     const existingId = nPhone.length >= 7 ? existingByPhone[nPhone] : null;
-
     if (existingId) {
-      const patch = {};
-      let changed = false;
+      const patch = {}; let changed = false;
       for (const f of fillable) {
         if (row[f] != null && row[f] !== "") { patch[f] = row[f]; changed = true; }
       }
@@ -1174,44 +1242,26 @@ async function importCSV(text) {
       toInsert.push({ ...row, source: "csv_import" });
     }
   }
-
   status.innerHTML = `${toInsert.length} new · ${toUpdate.length} to update · ${skipped} skipped<br>Inserting...`;
-
-  // Batch insert new leads
   const BATCH = 50;
   for (let i = 0; i < toInsert.length; i += BATCH) {
     const batch = toInsert.slice(i, i + BATCH);
     try {
-      const res = await fetch(db("crm_leads"), {
-        method: "POST",
-        headers: { ...hdr(), "Prefer": "return=minimal" },
-        body: JSON.stringify(batch)
-      });
-      if (!res.ok) {
-        const errText = await res.text().catch(()=>'');
-        console.error('Insert error:', res.status, errText);
-        errors += batch.length;
-        if (errors <= batch.length) status.innerHTML += `<br><small style="color:#f28b82">Insert error ${res.status}: ${errText.slice(0,200)}</small>`;
-      } else { inserted += batch.length; }
-    } catch(e) { console.error('Insert exception:', e); errors += batch.length; }
+      const res = await fetch(db("crm_leads"), { method: "POST", headers: { ...hdr(), "Prefer": "return=minimal" }, body: JSON.stringify(batch) });
+      if (!res.ok) { const errText = await res.text().catch(()=>''); errors += batch.length; if (errors <= batch.length) status.innerHTML += `<br><small style="color:#f28b82">Insert error ${res.status}: ${errText.slice(0,200)}</small>`; }
+      else { inserted += batch.length; }
+    } catch(e) { errors += batch.length; }
     status.innerHTML = `Inserted ${inserted}/${toInsert.length} new · ${toUpdate.length} to update...`;
   }
-
-  // Patch updates in parallel batches of 15
   const PARALLEL = 15;
   for (let i = 0; i < toUpdate.length; i += PARALLEL) {
     const chunk = toUpdate.slice(i, i + PARALLEL);
     const results = await Promise.allSettled(chunk.map(({ id, patch }) =>
-      fetch(db(`crm_leads?id=eq.${id}`), {
-        method: "PATCH",
-        headers: { ...hdr(), "Prefer": "return=minimal" },
-        body: JSON.stringify(patch)
-      })
+      fetch(db(`crm_leads?id=eq.${id}`), { method: "PATCH", headers: { ...hdr(), "Prefer": "return=minimal" }, body: JSON.stringify(patch) })
     ));
     results.forEach(r => { if (r.status === "fulfilled" && r.value.ok) updated++; else errors++; });
     status.innerHTML = `Inserted ${inserted} new · Updated ${updated}/${toUpdate.length}...`;
   }
-
   const parts = [];
   if (inserted) parts.push(`✅ ${inserted} inserted`);
   if (updated)  parts.push(`🔄 ${updated} updated`);
@@ -1221,7 +1271,6 @@ async function importCSV(text) {
   await loadLeads();
 }
 
-// ─── DEDUP ────────────────────────────────────────────────────────────────────
 function openDedupModal() {
   document.getElementById("dedup-modal").classList.add("open");
   document.getElementById("dedup-footer").innerHTML = "";
@@ -1230,7 +1279,6 @@ function openDedupModal() {
 
 function renderDedupContent() {
   const content = document.getElementById("dedup-content");
-
   const groups = {};
   allLeads.forEach(l => {
     const n = normalizePhone(l.phone);
@@ -1238,57 +1286,32 @@ function renderDedupContent() {
     if (!groups[n]) groups[n] = [];
     groups[n].push(l);
   });
-
   const dupGroups = Object.values(groups).filter(g => g.length > 1);
-
   if (!dupGroups.length) {
-    content.innerHTML = `<div style="text-align:center;padding:30px;color:#9aa0a6">
-      <p style="font-size:32px;margin-bottom:12px">✅</p>
-      <p>No duplicate phone numbers found!</p>
-    </div>`;
-    document.getElementById("dedup-footer").innerHTML = `
-      <button class="btn btn-ghost" onclick="document.getElementById('dedup-modal').classList.remove('open')">Close</button>`;
+    content.innerHTML = `<div style="text-align:center;padding:30px;color:#9aa0a6"><p style="font-size:32px;margin-bottom:12px">✅</p><p>No duplicate phone numbers found!</p></div>`;
+    document.getElementById("dedup-footer").innerHTML = `<button class="btn btn-ghost" onclick="document.getElementById('dedup-modal').classList.remove('open')">Close</button>`;
     return;
   }
-
   const totalDups = dupGroups.reduce((s, g) => s + g.length - 1, 0);
-  let html = `<p style="font-size:13px;color:#9aa0a6;margin-bottom:16px">
-    Found <strong style="color:#fbbc04">${dupGroups.length} duplicate group${dupGroups.length>1?"s":""}</strong>
-    — ${totalDups} extra record${totalDups>1?"s":""} will be removed.
-    The record with the most data is kept; blank fields are filled from duplicates.
-  </p>`;
-
+  let html = `<p style="font-size:13px;color:#9aa0a6;margin-bottom:16px">Found <strong style="color:#fbbc04">${dupGroups.length} duplicate group${dupGroups.length>1?"s":""}</strong> — ${totalDups} extra record${totalDups>1?"s":""} will be removed. The record with the most data is kept; blank fields are filled from duplicates.</p>`;
   dupGroups.forEach(group => {
-    const { winner, duplicates } = mergeLeads(group);
-    html += `<div class="dedup-group">
-      <div class="dedup-group-title">📞 ${esc(winner.phone || group[0].phone)}</div>`;
+    const { winner } = mergeLeads(group);
+    html += `<div class="dedup-group"><div class="dedup-group-title">📞 ${esc(winner.phone || group[0].phone)}</div>`;
     group.forEach(l => {
       const isWinner = l.id === winner.id;
       const loc = [l.city, l.state].filter(Boolean).join(", ");
-      html += `<div class="dedup-row">
-        ${isWinner ? '<span class="dedup-keep">KEEP</span>' : '<span style="font-size:11px;color:#d93025;padding:2px 6px">REMOVE</span>'}
-        <div style="flex:1">
-          <strong>${esc(l.business_name)}</strong>
-          ${l.contact_name ? `· ${esc(l.contact_name)}` : ""}
-          ${loc ? `· ${esc(loc)}` : ""}
-          <span style="color:#5f6368"> · Score: ${fieldScore(l)}</span>
-        </div>
-      </div>`;
+      html += `<div class="dedup-row">${isWinner ? '<span class="dedup-keep">KEEP</span>' : '<span style="font-size:11px;color:#d93025;padding:2px 6px">REMOVE</span>'}<div style="flex:1"><strong>${esc(l.business_name)}</strong>${l.contact_name?`· ${esc(l.contact_name)}`:""}${loc?`· ${esc(loc)}`:""}<span style="color:#5f6368"> · Score: ${fieldScore(l)}</span></div></div>`;
     });
     html += `</div>`;
   });
-
   content.innerHTML = html;
-  document.getElementById("dedup-footer").innerHTML = `
-    <button class="btn btn-ghost" onclick="document.getElementById('dedup-modal').classList.remove('open')">Cancel</button>
-    <button class="btn btn-warn" onclick="runAutoDedup()">Merge & Remove ${totalDups} Duplicate${totalDups>1?"s":""}</button>`;
+  document.getElementById("dedup-footer").innerHTML = `<button class="btn btn-ghost" onclick="document.getElementById('dedup-modal').classList.remove('open')">Cancel</button><button class="btn btn-warn" onclick="runAutoDedup()">Merge & Remove ${totalDups} Duplicate${totalDups>1?"s":""}</button>`;
 }
 
 async function runAutoDedup() {
   const content = document.getElementById("dedup-content");
   document.getElementById("dedup-footer").innerHTML = "";
   content.innerHTML = `<div class="spinner"></div><p style="text-align:center;color:#9aa0a6;margin-top:8px">Merging duplicates...</p>`;
-
   const groups = {};
   allLeads.forEach(l => {
     const n = normalizePhone(l.phone);
@@ -1297,46 +1320,294 @@ async function runAutoDedup() {
     groups[n].push(l);
   });
   const dupGroups = Object.values(groups).filter(g => g.length > 1);
-
   let merged = 0, removed = 0, errors = 0;
-
   for (const group of dupGroups) {
     const { winner, duplicates } = mergeLeads(group);
     try {
-      const patchFields = ["contact_name","email","address","city","state","county","website",
-        "rating","reviews","notes","google_maps_link","industry","follow_up_date","appointment_date","last_called_date"];
+      const patchFields = ["contact_name","email","address","city","state","county","website","rating","reviews","notes","google_maps_link","industry","follow_up_date","appointment_date","last_called_date"];
       const patch = {};
       patchFields.forEach(f => { if (winner[f] != null && winner[f] !== "") patch[f] = winner[f]; });
-      await fetch(db(`crm_leads?id=eq.${winner.id}`), {
-        method: "PATCH", headers: hdr(), body: JSON.stringify(patch)
-      });
+      await fetch(db(`crm_leads?id=eq.${winner.id}`), { method: "PATCH", headers: hdr(), body: JSON.stringify(patch) });
       merged++;
     } catch { errors++; }
-
     for (const dup of duplicates) {
-      try {
-        await fetch(db(`crm_leads?id=eq.${dup.id}`), { method: "DELETE", headers: hdr() });
-        removed++;
-      } catch { errors++; }
+      try { await fetch(db(`crm_leads?id=eq.${dup.id}`), { method: "DELETE", headers: hdr() }); removed++; }
+      catch { errors++; }
     }
   }
-
-  content.innerHTML = `<div style="text-align:center;padding:30px">
-    <p style="font-size:32px;margin-bottom:12px">✅</p>
-    <p style="font-size:15px;color:#e8eaed">${merged} group${merged>1?"s":""} merged, ${removed} duplicate${removed>1?"s":""} removed${errors?`, ${errors} errors`:""}</p>
-  </div>`;
-  document.getElementById("dedup-footer").innerHTML = `
-    <button class="btn btn-primary" onclick="document.getElementById('dedup-modal').classList.remove('open')">Done</button>`;
-
+  content.innerHTML = `<div style="text-align:center;padding:30px"><p style="font-size:32px;margin-bottom:12px">✅</p><p style="font-size:15px;color:#e8eaed">${merged} group${merged>1?"s":""} merged, ${removed} duplicate${removed>1?"s":""} removed${errors?`, ${errors} errors`:""}</p></div>`;
+  document.getElementById("dedup-footer").innerHTML = `<button class="btn btn-primary" onclick="document.getElementById('dedup-modal').classList.remove('open')">Done</button>`;
   await loadLeads();
 }
 
-// ─── MODAL BACKDROPS ──────────────────────────────────────────────────────────
-["add-modal","cal-modal","import-modal","dedup-modal"].forEach(id => {
+["add-modal","cal-modal","import-modal","dedup-modal","dialer-setup-modal"].forEach(id => {
   document.getElementById(id).addEventListener("click", e => {
     if (e.target === e.currentTarget) e.currentTarget.classList.remove("open");
   });
 });
+
+// ─── AUTO DIALER ──────────────────────────────────────────────────────────────
+let dialerQueue    = [];
+let dialerIndex    = 0;
+let dialerStats    = { called:0, connected:0, voicemail:0, noAnswer:0, appointments:0 };
+let callStartTime  = null;
+let callTimerInt   = null;
+let autoAdvanceOn  = true;
+let autoAdvanceSec = 3;
+let autoAdvanceTmo = null;
+let countdownInt   = null;
+
+const CONNECTED_DISPOS = new Set(['call_back','gate_keeper','follow_up','appointment','not_interested']);
+const VOICEMAIL_DISPOS = new Set(['voicemail']);
+const NO_ANSWER_DISPOS = new Set(['no_pick_up','bad_number']);
+
+function openDialerSetup() {
+  const counts = {};
+  allLeads.forEach(l => { counts[l.dispo] = (counts[l.dispo]||0) + 1; });
+  const defaultOn = new Set(['new','no_pick_up','voicemail','call_back','follow_up']);
+  document.getElementById('dialer-dispo-checks').innerHTML = Object.entries(DISPOS).map(([key, d]) => {
+    const n = counts[key] || 0;
+    const checked = defaultOn.has(key) && n > 0;
+    return `<label style="display:flex;align-items:center;gap:10px;padding:5px 0;cursor:pointer;font-size:13px;${n===0?'opacity:.4':''}">
+      <input type="checkbox" class="dd-check" value="${key}" ${checked?'checked':''} ${n===0?'disabled':''}
+        onchange="updateDialerCount()" style="width:14px;height:14px;cursor:pointer;flex-shrink:0">
+      <span class="dispo-badge" style="background:${d.color}">${d.label}</span>
+      <span style="color:#9aa0a6">${n} lead${n!==1?'s':''}</span>
+    </label>`;
+  }).join('');
+  document.getElementById('dialer-use-filter').checked = false;
+  updateDialerCount();
+  document.getElementById('dialer-setup-modal').classList.add('open');
+}
+
+function updateDialerCount() {
+  const useFilter = document.getElementById('dialer-use-filter').checked;
+  const count = useFilter
+    ? filteredLeads.length
+    : allLeads.filter(l => [...document.querySelectorAll('.dd-check:checked')].some(el => el.value === l.dispo)).length;
+  document.getElementById('dialer-queue-count').textContent = count;
+  document.getElementById('dialer-start-btn').disabled = count === 0;
+}
+
+function startDialerSession() {
+  const useFilter = document.getElementById('dialer-use-filter').checked;
+  if (useFilter) {
+    dialerQueue = [...filteredLeads];
+  } else {
+    const sel = new Set([...document.querySelectorAll('.dd-check:checked')].map(el => el.value));
+    dialerQueue = allLeads.filter(l => sel.has(l.dispo));
+  }
+  if (!dialerQueue.length) { showToast('No leads to dial','error'); return; }
+  dialerIndex = 0;
+  dialerStats = { called:0, connected:0, voicemail:0, noAnswer:0, appointments:0 };
+  document.getElementById('dialer-setup-modal').classList.remove('open');
+  document.getElementById('dialer-overlay').classList.add('open');
+  renderDialerLead();
+}
+
+function renderDialerLead() {
+  clearDialerTimers();
+  if (dialerIndex >= dialerQueue.length) {
+    document.getElementById('d-lead-panel').innerHTML = '';
+    document.getElementById('d-controls-panel').innerHTML = `
+      <div class="d-end-screen">
+        <div style="font-size:52px">🎉</div>
+        <div style="font-size:20px;color:#e8eaed;font-weight:500">Session Complete!</div>
+        <div style="font-size:14px">Called ${dialerStats.called} lead${dialerStats.called!==1?'s':''} &nbsp;·&nbsp; ${dialerStats.appointments} appointment${dialerStats.appointments!==1?'s':''}</div>
+        <button class="btn btn-primary" onclick="endDialerSession()" style="margin-top:8px">Back to CRM</button>
+      </div>`;
+    document.getElementById('d-progress-text').textContent = 'Done!';
+    document.getElementById('d-prog-fill').style.width = '100%';
+    renderDialerStats();
+    return;
+  }
+  const lead  = dialerQueue[dialerIndex];
+  const d     = DISPOS[lead.dispo] || DISPOS.new;
+  const pct   = (dialerIndex / dialerQueue.length) * 100;
+  const loc   = [lead.city, lead.state].filter(Boolean).join(', ');
+  const stars = lead.rating ? '★'.repeat(Math.round(lead.rating)) : '';
+  document.getElementById('d-progress-text').textContent = `Lead ${dialerIndex+1} of ${dialerQueue.length}`;
+  document.getElementById('d-prog-fill').style.width = pct + '%';
+  document.getElementById('d-footer-remaining').textContent = `${dialerQueue.length - dialerIndex - 1} remaining`;
+  renderDialerStats();
+  document.getElementById('d-lead-panel').innerHTML = `
+    <div style="margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span class="dispo-badge" style="background:${d.color}">${d.label}</span>
+      ${stars ? `<span style="color:#fbbc04;font-size:12px">${stars} ${lead.rating}</span>` : ''}
+      ${lead.reviews ? `<span style="color:#9aa0a6;font-size:11px">(${lead.reviews} reviews)</span>` : ''}
+    </div>
+    <div class="d-biz-name">${esc(lead.business_name)}</div>
+    <div class="d-contact">${lead.contact_name ? esc(lead.contact_name) : '<span style="font-style:italic;color:#5f6368">No contact name</span>'}</div>
+    <div class="d-phone-big">${lead.phone ? esc(lead.phone) : '<span style="font-size:16px;color:#5f6368">No phone number</span>'}</div>
+    ${loc ? `<div class="d-info-row"><span class="d-info-icon">📍</span>${esc(loc)}</div>` : ''}
+    ${lead.address ? `<div class="d-info-row"><span class="d-info-icon">🏠</span>${esc(lead.address)}</div>` : ''}
+    ${lead.email ? `<div class="d-info-row"><span class="d-info-icon">✉</span>${esc(lead.email)}</div>` : ''}
+    ${lead.website ? `<div class="d-info-row"><span class="d-info-icon">🌐</span><a href="${esc(lead.website)}" target="_blank" style="color:#8ab4f8;font-size:13px;word-break:break-all">${esc(lead.website)}</a></div>` : ''}
+    ${lead.google_maps_link ? `<div class="d-info-row"><span class="d-info-icon">🗺</span><a href="${esc(lead.google_maps_link)}" target="_blank" style="color:#8ab4f8;font-size:13px">Open Maps</a></div>` : ''}
+    ${lead.follow_up_date ? `<div class="d-info-row"><span class="d-info-icon">📅</span>Call back: ${lead.follow_up_date}</div>` : ''}
+    ${lead.notes ? `<div style="margin-top:14px"><div class="d-section-label">Notes</div><div class="d-notes-box">${esc(lead.notes)}</div></div>` : ''}
+    <div style="margin-top:16px">
+      <div class="d-section-label">Quick Note</div>
+      <textarea id="d-quick-note" class="d-quick-note" placeholder="Note about this call..."></textarea>
+    </div>`;
+  const dispoGrid = Object.entries(DISPOS).filter(([k]) => k !== 'new').map(([key, dsp]) =>
+    `<button class="d-dispo-btn" style="background:${dsp.color}" id="d-dispo-${key}" onclick="dialerSetDispo('${key}')">${dsp.label}</button>`
+  ).join('');
+  document.getElementById('d-controls-panel').innerHTML = `
+    <div>
+      <div class="d-section-label">Call</div>
+      <button class="d-call-btn ready" id="d-call-btn" onclick="dialerCall()" ${!lead.phone?'disabled':''}>
+        📞 ${lead.phone ? esc(lead.phone) : 'No phone'}
+      </button>
+      <div class="d-timer" id="d-timer">—</div>
+    </div>
+    <div>
+      <div class="d-section-label">Disposition</div>
+      <div class="d-dispo-grid">${dispoGrid}</div>
+      <div class="d-countdown" id="d-countdown"></div>
+    </div>
+    <div>
+      <div class="d-section-label">Auto-Advance</div>
+      <div class="d-auto-row">
+        <button class="d-toggle ${autoAdvanceOn?'on':''}" id="d-toggle" onclick="dialerToggleAuto()"></button>
+        <span style="font-size:13px;color:#9aa0a6" id="d-auto-label">${autoAdvanceOn?'On':'Off'}</span>
+        ${autoAdvanceOn ? `<span style="font-size:12px;color:#9aa0a6">after <input type="number" id="d-delay" value="${autoAdvanceSec}" min="1" max="15" class="d-delay-input" oninput="autoAdvanceSec=Math.max(1,parseInt(this.value)||3)"> s</span>` : ''}
+      </div>
+    </div>`;
+}
+
+function renderDialerStats() {
+  document.getElementById('d-stats-bar').innerHTML = [
+    { label:'Called',    val:dialerStats.called,       color:'#1a73e8' },
+    { label:'Connected', val:dialerStats.connected,    color:'#0f9d58' },
+    { label:'Voicemail', val:dialerStats.voicemail,    color:'#7c3aed' },
+    { label:'No Answer', val:dialerStats.noAnswer,     color:'#78716c' },
+    { label:'Appts',     val:dialerStats.appointments, color:'#fbbc04' },
+  ].map(s => `<div class="d-stat"><div class="d-stat-dot" style="background:${s.color}"></div><span style="color:#9aa0a6">${s.label}:</span><span style="color:#e8eaed;font-weight:500">${s.val}</span></div>`).join('');
+}
+
+async function dialerCall() {
+  const lead = dialerQueue[dialerIndex];
+  if (!lead?.phone) return;
+  const a = document.createElement('a');
+  a.href = 'tel:' + lead.phone.replace(/\D/g,'');
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  clearDialerTimers();
+  callStartTime = Date.now();
+  dialerStats.called++;
+  renderDialerStats();
+  const btn = document.getElementById('d-call-btn');
+  if (btn) { btn.className = 'd-call-btn calling'; btn.textContent = '📞 In Call…'; }
+  const timerEl = document.getElementById('d-timer');
+  if (timerEl) { timerEl.className = 'd-timer active'; timerEl.textContent = '0:00'; }
+  callTimerInt = setInterval(() => {
+    const secs = Math.floor((Date.now() - callStartTime) / 1000);
+    const m = Math.floor(secs/60);
+    const s = String(secs%60).padStart(2,'0');
+    const el = document.getElementById('d-timer');
+    if (el) el.textContent = `${m}:${s}`;
+  }, 1000);
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    await fetch(db(`crm_leads?id=eq.${lead.id}`), {
+      method:'PATCH', headers:hdr(),
+      body:JSON.stringify({ last_called_date:today, last_contacted_at:new Date().toISOString() })
+    });
+    lead.last_called_date = today;
+    const idx = allLeads.findIndex(l => l.id === lead.id);
+    if (idx !== -1) allLeads[idx].last_called_date = today;
+  } catch(e) {}
+}
+
+async function dialerSetDispo(newDispo) {
+  const lead = dialerQueue[dialerIndex];
+  if (!lead) return;
+  document.querySelectorAll('.d-dispo-btn').forEach(b => b.classList.remove('set'));
+  const btn = document.getElementById(`d-dispo-${newDispo}`);
+  if (btn) btn.classList.add('set');
+  if (CONNECTED_DISPOS.has(newDispo))  dialerStats.connected++;
+  if (VOICEMAIL_DISPOS.has(newDispo))  dialerStats.voicemail++;
+  if (NO_ANSWER_DISPOS.has(newDispo))  dialerStats.noAnswer++;
+  if (newDispo === 'appointment')       dialerStats.appointments++;
+  renderDialerStats();
+  const oldDispo = lead.dispo;
+  const note     = document.getElementById('d-quick-note')?.value?.trim() || '';
+  try {
+    await fetch(db(`crm_leads?id=eq.${lead.id}`), {
+      method:'PATCH', headers:hdr(),
+      body:JSON.stringify({ dispo:newDispo, last_contacted_at:new Date().toISOString() })
+    });
+    await fetch(db('crm_activity'), {
+      method:'POST', headers:hdr(),
+      body:JSON.stringify({ lead_id:lead.id, activity_type:'dispo_change', old_dispo:oldDispo, new_dispo:newDispo, body:note?`[Dialer] ${note}`:'[Auto Dialer]' })
+    });
+    if (note) {
+      const merged = lead.notes ? lead.notes + '\n' + note : note;
+      await fetch(db(`crm_leads?id=eq.${lead.id}`), { method:'PATCH', headers:hdr(), body:JSON.stringify({ notes:merged }) });
+      lead.notes = merged;
+    }
+    lead.dispo = newDispo;
+    const idx = allLeads.findIndex(l => l.id === lead.id);
+    if (idx !== -1) allLeads[idx].dispo = newDispo;
+  } catch(e) { showToast('Failed to save dispo','error'); }
+  if (autoAdvanceOn) {
+    let rem = autoAdvanceSec;
+    const cdEl = document.getElementById('d-countdown');
+    if (cdEl) cdEl.textContent = `Advancing in ${rem}s…`;
+    countdownInt = setInterval(() => {
+      rem--;
+      const el = document.getElementById('d-countdown');
+      if (el) el.textContent = rem > 0 ? `Advancing in ${rem}s…` : '';
+      if (rem <= 0) clearInterval(countdownInt);
+    }, 1000);
+    autoAdvanceTmo = setTimeout(() => { dialerNext(); }, autoAdvanceSec * 1000);
+  }
+}
+
+function dialerToggleAuto() {
+  autoAdvanceOn = !autoAdvanceOn;
+  const row = document.querySelector('.d-auto-row');
+  if (row) row.innerHTML = `
+    <button class="d-toggle ${autoAdvanceOn?'on':''}" id="d-toggle" onclick="dialerToggleAuto()"></button>
+    <span style="font-size:13px;color:#9aa0a6" id="d-auto-label">${autoAdvanceOn?'On':'Off'}</span>
+    ${autoAdvanceOn ? `<span style="font-size:12px;color:#9aa0a6">after <input type="number" id="d-delay" value="${autoAdvanceSec}" min="1" max="15" class="d-delay-input" oninput="autoAdvanceSec=Math.max(1,parseInt(this.value)||3)"> s</span>` : ''}`;
+}
+
+function dialerNext() {
+  clearDialerTimers();
+  dialerIndex++;
+  renderDialerLead();
+}
+
+function dialerPrev() {
+  if (dialerIndex <= 0) return;
+  clearDialerTimers();
+  dialerIndex--;
+  renderDialerLead();
+}
+
+function dialerSkip() {
+  clearDialerTimers();
+  dialerIndex++;
+  renderDialerLead();
+}
+
+function clearDialerTimers() {
+  if (callTimerInt)   { clearInterval(callTimerInt);  callTimerInt  = null; }
+  if (autoAdvanceTmo) { clearTimeout(autoAdvanceTmo); autoAdvanceTmo = null; }
+  if (countdownInt)   { clearInterval(countdownInt);  countdownInt  = null; }
+  callStartTime = null;
+}
+
+function endDialerSession() {
+  clearDialerTimers();
+  document.getElementById('dialer-overlay').classList.remove('open');
+  buildStats();
+  applyFilter();
+  showToast(`Session ended — ${dialerStats.called} calls · ${dialerStats.appointments} appointments`, 'success');
+}
 
 loadLeads();
 </script>
