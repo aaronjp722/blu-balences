@@ -178,37 +178,6 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
 .d-delay-input{width:38px;background:#35363a;border:1px solid #5f6368;border-radius:6px;color:#e8eaed;text-align:center;padding:3px 4px;font-size:12px;outline:none}
 .d-end-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:16px;color:#9aa0a6;text-align:center;padding:40px}
 
-/* ─── TAGS ───────────────────────────────────────────────────────────────────── */
-.tag-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500;color:#fff;white-space:nowrap}
-.tag-x{cursor:pointer;opacity:.7;font-size:10px;line-height:1}
-.tag-x:hover{opacity:1}
-.tag-chips-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
-.tag-wrap{position:relative}
-.tag-input-box{width:100%;background:#35363a;border:1px solid #5f6368;border-radius:8px;padding:6px 10px;color:#e8eaed;font-family:'Roboto',sans-serif;font-size:13px;outline:none}
-.tag-input-box:focus{border-color:#1a73e8}
-.tag-dropdown{position:absolute;top:calc(100% + 2px);left:0;right:0;background:#292a2d;border:1px solid #5f6368;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.5)}
-.tag-dd-item{display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;font-size:13px}
-.tag-dd-item:hover{background:#35363a}
-.tag-swatch{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.tag-color-pick{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.tag-color-opt{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;flex-shrink:0}
-.tag-color-opt.sel{border-color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.4)}
-.tag-mgr-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #3c4043}
-.tag-mgr-row:last-child{border-bottom:none}
-.tag-name-edit{flex:1;background:transparent;border:none;border-bottom:1px solid transparent;color:#e8eaed;font-family:'Roboto',sans-serif;font-size:13px;outline:none;padding:2px 4px}
-.tag-name-edit:focus{border-bottom-color:#1a73e8}
-.tag-count-lbl{font-size:11px;color:#9aa0a6;white-space:nowrap}
-/* ─── ACTIVITY BAR ────────────────────────────────────────────────────────────── */
-.act-bar{background:#292a2d;border-bottom:1px solid #3c4043;padding:8px 20px;display:flex;align-items:center;gap:6px;overflow-x:auto;flex-shrink:0}
-.act-bar-lbl{font-size:11px;color:#9aa0a6;font-weight:500;white-space:nowrap;margin-right:4px}
-.act-sep{color:#3c4043;margin:0 4px}
-.act-card{display:flex;align-items:center;gap:6px;background:#35363a;border-radius:10px;padding:4px 10px;white-space:nowrap}
-.act-val{font-size:15px;font-weight:500;color:#e8eaed;min-width:24px;text-align:center}
-.act-lbl{font-size:11px;color:#9aa0a6}
-.act-adj{display:flex;flex-direction:column;gap:1px}
-.act-btn{background:transparent;border:none;color:#9aa0a6;font-size:10px;line-height:1;cursor:pointer;padding:1px 3px;border-radius:3px}
-.act-btn:hover{background:#3c4043;color:#e8eaed}
-
 @media(max-width:768px){
   .side-panel.open{width:100vw;position:fixed;inset:0;z-index:200}
   .stats-bar{display:none}
@@ -229,7 +198,6 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.12 1.18 2 2 0 012.1 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.1v2.82z"/></svg>
       Auto Dialer
     </button>
-    <button class="btn btn-outline btn-sm" onclick="openTagsModal()">🏷 Tags</button>
     <button class="btn btn-outline btn-sm" onclick="openDedupModal()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
       Deduplicate
@@ -244,40 +212,6 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
 
 <div class="stats-bar" id="stats-bar"></div>
 
-<div class="act-bar" id="act-bar">
-  <span class="act-bar-lbl">TODAY</span>
-  <div class="act-card" id="act-card-dials">
-    <div class="act-adj"><button class="act-btn" onclick="adjustActivity('dials',1)">▲</button><button class="act-btn" onclick="adjustActivity('dials',-1)">▼</button></div>
-    <div><div class="act-val" id="av-dials">0</div><div class="act-lbl">Dials</div></div>
-  </div>
-  <div class="act-card">
-    <div class="act-adj"><button class="act-btn" onclick="adjustActivity('talk_time_secs',60)">▲</button><button class="act-btn" onclick="adjustActivity('talk_time_secs',-60)">▼</button></div>
-    <div><div class="act-val" id="av-talk">0:00</div><div class="act-lbl">Talk Time</div></div>
-  </div>
-  <div class="act-card">
-    <div class="act-adj"><button class="act-btn" onclick="adjustActivity('connected',1)">▲</button><button class="act-btn" onclick="adjustActivity('connected',-1)">▼</button></div>
-    <div><div class="act-val" id="av-connected">0</div><div class="act-lbl">Connected</div></div>
-  </div>
-  <div class="act-card">
-    <div class="act-adj"><button class="act-btn" onclick="adjustActivity('voicemail',1)">▲</button><button class="act-btn" onclick="adjustActivity('voicemail',-1)">▼</button></div>
-    <div><div class="act-val" id="av-voicemail">0</div><div class="act-lbl">Voicemail</div></div>
-  </div>
-  <div class="act-card">
-    <div class="act-adj"><button class="act-btn" onclick="adjustActivity('no_answer',1)">▲</button><button class="act-btn" onclick="adjustActivity('no_answer',-1)">▼</button></div>
-    <div><div class="act-val" id="av-noanswer">0</div><div class="act-lbl">No Answer</div></div>
-  </div>
-  <div class="act-card">
-    <div class="act-adj"><button class="act-btn" onclick="adjustActivity('appointments',1)">▲</button><button class="act-btn" onclick="adjustActivity('appointments',-1)">▼</button></div>
-    <div><div class="act-val" id="av-appts">0</div><div class="act-lbl">Appts</div></div>
-  </div>
-  <span class="act-sep">|</span>
-  <div class="act-card">
-    <div><div class="act-val" id="av-conv" style="color:#fbbc04">0%</div><div class="act-lbl">Conv%</div></div>
-  </div>
-  <span class="act-sep" style="margin-left:auto"></span>
-  <button class="btn btn-ghost btn-sm" onclick="resetTodayActivity()" style="font-size:11px">Reset</button>
-</div>
-
 <div class="toolbar">
   <div class="search-wrap">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -289,9 +223,6 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
     <option value="reviews_desc">Reviews ↓</option>
     <option value="created_at_desc">Newest</option>
     <option value="updated_at_desc">Recently Updated</option>
-  </select>
-  <select class="sort-select" id="tag-filter" onchange="applyFilter()" style="max-width:160px">
-    <option value="">All Tags</option>
   </select>
   <button class="btn btn-ghost btn-sm" id="filter-clear" onclick="clearFilter()" style="display:none">✕ Clear Filter</button>
   <span style="margin-left:auto;font-size:13px;color:#9aa0a6" id="lead-count"></span>
@@ -457,42 +388,10 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
         <p style="font-size:11px;margin-top:6px;color:#5f6368">Expected columns: Title · Rating · Reviews · Industry · Phone · Notes · Dispo · Call Back Date · Name · Email · Last Called Date · Appointment Date · Address · Website · City · State · County</p>
       </div>
       <input type="file" id="csv-file-input" accept=".csv" style="display:none" onchange="handleCSVFile(event)">
-      <div id="import-tags-section" style="margin-top:14px;display:none">
-        <div style="font-size:12px;font-weight:500;color:#9aa0a6;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Apply Tags to Imported Leads</div>
-        <div id="import-tag-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <input id="import-new-tag-input" class="tag-input-box" placeholder="New tag name..." style="flex:1;padding:5px 8px">
-          <button class="btn btn-outline btn-sm" onclick="createImportTag()">+ Add</button>
-        </div>
-      </div>
       <div id="import-status" style="margin-top:12px;font-size:13px;color:#9aa0a6;line-height:1.6"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="document.getElementById('import-modal').classList.remove('open')">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- TAGS MANAGER MODAL -->
-<div class="modal-backdrop" id="tags-modal">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <div class="modal-title">🏷 Tags Manager</div>
-      <button class="btn-ghost" onclick="document.getElementById('tags-modal').classList.remove('open')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #3c4043">
-        <div style="font-size:12px;font-weight:500;color:#9aa0a6;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Create New Tag</div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <input id="new-tag-name" class="tag-input-box" placeholder="Tag name..." style="flex:1;min-width:140px;padding:6px 10px">
-          <div id="new-tag-color-pick" class="tag-color-pick"></div>
-          <button class="btn btn-primary btn-sm" onclick="createTag()">Create</button>
-        </div>
-      </div>
-      <div id="tags-list"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="document.getElementById('tags-modal').classList.remove('open')">Done</button>
     </div>
   </div>
 </div>
@@ -624,16 +523,6 @@ let currentTab = "info";
 let activeDispo = null;
 let editingLead = null;
 
-// ─── TAGS STATE ───────────────────────────────────────────────────────────────
-const TAG_COLORS = ['#1a73e8','#0f9d58','#d93025','#d97706','#7c3aed','#0891b2','#be185d','#0f766e','#92400e','#374151','#16a34a','#ea580c'];
-let allTags = [], leadTagsMap = {};
-let selectedNewTagColor = TAG_COLORS[0];
-let importTagIds = [];
-
-// ─── DAILY ACTIVITY STATE ────────────────────────────────────────────────────
-let todayActivity = { dials:0, talk_time_secs:0, connected:0, voicemail:0, no_answer:0, appointments:0 };
-let activityDbId = null, actSaveTimer = null;
-
 const db  = path => `${SUPABASE_URL}/rest/v1/${path}`;
 const hdr = extra => ({
   "Content-Type": "application/json",
@@ -684,44 +573,19 @@ function mergeLeads(group) {
   return { winner, duplicates: sorted.slice(1) };
 }
 
-// ─── LOAD ────────────────────────────────────────────────────────────────────
 async function loadLeads() {
   try {
-    const today = new Date().toISOString().split('T')[0];
-    const [leadsRes, tagsRes, leadTagsRes, actRes] = await Promise.all([
-      fetch(db("crm_leads?select=*&order=created_at.desc"), { headers: hdr() }),
-      fetch(db("crm_tags?order=name.asc"), { headers: hdr() }),
-      fetch(db("crm_lead_tags?select=lead_id,tag_id"), { headers: hdr() }),
-      fetch(db(`crm_daily_activity?date=eq.${today}`), { headers: hdr() }),
-    ]);
-    if (!leadsRes.ok) throw new Error(await leadsRes.text());
-    allLeads = await leadsRes.json();
-    allTags = tagsRes.ok ? await tagsRes.json() : [];
-    const ltRows = leadTagsRes.ok ? await leadTagsRes.json() : [];
-    leadTagsMap = {};
-    ltRows.forEach(r => {
-      if (!leadTagsMap[r.lead_id]) leadTagsMap[r.lead_id] = [];
-      leadTagsMap[r.lead_id].push(r.tag_id);
-    });
-    if (actRes.ok) {
-      const actRows = await actRes.json();
-      if (actRows.length) {
-        const row = actRows[0];
-        activityDbId = row.id;
-        todayActivity = { dials: row.dials, talk_time_secs: row.talk_time_secs, connected: row.connected, voicemail: row.voicemail, no_answer: row.no_answer, appointments: row.appointments };
-      }
-    }
-    buildTagFilter();
+    const res = await fetch(db("crm_leads?select=*&order=created_at.desc"), { headers: hdr() });
+    if (!res.ok) throw new Error(await res.text());
+    allLeads = await res.json();
     buildStats();
     applyFilter();
-    renderActivityBar();
   } catch (e) {
     console.error(e);
     document.getElementById("table-area").innerHTML = `<div class="empty-state"><p>Could not load leads — check console</p></div>`;
   }
 }
 
-// ─── STATS ───────────────────────────────────────────────────────────────────
 function buildStats() {
   const bar = document.getElementById("stats-bar");
   const counts = {};
@@ -752,21 +616,16 @@ function filterDispo(key) {
 function clearFilter() {
   activeDispo = null;
   document.getElementById("search-input").value = "";
-  const tf = document.getElementById("tag-filter");
-  if (tf) tf.value = "";
   document.getElementById("filter-clear").style.display = "none";
   buildStats();
   applyFilter();
 }
 
-// ─── FILTER ──────────────────────────────────────────────────────────────────
 function applyFilter() {
   const q = (document.getElementById("search-input").value || "").toLowerCase();
   const sort = document.getElementById("sort-select").value;
-  const tagId = document.getElementById("tag-filter")?.value || "";
   let leads = allLeads.filter(l => {
     if (activeDispo && l.dispo !== activeDispo) return false;
-    if (tagId && !(leadTagsMap[l.id] || []).includes(tagId)) return false;
     if (!q) return true;
     return [l.business_name,l.contact_name,l.phone,l.email,l.address,l.city,l.state,l.notes]
       .join(" ").toLowerCase().includes(q);
@@ -784,7 +643,6 @@ function applyFilter() {
   renderTable();
 }
 
-// ─── TABLE ───────────────────────────────────────────────────────────────────
 function renderTable() {
   const area = document.getElementById("table-area");
   if (!filteredLeads.length) {
@@ -799,12 +657,8 @@ function renderTable() {
     const stars = l.rating ? "★".repeat(Math.round(l.rating)) + `<span style="color:#9aa0a6"> ${l.rating}</span>` : "—";
     const loc = [l.city, l.state].filter(Boolean).join(", ") || "—";
     const sel = currentLead?.id === l.id ? "selected" : "";
-    const tagChips = (leadTagsMap[l.id] || []).map(tid => {
-      const tag = allTags.find(t => t.id === tid);
-      return tag ? `<span class="tag-chip" style="background:${tag.color}">${esc(tag.name)}</span>` : '';
-    }).join('');
     return `<tr class="${sel}" onclick="openLead('${l.id}')">
-      <td style="font-weight:500;white-space:normal">${esc(l.business_name)}${tagChips ? `<div class="tag-chips-row">${tagChips}</div>` : ''}</td>
+      <td style="font-weight:500">${esc(l.business_name)}</td>
       <td>${esc(l.contact_name || "—")}</td>
       <td><a class="phone-link" href="tel:${esc(l.phone)}" onclick="event.stopPropagation()">${esc(l.phone || "—")}</a></td>
       <td>${esc(loc)}</td>
@@ -822,7 +676,6 @@ function renderTable() {
   </table>`;
 }
 
-// ─── PANEL ───────────────────────────────────────────────────────────────────
 async function openLead(id) {
   const lead = allLeads.find(l => l.id === id);
   if (!lead) return;
@@ -864,14 +717,12 @@ async function renderTab() {
   else if (currentTab === "activity") await renderActivityTab();
 }
 
-// INFO TAB
 function renderInfoTab() {
   const l = currentLead;
   const mapsLink = l.google_maps_link
     ? `<a href="${esc(l.google_maps_link)}" target="_blank" style="color:#8ab4f8;font-size:12px;text-decoration:none">📍 Maps</a>` : "";
   const webLink = l.website
     ? `<a href="${esc(l.website)}" target="_blank" style="color:#8ab4f8;font-size:12px;text-decoration:none">🌐 Website</a>` : "";
-
   document.getElementById("panel-body").innerHTML = `
     <div class="field-group"><label class="field-label">Business Name</label>
       <input class="field-input" id="e-business_name" value="${esc(l.business_name)}"></div>
@@ -911,13 +762,7 @@ function renderInfoTab() {
       <input class="field-input" id="e-last_called_date" type="date" value="${l.last_called_date||''}"></div>
     <div class="field-group"><label class="field-label">Google Maps Link</label>
       <input class="field-input" id="e-google_maps_link" value="${esc(l.google_maps_link||'')}"></div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">${mapsLink}${webLink}</div>
-    <div class="field-group" style="margin-top:14px">
-      <label class="field-label">Tags</label>
-      <div id="lead-tags-editor"></div>
-    </div>`;
-  renderLeadTagsEditor(l.id);
-
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">${mapsLink}${webLink}</div>`;
   document.getElementById("panel-footer").innerHTML = `
     <button class="btn btn-primary btn-sm" onclick="saveCurrentLead()">Save Changes</button>
     <button class="btn btn-outline btn-sm" onclick="openCalModal()">📅 Calendar</button>
@@ -925,7 +770,6 @@ function renderInfoTab() {
     <button class="btn btn-danger btn-sm" onclick="deleteLead()">Delete</button>`;
 }
 
-// DISPO TAB
 function renderDispoTab() {
   const btns = Object.entries(DISPOS).map(([key, d]) => `
     <button class="dispo-btn ${currentLead.dispo===key?'active':''}"
@@ -940,7 +784,6 @@ function renderDispoTab() {
   document.getElementById("panel-footer").innerHTML = "";
 }
 
-// NOTES TAB
 function renderNotesTab() {
   document.getElementById("panel-body").innerHTML = `
     <div class="field-group">
@@ -952,7 +795,6 @@ function renderNotesTab() {
     <button class="btn btn-primary btn-sm" onclick="saveNotes()">Save Notes</button>`;
 }
 
-// EMAIL TAB
 function renderEmailTab() {
   const tplBtns = Object.entries(EMAIL_TEMPLATES).map(([key, t]) =>
     `<button class="tpl-btn" onclick="applyTemplate('${key}')">${t.label}</button>`).join("");
@@ -977,7 +819,6 @@ function renderEmailTab() {
     <button class="btn btn-primary btn-sm" onclick="sendEmail()">Send Email</button>`;
 }
 
-// ACTIVITY TAB
 async function renderActivityTab() {
   document.getElementById("panel-body").innerHTML = `<div class="spinner"></div>`;
   document.getElementById("panel-footer").innerHTML = `
@@ -1008,7 +849,6 @@ async function renderActivityTab() {
   }
 }
 
-// ─── ACTIONS ─────────────────────────────────────────────────────────────────
 async function setDispo(newDispo) {
   if (!currentLead) return;
   const oldDispo = currentLead.dispo;
@@ -1112,7 +952,6 @@ async function deleteLead() {
   try {
     await fetch(db(`crm_leads?id=eq.${currentLead.id}`), { method: "DELETE", headers: hdr() });
     allLeads = allLeads.filter(l => l.id !== currentLead.id);
-    delete leadTagsMap[currentLead.id];
     closePanel();
     buildStats();
     applyFilter();
@@ -1120,7 +959,6 @@ async function deleteLead() {
   } catch(e) { showToast("Delete failed", "error"); }
 }
 
-// ─── ADD MODAL ───────────────────────────────────────────────────────────────
 function openAddModal() {
   editingLead = null;
   document.getElementById("add-modal-title").textContent = "Add Lead";
@@ -1178,7 +1016,6 @@ async function saveLeadModal() {
   } catch(e) { showToast("Failed to add lead: " + e.message, "error"); }
 }
 
-// ─── CALENDAR ────────────────────────────────────────────────────────────────
 function openCalModal() {
   if (!currentLead) return;
   document.getElementById("cal-biz-name").textContent = currentLead.business_name;
@@ -1211,7 +1048,6 @@ async function confirmPushToCalendar() {
   } catch(e) { showToast("Calendar push failed", "error"); }
 }
 
-// ─── GHL ─────────────────────────────────────────────────────────────────────
 async function quickGHL() {
   if (!currentLead) return;
   try {
@@ -1229,7 +1065,6 @@ async function quickGHL() {
   } catch(e) { showToast("GHL send failed", "error"); }
 }
 
-// ─── EMAIL ────────────────────────────────────────────────────────────────────
 function applyTemplate(key) {
   const tpl = EMAIL_TEMPLATES[key];
   if (!tpl || !currentLead) return;
@@ -1263,14 +1098,10 @@ async function sendEmail() {
   } catch(e) { showToast("Email send failed", "error"); }
 }
 
-// ─── CSV IMPORT ───────────────────────────────────────────────────────────────
 function openImportModal() {
-  importTagIds = [];
   document.getElementById("import-modal").classList.add("open");
   document.getElementById("import-status").textContent = "";
   document.getElementById("csv-file-input").value = "";
-  document.getElementById("import-tags-section").style.display = "block";
-  renderImportTagPicker();
 }
 
 function handleDrop(e) {
@@ -1358,18 +1189,15 @@ function parseRow(cols, format) {
 }
 
 async function importCSV(text) {
-  const importStartTime = new Date().toISOString();
   const status = document.getElementById("import-status");
   status.innerHTML = "Parsing CSV...";
   const lines = text.split(/\r?\n/).filter(l => l.trim());
   if (!lines.length) { status.textContent = "Empty file."; return; }
-
   const firstCols = parseCSVLine(lines[0]);
   const firstLower = firstCols[0].toLowerCase();
   const hasHeader = firstLower === "title" || firstLower === "business" || firstLower === "business_name" || firstLower === "name";
   const format = hasHeader ? detectColumns(firstCols) : "new";
   const dataLines = hasHeader ? lines.slice(1) : lines;
-
   const parsed = [];
   for (const line of dataLines) {
     if (!line.trim()) continue;
@@ -1378,19 +1206,13 @@ async function importCSV(text) {
     if (!row.business_name) continue;
     parsed.push(row);
   }
-
   if (!parsed.length) { status.textContent = "No valid rows found."; return; }
-
   status.innerHTML = `Found ${parsed.length} rows. Checking for existing records...`;
-
   const existingByPhone = {};
   let page = 0;
   const PAGE_SIZE = 1000;
   while (true) {
-    const res = await fetch(
-      db(`crm_leads?select=id,phone&limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`),
-      { headers: hdr() }
-    );
+    const res = await fetch(db(`crm_leads?select=id,phone&limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`), { headers: hdr() });
     if (!res.ok) break;
     const batch = await res.json();
     if (!batch.length) break;
@@ -1401,22 +1223,16 @@ async function importCSV(text) {
     if (batch.length < PAGE_SIZE) break;
     page++;
   }
-
   const fillable = ["business_name","contact_name","email","address","city","state","county",
     "website","rating","reviews","industry","google_maps_link","notes",
     "follow_up_date","appointment_date","last_called_date","dispo"];
-
   let inserted = 0, updated = 0, skipped = 0, errors = 0;
-  const toInsert = [];
-  const toUpdate = [];
-
+  const toInsert = [], toUpdate = [];
   for (const row of parsed) {
     const nPhone = normalizePhone(row.phone);
     const existingId = nPhone.length >= 7 ? existingByPhone[nPhone] : null;
-
     if (existingId) {
-      const patch = {};
-      let changed = false;
+      const patch = {}; let changed = false;
       for (const f of fillable) {
         if (row[f] != null && row[f] !== "") { patch[f] = row[f]; changed = true; }
       }
@@ -1426,60 +1242,26 @@ async function importCSV(text) {
       toInsert.push({ ...row, source: "csv_import" });
     }
   }
-
   status.innerHTML = `${toInsert.length} new · ${toUpdate.length} to update · ${skipped} skipped<br>Inserting...`;
-
   const BATCH = 50;
   for (let i = 0; i < toInsert.length; i += BATCH) {
     const batch = toInsert.slice(i, i + BATCH);
     try {
-      const res = await fetch(db("crm_leads"), {
-        method: "POST",
-        headers: { ...hdr(), "Prefer": "return=minimal" },
-        body: JSON.stringify(batch)
-      });
-      if (!res.ok) {
-        const errText = await res.text().catch(()=>'');
-        console.error('Insert error:', res.status, errText);
-        errors += batch.length;
-        if (errors <= batch.length) status.innerHTML += `<br><small style="color:#f28b82">Insert error ${res.status}: ${errText.slice(0,200)}</small>`;
-      } else { inserted += batch.length; }
-    } catch(e) { console.error('Insert exception:', e); errors += batch.length; }
+      const res = await fetch(db("crm_leads"), { method: "POST", headers: { ...hdr(), "Prefer": "return=minimal" }, body: JSON.stringify(batch) });
+      if (!res.ok) { const errText = await res.text().catch(()=>''); errors += batch.length; if (errors <= batch.length) status.innerHTML += `<br><small style="color:#f28b82">Insert error ${res.status}: ${errText.slice(0,200)}</small>`; }
+      else { inserted += batch.length; }
+    } catch(e) { errors += batch.length; }
     status.innerHTML = `Inserted ${inserted}/${toInsert.length} new · ${toUpdate.length} to update...`;
   }
-
   const PARALLEL = 15;
   for (let i = 0; i < toUpdate.length; i += PARALLEL) {
     const chunk = toUpdate.slice(i, i + PARALLEL);
     const results = await Promise.allSettled(chunk.map(({ id, patch }) =>
-      fetch(db(`crm_leads?id=eq.${id}`), {
-        method: "PATCH",
-        headers: { ...hdr(), "Prefer": "return=minimal" },
-        body: JSON.stringify(patch)
-      })
+      fetch(db(`crm_leads?id=eq.${id}`), { method: "PATCH", headers: { ...hdr(), "Prefer": "return=minimal" }, body: JSON.stringify(patch) })
     ));
     results.forEach(r => { if (r.status === "fulfilled" && r.value.ok) updated++; else errors++; });
     status.innerHTML = `Inserted ${inserted} new · Updated ${updated}/${toUpdate.length}...`;
   }
-
-  if (importTagIds.length && inserted > 0) {
-    try {
-      const newLeadsRes = await fetch(db(`crm_leads?created_at=gte.${encodeURIComponent(importStartTime)}&source=eq.csv_import&select=id`), { headers: hdr() });
-      if (newLeadsRes.ok) {
-        const newLeads = await newLeadsRes.json();
-        const ltRows = [];
-        newLeads.forEach(nl => importTagIds.forEach(tid => ltRows.push({ lead_id: nl.id, tag_id: tid })));
-        if (ltRows.length) {
-          await fetch(db("crm_lead_tags"), {
-            method: "POST",
-            headers: { ...hdr(), "Prefer": "return=minimal", "on-conflict": "lead_id,tag_id" },
-            body: JSON.stringify(ltRows)
-          });
-        }
-      }
-    } catch(e) { console.error('Tag apply error:', e); }
-  }
-
   const parts = [];
   if (inserted) parts.push(`✅ ${inserted} inserted`);
   if (updated)  parts.push(`🔄 ${updated} updated`);
@@ -1489,7 +1271,6 @@ async function importCSV(text) {
   await loadLeads();
 }
 
-// ─── DEDUP ────────────────────────────────────────────────────────────────────
 function openDedupModal() {
   document.getElementById("dedup-modal").classList.add("open");
   document.getElementById("dedup-footer").innerHTML = "";
@@ -1498,7 +1279,6 @@ function openDedupModal() {
 
 function renderDedupContent() {
   const content = document.getElementById("dedup-content");
-
   const groups = {};
   allLeads.forEach(l => {
     const n = normalizePhone(l.phone);
@@ -1506,57 +1286,32 @@ function renderDedupContent() {
     if (!groups[n]) groups[n] = [];
     groups[n].push(l);
   });
-
   const dupGroups = Object.values(groups).filter(g => g.length > 1);
-
   if (!dupGroups.length) {
-    content.innerHTML = `<div style="text-align:center;padding:30px;color:#9aa0a6">
-      <p style="font-size:32px;margin-bottom:12px">✅</p>
-      <p>No duplicate phone numbers found!</p>
-    </div>`;
-    document.getElementById("dedup-footer").innerHTML = `
-      <button class="btn btn-ghost" onclick="document.getElementById('dedup-modal').classList.remove('open')">Close</button>`;
+    content.innerHTML = `<div style="text-align:center;padding:30px;color:#9aa0a6"><p style="font-size:32px;margin-bottom:12px">✅</p><p>No duplicate phone numbers found!</p></div>`;
+    document.getElementById("dedup-footer").innerHTML = `<button class="btn btn-ghost" onclick="document.getElementById('dedup-modal').classList.remove('open')">Close</button>`;
     return;
   }
-
   const totalDups = dupGroups.reduce((s, g) => s + g.length - 1, 0);
-  let html = `<p style="font-size:13px;color:#9aa0a6;margin-bottom:16px">
-    Found <strong style="color:#fbbc04">${dupGroups.length} duplicate group${dupGroups.length>1?"s":""}</strong>
-    — ${totalDups} extra record${totalDups>1?"s":""} will be removed.
-    The record with the most data is kept; blank fields are filled from duplicates.
-  </p>`;
-
+  let html = `<p style="font-size:13px;color:#9aa0a6;margin-bottom:16px">Found <strong style="color:#fbbc04">${dupGroups.length} duplicate group${dupGroups.length>1?"s":""}</strong> — ${totalDups} extra record${totalDups>1?"s":""} will be removed. The record with the most data is kept; blank fields are filled from duplicates.</p>`;
   dupGroups.forEach(group => {
-    const { winner, duplicates } = mergeLeads(group);
-    html += `<div class="dedup-group">
-      <div class="dedup-group-title">📞 ${esc(winner.phone || group[0].phone)}</div>`;
+    const { winner } = mergeLeads(group);
+    html += `<div class="dedup-group"><div class="dedup-group-title">📞 ${esc(winner.phone || group[0].phone)}</div>`;
     group.forEach(l => {
       const isWinner = l.id === winner.id;
       const loc = [l.city, l.state].filter(Boolean).join(", ");
-      html += `<div class="dedup-row">
-        ${isWinner ? '<span class="dedup-keep">KEEP</span>' : '<span style="font-size:11px;color:#d93025;padding:2px 6px">REMOVE</span>'}
-        <div style="flex:1">
-          <strong>${esc(l.business_name)}</strong>
-          ${l.contact_name ? `· ${esc(l.contact_name)}` : ""}
-          ${loc ? `· ${esc(loc)}` : ""}
-          <span style="color:#5f6368"> · Score: ${fieldScore(l)}</span>
-        </div>
-      </div>`;
+      html += `<div class="dedup-row">${isWinner ? '<span class="dedup-keep">KEEP</span>' : '<span style="font-size:11px;color:#d93025;padding:2px 6px">REMOVE</span>'}<div style="flex:1"><strong>${esc(l.business_name)}</strong>${l.contact_name?`· ${esc(l.contact_name)}`:""}${loc?`· ${esc(loc)}`:""}<span style="color:#5f6368"> · Score: ${fieldScore(l)}</span></div></div>`;
     });
     html += `</div>`;
   });
-
   content.innerHTML = html;
-  document.getElementById("dedup-footer").innerHTML = `
-    <button class="btn btn-ghost" onclick="document.getElementById('dedup-modal').classList.remove('open')">Cancel</button>
-    <button class="btn btn-warn" onclick="runAutoDedup()">Merge & Remove ${totalDups} Duplicate${totalDups>1?"s":""}</button>`;
+  document.getElementById("dedup-footer").innerHTML = `<button class="btn btn-ghost" onclick="document.getElementById('dedup-modal').classList.remove('open')">Cancel</button><button class="btn btn-warn" onclick="runAutoDedup()">Merge & Remove ${totalDups} Duplicate${totalDups>1?"s":""}</button>`;
 }
 
 async function runAutoDedup() {
   const content = document.getElementById("dedup-content");
   document.getElementById("dedup-footer").innerHTML = "";
   content.innerHTML = `<div class="spinner"></div><p style="text-align:center;color:#9aa0a6;margin-top:8px">Merging duplicates...</p>`;
-
   const groups = {};
   allLeads.forEach(l => {
     const n = normalizePhone(l.phone);
@@ -1565,42 +1320,27 @@ async function runAutoDedup() {
     groups[n].push(l);
   });
   const dupGroups = Object.values(groups).filter(g => g.length > 1);
-
   let merged = 0, removed = 0, errors = 0;
-
   for (const group of dupGroups) {
     const { winner, duplicates } = mergeLeads(group);
     try {
-      const patchFields = ["contact_name","email","address","city","state","county","website",
-        "rating","reviews","notes","google_maps_link","industry","follow_up_date","appointment_date","last_called_date"];
+      const patchFields = ["contact_name","email","address","city","state","county","website","rating","reviews","notes","google_maps_link","industry","follow_up_date","appointment_date","last_called_date"];
       const patch = {};
       patchFields.forEach(f => { if (winner[f] != null && winner[f] !== "") patch[f] = winner[f]; });
-      await fetch(db(`crm_leads?id=eq.${winner.id}`), {
-        method: "PATCH", headers: hdr(), body: JSON.stringify(patch)
-      });
+      await fetch(db(`crm_leads?id=eq.${winner.id}`), { method: "PATCH", headers: hdr(), body: JSON.stringify(patch) });
       merged++;
     } catch { errors++; }
-
     for (const dup of duplicates) {
-      try {
-        await fetch(db(`crm_leads?id=eq.${dup.id}`), { method: "DELETE", headers: hdr() });
-        removed++;
-      } catch { errors++; }
+      try { await fetch(db(`crm_leads?id=eq.${dup.id}`), { method: "DELETE", headers: hdr() }); removed++; }
+      catch { errors++; }
     }
   }
-
-  content.innerHTML = `<div style="text-align:center;padding:30px">
-    <p style="font-size:32px;margin-bottom:12px">✅</p>
-    <p style="font-size:15px;color:#e8eaed">${merged} group${merged>1?"s":""} merged, ${removed} duplicate${removed>1?"s":""} removed${errors?`, ${errors} errors`:""}</p>
-  </div>`;
-  document.getElementById("dedup-footer").innerHTML = `
-    <button class="btn btn-primary" onclick="document.getElementById('dedup-modal').classList.remove('open')">Done</button>`;
-
+  content.innerHTML = `<div style="text-align:center;padding:30px"><p style="font-size:32px;margin-bottom:12px">✅</p><p style="font-size:15px;color:#e8eaed">${merged} group${merged>1?"s":""} merged, ${removed} duplicate${removed>1?"s":""} removed${errors?`, ${errors} errors`:""}</p></div>`;
+  document.getElementById("dedup-footer").innerHTML = `<button class="btn btn-primary" onclick="document.getElementById('dedup-modal').classList.remove('open')">Done</button>`;
   await loadLeads();
 }
 
-// ─── MODAL BACKDROPS ──────────────────────────────────────────────────────────
-["add-modal","cal-modal","import-modal","dedup-modal","dialer-setup-modal","tags-modal"].forEach(id => {
+["add-modal","cal-modal","import-modal","dedup-modal","dialer-setup-modal"].forEach(id => {
   document.getElementById(id).addEventListener("click", e => {
     if (e.target === e.currentTarget) e.currentTarget.classList.remove("open");
   });
@@ -1617,15 +1357,14 @@ let autoAdvanceSec = 3;
 let autoAdvanceTmo = null;
 let countdownInt   = null;
 
-const CONNECTED_DISPOS  = new Set(['call_back','gate_keeper','follow_up','appointment','not_interested']);
-const VOICEMAIL_DISPOS  = new Set(['voicemail']);
-const NO_ANSWER_DISPOS  = new Set(['no_pick_up','bad_number']);
+const CONNECTED_DISPOS = new Set(['call_back','gate_keeper','follow_up','appointment','not_interested']);
+const VOICEMAIL_DISPOS = new Set(['voicemail']);
+const NO_ANSWER_DISPOS = new Set(['no_pick_up','bad_number']);
 
 function openDialerSetup() {
   const counts = {};
   allLeads.forEach(l => { counts[l.dispo] = (counts[l.dispo]||0) + 1; });
   const defaultOn = new Set(['new','no_pick_up','voicemail','call_back','follow_up']);
-
   document.getElementById('dialer-dispo-checks').innerHTML = Object.entries(DISPOS).map(([key, d]) => {
     const n = counts[key] || 0;
     const checked = defaultOn.has(key) && n > 0;
@@ -1636,7 +1375,6 @@ function openDialerSetup() {
       <span style="color:#9aa0a6">${n} lead${n!==1?'s':''}</span>
     </label>`;
   }).join('');
-
   document.getElementById('dialer-use-filter').checked = false;
   updateDialerCount();
   document.getElementById('dialer-setup-modal').classList.add('open');
@@ -1660,9 +1398,8 @@ function startDialerSession() {
     dialerQueue = allLeads.filter(l => sel.has(l.dispo));
   }
   if (!dialerQueue.length) { showToast('No leads to dial','error'); return; }
-
-  dialerIndex   = 0;
-  dialerStats   = { called:0, connected:0, voicemail:0, noAnswer:0, appointments:0 };
+  dialerIndex = 0;
+  dialerStats = { called:0, connected:0, voicemail:0, noAnswer:0, appointments:0 };
   document.getElementById('dialer-setup-modal').classList.remove('open');
   document.getElementById('dialer-overlay').classList.add('open');
   renderDialerLead();
@@ -1670,7 +1407,6 @@ function startDialerSession() {
 
 function renderDialerLead() {
   clearDialerTimers();
-
   if (dialerIndex >= dialerQueue.length) {
     document.getElementById('d-lead-panel').innerHTML = '';
     document.getElementById('d-controls-panel').innerHTML = `
@@ -1685,18 +1421,15 @@ function renderDialerLead() {
     renderDialerStats();
     return;
   }
-
-  const lead = dialerQueue[dialerIndex];
-  const d    = DISPOS[lead.dispo] || DISPOS.new;
-  const pct  = (dialerIndex / dialerQueue.length) * 100;
-  const loc  = [lead.city, lead.state].filter(Boolean).join(', ');
+  const lead  = dialerQueue[dialerIndex];
+  const d     = DISPOS[lead.dispo] || DISPOS.new;
+  const pct   = (dialerIndex / dialerQueue.length) * 100;
+  const loc   = [lead.city, lead.state].filter(Boolean).join(', ');
   const stars = lead.rating ? '★'.repeat(Math.round(lead.rating)) : '';
-
   document.getElementById('d-progress-text').textContent = `Lead ${dialerIndex+1} of ${dialerQueue.length}`;
   document.getElementById('d-prog-fill').style.width = pct + '%';
   document.getElementById('d-footer-remaining').textContent = `${dialerQueue.length - dialerIndex - 1} remaining`;
   renderDialerStats();
-
   document.getElementById('d-lead-panel').innerHTML = `
     <div style="margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <span class="dispo-badge" style="background:${d.color}">${d.label}</span>
@@ -1712,20 +1445,14 @@ function renderDialerLead() {
     ${lead.website ? `<div class="d-info-row"><span class="d-info-icon">🌐</span><a href="${esc(lead.website)}" target="_blank" style="color:#8ab4f8;font-size:13px;word-break:break-all">${esc(lead.website)}</a></div>` : ''}
     ${lead.google_maps_link ? `<div class="d-info-row"><span class="d-info-icon">🗺</span><a href="${esc(lead.google_maps_link)}" target="_blank" style="color:#8ab4f8;font-size:13px">Open Maps</a></div>` : ''}
     ${lead.follow_up_date ? `<div class="d-info-row"><span class="d-info-icon">📅</span>Call back: ${lead.follow_up_date}</div>` : ''}
-    ${lead.notes ? `
-    <div style="margin-top:14px">
-      <div class="d-section-label">Notes</div>
-      <div class="d-notes-box">${esc(lead.notes)}</div>
-    </div>` : ''}
+    ${lead.notes ? `<div style="margin-top:14px"><div class="d-section-label">Notes</div><div class="d-notes-box">${esc(lead.notes)}</div></div>` : ''}
     <div style="margin-top:16px">
       <div class="d-section-label">Quick Note</div>
       <textarea id="d-quick-note" class="d-quick-note" placeholder="Note about this call..."></textarea>
     </div>`;
-
   const dispoGrid = Object.entries(DISPOS).filter(([k]) => k !== 'new').map(([key, dsp]) =>
     `<button class="d-dispo-btn" style="background:${dsp.color}" id="d-dispo-${key}" onclick="dialerSetDispo('${key}')">${dsp.label}</button>`
   ).join('');
-
   document.getElementById('d-controls-panel').innerHTML = `
     <div>
       <div class="d-section-label">Call</div>
@@ -1756,37 +1483,25 @@ function renderDialerStats() {
     { label:'Voicemail', val:dialerStats.voicemail,    color:'#7c3aed' },
     { label:'No Answer', val:dialerStats.noAnswer,     color:'#78716c' },
     { label:'Appts',     val:dialerStats.appointments, color:'#fbbc04' },
-  ].map(s => `<div class="d-stat">
-    <div class="d-stat-dot" style="background:${s.color}"></div>
-    <span style="color:#9aa0a6">${s.label}:</span>
-    <span style="color:#e8eaed;font-weight:500">${s.val}</span>
-  </div>`).join('');
+  ].map(s => `<div class="d-stat"><div class="d-stat-dot" style="background:${s.color}"></div><span style="color:#9aa0a6">${s.label}:</span><span style="color:#e8eaed;font-weight:500">${s.val}</span></div>`).join('');
 }
 
 async function dialerCall() {
   const lead = dialerQueue[dialerIndex];
   if (!lead?.phone) return;
-
   const a = document.createElement('a');
   a.href = 'tel:' + lead.phone.replace(/\D/g,'');
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-
   clearDialerTimers();
   callStartTime = Date.now();
   dialerStats.called++;
-  todayActivity.dials++;
   renderDialerStats();
-  renderActivityBar();
-  debounceSaveActivity();
-
   const btn = document.getElementById('d-call-btn');
   if (btn) { btn.className = 'd-call-btn calling'; btn.textContent = '📞 In Call…'; }
-
   const timerEl = document.getElementById('d-timer');
   if (timerEl) { timerEl.className = 'd-timer active'; timerEl.textContent = '0:00'; }
-
   callTimerInt = setInterval(() => {
     const secs = Math.floor((Date.now() - callStartTime) / 1000);
     const m = Math.floor(secs/60);
@@ -1794,7 +1509,6 @@ async function dialerCall() {
     const el = document.getElementById('d-timer');
     if (el) el.textContent = `${m}:${s}`;
   }, 1000);
-
   const today = new Date().toISOString().split('T')[0];
   try {
     await fetch(db(`crm_leads?id=eq.${lead.id}`), {
@@ -1804,25 +1518,20 @@ async function dialerCall() {
     lead.last_called_date = today;
     const idx = allLeads.findIndex(l => l.id === lead.id);
     if (idx !== -1) allLeads[idx].last_called_date = today;
-  } catch(e) { /* non-critical */ }
+  } catch(e) {}
 }
 
 async function dialerSetDispo(newDispo) {
   const lead = dialerQueue[dialerIndex];
   if (!lead) return;
-
   document.querySelectorAll('.d-dispo-btn').forEach(b => b.classList.remove('set'));
   const btn = document.getElementById(`d-dispo-${newDispo}`);
   if (btn) btn.classList.add('set');
-
-  if (CONNECTED_DISPOS.has(newDispo))  { dialerStats.connected++;    todayActivity.connected++; }
-  if (VOICEMAIL_DISPOS.has(newDispo))  { dialerStats.voicemail++;    today
-                                        if (VOICEMAIL_DISPOS.has(newDispo))  { dialerStats.voicemail++;    todayActivity.voicemail++; }
-  if (NO_ANSWER_DISPOS.has(newDispo))  { dialerStats.noAnswer++;     todayActivity.no_answer++; }
-  if (newDispo === 'appointment')       { dialerStats.appointments++; todayActivity.appointments++; }
+  if (CONNECTED_DISPOS.has(newDispo))  dialerStats.connected++;
+  if (VOICEMAIL_DISPOS.has(newDispo))  dialerStats.voicemail++;
+  if (NO_ANSWER_DISPOS.has(newDispo))  dialerStats.noAnswer++;
+  if (newDispo === 'appointment')       dialerStats.appointments++;
   renderDialerStats();
-  renderActivityBar();
-  debounceSaveActivity();
   const oldDispo = lead.dispo;
   const note     = document.getElementById('d-quick-note')?.value?.trim() || '';
   try {
@@ -1836,9 +1545,7 @@ async function dialerSetDispo(newDispo) {
     });
     if (note) {
       const merged = lead.notes ? lead.notes + '\n' + note : note;
-      await fetch(db(`crm_leads?id=eq.${lead.id}`), {
-        method:'PATCH', headers:hdr(), body:JSON.stringify({ notes:merged })
-      });
+      await fetch(db(`crm_leads?id=eq.${lead.id}`), { method:'PATCH', headers:hdr(), body:JSON.stringify({ notes:merged }) });
       lead.notes = merged;
     }
     lead.dispo = newDispo;
@@ -1858,49 +1565,42 @@ async function dialerSetDispo(newDispo) {
     autoAdvanceTmo = setTimeout(() => { dialerNext(); }, autoAdvanceSec * 1000);
   }
 }
+
 function dialerToggleAuto() {
   autoAdvanceOn = !autoAdvanceOn;
-  const btn   = document.getElementById('d-toggle');
-  const label = document.getElementById('d-auto-label');
-  if (btn)   btn.classList.toggle('on', autoAdvanceOn);
-  if (label) label.textContent = autoAdvanceOn ? 'On' : 'Off';
-  const lead = dialerQueue[dialerIndex];
-  if (!lead) return;
   const row = document.querySelector('.d-auto-row');
   if (row) row.innerHTML = `
     <button class="d-toggle ${autoAdvanceOn?'on':''}" id="d-toggle" onclick="dialerToggleAuto()"></button>
     <span style="font-size:13px;color:#9aa0a6" id="d-auto-label">${autoAdvanceOn?'On':'Off'}</span>
     ${autoAdvanceOn ? `<span style="font-size:12px;color:#9aa0a6">after <input type="number" id="d-delay" value="${autoAdvanceSec}" min="1" max="15" class="d-delay-input" oninput="autoAdvanceSec=Math.max(1,parseInt(this.value)||3)"> s</span>` : ''}`;
 }
+
 function dialerNext() {
   clearDialerTimers();
   dialerIndex++;
   renderDialerLead();
 }
+
 function dialerPrev() {
   if (dialerIndex <= 0) return;
   clearDialerTimers();
   dialerIndex--;
   renderDialerLead();
 }
+
 function dialerSkip() {
   clearDialerTimers();
   dialerIndex++;
   renderDialerLead();
 }
+
 function clearDialerTimers() {
-  if (callTimerInt) {
-    clearInterval(callTimerInt);
-    callTimerInt = null;
-    if (callStartTime) {
-      const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
-      if (elapsed > 0) { todayActivity.talk_time_secs += elapsed; renderActivityBar(); debounceSaveActivity(); }
-    }
-  }
-  if (autoAdvanceTmo){ clearTimeout(autoAdvanceTmo);  autoAdvanceTmo= null; }
-  if (countdownInt)  { clearInterval(countdownInt);   countdownInt  = null; }
+  if (callTimerInt)   { clearInterval(callTimerInt);  callTimerInt  = null; }
+  if (autoAdvanceTmo) { clearTimeout(autoAdvanceTmo); autoAdvanceTmo = null; }
+  if (countdownInt)   { clearInterval(countdownInt);  countdownInt  = null; }
   callStartTime = null;
 }
+
 function endDialerSession() {
   clearDialerTimers();
   document.getElementById('dialer-overlay').classList.remove('open');
@@ -1908,281 +1608,7 @@ function endDialerSession() {
   applyFilter();
   showToast(`Session ended — ${dialerStats.called} calls · ${dialerStats.appointments} appointments`, 'success');
 }
-// ─── TAGS ────────────────────────────────────────────────────────────────────
-function buildTagFilter() {
-  const sel = document.getElementById("tag-filter");
-  if (!sel) return;
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">All Tags</option>' + allTags.map(t =>
-    `<option value="${t.id}" ${cur===t.id?'selected':''}>${esc(t.name)}</option>`
-  ).join('');
-}
-function openTagsModal() {
-  document.getElementById("tags-modal").classList.add("open");
-  renderNewTagColorPick();
-  renderTagsList();
-}
-function renderNewTagColorPick() {
-  document.getElementById("new-tag-color-pick").innerHTML = TAG_COLORS.map(c =>
-    `<div class="tag-color-opt ${selectedNewTagColor===c?'sel':''}" style="background:${c}" onclick="selectedNewTagColor='${c}';renderNewTagColorPick()"></div>`
-  ).join('');
-}
-function renderTagsList() {
-  const counts = {};
-  Object.values(leadTagsMap).forEach(tids => tids.forEach(tid => { counts[tid] = (counts[tid]||0)+1; }));
-  document.getElementById("tags-list").innerHTML = allTags.length ? allTags.map(t =>
-    `<div class="tag-mgr-row">
-      <span class="tag-swatch" style="background:${t.color};width:14px;height:14px;border-radius:50%;display:inline-block;flex-shrink:0;cursor:pointer" onclick="cycleTagColor('${t.id}')"></span>
-      <input class="tag-name-edit" value="${esc(t.name)}" onblur="saveTagName('${t.id}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
-      <span class="tag-count-lbl">${counts[t.id]||0} lead${(counts[t.id]||0)!==1?'s':''}</span>
-      <button class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:11px;color:#d93025" onclick="deleteTag('${t.id}')">Delete</button>
-      <button class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:11px" onclick="bulkApplyTag('${t.id}')">Apply to Filtered</button>
-    </div>`
-  ).join('') : `<p style="font-size:13px;color:#9aa0a6">No tags yet. Create one above.</p>`;
-}
-async function createTag() {
-  const name = document.getElementById("new-tag-name").value.trim();
-  if (!name) { showToast("Enter a tag name", "error"); return; }
-  try {
-    const res = await fetch(db("crm_tags"), {
-      method: "POST", headers: hdr(), body: JSON.stringify({ name, color: selectedNewTagColor })
-    });
-    if (!res.ok) throw new Error(await res.text());
-    const [tag] = await res.json();
-    allTags.push(tag);
-    allTags.sort((a,b) => a.name.localeCompare(b.name));
-    document.getElementById("new-tag-name").value = "";
-    buildTagFilter();
-    renderTagsList();
-    showToast("Tag created", "success");
-  } catch(e) { showToast("Failed to create tag: " + e.message, "error"); }
-}
-async function saveTagName(id, name) {
-  name = name.trim();
-  if (!name) return;
-  const tag = allTags.find(t => t.id === id);
-  if (!tag || tag.name === name) return;
-  try {
-    await fetch(db(`crm_tags?id=eq.${id}`), { method: "PATCH", headers: hdr(), body: JSON.stringify({ name }) });
-    tag.name = name;
-    buildTagFilter();
-    renderTagsList();
-    renderTable();
-  } catch(e) { showToast("Failed to rename tag", "error"); }
-}
-async function cycleTagColor(id) {
-  const tag = allTags.find(t => t.id === id);
-  if (!tag) return;
-  const idx = TAG_COLORS.indexOf(tag.color);
-  const newColor = TAG_COLORS[(idx + 1) % TAG_COLORS.length];
-  try {
-    await fetch(db(`crm_tags?id=eq.${id}`), { method: "PATCH", headers: hdr(), body: JSON.stringify({ color: newColor }) });
-    tag.color = newColor;
-    renderTagsList();
-    renderTable();
-    if (currentLead) renderLeadTagsEditor(currentLead.id);
-  } catch(e) { showToast("Failed to update color", "error"); }
-}
-async function deleteTag(id) {
-  if (!confirm("Delete this tag? It will be removed from all leads.")) return;
-  try {
-    await fetch(db(`crm_tags?id=eq.${id}`), { method: "DELETE", headers: hdr() });
-    allTags = allTags.filter(t => t.id !== id);
-    Object.keys(leadTagsMap).forEach(lid => {
-      leadTagsMap[lid] = (leadTagsMap[lid] || []).filter(tid => tid !== id);
-    });
-    buildTagFilter();
-    renderTagsList();
-    renderTable();
-    if (currentLead) renderLeadTagsEditor(currentLead.id);
-    showToast("Tag deleted", "success");
-  } catch(e) { showToast("Failed to delete tag", "error"); }
-}
-async function bulkApplyTag(tagId) {
-  const leads = filteredLeads;
-  if (!leads.length) { showToast("No leads in current filter", "error"); return; }
-  const rows = leads
-    .filter(l => !(leadTagsMap[l.id]||[]).includes(tagId))
-    .map(l => ({ lead_id: l.id, tag_id: tagId }));
-  if (!rows.length) { showToast("All filtered leads already have this tag", "success"); return; }
-  try {
-    await fetch(db("crm_lead_tags"), {
-      method: "POST",
-      headers: { ...hdr(), "Prefer": "return=minimal" },
-      body: JSON.stringify(rows)
-    });
-    rows.forEach(r => {
-      if (!leadTagsMap[r.lead_id]) leadTagsMap[r.lead_id] = [];
-      if (!leadTagsMap[r.lead_id].includes(tagId)) leadTagsMap[r.lead_id].push(tagId);
-    });
-    renderTable();
-    if (currentLead) renderLeadTagsEditor(currentLead.id);
-    showToast(`Tag applied to ${rows.length} lead${rows.length!==1?'s':''}`, "success");
-  } catch(e) { showToast("Failed to apply tag", "error"); }
-}
-function renderLeadTagsEditor(leadId) {
-  const el = document.getElementById("lead-tags-editor");
-  if (!el) return;
-  const tids = leadTagsMap[leadId] || [];
-  const chips = tids.map(tid => {
-    const tag = allTags.find(t => t.id === tid);
-    return tag ? `<span class="tag-chip" style="background:${tag.color}">${esc(tag.name)}<span class="tag-x" onmousedown="removeLeadTag('${leadId}','${tid}')">✕</span></span>` : '';
-  }).join('');
-  el.innerHTML = `
-    <div class="tag-chips-row" id="ltag-chips-${leadId}">${chips}</div>
-    <div class="tag-wrap" style="margin-top:6px">
-      <input class="tag-input-box" id="ltag-input-${leadId}" placeholder="Add tag..." autocomplete="off"
-        oninput="renderTagDropdown('${leadId}')"
-        onkeydown="handleTagKey(event,'${leadId}')"
-        onfocus="renderTagDropdown('${leadId}')"
-        onblur="setTimeout(()=>{const d=document.getElementById('ltag-dd-${leadId}');if(d)d.remove()},150)">
-      <div id="ltag-dd-${leadId}"></div>
-    </div>`;
-}
-function renderTagDropdown(leadId) {
-  const input = document.getElementById(`ltag-input-${leadId}`);
-  const ddEl = document.getElementById(`ltag-dd-${leadId}`);
-  if (!input || !ddEl) return;
-  const q = input.value.toLowerCase();
-  const tids = leadTagsMap[leadId] || [];
-  const filtered = allTags.filter(t => !tids.includes(t.id) && t.name.toLowerCase().includes(q));
-  if (!filtered.length && !q) { ddEl.innerHTML = ''; return; }
-  const items = filtered.map(t =>
-    `<div class="tag-dd-item" onmousedown="addLeadTag('${leadId}','${t.id}')">
-      <span class="tag-swatch" style="background:${t.color}"></span>${esc(t.name)}</div>`
-  ).join('');
-  const createRow = q ? `<div class="tag-dd-item" onmousedown="createAndAddTag('${leadId}','${q}')">+ Create "<strong>${esc(q)}</strong>"</div>` : '';
-  ddEl.innerHTML = `<div class="tag-dropdown">${items}${createRow}</div>`;
-}
-function handleTagKey(e, leadId) {
-  if (e.key === 'Enter') {
-    const q = e.target.value.trim();
-    if (!q) return;
-    const tids = leadTagsMap[leadId] || [];
-    const match = allTags.find(t => t.name.toLowerCase() === q.toLowerCase() && !tids.includes(t.id));
-    if (match) addLeadTag(leadId, match.id);
-    else createAndAddTag(leadId, q);
-    e.target.value = '';
-  }
-  if (e.key === 'Escape') {
-    const dd = document.getElementById(`ltag-dd-${leadId}`);
-    if (dd) dd.innerHTML = '';
-  }
-}
-async function createAndAddTag(leadId, name) {
-  const input = document.getElementById(`ltag-input-${leadId}`);
-  const color = TAG_COLORS[allTags.length % TAG_COLORS.length];
-  try {
-    const res = await fetch(db("crm_tags"), { method: "POST", headers: hdr(), body: JSON.stringify({ name, color }) });
-    if (!res.ok) throw new Error(await res.text());
-    const [tag] = await res.json();
-    allTags.push(tag);
-    allTags.sort((a,b) => a.name.localeCompare(b.name));
-    buildTagFilter();
-    await addLeadTag(leadId, tag.id);
-    if (input) input.value = '';
-  } catch(e) { showToast("Failed to create tag", "error"); }
-}
-async function addLeadTag(leadId, tagId) {
-  if ((leadTagsMap[leadId]||[]).includes(tagId)) return;
-  try {
-    const res = await fetch(db("crm_lead_tags"), {
-      method: "POST", headers: { ...hdr(), "Prefer": "return=minimal" },
-      body: JSON.stringify({ lead_id: leadId, tag_id: tagId })
-    });
-    if (!res.ok) { const t = await res.text(); if (!t.includes('duplicate')) throw new Error(t); }
-    if (!leadTagsMap[leadId]) leadTagsMap[leadId] = [];
-    if (!leadTagsMap[leadId].includes(tagId)) leadTagsMap[leadId].push(tagId);
-    renderLeadTagsEditor(leadId);
-    renderTable();
-  } catch(e) { showToast("Failed to add tag", "error"); }
-}
-async function removeLeadTag(leadId, tagId) {
-  try {
-    await fetch(db(`crm_lead_tags?lead_id=eq.${leadId}&tag_id=eq.${tagId}`), { method: "DELETE", headers: hdr() });
-    if (leadTagsMap[leadId]) leadTagsMap[leadId] = leadTagsMap[leadId].filter(t => t !== tagId);
-    renderLeadTagsEditor(leadId);
-    renderTable();
-  } catch(e) { showToast("Failed to remove tag", "error"); }
-}
-function renderImportTagPicker() {
-  const el = document.getElementById("import-tag-chips");
-  if (!el) return;
-  el.innerHTML = allTags.map(t => {
-    const on = importTagIds.includes(t.id);
-    return `<span class="tag-chip" style="background:${on?t.color:'#35363a'};border:2px solid ${t.color};cursor:pointer;color:${on?'#fff':'#9aa0a6'}" onclick="toggleImportTag('${t.id}')">${esc(t.name)}</span>`;
-  }).join('') || '<span style="font-size:12px;color:#9aa0a6">No tags yet — create one below</span>';
-}
-function toggleImportTag(tagId) {
-  if (importTagIds.includes(tagId)) importTagIds = importTagIds.filter(t => t !== tagId);
-  else importTagIds.push(tagId);
-  renderImportTagPicker();
-}
-async function createImportTag() {
-  const input = document.getElementById("import-new-tag-input");
-  const name = input?.value?.trim();
-  if (!name) return;
-  const color = TAG_COLORS[allTags.length % TAG_COLORS.length];
-  try {
-    const res = await fetch(db("crm_tags"), { method: "POST", headers: hdr(), body: JSON.stringify({ name, color }) });
-    if (!res.ok) throw new Error(await res.text());
-    const [tag] = await res.json();
-    allTags.push(tag);
-    allTags.sort((a,b) => a.name.localeCompare(b.name));
-    importTagIds.push(tag.id);
-    if (input) input.value = '';
-    buildTagFilter();
-    renderImportTagPicker();
-    showToast("Tag created", "success");
-  } catch(e) { showToast("Failed to create tag", "error"); }
-}
-// ─── DAILY ACTIVITY ───────────────────────────────────────────────────────────
-function fmtTime(secs) {
-  secs = Math.max(0, secs);
-  const h = Math.floor(secs / 3600);
-  const m = Math.floor((secs % 3600) / 60);
-  const s = secs % 60;
-  return h ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${m}:${String(s).padStart(2,'0')}`;
-}
-function renderActivityBar() {
-  const a = todayActivity;
-  const conv = a.dials > 0 ? Math.round((a.appointments / a.dials) * 100) : 0;
-  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  set('av-dials',     a.dials);
-  set('av-talk',      fmtTime(a.talk_time_secs));
-  set('av-connected', a.connected);
-  set('av-voicemail', a.voicemail);
-  set('av-noanswer',  a.no_answer);
-  set('av-appts',     a.appointments);
-  set('av-conv',      conv + '%');
-}
-function adjustActivity(field, delta) {
-  todayActivity[field] = Math.max(0, (todayActivity[field] || 0) + delta);
-  renderActivityBar();
-  debounceSaveActivity();
-}
-function resetTodayActivity() {
-  if (!confirm("Reset today's activity counters?")) return;
-  todayActivity = { dials:0, talk_time_secs:0, connected:0, voicemail:0, no_answer:0, appointments:0 };
-  renderActivityBar();
-  saveTodayActivity();
-}
-function debounceSaveActivity() {
-  if (actSaveTimer) clearTimeout(actSaveTimer);
-  actSaveTimer = setTimeout(saveTodayActivity, 1500);
-}
-async function saveTodayActivity() {
-  const today = new Date().toISOString().split('T')[0];
-  const payload = { ...todayActivity, date: today, updated_at: new Date().toISOString() };
-  try {
-    if (activityDbId) {
-      await fetch(db(`crm_daily_activity?id=eq.${activityDbId}`), { method: "PATCH", headers: { ...hdr(), "Prefer": "return=minimal" }, body: JSON.stringify(payload) });
-    } else {
-      const res = await fetch(db("crm_daily_activity"), { method: "POST", headers: hdr(), body: JSON.stringify(payload) });
-      if (res.ok) { const [row] = await res.json(); activityDbId = row.id; }
-    }
-  } catch(e) { console.error('Activity save error:', e); }
-}
+
 loadLeads();
 </script>
 </body>
