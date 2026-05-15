@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamic Landing Page</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--accent:#16a34a;
+--dark:#0f172a;
+--text:#111827;
+--muted:#6b7280;
+}
+
+body{
+margin:0;
+font-family:Inter,sans-serif;
+background:#f9fafb;
+}
+
+/* HERO */
+.hook-section{padding:100px 20px;text-align:center;background:white;}
+.hook-container{max-width:900px;margin:auto;}
+.hook-eyebrow{color:var(--accent);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:13px;margin-bottom:20px;}
+.hook-title{font-size:clamp(36px,6vw,64px);font-weight:200;line-height:1.1;color:var(--dark);margin-bottom:25px;}
+.hook-highlight{color:var(--accent);}
+.hook-subtitle{font-size:20px;line-height:1.6;color:var(--muted);max-width:650px;margin:auto;margin-bottom:40px;}
+.hook-cta{display:inline-block;background:var(--accent);color:white;padding:18px 36px;font-weight:200;font-size:18px;border-radius:10px;text-decoration:none;box-shadow:0 10px 30px rgba(0,0,0,.12);}
+.hook-proof{margin-top:40px;font-size:14px;color:#9ca3af;}
+
+/* PROMISE */
+.promise-section{
+  padding:80px 20px 100px;
+  background:#f8fafc;
+}
+.promise-container{
+  max-width:900px;
+  margin:auto;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:40px; /* 🔥 controls ALL vertical spacing cleanly */
+}
+.promise-title{
+  font-size:clamp(32px,5vw,52px);
+  font-weight:300;
+  line-height:1.3; /* 🔥 key fix */
+  letter-spacing:0.3px;
+  color:#0f172a;
+  margin-bottom:20px;
+  max-width:700px; /* 🔥 controls wrapping */
+  margin-left:auto;
+  margin-right:auto;
+}
+.promise-text{font-size:20px;color:#475569;margin-bottom:50px;}
+.promise-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:24px;
+  margin-top:10px;
+}
+.promise-card{background:white;padding:30px;border-radius:14px;}
+.promise-button{background:#16a34a;color:white;padding:18px 36px;border-radius:10px;text-decoration:none;}
+
+/* PRODUCT */
+.product-section{padding:120px 20px;background:white;}
+.product-container{max-width:1100px;margin:auto;text-align:center;}
+.product-title{
+  font-size:clamp(34px,5vw,54px);
+  font-weight:300;
+  line-height:1.3; /* 🔥 spacing between lines */
+  letter-spacing:0.5px;
+  color:#0f172a;
+  margin-bottom:20px;
+  max-width:800px; /* 🔥 controls wrap so it looks intentional */
+  margin-left:auto;
+  margin-right:auto;
+}
+.product-mock{max-width:700px;border-radius:14px;}
+.product-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:30px;}
+.product-card{background:#f8fafc;padding:30px;border-radius:14px;}
+.product-button{background:#16a34a;color:white;padding:18px 40px;border-radius:10px;text-decoration:none;}
+  .product-container p{
+  font-size:18px; /* 🔥 bigger */
+  line-height:1.6;
+  color:#475569;
+  max-width:650px;
+  margin:0 auto 40px;
+}
+
+/* COMPARISON */
+.comparison-section{
+padding:120px 20px;
+background:#f8fafc;
+font-family:Inter,sans-serif;
+}
+
+.comparison-container{
+max-width:1100px;
+margin:auto;
+text-align:center;
+}
+
+.comparison-title{
+font-size:clamp(34px,5vw,54px);
+font-weight:200;
+color:#0f172a;
+margin-bottom:20px;
+}
+
+.comparison-subtitle{
+font-size:20px;
+color:#6b7280;
+max-width:720px;
+margin:auto;
+line-height:1.6;
+margin-bottom:70px;
+}
+
+.comparison-table{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:30px;
+max-width:900px;
+margin:auto;
+}
+
+.comparison-card{
+background:white;
+padding:40px;
+border-radius:14px;
+box-shadow:0 10px 35px rgba(0,0,0,.08);
+text-align:left;
+}
+
+.comparison-card h3{
+font-size:22px;
+font-weight:800;
+margin-bottom:20px;
+color:#111827;
+}
+
+.comparison-list{
+list-style:none;
+padding:0;
+margin:0;
+}
+
+.comparison-list li{
+font-size:16px;
+margin-bottom:14px;
+color:#6b7280;
+}
+
+.bad{
+color:#dc2626;
+font-weight:700;
+}
+
+.good{
+color:#16a34a;
+font-weight:700;
+}
+
+.comparison-cta{
+margin-top:60px;
+}
+
+.comparison-button{
+background:#16a34a;
+color:white;
+padding:18px 40px;
+font-size:18px;
+font-weight:200;
+border-radius:10px;
+text-decoration:none;
+display:inline-block;
+box-shadow:0 10px 30px rgba(0,0,0,.2);
+transition:.25s;
+}
+
+.comparison-button:hover{
+transform:translateY(-2px);
+}
+
+  
+/* 🔥 COMPARISON FIXES */
+.comparison-title {
+  margin-bottom: 30px;
+  line-height: 1.25;
+}
+
+.comparison-subtitle {
+  margin-bottom: 90px; /* more breathing before cards */
+}
+
+.comparison-table {
+  margin-top: 30px;
+}
+
+.comparison-cta {
+  margin-top: 80px; /* push CTA down */
+}
+
+/* TESTIMONIAL */
+.testimonial-section{padding:120px 20px;background:white;}
+.testimonial-container{max-width:1100px;margin:auto;text-align:center;}
+.testimonial-image{max-width:900px;border-radius:16px;}
+
+
+/* OFFER */
+.offer-section{
+padding:120px 20px;
+background:#f8fafc;
+font-family:Inter,sans-serif;
+}
+
+.offer-container{
+max-width:1100px;
+margin:auto;
+text-align:center;
+}
+
+.offer-title{
+font-size:clamp(34px,5vw,54px);
+font-weight:200;
+color:#0f172a;
+margin-bottom:25px;
+}
+
+.offer-subtitle{
+font-size:20px;
+color:#6b7280;
+max-width:720px;
+margin:auto;
+line-height:1.6;
+margin-bottom:70px;
+}
+
+.offer-box{
+background:white;
+padding:60px;
+border-radius:16px;
+box-shadow:0 20px 60px rgba(0,0,0,.1);
+max-width:700px;
+margin:auto;
+}
+
+.offer-list{
+list-style:none;
+padding:0;
+margin:30px 0;
+text-align:left;
+}
+
+.offer-list li{
+font-size:17px;
+margin-bottom:14px;
+color:#374151;
+}
+
+.offer-button{
+margin-top:30px;
+background:#16a34a;
+color:white;
+padding:20px 50px;
+font-size:20px;
+font-weight:600;
+border-radius:12px;
+text-decoration:none;
+display:inline-block;
+box-shadow:0 15px 40px rgba(0,0,0,.2);
+transition:.25s;
+}
+
+.offer-button:hover{
+transform:translateY(-3px);
+}
+
+.offer-note{
+margin-top:20px;
+font-size:14px;
+color:#6b7280;
+}
+
+  /* 🔥 OFFER FIXES */
+.offer-title {
+  margin-bottom: 30px;
+  line-height: 1.25;
+}
+
+.offer-subtitle {
+  margin-bottom: 90px;
+}
+
+.offer-box {
+  margin-top: 20px;
+  padding: 70px 60px; /* bigger box = more premium */
+}
+
+.offer-button {
+  margin-top: 40px;
+}
+
+/* 🔥 BETWEEN SECTIONS (MOST IMPORTANT FIX) */
+.comparison-section {
+  padding-bottom: 160px; /* creates gap before next section */
+}
+
+.offer-section {
+  padding-top: 160px; /* creates gap from previous */
+}
+</style>
+</head>
+
+<body>
+
+<div id="app"></div>
+
+<script>
+(async function(){
+
+// 🔥 ONLY CHANGE: added fallback anon client
+function getSupabaseClient(){
+  if(window.brandSupabase) return window.brandSupabase;
+
+  return window.supabase.createClient(
+    "https://rfdvogakvyodixgpvqvz.supabase.co",   // ← replace
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E"                      // ← replace
+  );
+}
+
+function getSlug(){
+  const parts = window.location.pathname.split("/").filter(Boolean);
+  return parts[parts.length - 1];
+}
+
+const sb = getSupabaseClient();
+const slug = getSlug();
+
+const { data: page } = await sb
+  .from("landing_pages")
+  .select("*")
+  .eq("slug", slug)
+  .single();
+
+if(!page) return;
+
+const { data: sections } = await sb
+  .from("sections")
+  .select("*")
+  .eq("page_id", page.id)
+  .order("order_index", { ascending: true });
+
+const app = document.getElementById("app");
+
+sections.forEach(s=>{
+  const c = typeof s.content === "string" ? JSON.parse(s.content) : (s.content || {});
+
+  if(s.section_type === "hero"){
+    app.innerHTML += `
+    <section class="hook-section">
+      <div class="hook-container">
+        <div class="hook-eyebrow">${c.brand_label || ""}</div>
+        <h1 class="hook-title">
+          ${c.headline_top || ""} <span class="hook-highlight">${c.headline_highlight || ""}</span>
+        </h1>
+        <p class="hook-subtitle">${c.description || ""}</p>
+        <div class="hook-proof">${c.affiliate_text || ""}</div>
+        <br>
+        <a href="${c.cta_link || "#"}" class="hook-cta">${c.cta_text || ""}</a>
+      </div>
+    </section>`;
+  }
+
+  if(s.section_type === "product_explanation"){
+    app.innerHTML += `
+    <section class="promise-section">
+      <div class="promise-container">
+        <h2 class="promise-title">${c.headline || ""}</h2>
+        <img src="${c.image_url || ""}" style="max-width:500px">
+        <p class="promise-text">${c.description || ""}</p>
+        <div class="promise-grid">
+          ${(c.features||[]).map(f=>`
+            <div class="promise-card">
+              <h3>${f.title}</h3>
+              <p>${f.description}</p>
+            </div>
+          `).join("")}
+        </div>
+        <a href="${c.cta_link || "#"}" class="promise-button">${c.cta_text || ""}</a>
+      </div>
+    </section>`;
+  }
+
+  if(s.section_type === "before_after"){
+    app.innerHTML += `
+    <section class="product-section">
+      <div class="product-container">
+        <h2 class="product-title">${c.headline || ""}</h2>
+        <p>${c.description || ""}</p>
+        <img src="${c.before_image || ""}" class="product-mock">
+      </div>
+    </section>`;
+  }
+
+  if(s.section_type === "comparison"){
+  app.innerHTML += `
+  <section class="comparison-section">
+
+    <div class="comparison-container">
+
+      <h2 class="comparison-title">
+        ${c.headline || ""}
+      </h2>
+
+      <p class="comparison-subtitle">
+        ${c.description || ""}
+      </p>
+
+      <div class="comparison-table">
+
+        <div class="comparison-card">
+          <h3>${c.left_title || ""}</h3>
+          <ul class="comparison-list">
+            ${(c.left||[]).map(i=>`<li class="bad">✕ ${i}</li>`).join("")}
+          </ul>
+        </div>
+
+        <div class="comparison-card">
+          <h3>${c.right_title || ""}</h3>
+          <ul class="comparison-list">
+            ${(c.right||[]).map(i=>`<li class="good">✓ ${i}</li>`).join("")}
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="comparison-cta">
+        <a href="${c.cta_link || "#"}" class="comparison-button">
+          ${c.cta_text || ""}
+        </a>
+      </div>
+
+    </div>
+
+  </section>`;
+}
+
+if(s.section_type === "reviews"){
+  app.innerHTML += `
+  <section class="testimonial-section">
+    <div class="testimonial-container">
+
+      <h2 style="
+        font-size:clamp(34px,5vw,48px);
+        font-weight:300;
+        color:#0f172a;
+        margin-bottom:50px;
+      ">
+        ${c.headline || ""}
+      </h2>
+
+      <img src="${c.image_url || ""}" class="testimonial-image" style="
+        width:100%;
+        max-width:900px;
+        border-radius:16px;
+      ">
+
+      <div style="margin-top:50px;">
+        <a href="${c.cta_link || "#"}" style="
+          background:#16a34a;
+          color:white;
+          padding:18px 40px;
+          font-size:18px;
+          font-weight:600;
+          border-radius:10px;
+          text-decoration:none;
+          display:inline-block;
+          box-shadow:0 10px 30px rgba(0,0,0,.2);
+          transition:.25s;
+        ">
+          ${c.cta_text || ""}
+        </a>
+      </div>
+
+    </div>
+  </section>`;
+}
+
+ if(s.section_type === "offer"){
+  app.innerHTML += `
+  <section class="offer-section">
+
+    <div class="offer-container">
+
+      <h2 class="offer-title">
+        ${c.headline || ""}
+      </h2>
+
+      <p class="offer-subtitle">
+        ${c.subtext || ""}
+      </p>
+
+      <div class="offer-box">
+
+        <h3 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:10px;">
+          What You Get
+        </h3>
+
+        <ul class="offer-list">
+          ${(c.features||[]).map(f=>`<li>✔ ${f}</li>`).join("")}
+        </ul>
+
+        <a href="${c.cta_link || "#"}" class="offer-button">
+          ${c.cta_text || ""}
+        </a>
+
+        <p class="offer-note">
+          As an Amazon Associate we may earn from qualifying purchases.
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>`;
+}
+
+});
+
+})();
+</script>
+
+</body>
+</html>
