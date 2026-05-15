@@ -1,0 +1,141 @@
+<style>
+  /* --- LOGIN STYLES --- */
+  .login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    min-height: 60vh;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .login-card {
+    background: #111827;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    padding: 40px 32px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    color: #e5e7eb;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  }
+  .login-card h1 { margin: 0 0 10px; color: #fff; font-size: 24px; }
+  .login-card p { color: #9ca3af; margin-bottom: 24px; font-size: 14px; }
+  
+  .login-input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 12px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    outline: none;
+  }
+  .login-input:focus { border-color: #22c55e; }
+  
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    background: #22c55e;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+  .login-btn:hover { background: #16a34a; }
+  .login-btn:disabled { opacity: 0.7; cursor: wait; }
+
+  .status-text { margin-top: 15px; font-size: 13px; min-height: 20px; }
+  .forgot-link { display: block; margin-top: 20px; color: #9ca3af; text-decoration: none; font-size: 13px; }
+  .forgot-link:hover { color: white; text-decoration: underline; }
+</style>
+
+<div class="login-wrapper">
+  <div class="login-card">
+    <h1>Welcome Back</h1>
+    <p>Please sign in to your account.</p>
+
+    <input id="email-field" class="login-input" type="email" placeholder="Email Address" required />
+    <input id="pass-field" class="login-input" type="password" placeholder="Password" required />
+
+    <button id="login-btn" class="login-btn">Sign In</button>
+    <div id="status-msg" class="status-text"></div>
+
+    <a href="/forgot-password" class="forgot-link">New User / Forgot Password?</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  // 2. Initialize Supabase (Safe Mode)
+  // This check prevents the "Identifier already declared" crash
+  if (typeof window.supabaseClient === 'undefined') {
+    const CONFIG = {
+      URL: "https://rfdvogakvyodixgpvqvz.supabase.co",
+      KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E"
+    };
+    window.supabaseClient = window.supabase.createClient(CONFIG.URL, CONFIG.KEY);
+  }
+
+  // 3. Login Logic
+  document.addEventListener("DOMContentLoaded", function() {
+    const btn = document.getElementById('login-btn');
+    const emailInput = document.getElementById('email-field');
+    const passInput = document.getElementById('pass-field');
+    const msg = document.getElementById('status-msg');
+
+    if(btn) {
+      btn.addEventListener('click', async () => {
+        // Reset UI
+        msg.textContent = "";
+        msg.style.color = "";
+        
+        const email = emailInput.value.trim();
+        const password = passInput.value;
+
+        if (!email || !password) {
+          msg.textContent = "Please enter both email and password.";
+          msg.style.color = "#ef4444"; 
+          return;
+        }
+
+        // Loading State
+        const originalText = btn.innerText;
+        btn.innerText = "Signing in...";
+        btn.disabled = true;
+
+        try {
+          // Use the window-scoped client
+          const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+          });
+
+          if (error) throw error;
+
+          // Success
+          msg.textContent = "Success! Redirecting...";
+          msg.style.color = "#22c55e"; 
+
+          setTimeout(() => {
+            window.location.href = "/dashboard"; // Change to your actual dashboard URL
+          }, 1500);
+
+        } catch (err) {
+          console.error("Login Error:", err);
+          msg.textContent = "Invalid email or password.";
+          msg.style.color = "#ef4444";
+          
+          btn.innerText = originalText;
+          btn.disabled = false;
+        }
+      });
+    }
+  });
+</script>
