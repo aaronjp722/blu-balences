@@ -15,12 +15,18 @@
       --border: rgba(255,255,255,0.1); --white: #ffffff;
     }
     body { font-family: 'Inter', sans-serif; background: var(--navy); color: var(--text); min-height: 100vh; padding: 40px 20px; -webkit-font-smoothing: antialiased; }
-    .wrap { width: 100%; max-width: 720px; margin: 0 auto; }
+    .wrap { width: 100%; max-width: 760px; margin: 0 auto; }
     .logo { font-size: 20px; font-weight: 800; color: var(--white); letter-spacing: -0.5px; text-align: center; margin-bottom: 32px; display: block; text-decoration: none; }
     .logo span { color: var(--green); }
     h1 { font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
-    .sub { font-size: 14px; color: var(--text-sub); margin-bottom: 28px; }
+    .sub { font-size: 14px; color: var(--text-sub); margin-bottom: 24px; }
 
+    /* Mode toggle */
+    .mode-toggle { display: flex; gap: 8px; margin-bottom: 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 4px; }
+    .mode-btn { flex: 1; padding: 10px; border-radius: 7px; border: none; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; color: var(--text-sub); background: transparent; }
+    .mode-btn.active { background: rgba(255,255,255,0.08); color: var(--white); }
+
+    /* Drop zone */
     .drop-zone { border: 2px dashed rgba(255,255,255,0.15); border-radius: 16px; padding: 48px 32px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: rgba(255,255,255,0.02); margin-bottom: 24px; }
     .drop-zone:hover, .drop-zone.drag-over { border-color: var(--green); background: rgba(34,197,94,0.04); }
     .drop-icon { font-size: 40px; margin-bottom: 12px; }
@@ -30,10 +36,9 @@
     .browse-btn { display: inline-block; margin-top: 14px; padding: 9px 20px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 8px; color: var(--green); font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
     .browse-btn:hover { background: rgba(34,197,94,0.2); }
 
-    /* Tag input panel */
+    /* Tag panel */
     .tag-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; }
     .tag-panel label { font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; display: block; margin-bottom: 10px; }
-    .tag-input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .tag-chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-height: 36px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: text; }
     .tag-chips:focus-within { border-color: var(--green); }
     .chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); color: #a78bfa; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 600; }
@@ -42,6 +47,7 @@
     .tag-text-input { background: none; border: none; outline: none; color: var(--white); font-family: 'Inter', sans-serif; font-size: 13px; min-width: 120px; flex: 1; }
     .tag-text-input::placeholder { color: var(--text-dim); }
 
+    /* Stats */
     .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
     @media (max-width: 540px) { .stats { grid-template-columns: repeat(2, 1fr); } }
     .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
@@ -49,20 +55,22 @@
     .stat-card .label { font-size: 11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.7px; }
     .num.green { color: var(--green); } .num.red { color: var(--red); } .num.yellow { color: var(--yellow); } .num.white { color: var(--white); }
 
+    /* Results card */
     .results-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
     .results-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
     .results-header h2 { font-size: 14px; font-weight: 600; color: var(--white); }
     .tab-row { display: flex; gap: 6px; }
     .tab { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; color: var(--text-sub); }
+    .tab.active-all { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); color: var(--white); }
     .tab.active-valid { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: var(--green); }
     .tab.active-invalid { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: var(--red); }
     .tab.active-dupes { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); color: var(--yellow); }
-    .tab:not(.active-valid):not(.active-invalid):not(.active-dupes):hover { background: rgba(255,255,255,0.05); color: var(--text); }
-    .search-bar { padding: 10px 20px; border-bottom: 1px solid var(--border); }
-    .search-bar input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; color: var(--white); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
-    .search-bar input:focus { border-color: var(--green); }
-    .search-bar input::placeholder { color: var(--text-dim); }
-    .table-wrap { max-height: 380px; overflow-y: auto; }
+    .tab:not([class*="active"]):hover { background: rgba(255,255,255,0.05); color: var(--text); }
+    .search-row { display: flex; gap: 10px; padding: 10px 20px; border-bottom: 1px solid var(--border); align-items: center; }
+    .search-row input { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; color: var(--white); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
+    .search-row input:focus { border-color: var(--green); }
+    .search-row input::placeholder { color: var(--text-dim); }
+    .table-wrap { max-height: 420px; overflow-y: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th { text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; background: rgba(255,255,255,0.02); position: sticky; top: 0; border-bottom: 1px solid var(--border); }
     td { padding: 8px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); vertical-align: middle; }
@@ -72,12 +80,19 @@
     .badge.valid { background: rgba(34,197,94,0.1); color: var(--green); }
     .badge.invalid { background: rgba(239,68,68,0.1); color: var(--red); }
     .badge.dupe { background: rgba(245,158,11,0.1); color: var(--yellow); }
+    .badge.unchecked { background: rgba(255,255,255,0.06); color: var(--text-dim); }
     .row-tag { display: inline-block; background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); color: #a78bfa; border-radius: 3px; padding: 1px 6px; font-size: 10px; font-weight: 600; margin: 1px; }
     .edit-btn { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 2px 6px; border-radius: 4px; font-size: 13px; transition: color 0.15s; }
     .edit-btn:hover { color: var(--white); }
     .empty { padding: 32px; text-align: center; color: var(--text-dim); font-size: 13px; }
+    .pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-sub); }
+    .page-btns { display: flex; gap: 6px; }
+    .page-btn { padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text-sub); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .page-btn:hover:not(:disabled) { background: rgba(255,255,255,0.05); color: var(--white); }
+    .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .db-loading { padding: 32px; text-align: center; color: var(--text-dim); font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
-    /* Edit modal */
+    /* Modal */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .modal { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 24px; width: 100%; max-width: 440px; }
     .modal h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
@@ -113,71 +128,112 @@
     .progress-bar-wrap { margin-top: 10px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; height: 4px; }
     .progress-bar { height: 100%; background: var(--blue); border-radius: 4px; transition: width 0.3s; }
     .hidden { display: none; }
+    .save-indicator { font-size: 12px; color: var(--green); margin-left: 8px; }
   </style>
 </head>
 <body>
 <div class="wrap">
   <a href="/" class="logo">Blu <span>Balence</span></a>
   <h1>Email Cleaner</h1>
-  <p class="sub">Upload a CSV — duplicates and invalid emails are removed, then push clean leads straight to Supabase.</p>
+  <p class="sub">Upload a CSV to clean and push leads, or browse and edit existing contacts in your database.</p>
 
-  <div class="drop-zone" id="drop-zone">
-    <div class="drop-icon">📋</div>
-    <p>Drag & drop your CSV here</p>
-    <span>Columns: Email, First Name, Last Name, Phone</span><br>
-    <label class="browse-btn" for="file-input">Browse File</label>
-    <input type="file" id="file-input" accept=".csv">
+  <!-- Mode toggle -->
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="mode-upload" onclick="setMode('upload')">⬆ Upload CSV</button>
+    <button class="mode-btn" id="mode-db" onclick="setMode('db')">🗄 View Database</button>
   </div>
 
-  <!-- Tag panel (shown after CSV loaded) -->
-  <div class="tag-panel hidden" id="tag-panel">
-    <label>Tags for this batch — applied to all contacts on push</label>
-    <div class="tag-chips" id="batch-tag-chips" onclick="document.getElementById('batch-tag-input').focus()">
-      <input class="tag-text-input" id="batch-tag-input" placeholder="Type a tag and press Enter...">
+  <!-- ── UPLOAD MODE ── -->
+  <div id="upload-mode">
+    <div class="drop-zone" id="drop-zone">
+      <div class="drop-icon">📋</div>
+      <p>Drag & drop your CSV here</p>
+      <span>Columns: Email, First Name, Last Name, Phone</span><br>
+      <label class="browse-btn" for="file-input">Browse File</label>
+      <input type="file" id="file-input" accept=".csv">
     </div>
-  </div>
 
-  <div class="stats hidden" id="stats">
-    <div class="stat-card"><div class="num white" id="stat-total">0</div><div class="label">Total Rows</div></div>
-    <div class="stat-card"><div class="num green" id="stat-valid">0</div><div class="label">Valid</div></div>
-    <div class="stat-card"><div class="num yellow" id="stat-dupes">0</div><div class="label">Duplicates</div></div>
-    <div class="stat-card"><div class="num red" id="stat-invalid">0</div><div class="label">Invalid</div></div>
-  </div>
-
-  <div class="results-card hidden" id="results-card">
-    <div class="results-header">
-      <h2>Results</h2>
-      <div class="tab-row">
-        <div class="tab active-valid" id="tab-valid" onclick="switchTab('valid')">Valid</div>
-        <div class="tab" id="tab-invalid" onclick="switchTab('invalid')">Invalid</div>
-        <div class="tab" id="tab-dupes" onclick="switchTab('dupes')">Duplicates</div>
+    <div class="tag-panel hidden" id="tag-panel">
+      <label>Tags for this batch — applied to all contacts on push</label>
+      <div class="tag-chips" id="batch-tag-chips" onclick="document.getElementById('batch-tag-input').focus()">
+        <input class="tag-text-input" id="batch-tag-input" placeholder="Type a tag and press Enter...">
       </div>
     </div>
-    <div class="search-bar">
-      <input type="text" id="search-input" placeholder="Search..." oninput="renderTable()">
+
+    <div class="stats hidden" id="stats">
+      <div class="stat-card"><div class="num white" id="stat-total">0</div><div class="label">Total Rows</div></div>
+      <div class="stat-card"><div class="num green" id="stat-valid">0</div><div class="label">Valid</div></div>
+      <div class="stat-card"><div class="num yellow" id="stat-dupes">0</div><div class="label">Duplicates</div></div>
+      <div class="stat-card"><div class="num red" id="stat-invalid">0</div><div class="label">Invalid</div></div>
     </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>#</th><th>Email</th><th>Name</th><th>Tags</th><th>Status</th><th></th></tr></thead>
-        <tbody id="table-body"></tbody>
-      </table>
-      <div class="empty hidden" id="empty-msg">No emails in this category.</div>
+
+    <div class="results-card hidden" id="upload-results-card">
+      <div class="results-header">
+        <h2>Results</h2>
+        <div class="tab-row">
+          <div class="tab active-valid" id="tab-valid" onclick="switchUploadTab('valid')">Valid</div>
+          <div class="tab" id="tab-invalid" onclick="switchUploadTab('invalid')">Invalid</div>
+          <div class="tab" id="tab-dupes" onclick="switchUploadTab('dupes')">Duplicates</div>
+        </div>
+      </div>
+      <div class="search-row">
+        <input type="text" id="upload-search" placeholder="Search..." oninput="renderUploadTable()">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Email</th><th>Name</th><th>Tags</th><th>Status</th><th></th></tr></thead>
+          <tbody id="upload-table-body"></tbody>
+        </table>
+        <div class="empty hidden" id="upload-empty-msg">No emails in this category.</div>
+      </div>
+    </div>
+
+    <div class="actions hidden" id="actions">
+      <button class="btn btn-green" onclick="downloadCSV()">⬇ Download Clean CSV</button>
+      <button class="btn btn-blue" id="push-btn" onclick="pushToSupabase()">☁ Push to Supabase</button>
+      <button class="btn btn-outline" onclick="resetUpload()">Upload New File</button>
+    </div>
+
+    <div class="push-status hidden" id="push-status">
+      <div class="status-row">
+        <div class="spinner" id="push-spinner"></div>
+        <div class="status-text" id="push-text">Pushing to Supabase...</div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+      </div>
     </div>
   </div>
 
-  <div class="actions hidden" id="actions">
-    <button class="btn btn-green" onclick="downloadCSV()">⬇ Download Clean CSV</button>
-    <button class="btn btn-blue" id="push-btn" onclick="pushToSupabase()">☁ Push to Supabase</button>
-    <button class="btn btn-outline" onclick="reset()">Upload New File</button>
-  </div>
-
-  <div class="push-status hidden" id="push-status">
-    <div class="status-row">
-      <div class="spinner" id="push-spinner"></div>
-      <div class="status-text" id="push-text">Pushing to Supabase...</div>
-    </div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+  <!-- ── DATABASE MODE ── -->
+  <div id="db-mode" class="hidden">
+    <div class="results-card">
+      <div class="results-header">
+        <h2 id="db-title">All Contacts</h2>
+        <div class="tab-row">
+          <div class="tab active-all" id="db-tab-all"    onclick="setDbFilter('all')">All</div>
+          <div class="tab" id="db-tab-valid"   onclick="setDbFilter('valid')">Valid</div>
+          <div class="tab" id="db-tab-invalid" onclick="setDbFilter('invalid')">Invalid</div>
+        </div>
+      </div>
+      <div class="search-row">
+        <input type="text" id="db-search" placeholder="Search by email..." oninput="dbSearchDebounce()">
+      </div>
+      <div class="table-wrap" id="db-table-wrap">
+        <div class="db-loading" id="db-loading"><div class="spinner"></div> Loading...</div>
+        <table id="db-table" class="hidden">
+          <thead><tr><th>#</th><th>Email</th><th>Name</th><th>Tags</th><th>SMTP</th><th></th></tr></thead>
+          <tbody id="db-table-body"></tbody>
+        </table>
+        <div class="empty hidden" id="db-empty-msg">No contacts found.</div>
+      </div>
+      <div class="pagination" id="db-pagination">
+        <span id="db-count-label">—</span>
+        <div class="page-btns">
+          <button class="page-btn" id="db-prev" onclick="dbChangePage(-1)" disabled>← Prev</button>
+          <button class="page-btn" id="db-next" onclick="dbChangePage(1)">Next →</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -197,85 +253,172 @@
       </div>
     </div>
     <div class="modal-footer">
+      <span class="save-indicator hidden" id="save-indicator">Saved!</span>
       <button class="btn-sm btn-sm-outline" onclick="closeModal()">Cancel</button>
-      <button class="btn-sm btn-sm-green" onclick="saveEdit()">Save</button>
+      <button class="btn-sm btn-sm-green" id="modal-save-btn" onclick="saveEdit()">Save</button>
     </div>
   </div>
 </div>
 
 <script>
-  let currentTab = 'valid';
-  let data = { valid: [], invalid: [], dupes: [] };
-  let batchTags = [];
-  let editIndex = null;
-  let editList = null;
-  let modalTags = [];
+  // ── State ─────────────────────────────────────────────────────────────────
+  let mode = 'upload';
+  let currentUploadTab = 'valid';
+  let uploadData = { valid: [], invalid: [], dupes: [] };
+  let batchTags  = [];
+  let editIndex  = null;
+  let editList   = null;
+  let editId     = null;
+  let modalTags  = [];
+
+  let dbPage    = 0;
+  let dbLimit   = 50;
+  let dbTotal   = 0;
+  let dbFilter  = 'all';
+  let dbSearch  = '';
+  let dbRows    = [];
+  let dbSearchTimer = null;
+
+  // ── Mode toggle ───────────────────────────────────────────────────────────
+  function setMode(m) {
+    mode = m;
+    document.getElementById('upload-mode').classList.toggle('hidden', m !== 'upload');
+    document.getElementById('db-mode').classList.toggle('hidden', m !== 'db');
+    document.getElementById('mode-upload').classList.toggle('active', m === 'upload');
+    document.getElementById('mode-db').classList.toggle('active', m === 'db');
+    if (m === 'db') loadDb();
+  }
+
+  // ── DB mode ───────────────────────────────────────────────────────────────
+  async function loadDb() {
+    document.getElementById('db-loading').classList.remove('hidden');
+    document.getElementById('db-table').classList.add('hidden');
+    document.getElementById('db-empty-msg').classList.add('hidden');
+
+    const params = new URLSearchParams({
+      page: dbPage, limit: dbLimit, filter: dbFilter,
+      ...(dbSearch ? { search: dbSearch } : {}),
+    });
+    try {
+      const res  = await fetch(`/api/get-leads?${params}`);
+      const json = await res.json();
+      dbRows  = json.data || [];
+      dbTotal = json.total || 0;
+    } catch (e) {
+      dbRows = []; dbTotal = 0;
+    }
+
+    document.getElementById('db-loading').classList.add('hidden');
+    renderDbTable();
+    updateDbPagination();
+  }
+
+  function renderDbTable() {
+    const tbody = document.getElementById('db-table-body');
+    const empty = document.getElementById('db-empty-msg');
+    const table = document.getElementById('db-table');
+    if (!dbRows.length) { table.classList.add('hidden'); empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+    table.classList.remove('hidden');
+    const offset = dbPage * dbLimit;
+    tbody.innerHTML = dbRows.map((r, i) => {
+      const tags    = (r.tags || []).map(t => `<span class="row-tag">${t}</span>`).join('') || '<span style="color:var(--text-dim);font-size:11px">—</span>';
+      const smtp    = r.smtp_checked ? (r.smtp_valid ? '<span class="badge valid">OK</span>' : '<span class="badge invalid">Fail</span>') : '<span class="badge unchecked">—</span>';
+      return `<tr>
+        <td style="color:var(--text-dim)">${offset + i + 1}</td>
+        <td>${r.email}</td>
+        <td style="color:var(--text-sub)">${[r.first_name, r.last_name].filter(Boolean).join(' ') || '—'}</td>
+        <td>${tags}</td>
+        <td>${smtp}</td>
+        <td><button class="edit-btn" onclick="openDbEdit(${i})">✎</button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function updateDbPagination() {
+    const start = dbPage * dbLimit + 1;
+    const end   = Math.min((dbPage + 1) * dbLimit, dbTotal);
+    document.getElementById('db-count-label').textContent = dbTotal ? `${start}–${end} of ${dbTotal}` : '0 contacts';
+    document.getElementById('db-prev').disabled = dbPage === 0;
+    document.getElementById('db-next').disabled = (dbPage + 1) * dbLimit >= dbTotal;
+  }
+
+  function dbChangePage(dir) {
+    dbPage = Math.max(0, dbPage + dir);
+    loadDb();
+  }
+
+  function setDbFilter(f) {
+    dbFilter = f; dbPage = 0;
+    ['all','valid','invalid'].forEach(t => {
+      const el = document.getElementById('db-tab-' + t);
+      el.className = 'tab' + (t === f ? ` active-${t}` : '');
+    });
+    loadDb();
+  }
+
+  function dbSearchDebounce() {
+    clearTimeout(dbSearchTimer);
+    dbSearchTimer = setTimeout(() => {
+      dbSearch = document.getElementById('db-search').value.trim();
+      dbPage   = 0;
+      loadDb();
+    }, 400);
+  }
+
+  function openDbEdit(i) {
+    const r = dbRows[i];
+    editId    = r.id;
+    editIndex = i;
+    editList  = null;
+    modalTags = [...(r.tags || [])];
+    document.getElementById('edit-email').value = r.email      || '';
+    document.getElementById('edit-first').value = r.first_name || '';
+    document.getElementById('edit-last').value  = r.last_name  || '';
+    document.getElementById('edit-phone').value = r.phone      || '';
+    document.getElementById('save-indicator').classList.add('hidden');
+    renderModalTags();
+    document.getElementById('modal').classList.remove('hidden');
+  }
 
   // ── Batch tag input ───────────────────────────────────────────────────────
   document.getElementById('batch-tag-input').addEventListener('keydown', e => {
     if ((e.key === 'Enter' || e.key === ',') && e.target.value.trim()) {
-      e.preventDefault();
-      addBatchTag(e.target.value.trim().replace(/,$/, ''));
-      e.target.value = '';
+      e.preventDefault(); addBatchTag(e.target.value.trim().replace(/,$/, '')); e.target.value = '';
     } else if (e.key === 'Backspace' && !e.target.value && batchTags.length) {
       removeBatchTag(batchTags.length - 1);
     }
   });
-
-  function addBatchTag(tag) {
-    if (!tag || batchTags.includes(tag)) return;
-    batchTags.push(tag);
-    renderBatchTags();
-  }
-
-  function removeBatchTag(i) {
-    batchTags.splice(i, 1);
-    renderBatchTags();
-  }
-
+  function addBatchTag(tag) { if (!tag || batchTags.includes(tag)) return; batchTags.push(tag); renderBatchTags(); }
+  function removeBatchTag(i) { batchTags.splice(i, 1); renderBatchTags(); }
   function renderBatchTags() {
     const container = document.getElementById('batch-tag-chips');
-    const input = document.getElementById('batch-tag-input');
+    const input     = document.getElementById('batch-tag-input');
     container.innerHTML = '';
     batchTags.forEach((t, i) => {
-      const chip = document.createElement('span');
-      chip.className = 'chip';
+      const chip = document.createElement('span'); chip.className = 'chip';
       chip.innerHTML = `${t}<button onclick="removeBatchTag(${i})">×</button>`;
       container.appendChild(chip);
     });
-    container.appendChild(input);
-    input.focus();
+    container.appendChild(input); input.focus();
   }
 
   // ── Modal tag input ───────────────────────────────────────────────────────
   document.getElementById('modal-tag-input').addEventListener('keydown', e => {
     if ((e.key === 'Enter' || e.key === ',') && e.target.value.trim()) {
-      e.preventDefault();
-      addModalTag(e.target.value.trim().replace(/,$/, ''));
-      e.target.value = '';
+      e.preventDefault(); addModalTag(e.target.value.trim().replace(/,$/, '')); e.target.value = '';
     } else if (e.key === 'Backspace' && !e.target.value && modalTags.length) {
       removeModalTag(modalTags.length - 1);
     }
   });
-
-  function addModalTag(tag) {
-    if (!tag || modalTags.includes(tag)) return;
-    modalTags.push(tag);
-    renderModalTags();
-  }
-
-  function removeModalTag(i) {
-    modalTags.splice(i, 1);
-    renderModalTags();
-  }
-
+  function addModalTag(tag) { if (!tag || modalTags.includes(tag)) return; modalTags.push(tag); renderModalTags(); }
+  function removeModalTag(i) { modalTags.splice(i, 1); renderModalTags(); }
   function renderModalTags() {
     const container = document.getElementById('modal-tag-chips');
-    const input = document.getElementById('modal-tag-input');
+    const input     = document.getElementById('modal-tag-input');
     container.innerHTML = '';
     modalTags.forEach((t, i) => {
-      const chip = document.createElement('span');
-      chip.className = 'chip';
+      const chip = document.createElement('span'); chip.className = 'chip';
       chip.innerHTML = `${t}<button onclick="removeModalTag(${i})">×</button>`;
       container.appendChild(chip);
     });
@@ -290,23 +433,19 @@
   dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) processFile(f); });
   fileInput.addEventListener('change', e => { if (e.target.files[0]) processFile(e.target.files[0]); });
 
-  function processFile(file) {
-    const reader = new FileReader();
-    reader.onload = e => parseCSV(e.target.result);
-    reader.readAsText(file);
-  }
+  function processFile(file) { const r = new FileReader(); r.onload = e => parseCSV(e.target.result); r.readAsText(file); }
 
   function parseCSV(text) {
     const lines = text.split(/\r?\n/).filter(l => l.trim());
     if (!lines.length) return alert('File is empty.');
-    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
+    const headers  = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
     const emailCol = headers.findIndex(h => h === 'email');
     if (emailCol === -1) return alert('No "Email" column found.');
     const firstCol = headers.findIndex(h => h.includes('first'));
     const lastCol  = headers.findIndex(h => h.includes('last'));
     const phoneCol = headers.findIndex(h => h.includes('phone'));
     const seen = new Set();
-    data = { valid: [], invalid: [], dupes: [] };
+    uploadData = { valid: [], invalid: [], dupes: [] };
     for (let i = 1; i < lines.length; i++) {
       const cols = splitCSVLine(lines[i]);
       const raw  = (cols[emailCol] || '').trim().replace(/^"|"$/g, '').toLowerCase();
@@ -316,150 +455,160 @@
         first_name: firstCol >= 0 ? (cols[firstCol] || '').trim().replace(/^"|"$/g, '') : '',
         last_name:  lastCol  >= 0 ? (cols[lastCol]  || '').trim().replace(/^"|"$/g, '') : '',
         phone:      phoneCol >= 0 ? (cols[phoneCol] || '').trim().replace(/^"|"$/g, '') : '',
-        tags:       [],
+        tags: [],
       };
-      if (seen.has(raw)) { data.dupes.push(record); }
-      else { seen.add(raw); isValidEmail(raw) ? data.valid.push(record) : data.invalid.push(record); }
+      if (seen.has(raw)) { uploadData.dupes.push(record); }
+      else { seen.add(raw); isValidEmail(raw) ? uploadData.valid.push(record) : uploadData.invalid.push(record); }
     }
-    document.getElementById('stat-total').textContent = data.valid.length + data.invalid.length + data.dupes.length;
-    document.getElementById('stat-valid').textContent = data.valid.length;
-    document.getElementById('stat-dupes').textContent = data.dupes.length;
-    document.getElementById('stat-invalid').textContent = data.invalid.length;
+    document.getElementById('stat-total').textContent = uploadData.valid.length + uploadData.invalid.length + uploadData.dupes.length;
+    document.getElementById('stat-valid').textContent   = uploadData.valid.length;
+    document.getElementById('stat-dupes').textContent   = uploadData.dupes.length;
+    document.getElementById('stat-invalid').textContent = uploadData.invalid.length;
     document.getElementById('tag-panel').classList.remove('hidden');
     document.getElementById('stats').classList.remove('hidden');
-    document.getElementById('results-card').classList.remove('hidden');
+    document.getElementById('upload-results-card').classList.remove('hidden');
     document.getElementById('actions').classList.remove('hidden');
     document.getElementById('drop-zone').classList.add('hidden');
-    switchTab('valid');
+    switchUploadTab('valid');
   }
 
   function splitCSVLine(line) {
-    const result = []; let cur = '', inQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"') { inQuotes = !inQuotes; }
-      else if (ch === ',' && !inQuotes) { result.push(cur); cur = ''; }
+    const result = []; let cur = '', inQ = false;
+    for (const ch of line) {
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
       else { cur += ch; }
     }
-    result.push(cur);
-    return result;
+    result.push(cur); return result;
   }
 
-  function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
-  }
+  function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e); }
 
-  // ── Table ─────────────────────────────────────────────────────────────────
-  function switchTab(tab) {
-    currentTab = tab;
-    document.getElementById('search-input').value = '';
-    ['valid', 'invalid', 'dupes'].forEach(t => {
+  // ── Upload table ──────────────────────────────────────────────────────────
+  function switchUploadTab(tab) {
+    currentUploadTab = tab;
+    document.getElementById('upload-search').value = '';
+    ['valid','invalid','dupes'].forEach(t => {
       const el = document.getElementById('tab-' + t);
-      el.className = 'tab';
-      if (t === tab) el.classList.add('active-' + (t === 'dupes' ? 'dupes' : t));
+      el.className = 'tab' + (t === tab ? ` active-${t}` : '');
     });
-    renderTable();
+    renderUploadTable();
   }
 
-  function renderTable() {
-    const query = document.getElementById('search-input').value.toLowerCase();
-    const list  = data[currentTab];
+  function renderUploadTable() {
+    const query = document.getElementById('upload-search').value.toLowerCase();
+    const list  = uploadData[currentUploadTab];
     const rows  = list.filter(r => r.email.includes(query));
-    const tbody = document.getElementById('table-body');
-    const empty = document.getElementById('empty-msg');
+    const tbody = document.getElementById('upload-table-body');
+    const empty = document.getElementById('upload-empty-msg');
     if (!rows.length) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
     empty.classList.add('hidden');
-    const badgeClass = currentTab === 'valid' ? 'valid' : currentTab === 'invalid' ? 'invalid' : 'dupe';
-    const badgeLabel = currentTab === 'valid' ? 'Valid' : currentTab === 'invalid' ? 'Invalid' : 'Duplicate';
+    const bc = currentUploadTab === 'valid' ? 'valid' : currentUploadTab === 'invalid' ? 'invalid' : 'dupe';
+    const bl = currentUploadTab === 'valid' ? 'Valid' : currentUploadTab === 'invalid' ? 'Invalid' : 'Duplicate';
     tbody.innerHTML = rows.map((r, i) => {
-      const allTags = [...new Set([...batchTags, ...(r.tags || [])])];
+      const allTags = [...new Set([...batchTags, ...(r.tags||[])])];
       const tagHtml = allTags.map(t => `<span class="row-tag">${t}</span>`).join('') || '<span style="color:var(--text-dim);font-size:11px">—</span>';
       const realIdx = list.indexOf(r);
       return `<tr>
-        <td style="color:var(--text-dim)">${i + 1}</td>
+        <td style="color:var(--text-dim)">${i+1}</td>
         <td>${r.email}</td>
-        <td style="color:var(--text-sub)">${[r.first_name, r.last_name].filter(Boolean).join(' ') || '—'}</td>
+        <td style="color:var(--text-sub)">${[r.first_name,r.last_name].filter(Boolean).join(' ')||'—'}</td>
         <td>${tagHtml}</td>
-        <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
-        <td><button class="edit-btn" onclick="openEdit('${currentTab}', ${realIdx})">✎</button></td>
+        <td><span class="badge ${bc}">${bl}</span></td>
+        <td><button class="edit-btn" onclick="openUploadEdit('${currentUploadTab}',${realIdx})">✎</button></td>
       </tr>`;
     }).join('');
   }
 
-  // ── Edit modal ────────────────────────────────────────────────────────────
-  function openEdit(tab, idx) {
-    const r = data[tab][idx];
+  function openUploadEdit(tab, idx) {
+    const r = uploadData[tab][idx];
+    editId    = null;
     editIndex = idx;
     editList  = tab;
-    modalTags = [...(r.tags || [])];
+    modalTags = [...(r.tags||[])];
     document.getElementById('edit-email').value = r.email;
     document.getElementById('edit-first').value = r.first_name;
     document.getElementById('edit-last').value  = r.last_name;
     document.getElementById('edit-phone').value = r.phone;
+    document.getElementById('save-indicator').classList.add('hidden');
     renderModalTags();
     document.getElementById('modal').classList.remove('hidden');
   }
 
-  function closeModal() {
-    document.getElementById('modal').classList.add('hidden');
-    editIndex = null; editList = null;
+  // ── Edit modal save ───────────────────────────────────────────────────────
+  function closeModal() { document.getElementById('modal').classList.add('hidden'); editIndex = null; editList = null; editId = null; }
+
+  async function saveEdit() {
+    const email      = document.getElementById('edit-email').value.trim().toLowerCase();
+    const first_name = document.getElementById('edit-first').value.trim();
+    const last_name  = document.getElementById('edit-last').value.trim();
+    const phone      = document.getElementById('edit-phone').value.trim();
+    const tags       = [...modalTags];
+    const btn        = document.getElementById('modal-save-btn');
+
+    if (editId) {
+      // DB mode — save to Supabase
+      btn.disabled = true; btn.textContent = 'Saving...';
+      try {
+        const res = await fetch('/api/update-lead', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: editId, email, first_name, last_name, phone, tags }),
+        });
+        if (res.ok) {
+          dbRows[editIndex] = { ...dbRows[editIndex], email, first_name, last_name, phone, tags };
+          renderDbTable();
+          document.getElementById('save-indicator').classList.remove('hidden');
+          setTimeout(() => closeModal(), 800);
+        } else {
+          alert('Save failed. Please try again.');
+        }
+      } catch (e) { alert('Save failed.'); }
+      btn.disabled = false; btn.textContent = 'Save';
+    } else {
+      // Upload mode — update local data
+      const r = uploadData[editList][editIndex];
+      r.email = email; r.first_name = first_name; r.last_name = last_name; r.phone = phone; r.tags = tags;
+      closeModal();
+      renderUploadTable();
+    }
   }
 
-  function saveEdit() {
-    if (editIndex === null) return;
-    const r = data[editList][editIndex];
-    r.email      = document.getElementById('edit-email').value.trim().toLowerCase();
-    r.first_name = document.getElementById('edit-first').value.trim();
-    r.last_name  = document.getElementById('edit-last').value.trim();
-    r.phone      = document.getElementById('edit-phone').value.trim();
-    r.tags       = [...modalTags];
-    closeModal();
-    renderTable();
-  }
-
-  document.getElementById('modal').addEventListener('click', e => {
-    if (e.target === document.getElementById('modal')) closeModal();
-  });
+  document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
 
   // ── Download ──────────────────────────────────────────────────────────────
   function downloadCSV() {
-    const rows = data.valid.map(r => {
-      const tags = [...new Set([...batchTags, ...(r.tags || [])])].join('|');
+    const rows = uploadData.valid.map(r => {
+      const tags = [...new Set([...batchTags,...(r.tags||[])])].join('|');
       return `${r.email},${r.first_name},${r.last_name},${r.phone},${tags}`;
     });
     const csv  = 'email,first_name,last_name,phone,tags\n' + rows.join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const a    = document.createElement('a');
-    a.href     = URL.createObjectURL(blob);
-    a.download = 'clean-leads.csv';
-    a.click();
+    a.href = URL.createObjectURL(blob); a.download = 'clean-leads.csv'; a.click();
   }
 
   // ── Push to Supabase ──────────────────────────────────────────────────────
   async function pushToSupabase() {
-    if (!data.valid.length) { alert('No valid emails to push.'); return; }
+    if (!uploadData.valid.length) { alert('No valid emails to push.'); return; }
     document.getElementById('push-status').classList.remove('hidden');
     document.getElementById('push-btn').disabled = true;
     document.getElementById('push-spinner').style.display = 'block';
 
     const BATCH = 50;
     let inserted = 0, skipped = 0, errors = 0;
-    const total = data.valid.length;
+    const total = uploadData.valid.length;
 
     for (let i = 0; i < total; i += BATCH) {
-      const batch = data.valid.slice(i, i + BATCH).map(r => ({
-        email:         r.email      || null,
-        first_name:    r.first_name || null,
-        last_name:     r.last_name  || null,
-        phone:         r.phone      || null,
-        email_valid:   true,
-        email_checked: true,
-        tags:          [...new Set([...batchTags, ...(r.tags || [])])],
+      const batch = uploadData.valid.slice(i, i + BATCH).map(r => ({
+        email: r.email||null, first_name: r.first_name||null,
+        last_name: r.last_name||null, phone: r.phone||null,
+        email_valid: true, email_checked: true,
+        tags: [...new Set([...batchTags,...(r.tags||[])])],
       }));
       try {
         const res = await fetch('/api/push-leads', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ records: batch }),
         });
         if (res.ok) { inserted += batch.length; }
@@ -468,10 +617,9 @@
           (res.status === 409 || err?.code === '23505') ? skipped += batch.length : errors += batch.length;
         }
       } catch (e) { console.error(e); errors += batch.length; }
-
-      const pct = Math.round(((i + BATCH) / total) * 100);
-      document.getElementById('progress-bar').style.width = Math.min(pct, 100) + '%';
-      document.getElementById('push-text').textContent = `Pushing... ${Math.min(i + BATCH, total)} of ${total}`;
+      const pct = Math.round(((i+BATCH)/total)*100);
+      document.getElementById('progress-bar').style.width = Math.min(pct,100)+'%';
+      document.getElementById('push-text').textContent = `Pushing... ${Math.min(i+BATCH,total)} of ${total}`;
     }
 
     document.getElementById('push-spinner').style.display = 'none';
@@ -480,22 +628,22 @@
       document.getElementById('push-text').textContent = `✓ Done — ${inserted} pushed, ${skipped} skipped (already in DB)`;
       document.getElementById('push-text').className = 'status-text success';
     } else {
-      document.getElementById('push-text').textContent = `⚠ Done — ${inserted} pushed, ${skipped} skipped, ${errors} errors. Check console.`;
+      document.getElementById('push-text').textContent = `⚠ Done — ${inserted} pushed, ${skipped} skipped, ${errors} errors.`;
       document.getElementById('push-text').className = 'status-text error';
     }
     document.getElementById('push-btn').disabled = false;
   }
 
-  // ── Reset ─────────────────────────────────────────────────────────────────
-  function reset() {
-    data = { valid: [], invalid: [], dupes: [] };
-    batchTags = []; currentTab = 'valid';
+  // ── Reset upload ──────────────────────────────────────────────────────────
+  function resetUpload() {
+    uploadData = { valid:[], invalid:[], dupes:[] };
+    batchTags = []; currentUploadTab = 'valid';
     fileInput.value = '';
     renderBatchTags();
     document.getElementById('drop-zone').classList.remove('hidden');
     document.getElementById('tag-panel').classList.add('hidden');
     document.getElementById('stats').classList.add('hidden');
-    document.getElementById('results-card').classList.add('hidden');
+    document.getElementById('upload-results-card').classList.add('hidden');
     document.getElementById('actions').classList.add('hidden');
     document.getElementById('push-status').classList.add('hidden');
     document.getElementById('push-text').textContent = 'Pushing to Supabase...';
