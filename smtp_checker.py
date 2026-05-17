@@ -20,7 +20,7 @@ TABLE          = os.getenv("SUPABASE_TABLE", "clean_leads")
 INTERVAL_HOURS = float(os.getenv("INTERVAL_HOURS", "24"))
 BATCH_SIZE     = int(os.getenv("BATCH_SIZE", "50"))
 REACHER_URL    = os.getenv("REACHER_URL", "https://backend-production-d43c8.up.railway.app")
-REACHER_SECRET = os.getenv("REACHER_SECRET", "bluvalences2024")
+REACHER_SECRET = os.getenv("RCH_HEADER_SECRET", "blubalences2024")
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
