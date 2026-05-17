@@ -12,6 +12,8 @@
     { "source": "/staff", "destination": "/staff.html" },
     { "source": "/find-work", "destination": "/find-work.html" },
     { "source": "/crm", "destination": "/crm.html" },
+    { "source": "/email-cleaner", "destination": "/email-cleaner.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
+
