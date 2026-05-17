@@ -17,5 +17,3 @@
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
-
-formatter.html
