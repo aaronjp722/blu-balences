@@ -58,7 +58,7 @@ def fetch_batch(offset: int) -> list[dict]:
     resp = (
         supabase.table(TABLE)
         .select("id, email")
-        .eq("smtp_checked", False)
+        .eq("smtp_checked", "false")
         .range(offset, offset + BATCH_SIZE - 1)
         .execute()
     )
