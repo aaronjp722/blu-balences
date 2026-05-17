@@ -68,14 +68,12 @@
     .search-row input:focus { border-color: var(--green); }
     .search-row input::placeholder { color: var(--text-dim); }
 
-    /* Tag filter row */
     .tag-filter-row { display: flex; gap: 10px; padding: 8px 20px; border-bottom: 1px solid var(--border); align-items: center; }
     .tag-filter-label { font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
     .tag-filter-chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-height: 32px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 4px 10px; cursor: text; align-items: center; transition: border-color 0.2s; }
     .tag-filter-chips:focus-within { border-color: var(--purple); }
     .tag-filter-chips .tag-text-input { font-size: 12px; min-width: 100px; }
 
-    /* Bulk bar */
     .bulk-bar { display: flex; align-items: center; gap: 10px; padding: 10px 20px; background: rgba(139,92,246,0.08); border-bottom: 1px solid rgba(139,92,246,0.2); flex-wrap: wrap; }
     .bulk-label { font-size: 13px; font-weight: 600; color: #a78bfa; white-space: nowrap; }
     .select-all-banner { font-size: 12px; color: var(--text-sub); white-space: nowrap; }
@@ -112,7 +110,6 @@
     .del-btn:hover { color: var(--red); }
     .empty { padding: 32px; text-align: center; color: var(--text-dim); font-size: 13px; }
 
-    /* Pagination */
     .pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-sub); flex-wrap: wrap; gap: 8px; }
     .page-btns { display: flex; gap: 6px; align-items: center; }
     .page-btn { padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text-sub); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
@@ -120,7 +117,6 @@
     .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
     .db-loading { padding: 32px; text-align: center; color: var(--text-dim); font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
-    /* Modal */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .modal { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 24px; width: 100%; max-width: 440px; }
     .modal h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
@@ -137,14 +133,12 @@
     .btn-sm-outline { background: transparent; border: 1px solid var(--border); color: var(--text-sub); }
     .btn-sm-outline:hover { background: rgba(255,255,255,0.05); color: var(--white); }
 
-    /* Confirm modal */
     .confirm-modal { background: var(--card-bg); border: 1px solid rgba(239,68,68,0.3); border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; }
     .confirm-modal h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; color: var(--white); }
     .confirm-modal p { font-size: 13px; color: var(--text-sub); margin-bottom: 20px; }
     .btn-sm-red { background: var(--red); color: var(--white); }
     .btn-sm-red:hover { background: #dc2626; }
 
-    /* Actions / push */
     .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
     .btn { padding: 12px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
     .btn-green { background: var(--green); color: var(--white); }
@@ -247,7 +241,7 @@
         <h2 id="db-title">All Contacts</h2>
         <div class="results-header-right">
           <div class="tab-row">
-            <div class="tab active-all"  id="db-tab-all"     onclick="setDbFilter('all')">All</div>
+            <div class="tab active-all"  id="db-tab-all"          onclick="setDbFilter('all')">All</div>
             <div class="tab"             id="db-tab-smtp_valid"   onclick="setDbFilter('smtp_valid')">SMTP Valid</div>
             <div class="tab"             id="db-tab-smtp_invalid" onclick="setDbFilter('smtp_invalid')">SMTP Invalid</div>
           </div>
@@ -259,7 +253,6 @@
         <input type="text" id="db-search" placeholder="Search by email or name..." oninput="dbSearchDebounce()">
       </div>
 
-      <!-- Tag filter row -->
       <div class="tag-filter-row">
         <span class="tag-filter-label">Tags</span>
         <div class="tag-filter-chips" id="tag-filter-chips">
@@ -267,7 +260,6 @@
         </div>
       </div>
 
-      <!-- Bulk bar -->
       <div class="bulk-bar hidden" id="bulk-bar">
         <span class="bulk-label" id="bulk-label">0 selected</span>
         <span class="select-all-banner hidden" id="sel-banner"></span>
@@ -450,7 +442,6 @@ function updateDbPagination() {
 function dbChangePage(dir) { dbPage = Math.max(0, dbPage + dir); loadDb(); }
 
 // ── SMTP Filter ────────────────────────────────────────────────────────────
-// Sends 'all', 'smtp_valid', or 'smtp_invalid' to the API
 function setDbFilter(f) {
   dbFilter = f; dbPage = 0;
   const tabs = ['all', 'smtp_valid', 'smtp_invalid'];
