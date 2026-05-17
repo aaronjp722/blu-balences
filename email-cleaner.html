@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blu Balence | Email Cleaner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0a1628;
+      --card-bg: #111827;
+      --green: #22c55e; --green-hover: #16a34a; --green-glow: rgba(34,197,94,0.2);
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --blue: #3b82f6;
+      --text: #e5e7eb; --text-sub: #9ca3af; --text-dim: #6b7280;
+      --border: rgba(255,255,255,0.1); --white: #ffffff;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--navy); color: var(--text); min-height: 100vh; padding: 40px 20px; -webkit-font-smoothing: antialiased; }
+    .wrap { width: 100%; max-width: 720px; margin: 0 auto; }
+    .logo { font-size: 20px; font-weight: 800; color: var(--white); letter-spacing: -0.5px; text-align: center; margin-bottom: 32px; display: block; text-decoration: none; }
+    .logo span { color: var(--green); }
+    h1 { font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+    .sub { font-size: 14px; color: var(--text-sub); margin-bottom: 28px; }
+
+    /* Settings Panel */
+    .settings-bar { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; }
+    .settings-toggle { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+    .settings-toggle span { font-size: 13px; font-weight: 600; color: var(--text-sub); display: flex; align-items: center; gap: 8px; }
+    .settings-toggle .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+    .settings-toggle .dot.connected { background: var(--green); }
+    .settings-toggle .arrow { font-size: 10px; color: var(--text-dim); transition: transform 0.2s; }
+    .settings-toggle .arrow.open { transform: rotate(180deg); }
+    .settings-body { margin-top: 16px; display: none; }
+    .settings-body.open { display: block; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    @media (max-width: 540px) { .field-row { grid-template-columns: 1fr; } }
+    .field label { font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; display: block; margin-bottom: 6px; }
+    .field input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; color: var(--white); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
+    .field input:focus { border-color: var(--green); }
+    .field input::placeholder { color: var(--text-dim); }
+    .save-btn { padding: 9px 18px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 8px; color: var(--green); font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .save-btn:hover { background: rgba(34,197,94,0.2); }
+
+    .drop-zone { border: 2px dashed rgba(255,255,255,0.15); border-radius: 16px; padding: 48px 32px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: rgba(255,255,255,0.02); margin-bottom: 24px; }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--green); background: rgba(34,197,94,0.04); }
+    .drop-icon { font-size: 40px; margin-bottom: 12px; }
+    .drop-zone p { font-size: 15px; color: var(--text-sub); margin-bottom: 6px; }
+    .drop-zone span { font-size: 12px; color: var(--text-dim); }
+    #file-input { display: none; }
+    .browse-btn { display: inline-block; margin-top: 14px; padding: 9px 20px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 8px; color: var(--green); font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .browse-btn:hover { background: rgba(34,197,94,0.2); }
+
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+    @media (max-width: 540px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+    .stat-card .num { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+    .stat-card .label { font-size: 11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.7px; }
+    .num.green { color: var(--green); } .num.red { color: var(--red); } .num.yellow { color: var(--yellow); } .num.white { color: var(--white); }
+
+    .results-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+    .results-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
+    .results-header h2 { font-size: 14px; font-weight: 600; color: var(--white); }
+    .tab-row { display: flex; gap: 6px; }
+    .tab { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; color: var(--text-sub); }
+    .tab.active-valid { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: var(--green); }
+    .tab.active-invalid { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: var(--red); }
+    .tab.active-dupes { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); color: var(--yellow); }
+    .tab:not(.active-valid):not(.active-invalid):not(.active-dupes):hover { background: rgba(255,255,255,0.05); color: var(--text); }
+    .search-bar { padding: 10px 20px; border-bottom: 1px solid var(--border); }
+    .search-bar input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; color: var(--white); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
+    .search-bar input:focus { border-color: var(--green); }
+    .search-bar input::placeholder { color: var(--text-dim); }
+    .table-wrap { max-height: 340px; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 20px; font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; background: rgba(255,255,255,0.02); position: sticky; top: 0; border-bottom: 1px solid var(--border); }
+    td { padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .badge.valid { background: rgba(34,197,94,0.1); color: var(--green); }
+    .badge.invalid { background: rgba(239,68,68,0.1); color: var(--red); }
+    .badge.dupe { background: rgba(245,158,11,0.1); color: var(--yellow); }
+    .empty { padding: 32px; text-align: center; color: var(--text-dim); font-size: 13px; }
+
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .btn { padding: 12px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+    .btn-green { background: var(--green); color: var(--white); }
+    .btn-green:hover { background: var(--green-hover); }
+    .btn-blue { background: var(--blue); color: var(--white); }
+    .btn-blue:hover { background: #2563eb; }
+    .btn-blue:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-sub); }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+
+    /* Push status */
+    .push-status { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; font-size: 13px; }
+    .push-status .status-row { display: flex; align-items: center; gap: 10px; }
+    .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.1); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status-text { color: var(--text-sub); }
+    .status-text.success { color: var(--green); }
+    .status-text.error { color: var(--red); }
+    .progress-bar-wrap { margin-top: 10px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; height: 4px; }
+    .progress-bar { height: 100%; background: var(--blue); border-radius: 4px; transition: width 0.3s; }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a href="/" class="logo">Blu <span>Balence</span></a>
+  <h1>Email Cleaner</h1>
+  <p class="sub">Upload a CSV — duplicates and invalid emails are removed, then push clean leads straight to Supabase.</p>
+
+  <!-- Settings -->
+  <div class="settings-bar">
+    <div class="settings-toggle" onclick="toggleSettings()">
+      <span><div class="dot" id="conn-dot"></div> Supabase Connection</span>
+      <span class="arrow" id="settings-arrow">▼</span>
+    </div>
+    <div class="settings-body" id="settings-body">
+      <div class="field-row">
+        <div class="field">
+          <label>Supabase URL</label>
+          <input type="text" id="sb-url" placeholder="https://xxxx.supabase.co">
+        </div>
+        <div class="field">
+          <label>Supabase Secret Key</label>
+          <input type="password" id="sb-key" placeholder="sb_secret_...">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Table Name</label>
+          <input type="text" id="sb-table" placeholder="clean_leads" value="clean_leads">
+        </div>
+      </div>
+      <button class="save-btn" onclick="saveSettings()">Save Credentials</button>
+    </div>
+  </div>
+
+  <!-- Drop Zone -->
+  <div class="drop-zone" id="drop-zone">
+    <div class="drop-icon">📋</div>
+    <p>Drag & drop your CSV here</p>
+    <span>Columns: Email, First Name, Last Name, Phone</span><br>
+    <label class="browse-btn" for="file-input">Browse File</label>
+    <input type="file" id="file-input" accept=".csv">
+  </div>
+
+  <!-- Stats -->
+  <div class="stats hidden" id="stats">
+    <div class="stat-card"><div class="num white" id="stat-total">0</div><div class="label">Total Rows</div></div>
+    <div class="stat-card"><div class="num green" id="stat-valid">0</div><div class="label">Valid</div></div>
+    <div class="stat-card"><div class="num yellow" id="stat-dupes">0</div><div class="label">Duplicates</div></div>
+    <div class="stat-card"><div class="num red" id="stat-invalid">0</div><div class="label">Invalid</div></div>
+  </div>
+
+  <!-- Results -->
+  <div class="results-card hidden" id="results-card">
+    <div class="results-header">
+      <h2>Results</h2>
+      <div class="tab-row">
+        <div class="tab active-valid" id="tab-valid" onclick="switchTab('valid')">Valid</div>
+        <div class="tab" id="tab-invalid" onclick="switchTab('invalid')">Invalid</div>
+        <div class="tab" id="tab-dupes" onclick="switchTab('dupes')">Duplicates</div>
+      </div>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search..." oninput="renderTable()">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Email</th><th>Name</th><th>Phone</th><th>Status</th></tr></thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <div class="empty hidden" id="empty-msg">No emails in this category.</div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions hidden" id="actions">
+    <button class="btn btn-green" onclick="downloadCSV()">⬇ Download Clean CSV</button>
+    <button class="btn btn-blue" id="push-btn" onclick="pushToSupabase()">☁ Push to Supabase</button>
+    <button class="btn btn-outline" onclick="reset()">Upload New File</button>
+  </div>
+
+  <!-- Push Status -->
+  <div class="push-status hidden" id="push-status">
+    <div class="status-row">
+      <div class="spinner" id="push-spinner"></div>
+      <div class="status-text" id="push-text">Pushing to Supabase...</div>
+    </div>
+    <div class="progress-bar-wrap" id="progress-wrap">
+      <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let currentTab = 'valid';
+  // Each record: { email, first_name, last_name, phone }
+  let data = { valid: [], invalid: [], dupes: [] };
+  let settingsOpen = false;
+
+  // ── Settings ──────────────────────────────────────────────────────────────
+  function loadSettings() {
+    const url   = localStorage.getItem('sb_url') || '';
+    const key   = localStorage.getItem('sb_key') || '';
+    const table = localStorage.getItem('sb_table') || 'clean_leads';
+    document.getElementById('sb-url').value   = url;
+    document.getElementById('sb-key').value   = key;
+    document.getElementById('sb-table').value = table;
+    updateDot(url && key);
+  }
+
+  function saveSettings() {
+    const url   = document.getElementById('sb-url').value.trim();
+    const key   = document.getElementById('sb-key').value.trim();
+    const table = document.getElementById('sb-table').value.trim() || 'clean_leads';
+    localStorage.setItem('sb_url', url);
+    localStorage.setItem('sb_key', key);
+    localStorage.setItem('sb_table', table);
+    updateDot(url && key);
+    toggleSettings();
+    alert('Credentials saved.');
+  }
+
+  function updateDot(connected) {
+    const dot = document.getElementById('conn-dot');
+    dot.className = 'dot' + (connected ? ' connected' : '');
+  }
+
+  function toggleSettings() {
+    settingsOpen = !settingsOpen;
+    document.getElementById('settings-body').className = 'settings-body' + (settingsOpen ? ' open' : '');
+    document.getElementById('settings-arrow').className = 'arrow' + (settingsOpen ? ' open' : '');
+  }
+
+  // ── File handling ─────────────────────────────────────────────────────────
+  const dropZone  = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) processFile(f); });
+  fileInput.addEventListener('change', e => { if (e.target.files[0]) processFile(e.target.files[0]); });
+
+  function processFile(file) {
+    const reader = new FileReader();
+    reader.onload = e => parseCSV(e.target.result);
+    reader.readAsText(file);
+  }
+
+  function parseCSV(text) {
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    if (!lines.length) return alert('File is empty.');
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
+
+    const emailCol = headers.findIndex(h => h === 'email');
+    if (emailCol === -1) return alert('No "Email" column found.');
+
+    const firstCol = headers.findIndex(h => h.includes('first'));
+    const lastCol  = headers.findIndex(h => h.includes('last'));
+    const phoneCol = headers.findIndex(h => h.includes('phone'));
+
+    const seen = new Set();
+    data = { valid: [], invalid: [], dupes: [] };
+
+    for (let i = 1; i < lines.length; i++) {
+      const cols = splitCSVLine(lines[i]);
+      const raw  = (cols[emailCol] || '').trim().replace(/^"|"$/g, '').toLowerCase();
+      if (!raw) continue;
+
+      const record = {
+        email:      raw,
+        first_name: firstCol >= 0 ? (cols[firstCol] || '').trim().replace(/^"|"$/g, '') : '',
+        last_name:  lastCol  >= 0 ? (cols[lastCol]  || '').trim().replace(/^"|"$/g, '') : '',
+        phone:      phoneCol >= 0 ? (cols[phoneCol] || '').trim().replace(/^"|"$/g, '') : '',
+      };
+
+      if (seen.has(raw)) {
+        data.dupes.push(record);
+      } else {
+        seen.add(raw);
+        isValidEmail(raw) ? data.valid.push(record) : data.invalid.push(record);
+      }
+    }
+
+    const total = data.valid.length + data.invalid.length + data.dupes.length;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-valid').textContent = data.valid.length;
+    document.getElementById('stat-dupes').textContent = data.dupes.length;
+    document.getElementById('stat-invalid').textContent = data.invalid.length;
+    document.getElementById('stats').classList.remove('hidden');
+    document.getElementById('results-card').classList.remove('hidden');
+    document.getElementById('actions').classList.remove('hidden');
+    document.getElementById('drop-zone').classList.add('hidden');
+    switchTab('valid');
+  }
+
+  function splitCSVLine(line) {
+    const result = []; let cur = '', inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQuotes = !inQuotes; }
+      else if (ch === ',' && !inQuotes) { result.push(cur); cur = ''; }
+      else { cur += ch; }
+    }
+    result.push(cur);
+    return result;
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  }
+
+  // ── Table ─────────────────────────────────────────────────────────────────
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('search-input').value = '';
+    ['valid', 'invalid', 'dupes'].forEach(t => {
+      const el = document.getElementById('tab-' + t);
+      el.className = 'tab';
+      if (t === tab) el.classList.add('active-' + (t === 'dupes' ? 'dupes' : t));
+    });
+    renderTable();
+  }
+
+  function renderTable() {
+    const query = document.getElementById('search-input').value.toLowerCase();
+    const rows  = data[currentTab].filter(r => r.email.includes(query));
+    const tbody = document.getElementById('table-body');
+    const empty = document.getElementById('empty-msg');
+    if (!rows.length) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+    const badgeClass = currentTab === 'valid' ? 'valid' : currentTab === 'invalid' ? 'invalid' : 'dupe';
+    const badgeLabel = currentTab === 'valid' ? 'Valid' : currentTab === 'invalid' ? 'Invalid' : 'Duplicate';
+    tbody.innerHTML = rows.map((r, i) => `
+      <tr>
+        <td style="color:var(--text-dim)">${i + 1}</td>
+        <td>${r.email}</td>
+        <td style="color:var(--text-sub)">${[r.first_name, r.last_name].filter(Boolean).join(' ') || '—'}</td>
+        <td style="color:var(--text-sub)">${r.phone || '—'}</td>
+        <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
+      </tr>`).join('');
+  }
+
+  // ── Download ──────────────────────────────────────────────────────────────
+  function downloadCSV() {
+    const rows = data.valid.map(r => `${r.email},${r.first_name},${r.last_name},${r.phone}`);
+    const csv  = 'email,first_name,last_name,phone\n' + rows.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a    = document.createElement('a');
+    a.href     = URL.createObjectURL(blob);
+    a.download = 'clean-leads.csv';
+    a.click();
+  }
+
+  // ── Push to Supabase ──────────────────────────────────────────────────────
+  async function pushToSupabase() {
+    const url   = localStorage.getItem('sb_url');
+    const key   = localStorage.getItem('sb_key');
+    const table = localStorage.getItem('sb_table') || 'clean_leads';
+
+    if (!url || !key) {
+      alert('Add your Supabase credentials in the settings panel first.');
+      toggleSettings();
+      return;
+    }
+    if (!data.valid.length) {
+      alert('No valid emails to push.');
+      return;
+    }
+
+    document.getElementById('push-status').classList.remove('hidden');
+    document.getElementById('push-btn').disabled = true;
+    document.getElementById('push-spinner').style.display = 'block';
+
+    const BATCH = 50;
+    let inserted = 0;
+    let skipped  = 0;
+    let errors   = 0;
+    const total  = data.valid.length;
+
+    for (let i = 0; i < total; i += BATCH) {
+      const batch = data.valid.slice(i, i + BATCH).map(r => ({
+        email:      r.email      || null,
+        first_name: r.first_name || null,
+        last_name:  r.last_name  || null,
+        phone:      r.phone      || null,
+        email_valid: true,
+        email_checked: true,
+      }));
+
+      try {
+        const res = await fetch(`${url}/rest/v1/${table}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': key,
+            'Authorization': `Bearer ${key}`,
+            'Prefer': 'resolution=ignore-duplicates,return=minimal',
+          },
+          body: JSON.stringify(batch),
+        });
+
+        if (res.ok) {
+          inserted += batch.length;
+        } else {
+          const err = await res.json();
+          console.error('Batch error:', err);
+          // If duplicate conflict, count as skipped
+          if (res.status === 409 || (err.code === '23505')) {
+            skipped += batch.length;
+          } else {
+            errors += batch.length;
+          }
+        }
+      } catch (e) {
+        console.error(e);
+        errors += batch.length;
+      }
+
+      const pct = Math.round(((i + BATCH) / total) * 100);
+      document.getElementById('progress-bar').style.width = Math.min(pct, 100) + '%';
+      document.getElementById('push-text').textContent = `Pushing... ${Math.min(i + BATCH, total)} of ${total}`;
+    }
+
+    document.getElementById('push-spinner').style.display = 'none';
+    document.getElementById('progress-bar').style.width = '100%';
+
+    if (errors === 0) {
+      document.getElementById('push-text').textContent = `✓ Done — ${inserted} pushed, ${skipped} skipped (already in DB)`;
+      document.getElementById('push-text').className = 'status-text success';
+    } else {
+      document.getElementById('push-text').textContent = `⚠ Done — ${inserted} pushed, ${skipped} skipped, ${errors} errors. Check console.`;
+      document.getElementById('push-text').className = 'status-text error';
+    }
+
+    document.getElementById('push-btn').disabled = false;
+  }
+
+  // ── Reset ─────────────────────────────────────────────────────────────────
+  function reset() {
+    data = { valid: [], invalid: [], dupes: [] };
+    currentTab = 'valid';
+    fileInput.value = '';
+    document.getElementById('drop-zone').classList.remove('hidden');
+    document.getElementById('stats').classList.add('hidden');
+    document.getElementById('results-card').classList.add('hidden');
+    document.getElementById('actions').classList.add('hidden');
+    document.getElementById('push-status').classList.add('hidden');
+    document.getElementById('push-text').textContent = 'Pushing to Supabase...';
+    document.getElementById('push-text').className = 'status-text';
+    document.getElementById('progress-bar').style.width = '0%';
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  loadSettings();
+</script>
+</body>
+</html>
