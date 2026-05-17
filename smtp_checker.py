@@ -29,7 +29,7 @@ HEADERS = {
     "Authorization": REACHER_SECRET,
 }
 
-REACHABLE = {"safe", "risky"}
+REACHABLE = {"safe", "risky", "unknown"}
 
 
 def verify_email(email: str) -> tuple[bool, str]:
