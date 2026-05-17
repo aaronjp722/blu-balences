@@ -15,18 +15,16 @@
       --border: rgba(255,255,255,0.1); --white: #ffffff;
     }
     body { font-family: 'Inter', sans-serif; background: var(--navy); color: var(--text); min-height: 100vh; padding: 40px 20px; -webkit-font-smoothing: antialiased; }
-    .wrap { width: 100%; max-width: 760px; margin: 0 auto; }
+    .wrap { width: 100%; max-width: 820px; margin: 0 auto; }
     .logo { font-size: 20px; font-weight: 800; color: var(--white); letter-spacing: -0.5px; text-align: center; margin-bottom: 32px; display: block; text-decoration: none; }
     .logo span { color: var(--green); }
     h1 { font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
     .sub { font-size: 14px; color: var(--text-sub); margin-bottom: 24px; }
 
-    /* Mode toggle */
     .mode-toggle { display: flex; gap: 8px; margin-bottom: 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 4px; }
     .mode-btn { flex: 1; padding: 10px; border-radius: 7px; border: none; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; color: var(--text-sub); background: transparent; }
     .mode-btn.active { background: rgba(255,255,255,0.08); color: var(--white); }
 
-    /* Drop zone */
     .drop-zone { border: 2px dashed rgba(255,255,255,0.15); border-radius: 16px; padding: 48px 32px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: rgba(255,255,255,0.02); margin-bottom: 24px; }
     .drop-zone:hover, .drop-zone.drag-over { border-color: var(--green); background: rgba(34,197,94,0.04); }
     .drop-icon { font-size: 40px; margin-bottom: 12px; }
@@ -36,7 +34,6 @@
     .browse-btn { display: inline-block; margin-top: 14px; padding: 9px 20px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 8px; color: var(--green); font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
     .browse-btn:hover { background: rgba(34,197,94,0.2); }
 
-    /* Tag panel */
     .tag-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; }
     .tag-panel label { font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; display: block; margin-bottom: 10px; }
     .tag-chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-height: 36px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: text; }
@@ -44,10 +41,9 @@
     .chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); color: #a78bfa; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 600; }
     .chip button { background: none; border: none; color: #a78bfa; cursor: pointer; font-size: 14px; line-height: 1; padding: 0; opacity: 0.7; }
     .chip button:hover { opacity: 1; }
-    .tag-text-input { background: none; border: none; outline: none; color: var(--white); font-family: 'Inter', sans-serif; font-size: 13px; min-width: 120px; flex: 1; }
+    .tag-text-input { background: none; border: none; outline: none; color: var(--white); font-family: 'Inter', sans-serif; font-size: 13px; min-width: 100px; flex: 1; }
     .tag-text-input::placeholder { color: var(--text-dim); }
 
-    /* Stats */
     .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
     @media (max-width: 540px) { .stats { grid-template-columns: repeat(2, 1fr); } }
     .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
@@ -55,7 +51,6 @@
     .stat-card .label { font-size: 11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.7px; }
     .num.green { color: var(--green); } .num.red { color: var(--red); } .num.yellow { color: var(--yellow); } .num.white { color: var(--white); }
 
-    /* Results card */
     .results-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
     .results-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
     .results-header h2 { font-size: 14px; font-weight: 600; color: var(--white); }
@@ -70,12 +65,26 @@
     .search-row input { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; color: var(--white); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
     .search-row input:focus { border-color: var(--green); }
     .search-row input::placeholder { color: var(--text-dim); }
+
+    /* Bulk action bar */
+    .bulk-bar { display: flex; align-items: center; gap: 12px; padding: 10px 20px; background: rgba(139,92,246,0.08); border-bottom: 1px solid rgba(139,92,246,0.2); flex-wrap: wrap; }
+    .bulk-label { font-size: 13px; font-weight: 600; color: #a78bfa; white-space: nowrap; }
+    .bulk-tag-chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-height: 32px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 4px 10px; cursor: text; min-width: 160px; }
+    .bulk-tag-chips:focus-within { border-color: var(--purple); }
+    .btn-purple { padding: 7px 14px; background: rgba(139,92,246,0.2); border: 1px solid rgba(139,92,246,0.4); border-radius: 7px; color: #a78bfa; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+    .btn-purple:hover { background: rgba(139,92,246,0.3); }
+    .btn-purple:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-clear-sel { padding: 7px 12px; background: transparent; border: 1px solid var(--border); border-radius: 7px; color: var(--text-dim); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .btn-clear-sel:hover { color: var(--white); }
+
     .table-wrap { max-height: 420px; overflow-y: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th { text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; background: rgba(255,255,255,0.02); position: sticky; top: 0; border-bottom: 1px solid var(--border); }
-    td { padding: 8px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); vertical-align: middle; }
+    th { text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; background: rgba(255,255,255,0.02); position: sticky; top: 0; border-bottom: 1px solid var(--border); }
+    td { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: rgba(255,255,255,0.02); }
+    tr.selected td { background: rgba(139,92,246,0.06); }
+    input[type=checkbox] { accent-color: var(--purple); width: 14px; height: 14px; cursor: pointer; }
     .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
     .badge.valid { background: rgba(34,197,94,0.1); color: var(--green); }
     .badge.invalid { background: rgba(239,68,68,0.1); color: var(--red); }
@@ -92,7 +101,6 @@
     .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
     .db-loading { padding: 32px; text-align: center; color: var(--text-dim); font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
-    /* Modal */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .modal { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 24px; width: 100%; max-width: 440px; }
     .modal h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
@@ -102,7 +110,7 @@
     .modal-field input:focus { border-color: var(--green); }
     .modal-tags { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; display: flex; flex-wrap: wrap; gap: 6px; min-height: 40px; cursor: text; }
     .modal-tags:focus-within { border-color: var(--green); }
-    .modal-footer { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+    .modal-footer { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; align-items: center; }
     .btn-sm { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
     .btn-sm-green { background: var(--green); color: var(--white); }
     .btn-sm-green:hover { background: var(--green-hover); }
@@ -128,7 +136,7 @@
     .progress-bar-wrap { margin-top: 10px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; height: 4px; }
     .progress-bar { height: 100%; background: var(--blue); border-radius: 4px; transition: width 0.3s; }
     .hidden { display: none; }
-    .save-indicator { font-size: 12px; color: var(--green); margin-left: 8px; }
+    .save-indicator { font-size: 12px; color: var(--green); }
   </style>
 </head>
 <body>
@@ -137,7 +145,6 @@
   <h1>Email Cleaner</h1>
   <p class="sub">Upload a CSV to clean and push leads, or browse and edit existing contacts in your database.</p>
 
-  <!-- Mode toggle -->
   <div class="mode-toggle">
     <button class="mode-btn active" id="mode-upload" onclick="setMode('upload')">⬆ Upload CSV</button>
     <button class="mode-btn" id="mode-db" onclick="setMode('db')">🗄 View Database</button>
@@ -219,10 +226,26 @@
       <div class="search-row">
         <input type="text" id="db-search" placeholder="Search by email..." oninput="dbSearchDebounce()">
       </div>
+
+      <!-- Bulk action bar (visible when rows selected) -->
+      <div class="bulk-bar hidden" id="bulk-bar">
+        <span class="bulk-label" id="bulk-label">0 selected</span>
+        <div class="bulk-tag-chips" id="bulk-tag-chips" onclick="document.getElementById('bulk-tag-input').focus()">
+          <input class="tag-text-input" id="bulk-tag-input" placeholder="Add tags to selected...">
+        </div>
+        <button class="btn-purple" id="bulk-apply-btn" onclick="applyBulkTags()">Apply Tags</button>
+        <button class="btn-clear-sel" onclick="clearSelection()">✕ Clear</button>
+      </div>
+
       <div class="table-wrap" id="db-table-wrap">
         <div class="db-loading" id="db-loading"><div class="spinner"></div> Loading...</div>
         <table id="db-table" class="hidden">
-          <thead><tr><th>#</th><th>Email</th><th>Name</th><th>Tags</th><th>SMTP</th><th></th></tr></thead>
+          <thead>
+            <tr>
+              <th style="width:32px"><input type="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)"></th>
+              <th>#</th><th>Email</th><th>Name</th><th>Tags</th><th>SMTP</th><th></th>
+            </tr>
+          </thead>
           <tbody id="db-table-body"></tbody>
         </table>
         <div class="empty hidden" id="db-empty-msg">No contacts found.</div>
@@ -261,25 +284,18 @@
 </div>
 
 <script>
-  // ── State ─────────────────────────────────────────────────────────────────
   let mode = 'upload';
   let currentUploadTab = 'valid';
   let uploadData = { valid: [], invalid: [], dupes: [] };
-  let batchTags  = [];
-  let editIndex  = null;
-  let editList   = null;
-  let editId     = null;
-  let modalTags  = [];
-
-  let dbPage    = 0;
-  let dbLimit   = 50;
-  let dbTotal   = 0;
-  let dbFilter  = 'all';
-  let dbSearch  = '';
-  let dbRows    = [];
+  let batchTags = [];
+  let editIndex = null, editList = null, editId = null;
+  let modalTags = [];
+  let dbPage = 0, dbLimit = 50, dbTotal = 0, dbFilter = 'all', dbSearch = '', dbRows = [];
   let dbSearchTimer = null;
+  let selectedIds = new Set();
+  let bulkTags = [];
 
-  // ── Mode toggle ───────────────────────────────────────────────────────────
+  // ── Mode ──────────────────────────────────────────────────────────────────
   function setMode(m) {
     mode = m;
     document.getElementById('upload-mode').classList.toggle('hidden', m !== 'upload');
@@ -289,25 +305,19 @@
     if (m === 'db') loadDb();
   }
 
-  // ── DB mode ───────────────────────────────────────────────────────────────
+  // ── DB load & render ──────────────────────────────────────────────────────
   async function loadDb() {
     document.getElementById('db-loading').classList.remove('hidden');
     document.getElementById('db-table').classList.add('hidden');
     document.getElementById('db-empty-msg').classList.add('hidden');
-
-    const params = new URLSearchParams({
-      page: dbPage, limit: dbLimit, filter: dbFilter,
-      ...(dbSearch ? { search: dbSearch } : {}),
-    });
+    const params = new URLSearchParams({ page: dbPage, limit: dbLimit, filter: dbFilter, ...(dbSearch ? { search: dbSearch } : {}) });
     try {
-      const res  = await fetch(`/api/get-leads?${params}`);
+      const res = await fetch(`/api/get-leads?${params}`);
       const json = await res.json();
-      dbRows  = json.data || [];
-      dbTotal = json.total || 0;
-    } catch (e) {
-      dbRows = []; dbTotal = 0;
-    }
-
+      dbRows = json.data || []; dbTotal = json.total || 0;
+    } catch { dbRows = []; dbTotal = 0; }
+    selectedIds.clear();
+    updateBulkBar();
     document.getElementById('db-loading').classList.add('hidden');
     renderDbTable();
     updateDbPagination();
@@ -318,13 +328,15 @@
     const empty = document.getElementById('db-empty-msg');
     const table = document.getElementById('db-table');
     if (!dbRows.length) { table.classList.add('hidden'); empty.classList.remove('hidden'); return; }
-    empty.classList.add('hidden');
-    table.classList.remove('hidden');
+    empty.classList.add('hidden'); table.classList.remove('hidden');
     const offset = dbPage * dbLimit;
     tbody.innerHTML = dbRows.map((r, i) => {
-      const tags    = (r.tags || []).map(t => `<span class="row-tag">${t}</span>`).join('') || '<span style="color:var(--text-dim);font-size:11px">—</span>';
-      const smtp    = r.smtp_checked ? (r.smtp_valid ? '<span class="badge valid">OK</span>' : '<span class="badge invalid">Fail</span>') : '<span class="badge unchecked">—</span>';
-      return `<tr>
+      const tags = (r.tags || []).map(t => `<span class="row-tag">${t}</span>`).join('') || '<span style="color:var(--text-dim);font-size:11px">—</span>';
+      const smtp = r.smtp_checked ? (r.smtp_valid ? '<span class="badge valid">OK</span>' : '<span class="badge invalid">Fail</span>') : '<span class="badge unchecked">—</span>';
+      const chk  = selectedIds.has(r.id) ? 'checked' : '';
+      const sel  = selectedIds.has(r.id) ? 'selected' : '';
+      return `<tr class="${sel}" id="row-${r.id}">
+        <td><input type="checkbox" ${chk} onchange="toggleRow(${r.id}, this.checked)"></td>
         <td style="color:var(--text-dim)">${offset + i + 1}</td>
         <td>${r.email}</td>
         <td style="color:var(--text-sub)">${[r.first_name, r.last_name].filter(Boolean).join(' ') || '—'}</td>
@@ -333,6 +345,7 @@
         <td><button class="edit-btn" onclick="openDbEdit(${i})">✎</button></td>
       </tr>`;
     }).join('');
+    document.getElementById('select-all').checked = dbRows.length > 0 && dbRows.every(r => selectedIds.has(r.id));
   }
 
   function updateDbPagination() {
@@ -343,34 +356,113 @@
     document.getElementById('db-next').disabled = (dbPage + 1) * dbLimit >= dbTotal;
   }
 
-  function dbChangePage(dir) {
-    dbPage = Math.max(0, dbPage + dir);
-    loadDb();
-  }
+  function dbChangePage(dir) { dbPage = Math.max(0, dbPage + dir); loadDb(); }
 
   function setDbFilter(f) {
     dbFilter = f; dbPage = 0;
     ['all','valid','invalid'].forEach(t => {
-      const el = document.getElementById('db-tab-' + t);
-      el.className = 'tab' + (t === f ? ` active-${t}` : '');
+      document.getElementById('db-tab-' + t).className = 'tab' + (t === f ? ` active-${t}` : '');
     });
     loadDb();
   }
 
   function dbSearchDebounce() {
     clearTimeout(dbSearchTimer);
-    dbSearchTimer = setTimeout(() => {
-      dbSearch = document.getElementById('db-search').value.trim();
-      dbPage   = 0;
-      loadDb();
-    }, 400);
+    dbSearchTimer = setTimeout(() => { dbSearch = document.getElementById('db-search').value.trim(); dbPage = 0; loadDb(); }, 400);
   }
 
+  // ── Selection ─────────────────────────────────────────────────────────────
+  function toggleRow(id, checked) {
+    checked ? selectedIds.add(id) : selectedIds.delete(id);
+    const row = document.getElementById('row-' + id);
+    if (row) row.className = checked ? 'selected' : '';
+    document.getElementById('select-all').checked = dbRows.length > 0 && dbRows.every(r => selectedIds.has(r.id));
+    updateBulkBar();
+  }
+
+  function toggleSelectAll(checked) {
+    dbRows.forEach(r => { checked ? selectedIds.add(r.id) : selectedIds.delete(r.id); });
+    renderDbTable();
+    updateBulkBar();
+  }
+
+  function clearSelection() {
+    selectedIds.clear();
+    bulkTags = [];
+    renderDbTable();
+    updateBulkBar();
+    renderBulkTags();
+  }
+
+  function updateBulkBar() {
+    const n = selectedIds.size;
+    document.getElementById('bulk-bar').classList.toggle('hidden', n === 0);
+    document.getElementById('bulk-label').textContent = `${n} selected`;
+  }
+
+  // ── Bulk tags ─────────────────────────────────────────────────────────────
+  document.getElementById('bulk-tag-input').addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ',') && e.target.value.trim()) {
+      e.preventDefault(); addBulkTag(e.target.value.trim().replace(/,$/, '')); e.target.value = '';
+    } else if (e.key === 'Backspace' && !e.target.value && bulkTags.length) {
+      bulkTags.pop(); renderBulkTags();
+    }
+  });
+
+  function addBulkTag(tag) { if (!tag || bulkTags.includes(tag)) return; bulkTags.push(tag); renderBulkTags(); }
+
+  function renderBulkTags() {
+    const container = document.getElementById('bulk-tag-chips');
+    const input     = document.getElementById('bulk-tag-input');
+    container.innerHTML = '';
+    bulkTags.forEach((t, i) => {
+      const chip = document.createElement('span'); chip.className = 'chip';
+      chip.innerHTML = `${t}<button onclick="bulkTags.splice(${i},1);renderBulkTags()">×</button>`;
+      container.appendChild(chip);
+    });
+    container.appendChild(input);
+  }
+
+  async function applyBulkTags() {
+    if (!bulkTags.length) { alert('Type at least one tag first.'); return; }
+    if (!selectedIds.size) return;
+
+    const btn = document.getElementById('bulk-apply-btn');
+    btn.disabled = true; btn.textContent = 'Applying...';
+
+    const updates = [...selectedIds].map(id => {
+      const row = dbRows.find(r => r.id === id);
+      const existing = row ? (row.tags || []) : [];
+      return { id, tags: [...new Set([...existing, ...bulkTags])] };
+    });
+
+    try {
+      const res = await fetch('/api/bulk-tag-leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ updates }),
+      });
+      const json = await res.json();
+      // Update local dbRows
+      updates.forEach(u => {
+        const row = dbRows.find(r => r.id === u.id);
+        if (row) row.tags = u.tags;
+      });
+      renderDbTable();
+      bulkTags = [];
+      renderBulkTags();
+      btn.textContent = `✓ Applied to ${json.ok}`;
+      setTimeout(() => { btn.textContent = 'Apply Tags'; btn.disabled = false; }, 1500);
+    } catch {
+      alert('Failed to apply tags.');
+      btn.textContent = 'Apply Tags'; btn.disabled = false;
+    }
+  }
+
+  // ── Individual DB edit ────────────────────────────────────────────────────
   function openDbEdit(i) {
     const r = dbRows[i];
-    editId    = r.id;
-    editIndex = i;
-    editList  = null;
+    editId = r.id; editIndex = i; editList = null;
     modalTags = [...(r.tags || [])];
     document.getElementById('edit-email').value = r.email      || '';
     document.getElementById('edit-first').value = r.first_name || '';
@@ -381,7 +473,7 @@
     document.getElementById('modal').classList.remove('hidden');
   }
 
-  // ── Batch tag input ───────────────────────────────────────────────────────
+  // ── Batch tag input (upload mode) ─────────────────────────────────────────
   document.getElementById('batch-tag-input').addEventListener('keydown', e => {
     if ((e.key === 'Enter' || e.key === ',') && e.target.value.trim()) {
       e.preventDefault(); addBatchTag(e.target.value.trim().replace(/,$/, '')); e.target.value = '';
@@ -432,7 +524,6 @@
   dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
   dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) processFile(f); });
   fileInput.addEventListener('change', e => { if (e.target.files[0]) processFile(e.target.files[0]); });
-
   function processFile(file) { const r = new FileReader(); r.onload = e => parseCSV(e.target.result); r.readAsText(file); }
 
   function parseCSV(text) {
@@ -460,7 +551,7 @@
       if (seen.has(raw)) { uploadData.dupes.push(record); }
       else { seen.add(raw); isValidEmail(raw) ? uploadData.valid.push(record) : uploadData.invalid.push(record); }
     }
-    document.getElementById('stat-total').textContent = uploadData.valid.length + uploadData.invalid.length + uploadData.dupes.length;
+    document.getElementById('stat-total').textContent   = uploadData.valid.length + uploadData.invalid.length + uploadData.dupes.length;
     document.getElementById('stat-valid').textContent   = uploadData.valid.length;
     document.getElementById('stat-dupes').textContent   = uploadData.dupes.length;
     document.getElementById('stat-invalid').textContent = uploadData.invalid.length;
@@ -489,8 +580,7 @@
     currentUploadTab = tab;
     document.getElementById('upload-search').value = '';
     ['valid','invalid','dupes'].forEach(t => {
-      const el = document.getElementById('tab-' + t);
-      el.className = 'tab' + (t === tab ? ` active-${t}` : '');
+      document.getElementById('tab-' + t).className = 'tab' + (t === tab ? ` active-${t}` : '');
     });
     renderUploadTable();
   }
@@ -522,9 +612,7 @@
 
   function openUploadEdit(tab, idx) {
     const r = uploadData[tab][idx];
-    editId    = null;
-    editIndex = idx;
-    editList  = tab;
+    editId = null; editIndex = idx; editList = tab;
     modalTags = [...(r.tags||[])];
     document.getElementById('edit-email').value = r.email;
     document.getElementById('edit-first').value = r.first_name;
@@ -535,11 +623,11 @@
     document.getElementById('modal').classList.remove('hidden');
   }
 
-  // ── Edit modal save ───────────────────────────────────────────────────────
+  // ── Modal save ────────────────────────────────────────────────────────────
   function closeModal() { document.getElementById('modal').classList.add('hidden'); editIndex = null; editList = null; editId = null; }
 
   async function saveEdit() {
-    const email      = document.getElementById('edit-email').value.trim().toLowerCase();
+    const email = document.getElementById('edit-email').value.trim().toLowerCase();
     const first_name = document.getElementById('edit-first').value.trim();
     const last_name  = document.getElementById('edit-last').value.trim();
     const phone      = document.getElementById('edit-phone').value.trim();
@@ -547,7 +635,6 @@
     const btn        = document.getElementById('modal-save-btn');
 
     if (editId) {
-      // DB mode — save to Supabase
       btn.disabled = true; btn.textContent = 'Saving...';
       try {
         const res = await fetch('/api/update-lead', {
@@ -560,17 +647,13 @@
           renderDbTable();
           document.getElementById('save-indicator').classList.remove('hidden');
           setTimeout(() => closeModal(), 800);
-        } else {
-          alert('Save failed. Please try again.');
-        }
-      } catch (e) { alert('Save failed.'); }
+        } else { alert('Save failed.'); }
+      } catch { alert('Save failed.'); }
       btn.disabled = false; btn.textContent = 'Save';
     } else {
-      // Upload mode — update local data
       const r = uploadData[editList][editIndex];
       r.email = email; r.first_name = first_name; r.last_name = last_name; r.phone = phone; r.tags = tags;
-      closeModal();
-      renderUploadTable();
+      closeModal(); renderUploadTable();
     }
   }
 
@@ -582,70 +665,52 @@
       const tags = [...new Set([...batchTags,...(r.tags||[])])].join('|');
       return `${r.email},${r.first_name},${r.last_name},${r.phone},${tags}`;
     });
-    const csv  = 'email,first_name,last_name,phone,tags\n' + rows.join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const a    = document.createElement('a');
+    const blob = new Blob(['email,first_name,last_name,phone,tags\n' + rows.join('\n')], { type: 'text/csv' });
+    const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = 'clean-leads.csv'; a.click();
   }
 
-  // ── Push to Supabase ──────────────────────────────────────────────────────
+  // ── Push ──────────────────────────────────────────────────────────────────
   async function pushToSupabase() {
     if (!uploadData.valid.length) { alert('No valid emails to push.'); return; }
     document.getElementById('push-status').classList.remove('hidden');
     document.getElementById('push-btn').disabled = true;
     document.getElementById('push-spinner').style.display = 'block';
-
-    const BATCH = 50;
-    let inserted = 0, skipped = 0, errors = 0;
+    const BATCH = 50; let inserted = 0, skipped = 0, errors = 0;
     const total = uploadData.valid.length;
-
     for (let i = 0; i < total; i += BATCH) {
       const batch = uploadData.valid.slice(i, i + BATCH).map(r => ({
-        email: r.email||null, first_name: r.first_name||null,
-        last_name: r.last_name||null, phone: r.phone||null,
+        email: r.email||null, first_name: r.first_name||null, last_name: r.last_name||null, phone: r.phone||null,
         email_valid: true, email_checked: true,
         tags: [...new Set([...batchTags,...(r.tags||[])])],
       }));
       try {
-        const res = await fetch('/api/push-leads', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ records: batch }),
-        });
+        const res = await fetch('/api/push-leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ records: batch }) });
         if (res.ok) { inserted += batch.length; }
         else {
           const err = await res.json().catch(() => ({}));
           (res.status === 409 || err?.code === '23505') ? skipped += batch.length : errors += batch.length;
         }
-      } catch (e) { console.error(e); errors += batch.length; }
-      const pct = Math.round(((i+BATCH)/total)*100);
-      document.getElementById('progress-bar').style.width = Math.min(pct,100)+'%';
+      } catch { errors += batch.length; }
+      document.getElementById('progress-bar').style.width = Math.min(Math.round(((i+BATCH)/total)*100), 100) + '%';
       document.getElementById('push-text').textContent = `Pushing... ${Math.min(i+BATCH,total)} of ${total}`;
     }
-
     document.getElementById('push-spinner').style.display = 'none';
     document.getElementById('progress-bar').style.width = '100%';
-    if (errors === 0) {
-      document.getElementById('push-text').textContent = `✓ Done — ${inserted} pushed, ${skipped} skipped (already in DB)`;
-      document.getElementById('push-text').className = 'status-text success';
-    } else {
-      document.getElementById('push-text').textContent = `⚠ Done — ${inserted} pushed, ${skipped} skipped, ${errors} errors.`;
-      document.getElementById('push-text').className = 'status-text error';
-    }
+    document.getElementById('push-text').textContent = errors === 0
+      ? `✓ Done — ${inserted} pushed, ${skipped} skipped (already in DB)`
+      : `⚠ Done — ${inserted} pushed, ${skipped} skipped, ${errors} errors.`;
+    document.getElementById('push-text').className = 'status-text ' + (errors === 0 ? 'success' : 'error');
     document.getElementById('push-btn').disabled = false;
   }
 
-  // ── Reset upload ──────────────────────────────────────────────────────────
+  // ── Reset ─────────────────────────────────────────────────────────────────
   function resetUpload() {
-    uploadData = { valid:[], invalid:[], dupes:[] };
-    batchTags = []; currentUploadTab = 'valid';
-    fileInput.value = '';
-    renderBatchTags();
-    document.getElementById('drop-zone').classList.remove('hidden');
-    document.getElementById('tag-panel').classList.add('hidden');
-    document.getElementById('stats').classList.add('hidden');
-    document.getElementById('upload-results-card').classList.add('hidden');
-    document.getElementById('actions').classList.add('hidden');
-    document.getElementById('push-status').classList.add('hidden');
+    uploadData = { valid:[], invalid:[], dupes:[] }; batchTags = []; currentUploadTab = 'valid';
+    fileInput.value = ''; renderBatchTags();
+    ['drop-zone','tag-panel','stats','upload-results-card','actions','push-status'].forEach(id => {
+      document.getElementById(id).classList.toggle('hidden', id !== 'drop-zone');
+    });
     document.getElementById('push-text').textContent = 'Pushing to Supabase...';
     document.getElementById('push-text').className = 'status-text';
     document.getElementById('progress-bar').style.width = '0%';
