@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blu Balence | Listmonk Formatter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0a1628;
+      --card-bg: #111827;
+      --green: #22c55e; --green-hover: #16a34a;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --blue: #3b82f6;
+      --text: #e5e7eb; --text-sub: #9ca3af; --text-dim: #6b7280;
+      --border: rgba(255,255,255,0.1); --white: #ffffff;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--navy); color: var(--text); min-height: 100vh; padding: 40px 20px; -webkit-font-smoothing: antialiased; }
+    .wrap { width: 100%; max-width: 680px; margin: 0 auto; }
+    .logo { font-size: 20px; font-weight: 800; color: var(--white); letter-spacing: -0.5px; text-align: center; margin-bottom: 8px; display: block; text-decoration: none; }
+    .logo span { color: var(--green); }
+    .tagline { text-align: center; font-size: 13px; color: var(--text-dim); margin-bottom: 36px; }
+
+    h1 { font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+    .sub { font-size: 14px; color: var(--text-sub); margin-bottom: 28px; }
+
+    /* Steps */
+    .steps { display: flex; gap: 0; margin-bottom: 32px; }
+    .step { flex: 1; text-align: center; position: relative; }
+    .step:not(:last-child)::after { content: ''; position: absolute; top: 14px; left: 60%; width: 80%; height: 1px; background: var(--border); }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--text-dim); margin: 0 auto 8px; position: relative; z-index: 1; transition: all 0.3s; }
+    .step.active .step-num { background: var(--green); border-color: var(--green); color: var(--white); }
+    .step.done .step-num { background: rgba(34,197,94,0.2); border-color: rgba(34,197,94,0.4); color: var(--green); }
+    .step-label { font-size: 11px; color: var(--text-dim); font-weight: 500; }
+    .step.active .step-label { color: var(--green); }
+
+    .drop-zone { border: 2px dashed rgba(255,255,255,0.15); border-radius: 16px; padding: 48px 32px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: rgba(255,255,255,0.02); margin-bottom: 24px; }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--green); background: rgba(34,197,94,0.04); }
+    .drop-icon { font-size: 36px; margin-bottom: 12px; }
+    .drop-zone p { font-size: 15px; color: var(--text-sub); margin-bottom: 4px; }
+    .drop-zone span { font-size: 12px; color: var(--text-dim); }
+    #file-input { display: none; }
+    .browse-btn { display: inline-block; margin-top: 14px; padding: 9px 20px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 8px; color: var(--green); font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .browse-btn:hover { background: rgba(34,197,94,0.2); }
+
+    /* Column mapper */
+    .mapper-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+    .mapper-card h2 { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+    .mapper-card p { font-size: 13px; color: var(--text-sub); margin-bottom: 20px; }
+    .mapper-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 500px) { .mapper-grid { grid-template-columns: 1fr; } }
+    .map-field label { font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; display: block; margin-bottom: 6px; }
+    .map-field select { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; color: var(--white); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+    .map-field select:focus { border-color: var(--green); }
+    .map-field select option { background: #1f2937; }
+
+    /* Preview */
+    .preview-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+    .preview-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .preview-header h2 { font-size: 14px; font-weight: 600; color: var(--white); }
+    .preview-header span { font-size: 12px; color: var(--text-dim); }
+    .table-wrap { max-height: 280px; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 9px 20px; font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; background: rgba(255,255,255,0.02); position: sticky; top: 0; border-bottom: 1px solid var(--border); }
+    td { padding: 9px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn { padding: 12px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-green { background: var(--green); color: var(--white); }
+    .btn-green:hover { background: var(--green-hover); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-sub); }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+
+    .info-box { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 10px; padding: 14px 18px; font-size: 13px; color: #93c5fd; margin-bottom: 20px; line-height: 1.6; }
+    .info-box strong { color: var(--white); }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a href="/" class="logo">Blu <span>Balence</span></a>
+  <div class="tagline">Listmonk CSV Formatter</div>
+
+  <h1>Format for Listmonk</h1>
+  <p class="sub">Upload your clean CSV and map the columns — outputs a Listmonk-ready file instantly.</p>
+
+  <div class="info-box">
+    <strong>Listmonk requires:</strong> an <code>email</code> column and a <code>name</code> column. This tool combines your first + last name columns and outputs the correct format.
+  </div>
+
+  <!-- Steps -->
+  <div class="steps">
+    <div class="step active" id="step-1"><div class="step-num">1</div><div class="step-label">Upload CSV</div></div>
+    <div class="step" id="step-2"><div class="step-num">2</div><div class="step-label">Map Columns</div></div>
+    <div class="step" id="step-3"><div class="step-num">3</div><div class="step-label">Preview & Download</div></div>
+  </div>
+
+  <!-- Step 1: Upload -->
+  <div id="section-upload">
+    <div class="drop-zone" id="drop-zone">
+      <div class="drop-icon">📄</div>
+      <p>Drag & drop your clean CSV here</p>
+      <span>Any CSV with email, name, or phone columns</span><br>
+      <label class="browse-btn" for="file-input">Browse File</label>
+      <input type="file" id="file-input" accept=".csv">
+    </div>
+  </div>
+
+  <!-- Step 2: Map Columns -->
+  <div class="mapper-card hidden" id="section-mapper">
+    <h2>Map Your Columns</h2>
+    <p>Tell us which column in your CSV maps to each field.</p>
+    <div class="mapper-grid">
+      <div class="map-field">
+        <label>Email Column *</label>
+        <select id="col-email"></select>
+      </div>
+      <div class="map-field">
+        <label>First Name Column</label>
+        <select id="col-first"></select>
+      </div>
+      <div class="map-field">
+        <label>Last Name Column</label>
+        <select id="col-last"></select>
+      </div>
+      <div class="map-field">
+        <label>Phone (saved as attribute)</label>
+        <select id="col-phone"></select>
+      </div>
+    </div>
+    <br>
+    <button class="btn btn-green" onclick="buildPreview()">Preview →</button>
+  </div>
+
+  <!-- Step 3: Preview & Download -->
+  <div class="hidden" id="section-preview">
+    <div class="preview-card">
+      <div class="preview-header">
+        <h2>Preview (first 10 rows)</h2>
+        <span id="preview-count"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>email</th><th>name</th><th>phone</th></tr></thead>
+          <tbody id="preview-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-green" onclick="downloadFormatted()">⬇ Download Listmonk CSV</button>
+      <button class="btn btn-outline" onclick="reset()">Start Over</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let headers  = [];
+  let rows     = [];
+  let formatted = [];
+
+  const dropZone  = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) processFile(f); });
+  fileInput.addEventListener('change', e => { if (e.target.files[0]) processFile(e.target.files[0]); });
+
+  function processFile(file) {
+    const reader = new FileReader();
+    reader.onload = e => parseCSV(e.target.result);
+    reader.readAsText(file);
+  }
+
+  function parseCSV(text) {
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    if (!lines.length) return alert('File is empty.');
+    headers = splitLine(lines[0]).map(h => h.trim().replace(/^"|"$/g, ''));
+    rows = lines.slice(1).map(l => splitLine(l).map(c => c.trim().replace(/^"|"$/g, '')));
+
+    populateSelects();
+    setStep(2);
+    document.getElementById('section-upload').classList.add('hidden');
+    document.getElementById('section-mapper').classList.remove('hidden');
+  }
+
+  function splitLine(line) {
+    const result = []; let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
+      else { cur += ch; }
+    }
+    result.push(cur);
+    return result;
+  }
+
+  function populateSelects() {
+    const options = ['— skip —', ...headers];
+    ['col-email','col-first','col-last','col-phone'].forEach(id => {
+      const sel = document.getElementById(id);
+      sel.innerHTML = options.map((h, i) => `<option value="${i - 1}">${h}</option>`).join('');
+    });
+
+    // Auto-detect common column names
+    const autoMap = {
+      'col-email': ['email', 'e-mail', 'email address'],
+      'col-first': ['first', 'first name', 'firstname', 'first_name'],
+      'col-last':  ['last', 'last name', 'lastname', 'last_name'],
+      'col-phone': ['phone', 'phone number', 'telephone', 'tel'],
+    };
+
+    Object.entries(autoMap).forEach(([id, matches]) => {
+      const idx = headers.findIndex(h => matches.includes(h.toLowerCase()));
+      if (idx >= 0) document.getElementById(id).value = idx;
+    });
+  }
+
+  function buildPreview() {
+    const emailIdx = parseInt(document.getElementById('col-email').value);
+    const firstIdx = parseInt(document.getElementById('col-first').value);
+    const lastIdx  = parseInt(document.getElementById('col-last').value);
+    const phoneIdx = parseInt(document.getElementById('col-phone').value);
+
+    if (emailIdx < 0) return alert('Please select an Email column.');
+
+    formatted = rows
+      .filter(r => r[emailIdx] && r[emailIdx].includes('@'))
+      .map(r => {
+        const first = firstIdx >= 0 ? (r[firstIdx] || '') : '';
+        const last  = lastIdx  >= 0 ? (r[lastIdx]  || '') : '';
+        const name  = [first, last].filter(Boolean).join(' ') || r[emailIdx].split('@')[0];
+        const phone = phoneIdx >= 0 ? (r[phoneIdx] || '') : '';
+        return { email: r[emailIdx].toLowerCase().trim(), name: name.trim(), phone };
+      });
+
+    const preview = formatted.slice(0, 10);
+    document.getElementById('preview-body').innerHTML = preview.map(r =>
+      `<tr><td>${r.email}</td><td>${r.name || '—'}</td><td>${r.phone || '—'}</td></tr>`
+    ).join('');
+    document.getElementById('preview-count').textContent = `${formatted.length} total rows`;
+
+    setStep(3);
+    document.getElementById('section-mapper').classList.add('hidden');
+    document.getElementById('section-preview').classList.remove('hidden');
+  }
+
+  function downloadFormatted() {
+    // Listmonk format: email, name, attributes (JSON for extra fields)
+    const lines = formatted.map(r => {
+      const attrs = r.phone ? JSON.stringify({ phone: r.phone }) : '{}';
+      return `"${r.email}","${r.name}","${attrs}"`;
+    });
+    const csv  = 'email,name,attributes\n' + lines.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a    = document.createElement('a');
+    a.href     = URL.createObjectURL(blob);
+    a.download = 'listmonk-import.csv';
+    a.click();
+  }
+
+  function setStep(n) {
+    [1,2,3].forEach(i => {
+      const el = document.getElementById('step-' + i);
+      el.className = 'step' + (i === n ? ' active' : i < n ? ' done' : '');
+    });
+  }
+
+  function reset() {
+    headers = []; rows = []; formatted = [];
+    fileInput.value = '';
+    document.getElementById('section-upload').classList.remove('hidden');
+    document.getElementById('section-mapper').classList.add('hidden');
+    document.getElementById('section-preview').classList.add('hidden');
+    setStep(1);
+  }
+</script>
+</body>
+</html>
