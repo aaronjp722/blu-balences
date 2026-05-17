@@ -92,6 +92,7 @@ def update_row(row_id, valid: bool, reason: str = "") -> None:
         "smtp_valid":      valid,
         "smtp_checked":    True,
         "smtp_checked_at": datetime.now(timezone.utc).isoformat(),
+        "smtp_reason":     reason,
     }).eq("id", row_id).execute()
 
 
