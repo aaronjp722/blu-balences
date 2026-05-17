@@ -10,7 +10,7 @@
     :root {
       --navy: #0a1628; --card-bg: #111827;
       --green: #22c55e; --green-hover: #16a34a;
-      --red: #ef4444; --yellow: #f59e0b; --blue: #3b82f6;
+      --red: #ef4444; --yellow: #f59e0b; --blue: #3b82f6; --purple: #8b5cf6;
       --text: #e5e7eb; --text-sub: #9ca3af; --text-dim: #6b7280;
       --border: rgba(255,255,255,0.1); --white: #ffffff;
     }
@@ -20,6 +20,7 @@
     .logo span { color: var(--green); }
     h1 { font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
     .sub { font-size: 14px; color: var(--text-sub); margin-bottom: 28px; }
+
     .drop-zone { border: 2px dashed rgba(255,255,255,0.15); border-radius: 16px; padding: 48px 32px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: rgba(255,255,255,0.02); margin-bottom: 24px; }
     .drop-zone:hover, .drop-zone.drag-over { border-color: var(--green); background: rgba(34,197,94,0.04); }
     .drop-icon { font-size: 40px; margin-bottom: 12px; }
@@ -28,12 +29,26 @@
     #file-input { display: none; }
     .browse-btn { display: inline-block; margin-top: 14px; padding: 9px 20px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 8px; color: var(--green); font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
     .browse-btn:hover { background: rgba(34,197,94,0.2); }
+
+    /* Tag input panel */
+    .tag-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; }
+    .tag-panel label { font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; display: block; margin-bottom: 10px; }
+    .tag-input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .tag-chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-height: 36px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: text; }
+    .tag-chips:focus-within { border-color: var(--green); }
+    .chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); color: #a78bfa; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 600; }
+    .chip button { background: none; border: none; color: #a78bfa; cursor: pointer; font-size: 14px; line-height: 1; padding: 0; opacity: 0.7; }
+    .chip button:hover { opacity: 1; }
+    .tag-text-input { background: none; border: none; outline: none; color: var(--white); font-family: 'Inter', sans-serif; font-size: 13px; min-width: 120px; flex: 1; }
+    .tag-text-input::placeholder { color: var(--text-dim); }
+
     .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
     @media (max-width: 540px) { .stats { grid-template-columns: repeat(2, 1fr); } }
     .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
     .stat-card .num { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
     .stat-card .label { font-size: 11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.7px; }
     .num.green { color: var(--green); } .num.red { color: var(--red); } .num.yellow { color: var(--yellow); } .num.white { color: var(--white); }
+
     .results-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
     .results-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
     .results-header h2 { font-size: 14px; font-weight: 600; color: var(--white); }
@@ -47,17 +62,38 @@
     .search-bar input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; color: var(--white); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
     .search-bar input:focus { border-color: var(--green); }
     .search-bar input::placeholder { color: var(--text-dim); }
-    .table-wrap { max-height: 340px; overflow-y: auto; }
+    .table-wrap { max-height: 380px; overflow-y: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th { text-align: left; padding: 10px 20px; font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; background: rgba(255,255,255,0.02); position: sticky; top: 0; border-bottom: 1px solid var(--border); }
-    td { padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); }
+    th { text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; background: rgba(255,255,255,0.02); position: sticky; top: 0; border-bottom: 1px solid var(--border); }
+    td { padding: 8px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: rgba(255,255,255,0.02); }
     .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
     .badge.valid { background: rgba(34,197,94,0.1); color: var(--green); }
     .badge.invalid { background: rgba(239,68,68,0.1); color: var(--red); }
     .badge.dupe { background: rgba(245,158,11,0.1); color: var(--yellow); }
+    .row-tag { display: inline-block; background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); color: #a78bfa; border-radius: 3px; padding: 1px 6px; font-size: 10px; font-weight: 600; margin: 1px; }
+    .edit-btn { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 2px 6px; border-radius: 4px; font-size: 13px; transition: color 0.15s; }
+    .edit-btn:hover { color: var(--white); }
     .empty { padding: 32px; text-align: center; color: var(--text-dim); font-size: 13px; }
+
+    /* Edit modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .modal { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 24px; width: 100%; max-width: 440px; }
+    .modal h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+    .modal-field { margin-bottom: 14px; }
+    .modal-field label { font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; display: block; margin-bottom: 6px; }
+    .modal-field input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; color: var(--white); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
+    .modal-field input:focus { border-color: var(--green); }
+    .modal-tags { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; display: flex; flex-wrap: wrap; gap: 6px; min-height: 40px; cursor: text; }
+    .modal-tags:focus-within { border-color: var(--green); }
+    .modal-footer { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+    .btn-sm { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-sm-green { background: var(--green); color: var(--white); }
+    .btn-sm-green:hover { background: var(--green-hover); }
+    .btn-sm-outline { background: transparent; border: 1px solid var(--border); color: var(--text-sub); }
+    .btn-sm-outline:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+
     .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
     .btn { padding: 12px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
     .btn-green { background: var(--green); color: var(--white); }
@@ -93,6 +129,14 @@
     <input type="file" id="file-input" accept=".csv">
   </div>
 
+  <!-- Tag panel (shown after CSV loaded) -->
+  <div class="tag-panel hidden" id="tag-panel">
+    <label>Tags for this batch — applied to all contacts on push</label>
+    <div class="tag-chips" id="batch-tag-chips" onclick="document.getElementById('batch-tag-input').focus()">
+      <input class="tag-text-input" id="batch-tag-input" placeholder="Type a tag and press Enter...">
+    </div>
+  </div>
+
   <div class="stats hidden" id="stats">
     <div class="stat-card"><div class="num white" id="stat-total">0</div><div class="label">Total Rows</div></div>
     <div class="stat-card"><div class="num green" id="stat-valid">0</div><div class="label">Valid</div></div>
@@ -114,7 +158,7 @@
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Email</th><th>Name</th><th>Phone</th><th>Status</th></tr></thead>
+        <thead><tr><th>#</th><th>Email</th><th>Name</th><th>Tags</th><th>Status</th><th></th></tr></thead>
         <tbody id="table-body"></tbody>
       </table>
       <div class="empty hidden" id="empty-msg">No emails in this category.</div>
@@ -138,10 +182,107 @@
   </div>
 </div>
 
+<!-- Edit modal -->
+<div class="modal-backdrop hidden" id="modal">
+  <div class="modal">
+    <h3>Edit Contact</h3>
+    <div class="modal-field"><label>Email</label><input type="text" id="edit-email"></div>
+    <div class="modal-field"><label>First Name</label><input type="text" id="edit-first"></div>
+    <div class="modal-field"><label>Last Name</label><input type="text" id="edit-last"></div>
+    <div class="modal-field"><label>Phone</label><input type="text" id="edit-phone"></div>
+    <div class="modal-field">
+      <label>Tags</label>
+      <div class="modal-tags" id="modal-tag-chips" onclick="document.getElementById('modal-tag-input').focus()">
+        <input class="tag-text-input" id="modal-tag-input" placeholder="Type a tag and press Enter...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-sm-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-sm btn-sm-green" onclick="saveEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
   let currentTab = 'valid';
   let data = { valid: [], invalid: [], dupes: [] };
+  let batchTags = [];
+  let editIndex = null;
+  let editList = null;
+  let modalTags = [];
 
+  // ── Batch tag input ───────────────────────────────────────────────────────
+  document.getElementById('batch-tag-input').addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ',') && e.target.value.trim()) {
+      e.preventDefault();
+      addBatchTag(e.target.value.trim().replace(/,$/, ''));
+      e.target.value = '';
+    } else if (e.key === 'Backspace' && !e.target.value && batchTags.length) {
+      removeBatchTag(batchTags.length - 1);
+    }
+  });
+
+  function addBatchTag(tag) {
+    if (!tag || batchTags.includes(tag)) return;
+    batchTags.push(tag);
+    renderBatchTags();
+  }
+
+  function removeBatchTag(i) {
+    batchTags.splice(i, 1);
+    renderBatchTags();
+  }
+
+  function renderBatchTags() {
+    const container = document.getElementById('batch-tag-chips');
+    const input = document.getElementById('batch-tag-input');
+    container.innerHTML = '';
+    batchTags.forEach((t, i) => {
+      const chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.innerHTML = `${t}<button onclick="removeBatchTag(${i})">×</button>`;
+      container.appendChild(chip);
+    });
+    container.appendChild(input);
+    input.focus();
+  }
+
+  // ── Modal tag input ───────────────────────────────────────────────────────
+  document.getElementById('modal-tag-input').addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ',') && e.target.value.trim()) {
+      e.preventDefault();
+      addModalTag(e.target.value.trim().replace(/,$/, ''));
+      e.target.value = '';
+    } else if (e.key === 'Backspace' && !e.target.value && modalTags.length) {
+      removeModalTag(modalTags.length - 1);
+    }
+  });
+
+  function addModalTag(tag) {
+    if (!tag || modalTags.includes(tag)) return;
+    modalTags.push(tag);
+    renderModalTags();
+  }
+
+  function removeModalTag(i) {
+    modalTags.splice(i, 1);
+    renderModalTags();
+  }
+
+  function renderModalTags() {
+    const container = document.getElementById('modal-tag-chips');
+    const input = document.getElementById('modal-tag-input');
+    container.innerHTML = '';
+    modalTags.forEach((t, i) => {
+      const chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.innerHTML = `${t}<button onclick="removeModalTag(${i})">×</button>`;
+      container.appendChild(chip);
+    });
+    container.appendChild(input);
+  }
+
+  // ── File handling ─────────────────────────────────────────────────────────
   const dropZone  = document.getElementById('drop-zone');
   const fileInput = document.getElementById('file-input');
   dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
@@ -175,6 +316,7 @@
         first_name: firstCol >= 0 ? (cols[firstCol] || '').trim().replace(/^"|"$/g, '') : '',
         last_name:  lastCol  >= 0 ? (cols[lastCol]  || '').trim().replace(/^"|"$/g, '') : '',
         phone:      phoneCol >= 0 ? (cols[phoneCol] || '').trim().replace(/^"|"$/g, '') : '',
+        tags:       [],
       };
       if (seen.has(raw)) { data.dupes.push(record); }
       else { seen.add(raw); isValidEmail(raw) ? data.valid.push(record) : data.invalid.push(record); }
@@ -183,6 +325,7 @@
     document.getElementById('stat-valid').textContent = data.valid.length;
     document.getElementById('stat-dupes').textContent = data.dupes.length;
     document.getElementById('stat-invalid').textContent = data.invalid.length;
+    document.getElementById('tag-panel').classList.remove('hidden');
     document.getElementById('stats').classList.remove('hidden');
     document.getElementById('results-card').classList.remove('hidden');
     document.getElementById('actions').classList.remove('hidden');
@@ -206,6 +349,7 @@
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
   }
 
+  // ── Table ─────────────────────────────────────────────────────────────────
   function switchTab(tab) {
     currentTab = tab;
     document.getElementById('search-input').value = '';
@@ -219,26 +363,71 @@
 
   function renderTable() {
     const query = document.getElementById('search-input').value.toLowerCase();
-    const rows  = data[currentTab].filter(r => r.email.includes(query));
+    const list  = data[currentTab];
+    const rows  = list.filter(r => r.email.includes(query));
     const tbody = document.getElementById('table-body');
     const empty = document.getElementById('empty-msg');
     if (!rows.length) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
     empty.classList.add('hidden');
     const badgeClass = currentTab === 'valid' ? 'valid' : currentTab === 'invalid' ? 'invalid' : 'dupe';
     const badgeLabel = currentTab === 'valid' ? 'Valid' : currentTab === 'invalid' ? 'Invalid' : 'Duplicate';
-    tbody.innerHTML = rows.map((r, i) => `
-      <tr>
+    tbody.innerHTML = rows.map((r, i) => {
+      const allTags = [...new Set([...batchTags, ...(r.tags || [])])];
+      const tagHtml = allTags.map(t => `<span class="row-tag">${t}</span>`).join('') || '<span style="color:var(--text-dim);font-size:11px">—</span>';
+      const realIdx = list.indexOf(r);
+      return `<tr>
         <td style="color:var(--text-dim)">${i + 1}</td>
         <td>${r.email}</td>
         <td style="color:var(--text-sub)">${[r.first_name, r.last_name].filter(Boolean).join(' ') || '—'}</td>
-        <td style="color:var(--text-sub)">${r.phone || '—'}</td>
+        <td>${tagHtml}</td>
         <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
-      </tr>`).join('');
+        <td><button class="edit-btn" onclick="openEdit('${currentTab}', ${realIdx})">✎</button></td>
+      </tr>`;
+    }).join('');
   }
 
+  // ── Edit modal ────────────────────────────────────────────────────────────
+  function openEdit(tab, idx) {
+    const r = data[tab][idx];
+    editIndex = idx;
+    editList  = tab;
+    modalTags = [...(r.tags || [])];
+    document.getElementById('edit-email').value = r.email;
+    document.getElementById('edit-first').value = r.first_name;
+    document.getElementById('edit-last').value  = r.last_name;
+    document.getElementById('edit-phone').value = r.phone;
+    renderModalTags();
+    document.getElementById('modal').classList.remove('hidden');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+    editIndex = null; editList = null;
+  }
+
+  function saveEdit() {
+    if (editIndex === null) return;
+    const r = data[editList][editIndex];
+    r.email      = document.getElementById('edit-email').value.trim().toLowerCase();
+    r.first_name = document.getElementById('edit-first').value.trim();
+    r.last_name  = document.getElementById('edit-last').value.trim();
+    r.phone      = document.getElementById('edit-phone').value.trim();
+    r.tags       = [...modalTags];
+    closeModal();
+    renderTable();
+  }
+
+  document.getElementById('modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal')) closeModal();
+  });
+
+  // ── Download ──────────────────────────────────────────────────────────────
   function downloadCSV() {
-    const rows = data.valid.map(r => `${r.email},${r.first_name},${r.last_name},${r.phone}`);
-    const csv  = 'email,first_name,last_name,phone\n' + rows.join('\n');
+    const rows = data.valid.map(r => {
+      const tags = [...new Set([...batchTags, ...(r.tags || [])])].join('|');
+      return `${r.email},${r.first_name},${r.last_name},${r.phone},${tags}`;
+    });
+    const csv  = 'email,first_name,last_name,phone,tags\n' + rows.join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const a    = document.createElement('a');
     a.href     = URL.createObjectURL(blob);
@@ -246,6 +435,7 @@
     a.click();
   }
 
+  // ── Push to Supabase ──────────────────────────────────────────────────────
   async function pushToSupabase() {
     if (!data.valid.length) { alert('No valid emails to push.'); return; }
     document.getElementById('push-status').classList.remove('hidden');
@@ -258,9 +448,13 @@
 
     for (let i = 0; i < total; i += BATCH) {
       const batch = data.valid.slice(i, i + BATCH).map(r => ({
-        email: r.email || null, first_name: r.first_name || null,
-        last_name: r.last_name || null, phone: r.phone || null,
-        email_valid: true, email_checked: true,
+        email:         r.email      || null,
+        first_name:    r.first_name || null,
+        last_name:     r.last_name  || null,
+        phone:         r.phone      || null,
+        email_valid:   true,
+        email_checked: true,
+        tags:          [...new Set([...batchTags, ...(r.tags || [])])],
       }));
       try {
         const res = await fetch('/api/push-leads', {
@@ -292,11 +486,14 @@
     document.getElementById('push-btn').disabled = false;
   }
 
+  // ── Reset ─────────────────────────────────────────────────────────────────
   function reset() {
     data = { valid: [], invalid: [], dupes: [] };
-    currentTab = 'valid';
+    batchTags = []; currentTab = 'valid';
     fileInput.value = '';
+    renderBatchTags();
     document.getElementById('drop-zone').classList.remove('hidden');
+    document.getElementById('tag-panel').classList.add('hidden');
     document.getElementById('stats').classList.add('hidden');
     document.getElementById('results-card').classList.add('hidden');
     document.getElementById('actions').classList.add('hidden');
