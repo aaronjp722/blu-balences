@@ -1,60 +1,59 @@
 import os
-import socket
-import smtplib
 import logging
 import time
 from datetime import datetime, timezone
 
-import dns.resolver
+import requests
 import schedule
 from supabase import create_client
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 log = logging.getLogger(__name__)
 
-SUPABASE_URL   = os.environ["SUPABASE_URL"]
-SUPABASE_KEY   = os.environ["SUPABASE_KEY"]
-TABLE          = os.getenv("SUPABASE_TABLE", "clean_leads")
-INTERVAL_HOURS = float(os.getenv("INTERVAL_HOURS", "24"))
-SMTP_TIMEOUT   = int(os.getenv("SMTP_TIMEOUT", "10"))
-BATCH_SIZE     = int(os.getenv("BATCH_SIZE", "50"))
+SUPABASE_URL    = os.environ["SUPABASE_URL"]
+SUPABASE_KEY    = os.environ["SUPABASE_KEY"]
+TABLE           = os.getenv("SUPABASE_TABLE", "clean_leads")
+INTERVAL_HOURS  = float(os.getenv("INTERVAL_HOURS", "24"))
+BATCH_SIZE      = int(os.getenv("BATCH_SIZE", "50"))
+VERIFY_BACKEND  = os.getenv("VERIFY_BACKEND", "https://backend-production-d43c8.up.railway.app")
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
-def get_mx_host(domain: str) -> str | None:
+def verify_email(email):
     try:
-        records = dns.resolver.resolve(domain, "MX")
-        return str(sorted(records, key=lambda r: r.preference)[0].exchange).rstrip(".")
+        r = requests.post(
+            f"{VERIFY_BACKEND}/verify",
+            json={"email": email},
+            timeout=15,
+        )
+        if r.ok:
+            data = r.json()
+            return data.get("valid", False), data.get("reason", "ok")
+        return False, f"http_{r.status_code}"
+    except requests.Timeout:
+        return False, "timeout"
+    except Exception as e:
+        return False, str(e)
+
+
+def verify_batch(emails):
+    """Try batch endpoint first, fall back to individual calls."""
+    try:
+        r = requests.post(
+            f"{VERIFY_BACKEND}/verify-batch",
+            json={"emails": emails},
+            timeout=30,
+        )
+        if r.ok:
+            return r.json().get("results", [])
     except Exception:
-        return None
+        pass
+    # Fall back to individual
+    return [{"email": e, **dict(zip(["valid","reason"], verify_email(e)))} for e in emails]
 
 
-def smtp_verify(email: str) -> bool:
-    domain = email.split("@")[-1]
-    mx = get_mx_host(domain)
-    if not mx:
-        log.debug(f"No MX record for {domain}")
-        return False
-    try:
-        with smtplib.SMTP(mx, 25, timeout=SMTP_TIMEOUT) as smtp:
-            smtp.ehlo("check.local")
-            smtp.mail("verify@check.local")
-            code, _ = smtp.rcpt(email)
-            return code == 250
-    except (smtplib.SMTPConnectError, smtplib.SMTPServerDisconnected,
-            socket.timeout, OSError) as e:
-        log.debug(f"SMTP error for {email}: {e}")
-        return False
-    except smtplib.SMTPResponseException:
-        return False
-
-
-def fetch_batch(offset: int) -> list[dict]:
+def fetch_batch(offset):
     resp = (
         supabase.table(TABLE)
         .select("id, email")
@@ -65,7 +64,7 @@ def fetch_batch(offset: int) -> list[dict]:
     return resp.data or []
 
 
-def update_row(row_id, valid: bool) -> None:
+def update_row(row_id, valid):
     supabase.table(TABLE).update({
         "smtp_valid":      valid,
         "smtp_checked":    True,
@@ -73,9 +72,10 @@ def update_row(row_id, valid: bool) -> None:
     }).eq("id", row_id).execute()
 
 
-def run_check() -> None:
+def run_check():
     log.info("Starting SMTP check run...")
     total = checked = valid = failed = 0
+    reason_counts = {}
     offset = 0
 
     while True:
@@ -83,39 +83,39 @@ def run_check() -> None:
         if not rows:
             break
 
-        log.info(f"Processing batch of {len(rows)} (offset {offset})")
+        emails = [r["email"] for r in rows if r.get("email")]
+        log.info(f"Verifying batch of {len(rows)} (offset {offset})")
+
+        results = verify_batch(emails)
+        result_map = {r["email"]: r for r in results}
+
         for row in rows:
             email = (row.get("email") or "").strip().lower()
             if not email:
                 update_row(row["id"], False)
                 failed += 1
                 continue
-
-            result = smtp_verify(email)
-            update_row(row["id"], result)
-            checked += 1
-            total += 1
-            if result:
-                valid += 1
-            else:
-                failed += 1
+            res    = result_map.get(email, {})
+            is_valid = res.get("valid", False)
+            reason   = res.get("reason", "unknown")
+            update_row(row["id"], is_valid)
+            checked += 1; total += 1
+            reason_counts[reason] = reason_counts.get(reason, 0) + 1
+            if is_valid: valid += 1
+            else: failed += 1
 
         offset += BATCH_SIZE
         if len(rows) < BATCH_SIZE:
             break
-
-        log.info("Batch done - sleeping 2s before next batch")
+        log.info("Batch done — sleeping 2s")
         time.sleep(2)
 
-    log.info(
-        f"Run complete - checked: {checked}, valid: {valid}, "
-        f"failed: {failed}, total processed: {total}"
-    )
+    log.info(f"Run complete — checked: {checked}, valid: {valid}, failed: {failed}")
+    log.info(f"Reasons: {reason_counts}")
 
 
 if __name__ == "__main__":
-    log.info(f"SMTP checker starting - interval: {INTERVAL_HOURS}h, "
-             f"batch size: {BATCH_SIZE}, timeout: {SMTP_TIMEOUT}s")
+    log.info(f"SMTP checker starting — backend: {VERIFY_BACKEND}")
     run_check()
     schedule.every(INTERVAL_HOURS).hours.do(run_check)
     while True:
