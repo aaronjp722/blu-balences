@@ -54,6 +54,10 @@
     .results-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
     .results-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
     .results-header h2 { font-size: 14px; font-weight: 600; color: var(--white); }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .btn-export { padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text-sub); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .btn-export:hover:not(:disabled) { background: rgba(255,255,255,0.06); color: var(--white); border-color: rgba(255,255,255,0.2); }
+    .btn-export:disabled { opacity: 0.4; cursor: not-allowed; }
     .tab-row { display: flex; gap: 6px; flex-wrap: wrap; }
     .tab { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; color: var(--text-sub); }
     .tab.active-all { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); color: var(--white); }
@@ -66,7 +70,6 @@
     .search-row input:focus { border-color: var(--green); }
     .search-row input::placeholder { color: var(--text-dim); }
 
-    /* Bulk bar */
     .bulk-bar { display: flex; align-items: center; gap: 10px; padding: 10px 20px; background: rgba(139,92,246,0.08); border-bottom: 1px solid rgba(139,92,246,0.2); flex-wrap: wrap; }
     .bulk-label { font-size: 13px; font-weight: 600; color: #a78bfa; white-space: nowrap; }
     .select-all-banner { font-size: 12px; color: var(--text-sub); white-space: nowrap; }
@@ -97,7 +100,6 @@
     .edit-btn:hover { color: var(--white); }
     .empty { padding: 32px; text-align: center; color: var(--text-dim); font-size: 13px; }
 
-    /* Pagination */
     .pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-sub); flex-wrap: wrap; gap: 8px; }
     .page-btns { display: flex; gap: 6px; align-items: center; }
     .page-btn { padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text-sub); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
@@ -105,7 +107,6 @@
     .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
     .db-loading { padding: 32px; text-align: center; color: var(--text-dim); font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
-    /* Modal */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .modal { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 24px; width: 100%; max-width: 440px; }
     .modal h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
@@ -122,7 +123,6 @@
     .btn-sm-outline { background: transparent; border: 1px solid var(--border); color: var(--text-sub); }
     .btn-sm-outline:hover { background: rgba(255,255,255,0.05); color: var(--white); }
 
-    /* Actions / push */
     .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
     .btn { padding: 12px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
     .btn-green { background: var(--green); color: var(--white); }
@@ -222,7 +222,10 @@
   <div id="db-mode" class="hidden">
     <div class="results-card">
       <div class="results-header">
-        <h2 id="db-title">All Contacts</h2>
+        <div class="header-left">
+          <h2 id="db-title">All Contacts</h2>
+          <button class="btn-export" id="db-export-btn" onclick="downloadDbCSV()">⬇ Export CSV</button>
+        </div>
         <div class="tab-row">
           <div class="tab active-all"  id="db-tab-all"     onclick="setDbFilter('all')">All</div>
           <div class="tab"             id="db-tab-valid"   onclick="setDbFilter('valid')">SMTP Valid</div>
@@ -309,10 +312,9 @@ let bulkTags = [];
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function escHtml(s) {
-  return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+function csvCell(v) { return '"' + String(v || '').replace(/"/g, '""') + '"'; }
 
 // ── Mode ───────────────────────────────────────────────────────────────────
 function setMode(m) {
@@ -365,8 +367,7 @@ function renderDbTable() {
       <td><button class="edit-btn" onclick="openDbEdit(${i})">✎</button></td>
     </tr>`;
   }).join('');
-  const allChecked = dbRows.length > 0 && dbRows.every(r => selectedIds.has(r.id));
-  document.getElementById('select-all-check').checked = allChecked;
+  document.getElementById('select-all-check').checked = dbRows.length > 0 && dbRows.every(r => selectedIds.has(r.id));
 }
 
 function updateDbPagination() {
@@ -395,10 +396,54 @@ function dbSearchDebounce() {
   clearTimeout(dbSearchTimer);
   dbSearchTimer = setTimeout(() => {
     dbSearch = document.getElementById('db-search').value.trim();
-    dbPage = 0;
-    clearSelection();
-    loadDb();
+    dbPage = 0; clearSelection(); loadDb();
   }, 400);
+}
+
+// ── DB CSV Export ──────────────────────────────────────────────────────────
+async function downloadDbCSV() {
+  const btn = document.getElementById('db-export-btn');
+  btn.disabled = true; btn.textContent = 'Exporting...';
+
+  try {
+    const allRows = [];
+    const pageSize = 500;
+    let pg = 0;
+
+    while (true) {
+      const params = new URLSearchParams({ page: pg, limit: pageSize, filter: dbFilter });
+      if (dbSearch) params.set('search', dbSearch);
+      const res  = await fetch(`/api/get-leads?${params}`);
+      const json = await res.json();
+      const batch = json.data || [];
+      allRows.push(...batch);
+      if (batch.length < pageSize) break;
+      pg++;
+    }
+
+    const header = 'email,first_name,last_name,phone,tags,smtp_valid,smtp_checked_at';
+    const rows = allRows.map(r => [
+      csvCell(r.email),
+      csvCell(r.first_name),
+      csvCell(r.last_name),
+      csvCell(r.phone),
+      csvCell((r.tags || []).join('|')),
+      csvCell(r.smtp_checked ? (r.smtp_valid ? 'true' : 'false') : ''),
+      csvCell(r.smtp_checked_at || ''),
+    ].join(','));
+
+    const label = dbFilter === 'all' ? 'all' : dbFilter === 'valid' ? 'smtp-valid' : 'smtp-invalid';
+    const date  = new Date().toISOString().slice(0, 10);
+    const blob  = new Blob([header + '\n' + rows.join('\n')], { type: 'text/csv' });
+    const a     = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `leads-${label}-${date}.csv`;
+    a.click();
+  } catch(e) {
+    alert('Export failed: ' + e.message);
+  }
+
+  btn.disabled = false; btn.textContent = '⬇ Export CSV';
 }
 
 // ── Selection ──────────────────────────────────────────────────────────────
@@ -407,91 +452,69 @@ function toggleRow(id, checked) {
   checked ? selectedIds.add(id) : selectedIds.delete(id);
   const row = document.getElementById('row-' + id);
   if (row) row.className = checked ? 'selected' : '';
-  const allChecked = dbRows.length > 0 && dbRows.every(r => selectedIds.has(r.id));
-  document.getElementById('select-all-check').checked = allChecked;
+  document.getElementById('select-all-check').checked = dbRows.length > 0 && dbRows.every(r => selectedIds.has(r.id));
   updateBulkBar();
 }
 
 function toggleSelectAll(checked) {
   selectAllMode = false;
   dbRows.forEach(r => { checked ? selectedIds.add(r.id) : selectedIds.delete(r.id); });
-  renderDbTable();
-  updateBulkBar();
+  renderDbTable(); updateBulkBar();
 }
 
 function selectAllAcrossPages(e) {
   if (e) e.preventDefault();
-  selectAllMode = true;
-  updateBulkBar();
+  selectAllMode = true; updateBulkBar();
 }
 
 function clearSelection() {
-  selectedIds.clear();
-  selectAllMode = false;
-  bulkTags = [];
-  renderBulkTags();
-  renderDbTable();
-  updateBulkBar();
+  selectedIds.clear(); selectAllMode = false; bulkTags = [];
+  renderBulkTags(); renderDbTable(); updateBulkBar();
 }
 
 function updateBulkBar() {
   const bar    = document.getElementById('bulk-bar');
   const label  = document.getElementById('bulk-label');
   const banner = document.getElementById('sel-banner');
-
   const n = selectAllMode ? dbTotal : selectedIds.size;
   if (n === 0) { bar.classList.add('hidden'); return; }
   bar.classList.remove('hidden');
-
   if (selectAllMode) {
     label.textContent = `All ${dbTotal.toLocaleString()} contacts selected`;
     banner.innerHTML  = `<a onclick="clearSelection()">Clear selection</a>`;
     banner.classList.remove('hidden');
   } else {
     label.textContent = `${n} selected`;
-    const allOnPageSelected = dbRows.length > 0 && dbRows.every(r => selectedIds.has(r.id));
-    if (allOnPageSelected && dbTotal > dbLimit) {
+    const allOnPage = dbRows.length > 0 && dbRows.every(r => selectedIds.has(r.id));
+    if (allOnPage && dbTotal > dbLimit) {
       banner.innerHTML = `All ${dbRows.length} on this page selected. <a onclick="selectAllAcrossPages(event)">Select all ${dbTotal.toLocaleString()} contacts</a>`;
       banner.classList.remove('hidden');
-    } else {
-      banner.classList.add('hidden');
-    }
+    } else { banner.classList.add('hidden'); }
   }
 }
 
-// ── Bulk tag chips (event delegation — input element never destroyed) ───────
+// ── Bulk tag chips ─────────────────────────────────────────────────────────
 document.getElementById('bulk-tag-chips').addEventListener('keydown', e => {
   if (e.target.id !== 'bulk-tag-input') return;
   if ((e.key === 'Enter' || e.key === ',') && e.target.value.trim()) {
-    e.preventDefault();
-    addBulkTag(e.target.value.trim().replace(/,$/, ''));
-    e.target.value = '';
+    e.preventDefault(); addBulkTag(e.target.value.trim().replace(/,$/, '')); e.target.value = '';
   } else if (e.key === 'Backspace' && !e.target.value && bulkTags.length) {
-    bulkTags.pop();
-    renderBulkTags();
+    bulkTags.pop(); renderBulkTags();
   }
 });
 
 function addBulkTag(tag) {
-  tag = tag.trim();
-  if (!tag || bulkTags.includes(tag)) return;
-  bulkTags.push(tag);
-  renderBulkTags();
+  tag = tag.trim(); if (!tag || bulkTags.includes(tag)) return; bulkTags.push(tag); renderBulkTags();
 }
 
 function renderBulkTags() {
   const container = document.getElementById('bulk-tag-chips');
   const input     = document.getElementById('bulk-tag-input');
-  // Remove chips only — never remove the input element itself
   container.querySelectorAll('.chip').forEach(el => el.remove());
   bulkTags.forEach((t, i) => {
-    const chip = document.createElement('span');
-    chip.className = 'chip';
+    const chip = document.createElement('span'); chip.className = 'chip';
     chip.innerHTML = `${escHtml(t)}<button type="button">×</button>`;
-    chip.querySelector('button').addEventListener('click', () => {
-      bulkTags.splice(i, 1);
-      renderBulkTags();
-    });
+    chip.querySelector('button').addEventListener('click', () => { bulkTags.splice(i, 1); renderBulkTags(); });
     container.insertBefore(chip, input);
   });
 }
@@ -500,10 +523,8 @@ async function applyBulkTags() {
   if (!bulkTags.length) { alert('Type at least one tag first.'); return; }
   const n = selectAllMode ? dbTotal : selectedIds.size;
   if (!n) { alert('Select at least one contact.'); return; }
-
   const btn = document.getElementById('bulk-apply-btn');
   btn.disabled = true; btn.textContent = 'Applying...';
-
   try {
     let body;
     if (selectAllMode) {
@@ -511,38 +532,22 @@ async function applyBulkTags() {
     } else {
       const updates = [...selectedIds].map(id => {
         const row = dbRows.find(r => r.id === id);
-        return { id, tags: [...new Set([...(row ? row.tags || [] : []), ...bulkTags])] };
+        return { id, tags: [...new Set([...(row ? row.tags||[] : []), ...bulkTags])] };
       });
       body = { updates };
     }
-
-    const res  = await fetch('/api/bulk-tag-leads', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    const res  = await fetch('/api/bulk-tag-leads', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
     const json = await res.json();
     if (!res.ok) { alert('Error: ' + JSON.stringify(json.error)); btn.disabled = false; btn.textContent = 'Apply Tags'; return; }
-
     if (!selectAllMode) {
-      [...selectedIds].forEach(id => {
-        const row = dbRows.find(r => r.id === id);
-        if (row) row.tags = [...new Set([...(row.tags||[]), ...bulkTags])];
-      });
+      [...selectedIds].forEach(id => { const row = dbRows.find(r => r.id === id); if (row) row.tags = [...new Set([...(row.tags||[]), ...bulkTags])]; });
       renderDbTable();
     }
-
-    bulkTags = [];
-    renderBulkTags();
-    clearSelection();
+    bulkTags = []; renderBulkTags(); clearSelection();
     if (selectAllMode) { selectAllMode = false; loadDb(); }
-
     btn.textContent = `✓ Applied to ${json.ok}`;
     setTimeout(() => { btn.textContent = 'Apply Tags'; btn.disabled = false; }, 1800);
-  } catch(e) {
-    alert('Failed: ' + e.message);
-    btn.textContent = 'Apply Tags'; btn.disabled = false;
-  }
+  } catch(e) { alert('Failed: ' + e.message); btn.textContent = 'Apply Tags'; btn.disabled = false; }
 }
 
 // ── DB edit modal ──────────────────────────────────────────────────────────
@@ -559,7 +564,6 @@ function openDbEdit(i) {
   document.getElementById('modal').classList.remove('hidden');
 }
 
-// ── Upload mode edit ───────────────────────────────────────────────────────
 function openUploadEdit(tab, idx) {
   const r = uploadData[tab][idx];
   editId = null; editIndex = idx; editList = tab;
@@ -577,42 +581,25 @@ function openUploadEdit(tab, idx) {
 document.getElementById('modal-tag-chips').addEventListener('keydown', e => {
   if (e.target.id !== 'modal-tag-input') return;
   if ((e.key === 'Enter' || e.key === ',') && e.target.value.trim()) {
-    e.preventDefault();
-    addModalTag(e.target.value.trim().replace(/,$/, ''));
-    e.target.value = '';
-  } else if (e.key === 'Backspace' && !e.target.value && modalTags.length) {
-    modalTags.pop();
-    renderModalTags();
-  }
+    e.preventDefault(); addModalTag(e.target.value.trim().replace(/,$/, '')); e.target.value = '';
+  } else if (e.key === 'Backspace' && !e.target.value && modalTags.length) { modalTags.pop(); renderModalTags(); }
 });
 
-function addModalTag(tag) {
-  tag = tag.trim();
-  if (!tag || modalTags.includes(tag)) return;
-  modalTags.push(tag);
-  renderModalTags();
-}
+function addModalTag(tag) { tag = tag.trim(); if (!tag || modalTags.includes(tag)) return; modalTags.push(tag); renderModalTags(); }
 
 function renderModalTags() {
   const container = document.getElementById('modal-tag-chips');
   const input     = document.getElementById('modal-tag-input');
   container.querySelectorAll('.chip').forEach(el => el.remove());
   modalTags.forEach((t, i) => {
-    const chip = document.createElement('span');
-    chip.className = 'chip';
+    const chip = document.createElement('span'); chip.className = 'chip';
     chip.innerHTML = `${escHtml(t)}<button type="button">×</button>`;
-    chip.querySelector('button').addEventListener('click', () => {
-      modalTags.splice(i, 1);
-      renderModalTags();
-    });
+    chip.querySelector('button').addEventListener('click', () => { modalTags.splice(i, 1); renderModalTags(); });
     container.insertBefore(chip, input);
   });
 }
 
-function closeModal() {
-  document.getElementById('modal').classList.add('hidden');
-  editIndex = null; editList = null; editId = null;
-}
+function closeModal() { document.getElementById('modal').classList.add('hidden'); editIndex = null; editList = null; editId = null; }
 
 async function saveEdit() {
   const email      = document.getElementById('edit-email').value.trim().toLowerCase();
@@ -621,21 +608,12 @@ async function saveEdit() {
   const phone      = document.getElementById('edit-phone').value.trim();
   const tags       = [...modalTags];
   const btn        = document.getElementById('modal-save-btn');
-
   if (editId) {
     btn.disabled = true; btn.textContent = 'Saving...';
     try {
-      const res = await fetch('/api/update-lead', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: editId, email, first_name, last_name, phone, tags }),
-      });
-      if (res.ok) {
-        dbRows[editIndex] = { ...dbRows[editIndex], email, first_name, last_name, phone, tags };
-        renderDbTable();
-        document.getElementById('save-indicator').classList.remove('hidden');
-        setTimeout(() => closeModal(), 800);
-      } else { alert('Save failed.'); }
+      const res = await fetch('/api/update-lead', { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id: editId, email, first_name, last_name, phone, tags }) });
+      if (res.ok) { dbRows[editIndex] = { ...dbRows[editIndex], email, first_name, last_name, phone, tags }; renderDbTable(); document.getElementById('save-indicator').classList.remove('hidden'); setTimeout(() => closeModal(), 800); }
+      else { alert('Save failed.'); }
     } catch { alert('Save failed.'); }
     btn.disabled = false; btn.textContent = 'Save';
   } else {
@@ -647,38 +625,24 @@ async function saveEdit() {
 
 document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
 
-// ── Batch tag chips (upload mode) ──────────────────────────────────────────
+// ── Batch tag chips ────────────────────────────────────────────────────────
 document.getElementById('batch-tag-chips').addEventListener('keydown', e => {
   if (e.target.id !== 'batch-tag-input') return;
   if ((e.key === 'Enter' || e.key === ',') && e.target.value.trim()) {
-    e.preventDefault();
-    addBatchTag(e.target.value.trim().replace(/,$/, ''));
-    e.target.value = '';
-  } else if (e.key === 'Backspace' && !e.target.value && batchTags.length) {
-    batchTags.pop();
-    renderBatchTags();
-  }
+    e.preventDefault(); addBatchTag(e.target.value.trim().replace(/,$/, '')); e.target.value = '';
+  } else if (e.key === 'Backspace' && !e.target.value && batchTags.length) { batchTags.pop(); renderBatchTags(); }
 });
 
-function addBatchTag(tag) {
-  tag = tag.trim();
-  if (!tag || batchTags.includes(tag)) return;
-  batchTags.push(tag);
-  renderBatchTags();
-}
+function addBatchTag(tag) { tag = tag.trim(); if (!tag || batchTags.includes(tag)) return; batchTags.push(tag); renderBatchTags(); }
 
 function renderBatchTags() {
   const container = document.getElementById('batch-tag-chips');
   const input     = document.getElementById('batch-tag-input');
   container.querySelectorAll('.chip').forEach(el => el.remove());
   batchTags.forEach((t, i) => {
-    const chip = document.createElement('span');
-    chip.className = 'chip';
+    const chip = document.createElement('span'); chip.className = 'chip';
     chip.innerHTML = `${escHtml(t)}<button type="button">×</button>`;
-    chip.querySelector('button').addEventListener('click', () => {
-      batchTags.splice(i, 1);
-      renderBatchTags();
-    });
+    chip.querySelector('button').addEventListener('click', () => { batchTags.splice(i, 1); renderBatchTags(); });
     container.insertBefore(chip, input);
   });
   renderUploadTable();
@@ -692,11 +656,7 @@ dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-ove
 dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) processFile(f); });
 fileInput.addEventListener('change', e => { if (e.target.files[0]) processFile(e.target.files[0]); });
 
-function processFile(file) {
-  const r = new FileReader();
-  r.onload = e => parseCSV(e.target.result);
-  r.readAsText(file);
-}
+function processFile(file) { const r = new FileReader(); r.onload = e => parseCSV(e.target.result); r.readAsText(file); }
 
 function parseCSV(text) {
   const lines   = text.split(/\r?\n/).filter(l => l.trim());
@@ -734,11 +694,7 @@ function parseCSV(text) {
 
 function splitCSVLine(line) {
   const result = []; let cur = '', inQ = false;
-  for (const ch of line) {
-    if (ch === '"') { inQ = !inQ; }
-    else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
-    else { cur += ch; }
-  }
+  for (const ch of line) { if (ch === '"') { inQ = !inQ; } else if (ch === ',' && !inQ) { result.push(cur); cur = ''; } else { cur += ch; } }
   result.push(cur); return result;
 }
 
@@ -748,9 +704,7 @@ function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e); }
 function switchUploadTab(tab) {
   currentUploadTab = tab;
   document.getElementById('upload-search').value = '';
-  ['valid','invalid','dupes'].forEach(t => {
-    document.getElementById('tab-' + t).className = 'tab' + (t === tab ? ` active-${t}` : '');
-  });
+  ['valid','invalid','dupes'].forEach(t => { document.getElementById('tab-' + t).className = 'tab' + (t === tab ? ` active-${t}` : ''); });
   renderUploadTable();
 }
 
@@ -767,27 +721,25 @@ function renderUploadTable() {
   tbody.innerHTML = rows.map((r, i) => {
     const allTags = [...new Set([...batchTags,...(r.tags||[])])];
     const tagHtml = allTags.map(t => `<span class="row-tag">${escHtml(t)}</span>`).join('') || '<span style="color:var(--text-dim);font-size:11px">—</span>';
-    const realIdx = list.indexOf(r);
     return `<tr>
       <td style="color:var(--text-dim)">${i+1}</td>
       <td style="font-size:12px">${escHtml(r.email)}</td>
       <td style="color:var(--text-sub);font-size:12px">${escHtml([r.first_name,r.last_name].filter(Boolean).join(' ')||'—')}</td>
       <td>${tagHtml}</td>
       <td><span class="badge ${bc}">${bl}</span></td>
-      <td><button class="edit-btn" onclick="openUploadEdit('${currentUploadTab}',${realIdx})">✎</button></td>
+      <td><button class="edit-btn" onclick="openUploadEdit('${currentUploadTab}',${list.indexOf(r)})">✎</button></td>
     </tr>`;
   }).join('');
 }
 
-// ── Download ───────────────────────────────────────────────────────────────
+// ── Upload download ────────────────────────────────────────────────────────
 function downloadCSV() {
   const rows = uploadData.valid.map(r => {
     const tags = [...new Set([...batchTags,...(r.tags||[])])].join('|');
     return `${r.email},${r.first_name},${r.last_name},${r.phone},${tags}`;
   });
   const blob = new Blob(['email,first_name,last_name,phone,tags\n' + rows.join('\n')], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = 'clean-leads.csv'; a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'clean-leads.csv'; a.click();
 }
 
 // ── Push ───────────────────────────────────────────────────────────────────
@@ -807,10 +759,7 @@ async function pushToSupabase() {
     try {
       const res = await fetch('/api/push-leads', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ records: batch }) });
       if (res.ok) { inserted += batch.length; }
-      else {
-        const err = await res.json().catch(()=>({}));
-        (res.status===409||err?.code==='23505') ? skipped += batch.length : errors += batch.length;
-      }
+      else { const err = await res.json().catch(()=>({})); (res.status===409||err?.code==='23505') ? skipped += batch.length : errors += batch.length; }
     } catch { errors += batch.length; }
     document.getElementById('progress-bar').style.width = Math.min(Math.round(((i+BATCH)/total)*100),100) + '%';
     document.getElementById('push-text').textContent = `Pushing... ${Math.min(i+BATCH,total)} of ${total}`;
@@ -827,8 +776,7 @@ async function pushToSupabase() {
 // ── Reset upload ───────────────────────────────────────────────────────────
 function resetUpload() {
   uploadData = { valid:[],invalid:[],dupes:[] }; batchTags = []; currentUploadTab = 'valid';
-  fileInput.value = '';
-  renderBatchTags();
+  fileInput.value = ''; renderBatchTags();
   document.getElementById('drop-zone').classList.remove('hidden');
   ['tag-panel','stats','upload-results-card','actions','push-status'].forEach(id => document.getElementById(id).classList.add('hidden'));
   document.getElementById('push-text').textContent = 'Pushing to Supabase...';
