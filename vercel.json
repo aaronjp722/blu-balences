@@ -13,7 +13,9 @@
     { "source": "/find-work", "destination": "/find-work.html" },
     { "source": "/crm", "destination": "/crm.html" },
     { "source": "/email-cleaner", "destination": "/email-cleaner.html" },
+    { "source": "/formatter.html", "destination": "/formatter.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
 
+formatter.html
