@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YP Scraper — Control Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    * { font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f1117; }
+    ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+    .stat-card { background: linear-gradient(135deg, #1a1d27 0%, #1e2235 100%); }
+    .glow-dot { box-shadow: 0 0 6px currentColor; }
+  </style>
+</head>
+<body class="bg-[#0a0c14] text-gray-100 min-h-screen">
+
+  <!-- ── Setup Modal ── -->
+  <div id="setupModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-[#13161f] border border-gray-800 rounded-2xl p-8 w-full max-w-md shadow-2xl">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-lg">🔌</div>
+        <div>
+          <h2 class="text-lg font-bold">Connect to Supabase</h2>
+          <p class="text-gray-500 text-xs">Stored locally in your browser only</p>
+        </div>
+      </div>
+      <label class="block text-xs font-medium text-gray-400 mb-1 uppercase tracking-wider">Supabase URL</label>
+      <input id="cfgUrl" type="text" placeholder="https://xxxx.supabase.co"
+        class="w-full bg-[#0a0c14] border border-gray-700 rounded-xl px-4 py-2.5 mb-4 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition" />
+      <label class="block text-xs font-medium text-gray-400 mb-1 uppercase tracking-wider">Anon / Public Key</label>
+      <input id="cfgKey" type="password" placeholder="eyJhbGciOiJIUzI1NiIs..."
+        class="w-full bg-[#0a0c14] border border-gray-700 rounded-xl px-4 py-2.5 mb-6 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition" />
+      <button onclick="saveConfig()"
+        class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl transition-all duration-150 shadow-lg shadow-indigo-900/40">
+        Connect →
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Header ── -->
+  <header class="border-b border-gray-800/60 px-6 py-4 flex items-center justify-between bg-[#0d0f19]/80 backdrop-blur-md sticky top-0 z-10">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center text-sm font-bold">YP</div>
+      <span class="font-semibold text-base">Scraper</span>
+      <span class="text-gray-600 text-sm hidden sm:block">Control Panel</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5 mr-2">
+        <div class="w-1.5 h-1.5 rounded-full glow-dot" id="statusDot" style="color:#6b7280;background:#6b7280"></div>
+        <span id="statusText" class="text-xs text-gray-500">Connecting...</span>
+      </div>
+      <span id="lastRun" class="text-xs text-gray-600 hidden sm:block mr-2"></span>
+      <button onclick="init()" title="Refresh"
+        class="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-3 py-1.5 rounded-lg transition">↺</button>
+      <button onclick="showSetup()"
+        class="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-3 py-1.5 rounded-lg transition">⚙ Settings</button>
+    </div>
+  </header>
+
+  <!-- ── Tabs ── -->
+  <nav class="px-6 flex gap-1 border-b border-gray-800/60 bg-[#0d0f19]/50">
+    <button onclick="setTab('dashboard')" id="tab-dashboard"
+      class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-indigo-500 text-white transition-all">
+      📊 Dashboard
+    </button>
+    <button onclick="setTab('leads')" id="tab-leads"
+      class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-300 transition-all">
+      📋 Leads
+    </button>
+    <button onclick="setTab('jobs')" id="tab-jobs"
+      class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-300 transition-all">
+      ⚙ Jobs
+    </button>
+  </nav>
+
+  <!-- ── Dashboard ── -->
+  <div id="view-dashboard" class="p-6 max-w-6xl mx-auto">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="stat-card rounded-2xl p-5 border border-gray-800/50">
+        <p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-2">Total Leads</p>
+        <p id="statTotal" class="text-3xl font-bold text-white">—</p>
+        <p class="text-gray-600 text-xs mt-1">all time</p>
+      </div>
+      <div class="stat-card rounded-2xl p-5 border border-gray-800/50">
+        <p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-2">Added Today</p>
+        <p id="statToday" class="text-3xl font-bold text-emerald-400">—</p>
+        <p class="text-gray-600 text-xs mt-1">new records</p>
+      </div>
+      <div class="stat-card rounded-2xl p-5 border border-gray-800/50">
+        <p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-2">Cities</p>
+        <p id="statCities" class="text-3xl font-bold text-indigo-400">—</p>
+        <p class="text-gray-600 text-xs mt-1">unique locations</p>
+      </div>
+      <div class="stat-card rounded-2xl p-5 border border-gray-800/50">
+        <p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-2">Keywords</p>
+        <p id="statKeywords" class="text-3xl font-bold text-amber-400">—</p>
+        <p class="text-gray-600 text-xs mt-1">categories scraped</p>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-4">
+      <div class="bg-[#13161f] border border-gray-800/50 rounded-2xl p-5">
+        <h3 class="font-semibold text-sm text-gray-300 mb-4">Leads by Keyword</h3>
+        <div id="byKeyword" class="space-y-3">
+          <div class="text-gray-600 text-xs text-center py-4">Loading...</div>
+        </div>
+      </div>
+      <div class="bg-[#13161f] border border-gray-800/50 rounded-2xl p-5">
+        <h3 class="font-semibold text-sm text-gray-300 mb-4">Top Cities</h3>
+        <div id="byCity" class="space-y-3">
+          <div class="text-gray-600 text-xs text-center py-4">Loading...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Leads ── -->
+  <div id="view-leads" class="p-6 max-w-7xl mx-auto hidden">
+    <div class="flex flex-wrap gap-3 mb-4">
+      <div class="relative">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">🔍</span>
+        <input id="searchInput" oninput="filterLeads()" type="text" placeholder="Search name, phone, city..."
+          class="bg-[#13161f] border border-gray-700 rounded-xl pl-9 pr-4 py-2 text-sm w-64 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition" />
+      </div>
+      <select id="filterKeyword" onchange="filterLeads()"
+        class="bg-[#13161f] border border-gray-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-indigo-500 transition">
+        <option value="">All Keywords</option>
+      </select>
+      <select id="filterCity" onchange="filterLeads()"
+        class="bg-[#13161f] border border-gray-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-indigo-500 transition">
+        <option value="">All Cities</option>
+      </select>
+      <button onclick="exportCSV()"
+        class="ml-auto flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-sm px-4 py-2 rounded-xl transition shadow-lg shadow-indigo-900/30">
+        ⬇ Export CSV
+      </button>
+    </div>
+
+    <div class="overflow-x-auto rounded-2xl border border-gray-800/60">
+      <table class="w-full text-sm">
+        <thead class="bg-[#13161f] text-gray-500 text-xs uppercase tracking-wider">
+          <tr>
+            <th class="px-4 py-3 text-left font-medium">Business</th>
+            <th class="px-4 py-3 text-left font-medium">Phone</th>
+            <th class="px-4 py-3 text-left font-medium">Location</th>
+            <th class="px-4 py-3 text-left font-medium">Keyword</th>
+            <th class="px-4 py-3 text-left font-medium">Website</th>
+            <th class="px-4 py-3 text-left font-medium">Date</th>
+          </tr>
+        </thead>
+        <tbody id="leadsBody" class="divide-y divide-gray-800/50 bg-[#0d0f19]"></tbody>
+      </table>
+    </div>
+
+    <div class="mt-3 flex items-center justify-between text-xs text-gray-500">
+      <span id="leadCount" class="font-medium">0 leads</span>
+      <div class="flex items-center gap-1">
+        <button onclick="prevPage()"
+          class="px-3 py-1.5 bg-[#13161f] border border-gray-800 rounded-lg hover:border-gray-600 transition">← Prev</button>
+        <span id="pageInfo" class="px-3 py-1.5 bg-[#13161f] border border-gray-800 rounded-lg">1 of 1</span>
+        <button onclick="nextPage()"
+          class="px-3 py-1.5 bg-[#13161f] border border-gray-800 rounded-lg hover:border-gray-600 transition">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Jobs ── -->
+  <div id="view-jobs" class="p-6 max-w-4xl mx-auto hidden">
+    <div class="bg-[#13161f] border border-gray-800/50 rounded-2xl p-5 mb-5">
+      <h3 class="font-semibold mb-1">Add Scrape Job</h3>
+      <p class="text-gray-500 text-xs mb-4">Jobs are saved to your Supabase <code class="text-indigo-400">scraper_jobs</code> table and read dynamically by the agent.</p>
+      <div class="flex gap-3 flex-wrap">
+        <input id="jobKeyword" type="text" placeholder='Keyword — e.g. roofing contractors'
+          class="bg-[#0a0c14] border border-gray-700 rounded-xl px-4 py-2 text-sm flex-1 min-w-[200px] focus:outline-none focus:border-indigo-500 transition" />
+        <input id="jobPlace" type="text" placeholder='Place — e.g. Dallas,TX'
+          class="bg-[#0a0c14] border border-gray-700 rounded-xl px-4 py-2 text-sm w-44 focus:outline-none focus:border-indigo-500 transition" />
+        <button onclick="addJob()"
+          class="bg-indigo-600 hover:bg-indigo-500 text-sm px-5 py-2 rounded-xl transition font-semibold shadow-lg shadow-indigo-900/30 whitespace-nowrap">
+          + Add Job
+        </button>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto rounded-2xl border border-gray-800/60 mb-6">
+      <table class="w-full text-sm">
+        <thead class="bg-[#13161f] text-gray-500 text-xs uppercase tracking-wider">
+          <tr>
+            <th class="px-4 py-3 text-left font-medium">Keyword</th>
+            <th class="px-4 py-3 text-left font-medium">Place</th>
+            <th class="px-4 py-3 text-left font-medium">Status</th>
+            <th class="px-4 py-3 text-left font-medium">Added</th>
+            <th class="px-4 py-3 text-left font-medium"></th>
+          </tr>
+        </thead>
+        <tbody id="jobsBody" class="divide-y divide-gray-800/50 bg-[#0d0f19]"></tbody>
+      </table>
+    </div>
+
+    <!-- Setup steps -->
+    <div class="space-y-4">
+      <div class="bg-[#13161f] border border-gray-800/50 rounded-2xl p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="bg-indigo-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">1</span>
+          <h3 class="font-semibold text-sm">Create table in Supabase SQL Editor</h3>
+        </div>
+        <pre class="bg-[#0a0c14] border border-gray-800 rounded-xl p-4 text-xs text-blue-300 overflow-x-auto leading-relaxed">create table scraper_jobs (
+  id         uuid primary key default gen_random_uuid(),
+  keyword    text not null,
+  place      text not null,
+  active     boolean default true,
+  created_at timestamptz default now()
+);</pre>
+      </div>
+
+      <div class="bg-[#13161f] border border-gray-800/50 rounded-2xl p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="bg-indigo-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">2</span>
+          <h3 class="font-semibold text-sm">Replace hardcoded JOBS in your agent's <code class="text-indigo-400">main.py</code></h3>
+        </div>
+        <pre class="bg-[#0a0c14] border border-gray-800 rounded-xl p-4 text-xs text-emerald-300 overflow-x-auto leading-relaxed">def load_jobs():
+    try:
+        resp = supabase.table("scraper_jobs").select("*").eq("active", True).execute()
+        return [{"keyword": r["keyword"], "place": r["place"]} for r in resp.data]
+    except Exception as e:
+        log.error(f"Could not load jobs from Supabase: {e}")
+        return []
+
+# In run_agent(), change:
+#   for job in JOBS:
+# to:
+#   for job in load_jobs():</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createClient } = supabase;
+    let sb = null, allLeads = [], filteredLeads = [], currentPage = 1;
+    const PAGE_SIZE = 50;
+
+    // ── Config ──────────────────────────────────────────────
+    function loadConfig() {
+      const url = localStorage.getItem('sb_url'), key = localStorage.getItem('sb_key');
+      if (url && key) { sb = createClient(url, key); return true; }
+      return false;
+    }
+    function saveConfig() {
+      const url = document.getElementById('cfgUrl').value.trim();
+      const key = document.getElementById('cfgKey').value.trim();
+      if (!url || !key) return alert('Both fields are required.');
+      localStorage.setItem('sb_url', url); localStorage.setItem('sb_key', key);
+      sb = createClient(url, key);
+      document.getElementById('setupModal').classList.add('hidden');
+      init();
+    }
+    function showSetup() {
+      document.getElementById('cfgUrl').value = localStorage.getItem('sb_url') || '';
+      document.getElementById('cfgKey').value = localStorage.getItem('sb_key') || '';
+      document.getElementById('setupModal').classList.remove('hidden');
+    }
+
+    // ── Tabs ─────────────────────────────────────────────────
+    function setTab(name) {
+      ['dashboard','leads','jobs'].forEach(t => {
+        document.getElementById('view-'+t).classList.toggle('hidden', t !== name);
+        const b = document.getElementById('tab-'+t);
+        b.classList.toggle('border-indigo-500', t === name);
+        b.classList.toggle('text-white', t === name);
+        b.classList.toggle('border-transparent', t !== name);
+        b.classList.toggle('text-gray-500', t !== name);
+      });
+    }
+
+    // ── Init ─────────────────────────────────────────────────
+    async function init() {
+      if (!sb) return;
+      setStatus('yellow', 'Loading...');
+      await Promise.all([loadDashboard(), loadLeads(), loadJobs()]);
+      setStatus('green', 'Connected');
+    }
+    function setStatus(color, text) {
+      const d = document.getElementById('statusDot'), t = document.getElementById('statusText');
+      const colors = { green: '#34d399', yellow: '#fbbf24', red: '#f87171', gray: '#6b7280' };
+      d.style.background = d.style.color = colors[color] || colors.gray;
+      t.textContent = text;
+      t.className = 'text-xs ' + ({ green:'text-emerald-400', yellow:'text-amber-400', red:'text-red-400' }[color] || 'text-gray-500');
+    }
+
+    // ── Dashboard ────────────────────────────────────────────
+    async function loadDashboard() {
+      try {
+        const { data, error } = await sb.from('leads').select('search_keyword,locality,scraped_at');
+        if (error) throw error;
+        document.getElementById('statTotal').textContent = data.length.toLocaleString();
+        const today = new Date().toISOString().slice(0,10);
+        document.getElementById('statToday').textContent =
+          data.filter(r => r.scraped_at?.slice(0,10) === today).length.toLocaleString();
+        document.getElementById('statCities').textContent =
+          new Set(data.map(r => r.locality).filter(Boolean)).size;
+        document.getElementById('statKeywords').textContent =
+          new Set(data.map(r => r.search_keyword).filter(Boolean)).size;
+
+        const kwC = {}, cityC = {};
+        data.forEach(r => {
+          if (r.search_keyword) kwC[r.search_keyword] = (kwC[r.search_keyword]||0)+1;
+          if (r.locality) cityC[r.locality] = (cityC[r.locality]||0)+1;
+        });
+        renderBars('byKeyword', kwC, 'bg-indigo-500');
+        renderBars('byCity', cityC, 'bg-emerald-500', 8);
+
+        const latest = data.map(r=>r.scraped_at).filter(Boolean).sort().at(-1);
+        if (latest) document.getElementById('lastRun').textContent =
+          'Last run: ' + new Date(latest).toLocaleString();
+      } catch(e) { console.error(e); }
+    }
+    function renderBars(id, counts, color, limit=20) {
+      const entries = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,limit);
+      const max = entries[0]?.[1] || 1;
+      document.getElementById(id).innerHTML = entries.map(([k,v]) => `
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-gray-400 truncate" style="width:140px">${k}</span>
+          <div class="flex-1 bg-gray-800 rounded-full h-1.5">
+            <div class="${color} h-1.5 rounded-full transition-all" style="width:${(v/max*100).toFixed(0)}%"></div>
+          </div>
+          <span class="text-xs text-gray-400 w-8 text-right font-medium">${v}</span>
+        </div>`).join('') || '<p class="text-gray-600 text-xs text-center py-2">No data yet</p>';
+    }
+
+    // ── Leads ────────────────────────────────────────────────
+    async function loadLeads() {
+      try {
+        const { data, error } = await sb.from('leads').select('*').order('scraped_at',{ascending:false});
+        if (error) throw error;
+        allLeads = data; populateFilters(data); filteredLeads = data; currentPage = 1; renderLeads();
+      } catch(e) { console.error(e); }
+    }
+    function populateFilters(data) {
+      const kws = [...new Set(data.map(r=>r.search_keyword).filter(Boolean))].sort();
+      const cities = [...new Set(data.map(r=>r.locality).filter(Boolean))].sort();
+      document.getElementById('filterKeyword').innerHTML =
+        '<option value="">All Keywords</option>' + kws.map(k=>`<option value="${k}">${k}</option>`).join('');
+      document.getElementById('filterCity').innerHTML =
+        '<option value="">All Cities</option>' + cities.map(c=>`<option value="${c}">${c}</option>`).join('');
+    }
+    function filterLeads() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const kw = document.getElementById('filterKeyword').value;
+      const city = document.getElementById('filterCity').value;
+      filteredLeads = allLeads.filter(r => {
+        const mQ = !q || [r.business_name,r.telephone,r.locality,r.street].some(v=>v?.toLowerCase().includes(q));
+        return mQ && (!kw||r.search_keyword===kw) && (!city||r.locality===city);
+      });
+      currentPage = 1; renderLeads();
+    }
+    function renderLeads() {
+      const start = (currentPage-1)*PAGE_SIZE, page = filteredLeads.slice(start,start+PAGE_SIZE);
+      const total = Math.ceil(filteredLeads.length/PAGE_SIZE)||1;
+      document.getElementById('leadCount').textContent = `${filteredLeads.length.toLocaleString()} leads`;
+      document.getElementById('pageInfo').textContent = `${currentPage} of ${total}`;
+      document.getElementById('leadsBody').innerHTML = page.map(r=>`
+        <tr class="hover:bg-[#13161f] transition-colors">
+          <td class="px-4 py-3 font-medium">
+            ${r.business_page
+              ? `<a href="${r.business_page}" target="_blank" class="text-indigo-400 hover:text-indigo-300 hover:underline">${r.business_name||'—'}</a>`
+              : (r.business_name||'—')}
+          </td>
+          <td class="px-4 py-3 text-gray-300 font-mono text-xs">${r.telephone||'—'}</td>
+          <td class="px-4 py-3 text-gray-400 text-xs">${[r.locality,r.region].filter(Boolean).join(', ')||'—'}</td>
+          <td class="px-4 py-3">
+            <span class="bg-indigo-950 text-indigo-300 text-xs px-2 py-0.5 rounded-full border border-indigo-800/50">
+              ${r.search_keyword||'—'}
+            </span>
+          </td>
+          <td class="px-4 py-3">
+            ${r.website
+              ? `<a href="${r.website}" target="_blank" class="text-emerald-400 hover:text-emerald-300 hover:underline text-xs truncate block max-w-[160px]">${r.website.replace(/^https?:\/\//,'')}</a>`
+              : '<span class="text-gray-700">—</span>'}
+          </td>
+          <td class="px-4 py-3 text-gray-600 text-xs">${r.scraped_at?new Date(r.scraped_at).toLocaleDateString():'—'}</td>
+        </tr>`).join('') || `<tr><td colspan="6" class="px-4 py-10 text-center text-gray-600 text-sm">No leads found</td></tr>`;
+    }
+    function prevPage() { if(currentPage>1){currentPage--;renderLeads();} }
+    function nextPage() { if(currentPage<Math.ceil(filteredLeads.length/PAGE_SIZE)){currentPage++;renderLeads();} }
+    function exportCSV() {
+      const cols=['business_name','telephone','street','locality','region','zipcode','search_keyword','website','business_page','scraped_at'];
+      const csv=[cols.join(','),...filteredLeads.map(r=>cols.map(c=>JSON.stringify(r[c]??'')).join(','))].join('\n');
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+      a.download=`leads-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+    }
+
+    // ── Jobs ─────────────────────────────────────────────────
+    async function loadJobs() {
+      try {
+        const { data, error } = await sb.from('scraper_jobs').select('*').order('created_at',{ascending:false});
+        if (error) {
+          document.getElementById('jobsBody').innerHTML =
+            `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-600 text-xs">
+              Table <code class="text-indigo-400">scraper_jobs</code> not found — run the SQL below to create it.
+            </td></tr>`; return;
+        }
+        document.getElementById('jobsBody').innerHTML = data.length ? data.map(j=>`
+          <tr class="hover:bg-[#13161f] transition-colors">
+            <td class="px-4 py-3 font-medium">${j.keyword}</td>
+            <td class="px-4 py-3 text-gray-400">${j.place}</td>
+            <td class="px-4 py-3">
+              <button onclick="toggleJob('${j.id}',${!j.active})"
+                class="text-xs px-2.5 py-0.5 rounded-full border transition hover:opacity-80
+                  ${j.active
+                    ? 'bg-emerald-950 text-emerald-400 border-emerald-800/50'
+                    : 'bg-gray-900 text-gray-500 border-gray-700'}">
+                ${j.active ? '● Active' : '○ Paused'}
+              </button>
+            </td>
+            <td class="px-4 py-3 text-gray-600 text-xs">${new Date(j.created_at).toLocaleDateString()}</td>
+            <td class="px-4 py-3">
+              <button onclick="deleteJob('${j.id}')"
+                class="text-xs text-red-500 hover:text-red-400 transition">Delete</button>
+            </td>
+          </tr>`).join('') :
+          `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-600 text-sm">No jobs yet — add one above.</td></tr>`;
+      } catch(e) { console.error(e); }
+    }
+    async function addJob() {
+      const keyword = document.getElementById('jobKeyword').value.trim();
+      const place = document.getElementById('jobPlace').value.trim();
+      if (!keyword||!place) return alert('Both keyword and place are required.');
+      const { error } = await sb.from('scraper_jobs').insert({keyword,place,active:true});
+      if (error) return alert('Error: '+error.message);
+      document.getElementById('jobKeyword').value=''; document.getElementById('jobPlace').value='';
+      loadJobs();
+    }
+    async function toggleJob(id,active) { await sb.from('scraper_jobs').update({active}).eq('id',id); loadJobs(); }
+    async function deleteJob(id) {
+      if(!confirm('Delete this job?'))return;
+      await sb.from('scraper_jobs').delete().eq('id',id); loadJobs();
+    }
+
+    // ── Boot ─────────────────────────────────────────────────
+    if (loadConfig()) { init(); } else { showSetup(); }
+  </script>
+</body>
+</html>
