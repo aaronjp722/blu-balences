@@ -243,23 +243,20 @@
     const PAGE_SIZE = 50;
 
     // ── Config ──────────────────────────────────────────────
+    const SB_URL = 'https://xbwuvaxtnylqvagdvpxp.supabase.co';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhid3V2YXh0bnlscXZhZ2R2cHhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3Njk1NjMsImV4cCI6MjA5NDM0NTU2M30.WnCOew6w9HtQ2eAM1vpSJCb_AjAvv9x7Mev-k2IxSpc';
+
     function loadConfig() {
-      const url = localStorage.getItem('sb_url'), key = localStorage.getItem('sb_key');
-      if (url && key) { sb = createClient(url, key); return true; }
-      return false;
+      sb = createClient(SB_URL, SB_KEY);
+      return true;
     }
     function saveConfig() {
-      const url = document.getElementById('cfgUrl').value.trim();
-      const key = document.getElementById('cfgKey').value.trim();
-      if (!url || !key) return alert('Both fields are required.');
-      localStorage.setItem('sb_url', url); localStorage.setItem('sb_key', key);
-      sb = createClient(url, key);
       document.getElementById('setupModal').classList.add('hidden');
       init();
     }
     function showSetup() {
-      document.getElementById('cfgUrl').value = localStorage.getItem('sb_url') || '';
-      document.getElementById('cfgKey').value = localStorage.getItem('sb_key') || '';
+      document.getElementById('cfgUrl').value = SB_URL;
+      document.getElementById('cfgKey').value = SB_KEY;
       document.getElementById('setupModal').classList.remove('hidden');
     }
 
@@ -441,7 +438,7 @@
     }
 
     // ── Boot ─────────────────────────────────────────────────
-    if (loadConfig()) { init(); } else { showSetup(); }
+    loadConfig(); init();
   </script>
 </body>
 </html>
