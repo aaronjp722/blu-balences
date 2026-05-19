@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>YP Scraper — Control Panel</title>
+  <title>Scraper — Control Panel</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -14,8 +14,8 @@
     ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
     .stat-card { background: linear-gradient(135deg, #1a1d27 0%, #1e2235 100%); }
     .glow-dot { box-shadow: 0 0 6px currentColor; }
-    .tag-chip { display:inline-flex; align-items:center; gap:3px; background:rgba(99,102,241,0.15); border:1px solid rgba(99,102,241,0.3); color:#a5b4fc; border-radius:4px; padding:1px 7px; font-size:11px; font-weight:600; margin:1px; }
-    .tag-chip button { background:none; border:none; color:#a5b4fc; cursor:pointer; font-size:13px; padding:0 1px; opacity:0.7; line-height:1; }
+    .tag-chip { display:inline-flex;align-items:center;gap:3px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#a5b4fc;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:600;margin:1px; }
+    .tag-chip button { background:none;border:none;color:#a5b4fc;cursor:pointer;font-size:13px;padding:0 1px;opacity:0.7;line-height:1; }
     .tag-chip button:hover { opacity:1; }
   </style>
 </head>
@@ -39,7 +39,7 @@
   <!-- Header -->
   <header class="border-b border-gray-800/60 px-6 py-4 flex items-center justify-between bg-[#0d0f19]/80 backdrop-blur-md sticky top-0 z-10">
     <div class="flex items-center gap-3">
-      <div class="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center text-sm font-bold">YP</div>
+      <div class="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center text-sm font-bold">FS</div>
       <span class="font-semibold text-base">Scraper</span>
       <span class="text-gray-600 text-sm hidden sm:block">Control Panel</span>
     </div>
@@ -67,8 +67,8 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <div class="stat-card rounded-2xl p-5 border border-gray-800/50"><p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-2">Total Leads</p><p id="statTotal" class="text-3xl font-bold text-white">—</p><p class="text-gray-600 text-xs mt-1">all time</p></div>
       <div class="stat-card rounded-2xl p-5 border border-gray-800/50"><p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-2">Added Today</p><p id="statToday" class="text-3xl font-bold text-emerald-400">—</p><p class="text-gray-600 text-xs mt-1">new records</p></div>
+      <div class="stat-card rounded-2xl p-5 border border-gray-800/50"><p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-2">With Email</p><p id="statEmails" class="text-3xl font-bold text-purple-400">—</p><p class="text-gray-600 text-xs mt-1">emails found</p></div>
       <div class="stat-card rounded-2xl p-5 border border-gray-800/50"><p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-2">Cities</p><p id="statCities" class="text-3xl font-bold text-indigo-400">—</p><p class="text-gray-600 text-xs mt-1">unique locations</p></div>
-      <div class="stat-card rounded-2xl p-5 border border-gray-800/50"><p class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-2">Keywords</p><p id="statKeywords" class="text-3xl font-bold text-amber-400">—</p><p class="text-gray-600 text-xs mt-1">categories scraped</p></div>
     </div>
     <div class="grid lg:grid-cols-2 gap-4">
       <div class="bg-[#13161f] border border-gray-800/50 rounded-2xl p-5"><h3 class="font-semibold text-sm text-gray-300 mb-4">Leads by Keyword</h3><div id="byKeyword" class="space-y-3"><div class="text-gray-600 text-xs text-center py-4">Loading...</div></div></div>
@@ -78,18 +78,21 @@
 
   <!-- Leads -->
   <div id="view-leads" class="p-6 max-w-7xl mx-auto hidden">
-    <!-- Filter row 1 -->
     <div class="flex flex-wrap gap-3 mb-2">
       <div class="relative">
         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">🔍</span>
-        <input id="searchInput" oninput="filterLeads()" type="text" placeholder="Search name, phone, city..." class="bg-[#13161f] border border-gray-700 rounded-xl pl-9 pr-4 py-2 text-sm w-56 focus:outline-none focus:border-indigo-500 transition" />
+        <input id="searchInput" oninput="filterLeads()" type="text" placeholder="Search name, phone, city, email..." class="bg-[#13161f] border border-gray-700 rounded-xl pl-9 pr-4 py-2 text-sm w-64 focus:outline-none focus:border-indigo-500 transition" />
       </div>
       <select id="filterKeyword" onchange="filterLeads()" class="bg-[#13161f] border border-gray-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-indigo-500 transition"><option value="">All Keywords</option></select>
       <select id="filterCity" onchange="filterLeads()" class="bg-[#13161f] border border-gray-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-indigo-500 transition"><option value="">All Cities</option></select>
-      <button onclick="exportCSV()" class="ml-auto flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-sm px-4 py-2 rounded-xl transition shadow-lg shadow-indigo-900/30">⬇ Export CSV</button>
-      <button onclick="pushToSMTP(event)" class="flex items-center gap-2 bg-purple-700 hover:bg-purple-600 text-sm px-4 py-2 rounded-xl transition shadow-lg shadow-purple-900/30">📧 Push to SMTP Checker</button>
+      <select id="filterEmail" onchange="filterLeads()" class="bg-[#13161f] border border-gray-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-indigo-500 transition">
+        <option value="">All Leads</option>
+        <option value="with">With Email</option>
+        <option value="without">Without Email</option>
+      </select>
+      <button onclick="exportCSV()" class="ml-auto flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-sm px-4 py-2 rounded-xl transition">⬇ Export CSV</button>
+      <button onclick="pushToSMTP(event)" class="flex items-center gap-2 bg-purple-700 hover:bg-purple-600 text-sm px-4 py-2 rounded-xl transition">📧 Push to SMTP</button>
     </div>
-    <!-- Filter row 2: tags + dates -->
     <div class="flex flex-wrap gap-3 mb-4">
       <div class="flex items-center gap-2 bg-[#13161f] border border-gray-700 rounded-xl px-3 py-1.5 flex-1 min-w-[240px] cursor-text" onclick="document.getElementById('leadTagInput').focus()">
         <span class="text-gray-600 text-xs">🏷</span>
@@ -112,6 +115,7 @@
           <tr>
             <th class="px-4 py-3 text-left font-medium">Business</th>
             <th class="px-4 py-3 text-left font-medium">Phone</th>
+            <th class="px-4 py-3 text-left font-medium">Email</th>
             <th class="px-4 py-3 text-left font-medium">Location</th>
             <th class="px-4 py-3 text-left font-medium">Keyword</th>
             <th class="px-4 py-3 text-left font-medium">Tags</th>
@@ -169,16 +173,6 @@
         <tbody id="jobsBody" class="divide-y divide-gray-800/50 bg-[#0d0f19]"></tbody>
       </table>
     </div>
-
-    <!-- SQL snippet -->
-    <div class="bg-[#13161f] border border-gray-800/50 rounded-2xl p-5 mb-4">
-      <div class="flex items-center gap-2 mb-3">
-        <span class="bg-indigo-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">!</span>
-        <h3 class="font-semibold text-sm">Update agent to save tags on insert</h3>
-      </div>
-      <p class="text-gray-500 text-xs mb-2">In <code class="text-indigo-400">scraper_agent.py</code>, inside the results.append({}) block add:</p>
-      <pre class="bg-[#0a0c14] border border-gray-800 rounded-xl p-4 text-xs text-emerald-300 overflow-x-auto leading-relaxed">"tags": [keyword, place, datetime.utcnow().strftime("%Y-%m-%d")],</pre>
-    </div>
   </div>
 
   <!-- Schedule -->
@@ -208,25 +202,8 @@
         <div id="scheduleStatus" class="text-xs text-center hidden"></div>
       </div>
     </div>
-
-    <div class="bg-yellow-900/20 border border-yellow-700/30 rounded-2xl p-4 text-xs text-yellow-300 mb-4">
-      <strong>To apply:</strong> Railway → <code>-yp-scraper-agent</code> → Deployments → Restart. The agent reads the config from Supabase on startup.
-    </div>
-
-    <div class="bg-[#13161f] border border-gray-800/50 rounded-2xl p-5">
-      <h3 class="font-semibold text-sm mb-3">Add this to <code class="text-indigo-400">scraper_agent.py</code> to read schedule from Supabase</h3>
-      <pre class="bg-[#0a0c14] border border-gray-800 rounded-xl p-4 text-xs text-emerald-300 overflow-x-auto leading-relaxed">def load_config():
-    try:
-        resp = supabase.table("scraper_config").select("*").execute()
-        return {r["key"]: r["value"] for r in resp.data}
-    except Exception as e:
-        log.error(f"Could not load config: {e}")
-        return {}
-
-cfg            = load_config()
-SCHEDULE       = cfg.get("SCHEDULE", os.environ.get("SCHEDULE", "weekly"))
-RUN_HOUR       = cfg.get("RUN_HOUR",  os.environ.get("RUN_HOUR",  "06:00"))
-INTERVAL_HOURS = int(cfg.get("INTERVAL_HOURS", os.environ.get("INTERVAL_HOURS", "24")))</pre>
+    <div class="bg-yellow-900/20 border border-yellow-700/30 rounded-2xl p-4 text-xs text-yellow-300">
+      <strong>To apply:</strong> Railway → your service → Deployments → Restart. The agent reads config from Supabase on startup.
     </div>
   </div>
 
@@ -234,10 +211,8 @@ INTERVAL_HOURS = int(cfg.get("INTERVAL_HOURS", os.environ.get("INTERVAL_HOURS", 
     const { createClient } = supabase;
     let sb = null, allLeads = [], filteredLeads = [], currentPage = 1;
     const PAGE_SIZE = 50;
-    let leadTagFilter = [];
-    let jobCustomTags = [];
+    let leadTagFilter = [], jobCustomTags = [];
 
-    // ── Config ──────────────────────────────────────────────
     const SB_URL = 'https://xbwuvaxtnylqvagdvpxp.supabase.co';
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhid3V2YXh0bnlscXZhZ2R2cHhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3Njk1NjMsImV4cCI6MjA5NDM0NTU2M30.WnCOew6w9HtQ2eAM1vpSJCb_AjAvv9x7Mev-k2IxSpc';
 
@@ -249,7 +224,6 @@ INTERVAL_HOURS = int(cfg.get("INTERVAL_HOURS", os.environ.get("INTERVAL_HOURS", 
       document.getElementById('setupModal').classList.remove('hidden');
     }
 
-    // ── Tabs ─────────────────────────────────────────────────
     function setTab(name) {
       ['dashboard','leads','jobs','schedule'].forEach(t => {
         document.getElementById('view-'+t).classList.toggle('hidden', t !== name);
@@ -262,7 +236,6 @@ INTERVAL_HOURS = int(cfg.get("INTERVAL_HOURS", os.environ.get("INTERVAL_HOURS", 
       if (name === 'schedule') loadSchedule();
     }
 
-    // ── Init ─────────────────────────────────────────────────
     async function init() {
       if (!sb) return;
       setStatus('yellow', 'Loading...');
@@ -277,20 +250,19 @@ INTERVAL_HOURS = int(cfg.get("INTERVAL_HOURS", os.environ.get("INTERVAL_HOURS", 
       t.className = 'text-xs ' + ({green:'text-emerald-400',yellow:'text-amber-400',red:'text-red-400'}[color]||'text-gray-500');
     }
 
-    // ── Dashboard ────────────────────────────────────────────
     async function loadDashboard() {
       try {
-        const { data, error } = await sb.from('leads').select('search_keyword,locality,scraped_at');
+        const { data, error } = await sb.from('leads').select('search_keyword,locality,scraped_at,email');
         if (error) throw error;
         document.getElementById('statTotal').textContent = data.length.toLocaleString();
         const today = new Date().toISOString().slice(0,10);
         document.getElementById('statToday').textContent = data.filter(r=>r.scraped_at?.slice(0,10)===today).length.toLocaleString();
+        document.getElementById('statEmails').textContent = data.filter(r=>r.email).length.toLocaleString();
         document.getElementById('statCities').textContent = new Set(data.map(r=>r.locality).filter(Boolean)).size;
-        document.getElementById('statKeywords').textContent = new Set(data.map(r=>r.search_keyword).filter(Boolean)).size;
         const kwC={}, cityC={};
         data.forEach(r=>{
           if(r.search_keyword) kwC[r.search_keyword]=(kwC[r.search_keyword]||0)+1;
-                    if(r.locality) cityC[r.locality]=(cityC[r.locality]||0)+1;
+          if(r.locality) cityC[r.locality]=(cityC[r.locality]||0)+1;
         });
         renderBars('byKeyword',kwC,'bg-indigo-500');
         renderBars('byCity',cityC,'bg-emerald-500',8);
@@ -309,7 +281,6 @@ INTERVAL_HOURS = int(cfg.get("INTERVAL_HOURS", os.environ.get("INTERVAL_HOURS", 
         </div>`).join('')||'<p class="text-gray-600 text-xs text-center py-2">No data yet</p>';
     }
 
-    // ── Leads ────────────────────────────────────────────────
     async function loadLeads() {
       try {
         const {data,error}=await sb.from('leads').select('*').order('scraped_at',{ascending:false});
@@ -327,17 +298,19 @@ INTERVAL_HOURS = int(cfg.get("INTERVAL_HOURS", os.environ.get("INTERVAL_HOURS", 
       const q=document.getElementById('searchInput').value.toLowerCase();
       const kw=document.getElementById('filterKeyword').value;
       const city=document.getElementById('filterCity').value;
+      const emailF=document.getElementById('filterEmail').value;
       const dFrom=document.getElementById('dateFrom').value;
       const dTo=document.getElementById('dateTo').value;
       filteredLeads=allLeads.filter(r=>{
-        const mQ=!q||[r.business_name,r.telephone,r.locality,r.street].some(v=>v?.toLowerCase().includes(q));
+        const mQ=!q||[r.business_name,r.telephone,r.locality,r.street,r.email].some(v=>v?.toLowerCase().includes(q));
         const mKw=!kw||r.search_keyword===kw;
         const mCity=!city||r.locality===city;
+        const mEmail=!emailF||(emailF==='with'?!!r.email:!r.email);
         const rDate=r.scraped_at?.slice(0,10)||'';
         const mFrom=!dFrom||rDate>=dFrom;
         const mTo=!dTo||rDate<=dTo;
         const mTags=leadTagFilter.length===0||leadTagFilter.every(ft=>(r.tags||[]).some(rt=>rt.toLowerCase().includes(ft.toLowerCase())));
-        return mQ&&mKw&&mCity&&mFrom&&mTo&&mTags;
+        return mQ&&mKw&&mCity&&mEmail&&mFrom&&mTo&&mTags;
       });
       currentPage=1; renderLeads();
     }
@@ -355,17 +328,18 @@ INTERVAL_HOURS = int(cfg.get("INTERVAL_HOURS", os.environ.get("INTERVAL_HOURS", 
         <tr class="hover:bg-[#13161f] transition-colors">
           <td class="px-4 py-3 font-medium">${r.business_page?`<a href="${r.business_page}" target="_blank" class="text-indigo-400 hover:text-indigo-300 hover:underline">${r.business_name||'—'}</a>`:(r.business_name||'—')}</td>
           <td class="px-4 py-3 text-gray-300 font-mono text-xs">${r.telephone||'—'}</td>
+          <td class="px-4 py-3 text-xs">${r.email?`<a href="mailto:${r.email}" class="text-purple-400 hover:text-purple-300 hover:underline">${r.email}</a>`:'<span class="text-gray-700">—</span>'}</td>
           <td class="px-4 py-3 text-gray-400 text-xs">${[r.locality,r.region].filter(Boolean).join(', ')||'—'}</td>
           <td class="px-4 py-3"><span class="bg-indigo-950 text-indigo-300 text-xs px-2 py-0.5 rounded-full border border-indigo-800/50">${r.search_keyword||'—'}</span></td>
-          <td class="px-4 py-3 max-w-[180px]">${(r.tags||[]).length?r.tags.map(t=>`<span class="tag-chip">${t}</span>`).join(''):'<span class="text-gray-700 text-xs">—</span>'}</td>
-          <td class="px-4 py-3">${r.website?`<a href="${r.website}" target="_blank" class="text-emerald-400 hover:text-emerald-300 hover:underline text-xs truncate block max-w-[140px]">${r.website.replace(/^https?:\/\//,'')}</a>`:'<span class="text-gray-700">—</span>'}</td>
+          <td class="px-4 py-3 max-w-[160px]">${(r.tags||[]).length?r.tags.map(t=>`<span class="tag-chip">${t}</span>`).join(''):'<span class="text-gray-700 text-xs">—</span>'}</td>
+          <td class="px-4 py-3">${r.website?`<a href="${r.website}" target="_blank" class="text-emerald-400 hover:text-emerald-300 hover:underline text-xs truncate block max-w-[130px]">${r.website.replace(/^https?:\/\//,'')}</a>`:'<span class="text-gray-700">—</span>'}</td>
           <td class="px-4 py-3 text-gray-600 text-xs">${r.scraped_at?new Date(r.scraped_at).toLocaleDateString():'—'}</td>
-        </tr>`).join('')||`<tr><td colspan="7" class="px-4 py-10 text-center text-gray-600 text-sm">No leads found</td></tr>`;
+        </tr>`).join('')||`<tr><td colspan="8" class="px-4 py-10 text-center text-gray-600 text-sm">No leads found</td></tr>`;
     }
     function prevPage(){if(currentPage>1){currentPage--;renderLeads();}}
     function nextPage(){if(currentPage<Math.ceil(filteredLeads.length/PAGE_SIZE)){currentPage++;renderLeads();}}
     function exportCSV(){
-      const cols=['business_name','telephone','street','locality','region','zipcode','search_keyword','tags','email','website','business_page','scraped_at'];
+      const cols=['business_name','telephone','email','street','locality','region','zipcode','search_keyword','tags','website','business_page','scraped_at'];
       const csv=[cols.join(','),...filteredLeads.map(r=>cols.map(c=>{
         let v=r[c]??''; if(Array.isArray(v)) v=v.join('|');
         return JSON.stringify(String(v));
@@ -375,7 +349,6 @@ INTERVAL_HOURS = int(cfg.get("INTERVAL_HOURS", os.environ.get("INTERVAL_HOURS", 
       a.download=`leads-${new Date().toISOString().slice(0,10)}.csv`; a.click();
     }
 
-    // ── Lead tag filter chips ─────────────────────────────────
     document.getElementById('leadTagInput').addEventListener('keydown',e=>{
       if((e.key==='Enter'||e.key===',')&&e.target.value.trim()){
         e.preventDefault();
@@ -399,14 +372,10 @@ INTERVAL_HOURS = int(cfg.get("INTERVAL_HOURS", os.environ.get("INTERVAL_HOURS", 
     }
     function removeLeadTag(i){leadTagFilter.splice(i,1);renderLeadTagChips();filterLeads();}
 
-    // ── Push to SMTP Checker ──────────────────────────────────
     async function pushToSMTP(e){
       const btn=e.currentTarget;
       const toSend=filteredLeads.filter(r=>r.email);
-      if(!toSend.length){
-        alert(`No email addresses in the ${filteredLeads.length} filtered leads.\n\nAdd an "email" column to your leads table and populate it, then push.`);
-        return;
-      }
+      if(!toSend.length){alert(`No email addresses in the ${filteredLeads.length} filtered leads.`);return;}
       if(!confirm(`Push ${toSend.length} lead${toSend.length!==1?'s':''} to SMTP Checker?`)) return;
       btn.textContent='Pushing...'; btn.disabled=true;
       try {
@@ -421,15 +390,14 @@ INTERVAL_HOURS = int(cfg.get("INTERVAL_HOURS", os.environ.get("INTERVAL_HOURS", 
           res.ok?ok+=records.length:fail+=records.length;
         }
         btn.textContent=`✓ Pushed ${ok}`;
-        setTimeout(()=>{btn.textContent='📧 Push to SMTP Checker';btn.disabled=false;},2500);
-      } catch(err){alert('Push failed: '+err.message);btn.textContent='📧 Push to SMTP Checker';btn.disabled=false;}
+        setTimeout(()=>{btn.textContent='📧 Push to SMTP';btn.disabled=false;},2500);
+      } catch(err){alert('Push failed: '+err.message);btn.textContent='📧 Push to SMTP';btn.disabled=false;}
     }
 
-    // ── Jobs ─────────────────────────────────────────────────
     async function loadJobs(){
       try {
         const {data,error}=await sb.from('scraper_jobs').select('*').order('created_at',{ascending:false});
-        if(error){document.getElementById('jobsBody').innerHTML=`<tr><td colspan="6" class="px-4 py-8 text-center text-gray-600 text-xs">Table not found — run the SQL above to create it.</td></tr>`;return;}
+        if(error){document.getElementById('jobsBody').innerHTML=`<tr><td colspan="6" class="px-4 py-8 text-center text-gray-600 text-xs">Table not found — create scraper_jobs in Supabase.</td></tr>`;return;}
         document.getElementById('jobsBody').innerHTML=data.length?data.map(j=>`
           <tr class="hover:bg-[#13161f] transition-colors">
             <td class="px-4 py-3 font-medium">${j.keyword}</td>
@@ -446,7 +414,6 @@ INTERVAL_HOURS = int(cfg.get("INTERVAL_HOURS", os.environ.get("INTERVAL_HOURS", 
       } catch(e){console.error(e);}
     }
 
-    // ── Job tag chips ─────────────────────────────────────────
     document.getElementById('jobTagInput').addEventListener('keydown',e=>{
       if((e.key==='Enter'||e.key===',')&&e.target.value.trim()){
         e.preventDefault();
@@ -490,7 +457,6 @@ INTERVAL_HOURS = int(cfg.get("INTERVAL_HOURS", os.environ.get("INTERVAL_HOURS", 
     async function toggleJob(id,active){await sb.from('scraper_jobs').update({active}).eq('id',id);loadJobs();}
     async function deleteJob(id){if(!confirm('Delete this job?'))return;await sb.from('scraper_jobs').delete().eq('id',id);loadJobs();}
 
-    // ── Schedule ──────────────────────────────────────────────
     async function loadSchedule(){
       try {
         const {data,error}=await sb.from('scraper_config').select('*');
@@ -530,7 +496,6 @@ INTERVAL_HOURS = int(cfg.get("INTERVAL_HOURS", os.environ.get("INTERVAL_HOURS", 
       btn.disabled=false; btn.textContent='Save Schedule';
     }
 
-    // ── Boot ─────────────────────────────────────────────────
     loadConfig(); init();
   </script>
 </body>
