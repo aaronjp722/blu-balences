@@ -1,18 +1,16 @@
 """
-Listmonk drip automation — reads config from Supabase, fires campaigns, logs sends.
+Blu Balence drip automation — reads config from Supabase, sends via Brevo API.
 
 Setup:
   export SUPABASE_URL=https://xxxx.supabase.co
-  export SUPABASE_SERVICE_KEY=your-service-role-key   # NOT the anon key
+  export SUPABASE_SERVICE_KEY=your-service-role-key
   python listmonk_drip.py
-
-Cron (daily 9am):
-  0 9 * * * cd /path/to/repo && python listmonk_drip.py >> drip.log 2>&1
 """
 
 import datetime as dt
 import logging
 import os
+import re
 import sys
 import time
 
@@ -47,75 +45,47 @@ def supa_patch(base: str, key: str, table: str, qs: str, payload: dict) -> None:
     r.raise_for_status()
 
 
-# ── Listmonk API client ──────────────────────────────────────
+# ── Brevo sender ─────────────────────────────────────────────
 
-class Listmonk:
-    def __init__(self, url: str, username: str, password: str):
-        self.base = url.rstrip("/")
-        self.s = requests.Session()
-        self.s.auth = (username, password)
-        self.s.headers["Content-Type"] = "application/json"
+def parse_from_email(from_email: str):
+    m = re.match(r'^(.+?)\s*<(.+?)>$', from_email.strip())
+    if m:
+        return m.group(1).strip(), m.group(2).strip()
+    return from_email.strip(), from_email.strip()
 
-    def _get(self, path: str, **params):
-        r = self.s.get(f"{self.base}{path}", params=params, timeout=30)
-        r.raise_for_status()
-        return r.json()["data"]
+def personalize(text: str, email: str, name: str) -> str:
+    first = (name or email.split("@")[0]).split()[0]
+    return (text
+        .replace("{{ .Subscriber.FirstName }}", first)
+        .replace("{{ .Subscriber.Name }}", name or first)
+        .replace("{{ .Subscriber.Email }}", email))
 
-    def _post(self, path: str, payload: dict):
-        r = self.s.post(f"{self.base}{path}", json=payload, timeout=30)
-        r.raise_for_status()
-        return r.json()["data"]
+def send_email(api_key: str, to_email: str, to_name: str,
+               from_email: str, subject: str, body: str,
+               tags: list[str]) -> str:
+    sender_name, sender_addr = parse_from_email(from_email)
+    content = personalize(body, to_email, to_name or "")
+    subject = personalize(subject, to_email, to_name or "")
 
-    def _put(self, path: str, payload: dict):
-        r = self.s.put(f"{self.base}{path}", json=payload, timeout=30)
-        r.raise_for_status()
-        return r.json().get("data")
+    # Wrap plain text in simple HTML if no tags detected
+    if not re.search(r'<[a-zA-Z]', content):
+        content = "<div>" + content.replace("\n", "<br>\n") + "</div>"
 
-    def create_list(self, name: str) -> int:
-        return self._post("/api/lists", {"name": name, "type": "private", "optin": "single"})["id"]
-
-    def delete_list(self, list_id: int) -> None:
-        self.s.delete(f"{self.base}/api/lists/{list_id}", timeout=30)
-
-    def find_subscriber(self, email: str) -> int | None:
-        data = self._get("/api/subscribers", query=f"subscribers.email = '{email}'")
-        results = data.get("results", [])
-        return results[0]["id"] if results else None
-
-    def upsert_subscriber(self, email: str, name: str, list_id: int) -> int:
-        sub_id = self.find_subscriber(email)
-        if sub_id:
-            self._put("/api/subscribers/lists", {
-                "ids": [sub_id], "action": "add",
-                "target_list_ids": [list_id], "status": "confirmed",
-            })
-        else:
-            data = self._post("/api/subscribers", {
-                "email": email, "name": name or email, "status": "enabled",
-                "lists": [list_id], "preconfirm_subscriptions": True,
-            })
-            sub_id = data["id"]
-        return sub_id
-
-    def create_campaign(self, name: str, subject: str, from_email: str,
-                        list_ids: list[int], template_id: int,
-                        body: str = " ", tags: list[str] = None) -> int:
-        data = self._post("/api/campaigns", {
-            "name": name,
-            "subject": subject,
-            "from_email": from_email,
-            "lists": list_ids,
-            "template_id": template_id,
-            "type": "regular",
-            "content_type": "richtext",
-            "messenger": "email",
-            "body": body if body and body.strip() else " ",
-            "tags": tags or [],
-        })
-        return data["id"]
-
-    def start_campaign(self, campaign_id: int) -> None:
-        self._put(f"/api/campaigns/{campaign_id}/status", {"status": "running"})
+    payload = {
+        "sender": {"name": sender_name, "email": sender_addr},
+        "to": [{"email": to_email, "name": to_name or to_email}],
+        "subject": subject,
+        "htmlContent": content,
+        "tags": tags or [],
+    }
+    r = requests.post(
+        "https://api.brevo.com/v3/smtp/email",
+        json=payload,
+        headers={"api-key": api_key, "Content-Type": "application/json"},
+        timeout=30,
+    )
+    r.raise_for_status()
+    return r.json().get("messageId", "")
 
 
 # ── Main ─────────────────────────────────────────────────────
@@ -138,11 +108,12 @@ def main() -> int:
     def patch(table, qs, payload): return supa_patch(SUPA_URL, SUPA_KEY, table, qs, payload)
 
     cfg = {r["key"]: r["value"] for r in get("settings", "?select=key,value")}
-    lm = Listmonk(
-        cfg.get("listmonk_url", "http://localhost:9000"),
-        cfg.get("listmonk_username", "admin"),
-        cfg.get("listmonk_password", ""),
-    )
+
+    brevo_api_key = cfg.get("brevo_api_key", "")
+    if not brevo_api_key:
+        log.error("brevo_api_key not set in Supabase settings table")
+        return 1
+
     global_emails_per_minute = float(cfg.get("emails_per_minute", "2"))
     global_send_interval = 60.0 / global_emails_per_minute
 
@@ -170,7 +141,11 @@ def main() -> int:
             batch_interval_minutes = int(step.get("batch_interval_minutes") or 0)
             send_interval = (batch_interval_minutes * 60) if batch_interval_minutes > 0 else global_send_interval
 
-            step_body = step.get("body") or " "
+            step_body = step.get("body") or ""
+            if not step_body.strip():
+                log.warning("  Step %d has no body — skipping", snum)
+                continue
+
             step_tags = [t.strip() for t in (step.get("tags") or "").split(",") if t.strip()]
 
             if snum == 1:
@@ -196,54 +171,39 @@ def main() -> int:
                 due = [e for e in due if e["id"] not in already_sent_ids]
                 skipped = before - len(due)
                 if skipped:
-                    log.info("  Step %d: skipped %d already-sent enrollment(s)", snum, skipped)
+                    log.info("  Step %d: skipped %d already-sent", snum, skipped)
 
             if not due:
                 log.info("  Step %d: all due already sent, skipping", snum)
                 continue
 
             if batch_limit > 0 and len(due) > batch_limit:
-                log.info("  Step %d: %d due, capped to batch limit of %d", snum, len(due), batch_limit)
+                log.info("  Step %d: capped to %d (batch limit)", snum, batch_limit)
                 due = due[:batch_limit]
             else:
-                log.info("  Step %d: %d due (delay was %d min)", snum, len(due), delay_mins)
-
-            if batch_interval_minutes > 0:
-                log.info("  Step %d: interval %d min between emails", snum, batch_interval_minutes)
-            else:
-                log.info("  Step %d: using global rate %.1f emails/min", snum, global_emails_per_minute)
-
-            if step_tags:
-                log.info("  Step %d: tags %s", snum, step_tags)
+                log.info("  Step %d: %d due", snum, len(due))
 
             is_last = snum >= total_steps
 
             for i, enr in enumerate(due):
-                temp_list_id = None
                 try:
-                    list_name = f"_drip_{seq['name'][:20]}_s{snum}_{enr['id'][:8]}"
-                    temp_list_id = lm.create_list(list_name)
-                    lm.upsert_subscriber(enr["email"], enr.get("name") or "", temp_list_id)
-
-                    campaign_id = lm.create_campaign(
-                        name=f"{seq['name']} Step {snum} {enr['email']}",
-                        subject=step["subject"],
+                    msg_id = send_email(
+                        api_key=brevo_api_key,
+                        to_email=enr["email"],
+                        to_name=enr.get("name") or "",
                         from_email=step["from_email"],
-                        list_ids=[temp_list_id],
-                        template_id=step["template_id"],
+                        subject=step["subject"],
                         body=step_body,
                         tags=step_tags,
                     )
-                    lm.start_campaign(campaign_id)
-                    log.info("  [%d/%d] Campaign #%d → %s (tags: %s)",
-                             i + 1, len(due), campaign_id, enr["email"], step_tags or "none")
+                    log.info("  [%d/%d] Sent → %s (id: %s)", i + 1, len(due), enr["email"], msg_id)
 
                     now = dt.datetime.now(dt.timezone.utc).isoformat()
                     post("send_log", {
                         "enrollment_id": enr["id"],
                         "step_id": step["id"],
                         "step_number": snum,
-                        "listmonk_campaign_id": campaign_id,
+                        "brevo_message_id": msg_id,
                         "status": "sent",
                     })
                     patch("enrollments", f"?id=eq.{enr['id']}", {
@@ -254,8 +214,6 @@ def main() -> int:
 
                 except Exception:
                     log.exception("  [%d/%d] Failed for %s", i + 1, len(due), enr["email"])
-                    if temp_list_id:
-                        lm.delete_list(temp_list_id)
 
                 if i < len(due) - 1:
                     log.info("  Waiting %.0f seconds before next email…", send_interval)
