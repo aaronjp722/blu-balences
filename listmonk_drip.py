@@ -137,7 +137,6 @@ def main() -> int:
     def post(table, payload): return supa_post(SUPA_URL, SUPA_KEY, table, payload)
     def patch(table, qs, payload): return supa_patch(SUPA_URL, SUPA_KEY, table, qs, payload)
 
-    # Load settings from Supabase
     cfg = {r["key"]: r["value"] for r in get("settings", "?select=key,value")}
     lm = Listmonk(
         cfg.get("listmonk_url", "http://localhost:9000"),
@@ -167,12 +166,10 @@ def main() -> int:
                 + step["delay_minutes"]
             )
 
-            # Step-level batch controls (override global if set)
             batch_limit = int(step.get("batch_limit") or 0)
             batch_interval_minutes = int(step.get("batch_interval_minutes") or 0)
             send_interval = (batch_interval_minutes * 60) if batch_interval_minutes > 0 else global_send_interval
 
-            # Step-level body and tags
             step_body = step.get("body") or " "
             step_tags = [t.strip() for t in (step.get("tags") or "").split(",") if t.strip()]
 
@@ -190,6 +187,19 @@ def main() -> int:
 
             if not due:
                 log.info("  Step %d: nobody due", snum)
+                continue
+
+            already_sent = get("send_log", f"?step_id=eq.{step['id']}&select=enrollment_id")
+            already_sent_ids = {r["enrollment_id"] for r in already_sent}
+            if already_sent_ids:
+                before = len(due)
+                due = [e for e in due if e["id"] not in already_sent_ids]
+                skipped = before - len(due)
+                if skipped:
+                    log.info("  Step %d: skipped %d already-sent enrollment(s)", snum, skipped)
+
+            if not due:
+                log.info("  Step %d: all due already sent, skipping", snum)
                 continue
 
             if batch_limit > 0 and len(due) > batch_limit:
