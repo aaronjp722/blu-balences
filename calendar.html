@@ -21,17 +21,14 @@
       --primary-dark: #1557b0;
       --today-bg: rgba(26,115,232,.10);
       --input-bg: #202124;
-
-      /* Dispo palette (Google-spectrum) */
       --c-pending:    #1a73e8;
       --c-sold:       #0f9d58;
+      --c-not_sold:   #7c3aed;
       --c-rescheduled:#f9ab00;
       --c-no_show:    #e37400;
       --c-canceled:   #d93025;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'Roboto', sans-serif;
       background: var(--bg);
@@ -44,57 +41,35 @@
 
     /* ── TOP BAR ── */
     .topbar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      display: flex; align-items: center; gap: 12px;
       padding: 10px 16px;
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-      z-index: 10;
+      flex-shrink: 0; z-index: 10;
     }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-    }
+    .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
     .logo-mark {
-      width: 32px; height: 32px;
-      background: var(--primary);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 15px; color: #fff; flex-shrink: 0;
+      width: 32px; height: 32px; background: var(--primary);
+      border-radius: 8px; display: flex; align-items: center;
+      justify-content: center; font-weight: 700; font-size: 15px; color: #fff; flex-shrink: 0;
     }
     .logo-text { font-size: 20px; font-weight: 400; color: var(--text); letter-spacing: -.3px; }
     .topbar-sep { width: 1px; height: 24px; background: var(--border); }
     .topbar-title { font-size: 18px; font-weight: 400; color: var(--text); }
     .topbar-spacer { flex: 1; }
-
     .tz-label { font-size: 12px; color: var(--text-sub); }
 
     select {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 13px;
-      padding: 6px 10px;
-      cursor: pointer;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-family: inherit;
+      font-size: 13px; padding: 6px 10px; cursor: pointer;
     }
     select:focus { outline: none; border-color: var(--primary); }
 
     .btn {
-      padding: 8px 20px;
-      border-radius: 20px;
-      border: none;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background .15s, box-shadow .15s;
+      padding: 8px 20px; border-radius: 20px; border: none;
+      font-family: inherit; font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: background .15s, box-shadow .15s;
       letter-spacing: .25px;
     }
     .btn:active { transform: scale(.98); }
@@ -104,50 +79,59 @@
     .btn-ghost:hover { background: var(--surface2); }
     .btn-danger { background: var(--c-canceled); color: #fff; }
     .btn-danger:hover { background: #c5221f; }
-
+    .btn-notify { background: #0f9d58; color: #fff; font-size: 13px; padding: 7px 14px; border-radius: 16px; border: none; font-family: inherit; font-weight: 500; cursor: pointer; transition: background .15s; }
+    .btn-notify:hover { background: #0b8044; }
+    .btn-call { background: #1a73e8; color: #fff; font-size: 13px; padding: 7px 14px; border-radius: 16px; border: none; font-family: inherit; font-weight: 500; cursor: pointer; transition: background .15s; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-call:hover { background: #1557b0; }
+    .btn-call:disabled { opacity: .4; cursor: not-allowed; }
     .btn-icon {
-      width: 36px; height: 36px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%; border: none;
+      width: 36px; height: 36px; display: flex; align-items: center;
+      justify-content: center; border-radius: 50%; border: none;
       background: transparent; color: var(--text-sub);
       cursor: pointer; font-size: 20px; transition: background .15s;
     }
     .btn-icon:hover { background: var(--surface2); }
 
+    /* ── STATS BAR ── */
+    .stats-bar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 16px; background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0; overflow-x: auto; flex-wrap: nowrap;
+    }
+    .stats-bar::-webkit-scrollbar { height: 0; }
+    .stat-pill {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface2); border-radius: 14px;
+      padding: 4px 12px; white-space: nowrap; flex-shrink: 0;
+    }
+    .stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .stat-label { font-size: 11px; color: var(--text-sub); }
+    .stat-count { font-size: 13px; font-weight: 600; color: var(--text); }
+    .stat-sep { width: 1px; height: 18px; background: var(--border); flex-shrink: 0; margin: 0 4px; }
+
     /* ── TOOLBAR ── */
     .cal-toolbar {
       display: flex; align-items: center; gap: 8px;
-      padding: 8px 16px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
+      padding: 8px 16px; background: var(--surface);
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
     }
-
     .btn-today {
       padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
       background: transparent; color: var(--text); font-family: inherit;
       font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s;
     }
     .btn-today:hover { background: var(--surface2); }
-
-    .period-label {
-      font-size: 22px; font-weight: 400;
-      min-width: 200px; color: var(--text);
-      letter-spacing: -.3px;
-    }
-
+    .period-label { font-size: 22px; font-weight: 400; min-width: 200px; color: var(--text); letter-spacing: -.3px; }
     .view-tabs {
-      display: flex;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2px; gap: 2px;
+      display: flex; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 20px; padding: 2px; gap: 2px;
     }
     .view-tab {
-      padding: 5px 16px; border-radius: 18px;
-      font-size: 13px; font-weight: 500; cursor: pointer;
-      color: var(--text-sub); border: none; background: transparent;
-      font-family: inherit; transition: background .15s, color .15s;
+      padding: 5px 16px; border-radius: 18px; font-size: 13px;
+      font-weight: 500; cursor: pointer; color: var(--text-sub);
+      border: none; background: transparent; font-family: inherit;
+      transition: background .15s, color .15s;
     }
     .view-tab.active { background: var(--primary); color: #fff; }
     .view-tab:not(.active):hover { background: var(--surface3); color: var(--text); }
@@ -156,92 +140,37 @@
 
     /* ── MONTH ── */
     .month-view { display: flex; flex-direction: column; height: 100%; }
-    .month-header {
-      display: grid; grid-template-columns: repeat(7,1fr);
-      border-bottom: 1px solid var(--border); flex-shrink: 0;
-    }
-    .month-dow {
-      padding: 8px 0; text-align: center;
-      font-size: 11px; font-weight: 500; color: var(--text-sub);
-      text-transform: uppercase; letter-spacing: .08em;
-    }
-    .month-grid {
-      display: grid; grid-template-columns: repeat(7,1fr);
-      grid-template-rows: repeat(6,1fr); flex: 1; overflow: hidden;
-    }
-    .month-cell {
-      border-right: 1px solid var(--border2);
-      border-bottom: 1px solid var(--border2);
-      padding: 4px; cursor: pointer;
-      transition: background .1s; overflow: hidden; min-height: 0;
-      position: relative;
-    }
+    .month-header { display: grid; grid-template-columns: repeat(7,1fr); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .month-dow { padding: 8px 0; text-align: center; font-size: 11px; font-weight: 500; color: var(--text-sub); text-transform: uppercase; letter-spacing: .08em; }
+    .month-grid { display: grid; grid-template-columns: repeat(7,1fr); grid-template-rows: repeat(6,1fr); flex: 1; overflow: hidden; }
+    .month-cell { border-right: 1px solid var(--border2); border-bottom: 1px solid var(--border2); padding: 4px; cursor: pointer; transition: background .1s; overflow: hidden; min-height: 0; position: relative; }
     .month-cell:hover { background: rgba(255,255,255,.03); }
     .month-cell.other-month .cell-day { color: var(--text-dim); }
     .month-cell.today { background: var(--today-bg); }
-    .month-cell.today .cell-day {
-      background: var(--primary); color: #fff;
-      border-radius: 50%; width: 26px; height: 26px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .month-cell.drag-over {
-      background: rgba(26,115,232,.12);
-      outline: 2px solid var(--primary);
-      outline-offset: -2px;
-    }
-    .cell-day {
-      font-size: 12px; font-weight: 500;
-      margin-bottom: 2px; width: 26px; height: 26px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-    }
-    .event-pill {
-      color: #fff; font-size: 11px; font-weight: 500;
-      padding: 2px 6px; border-radius: 4px; margin-bottom: 2px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      cursor: grab; transition: filter .1s, opacity .15s;
-      user-select: none; display: block;
-    }
+    .month-cell.today .cell-day { background: var(--primary); color: #fff; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
+    .month-cell.drag-over { background: rgba(26,115,232,.12); outline: 2px solid var(--primary); outline-offset: -2px; }
+    .cell-day { font-size: 12px; font-weight: 500; margin-bottom: 2px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+    .event-pill { color: #fff; font-size: 11px; font-weight: 500; padding: 2px 6px; border-radius: 4px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: grab; transition: filter .1s, opacity .15s; user-select: none; display: block; }
     .event-pill:active { cursor: grabbing; }
     .event-pill.dragging { opacity: .35; }
     .event-pill:hover { filter: brightness(1.12); }
-    .more-events {
-      font-size: 11px; color: var(--text-sub);
-      padding: 1px 6px; cursor: pointer; border-radius: 4px;
-    }
+    .more-events { font-size: 11px; color: var(--text-sub); padding: 1px 6px; cursor: pointer; border-radius: 4px; }
     .more-events:hover { background: var(--surface2); color: var(--primary); }
 
     /* ── WEEK ── */
     .week-view { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-    .week-header-row {
-      display: grid; grid-template-columns: 56px repeat(7,1fr);
-      border-bottom: 1px solid var(--border); flex-shrink: 0;
-    }
+    .week-header-row { display: grid; grid-template-columns: 56px repeat(7,1fr); border-bottom: 1px solid var(--border); flex-shrink: 0; }
     .week-gutter { border-right: 1px solid var(--border2); }
-    .week-header-day {
-      padding: 8px 4px; text-align: center;
-      border-left: 1px solid var(--border2); cursor: pointer;
-      transition: background .1s;
-    }
+    .week-header-day { padding: 8px 4px; text-align: center; border-left: 1px solid var(--border2); cursor: pointer; transition: background .1s; }
     .week-header-day:hover { background: rgba(255,255,255,.04); }
     .week-header-dow { font-size: 11px; font-weight: 500; color: var(--text-sub); text-transform: uppercase; letter-spacing: .05em; }
     .week-header-num { font-size: 24px; font-weight: 400; color: var(--text); line-height: 1.3; }
-    .week-header-num.today {
-      color: #fff; background: var(--primary);
-      border-radius: 50%; width: 36px; height: 36px;
-      display: flex; align-items: center; justify-content: center;
-      margin: 2px auto 0; font-size: 19px;
-    }
+    .week-header-num.today { color: #fff; background: var(--primary); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; margin: 2px auto 0; font-size: 19px; }
     .week-body { flex: 1; overflow-y: auto; overflow-x: hidden; }
     .week-body::-webkit-scrollbar { width: 6px; }
     .week-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     .week-time-grid { display: grid; grid-template-columns: 56px repeat(7,1fr); position: relative; }
-    .week-hour-label {
-      font-size: 10px; color: var(--text-dim); text-align: right;
-      padding-right: 8px; height: 60px;
-      display: flex; align-items: flex-start; padding-top: 2px;
-      border-right: 1px solid var(--border2); flex-shrink: 0;
-    }
+    .week-hour-label { font-size: 10px; color: var(--text-dim); text-align: right; padding-right: 8px; height: 60px; display: flex; align-items: flex-start; padding-top: 2px; border-right: 1px solid var(--border2); flex-shrink: 0; }
     .week-col { border-left: 1px solid var(--border2); position: relative; }
     .week-col:hover { background: rgba(26,115,232,.03); }
     .hour-line { height: 60px; border-bottom: 1px solid var(--border2); }
@@ -254,182 +183,100 @@
     .day-body::-webkit-scrollbar { width: 6px; }
     .day-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     .day-labels { display: flex; flex-direction: column; }
-    .day-label {
-      height: 60px; font-size: 10px; color: var(--text-dim);
-      text-align: right; padding-right: 8px; padding-top: 4px;
-      border-bottom: 1px solid var(--border2); flex-shrink: 0;
-      border-right: 1px solid var(--border2);
-    }
+    .day-label { height: 60px; font-size: 10px; color: var(--text-dim); text-align: right; padding-right: 8px; padding-top: 4px; border-bottom: 1px solid var(--border2); flex-shrink: 0; border-right: 1px solid var(--border2); }
     .day-col { border-left: 1px solid var(--border2); position: relative; }
     .day-hour-row { height: 60px; border-bottom: 1px solid var(--border2); cursor: pointer; }
     .day-hour-row:hover { background: rgba(26,115,232,.04); }
-    .day-event {
-      position: absolute; left: 4px; right: 4px;
-      border-radius: 6px; padding: 4px 8px;
-      font-size: 12px; font-weight: 500; color: #fff;
-      cursor: pointer; z-index: 2; min-height: 24px;
-    }
+    .day-event { position: absolute; left: 4px; right: 4px; border-radius: 6px; padding: 4px 8px; font-size: 12px; font-weight: 500; color: #fff; cursor: pointer; z-index: 2; min-height: 24px; }
     .day-event:hover { filter: brightness(1.1); }
 
-    /* ── AGENDA (ALL) ── */
+    /* ── AGENDA ── */
     .agenda-view { height: 100%; overflow-y: auto; padding: 16px 24px; }
     .agenda-view::-webkit-scrollbar { width: 6px; }
     .agenda-view::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     .agenda-date-group { margin-bottom: 20px; }
-    .agenda-date-header {
-      display: flex; align-items: baseline; gap: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border2);
-      margin-bottom: 6px;
-    }
+    .agenda-date-header { display: flex; align-items: baseline; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border2); margin-bottom: 6px; }
     .agenda-date-header.today .agenda-date-num { color: var(--primary); }
     .agenda-date-num { font-size: 26px; font-weight: 300; color: var(--text); }
     .agenda-date-label { font-size: 13px; color: var(--text-sub); }
-    .agenda-item {
-      display: flex; align-items: flex-start; gap: 14px;
-      padding: 10px 10px; border-radius: 8px;
-      cursor: pointer; transition: background .1s; margin-bottom: 2px;
-    }
+    .agenda-item { display: flex; align-items: flex-start; gap: 14px; padding: 10px 10px; border-radius: 8px; cursor: pointer; transition: background .1s; margin-bottom: 2px; }
     .agenda-item:hover { background: var(--surface2); }
     .agenda-time { font-size: 12px; color: var(--text-sub); min-width: 80px; padding-top: 2px; flex-shrink: 0; }
     .agenda-bar { width: 4px; border-radius: 4px; align-self: stretch; flex-shrink: 0; min-height: 36px; }
     .agenda-content { flex: 1; }
     .agenda-title { font-size: 14px; font-weight: 500; color: var(--text); }
     .agenda-meta { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
-    .agenda-empty {
-      text-align: center; padding: 80px 20px;
-      color: var(--text-sub); font-size: 14px;
-    }
+    .agenda-empty { text-align: center; padding: 80px 20px; color: var(--text-sub); font-size: 14px; }
     .agenda-empty-icon { font-size: 52px; margin-bottom: 16px; }
 
     /* ── MODAL ── */
-    .modal-backdrop {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,.65); z-index: 1000;
-      align-items: center; justify-content: center; padding: 20px;
-    }
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
     .modal-backdrop.open { display: flex; }
-    .modal {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 24px;
-      width: 100%; max-width: 480px;
-      max-height: 90vh; overflow-y: auto;
-      box-shadow: 0 24px 60px rgba(0,0,0,.55);
-    }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,.55); }
     .modal::-webkit-scrollbar { width: 4px; }
     .modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
     .modal-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
     .modal-title { font-size: 20px; font-weight: 400; color: var(--text); }
-    .modal-close {
-      width: 32px; height: 32px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%; border: none;
-      background: transparent; color: var(--text-sub);
-      cursor: pointer; font-size: 20px;
-      transition: background .15s;
-    }
+    .modal-close { width: 32px; height: 32px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: none; background: transparent; color: var(--text-sub); cursor: pointer; font-size: 20px; transition: background .15s; }
     .modal-close:hover { background: var(--surface2); color: var(--text); }
-
     .form-group { margin-bottom: 16px; }
-    label {
-      display: block; font-size: 11px; font-weight: 500;
-      color: var(--text-sub); text-transform: uppercase;
-      letter-spacing: .06em; margin-bottom: 6px;
-    }
-
-    input[type="text"],
-    input[type="tel"],
-    input[type="date"],
-    input[type="time"],
-    textarea {
-      width: 100%; padding: 9px 0;
-      background: transparent;
-      border: none; border-bottom: 1px solid var(--border);
-      color: var(--text); font-family: inherit; font-size: 14px;
-      transition: border-color .15s; border-radius: 0;
+    label { display: block; font-size: 11px; font-weight: 500; color: var(--text-sub); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    input[type="text"], input[type="tel"], input[type="date"], input[type="time"], textarea {
+      width: 100%; padding: 9px 0; background: transparent; border: none;
+      border-bottom: 1px solid var(--border); color: var(--text);
+      font-family: inherit; font-size: 14px; transition: border-color .15s; border-radius: 0;
     }
     input:focus, textarea:focus { outline: none; border-color: var(--primary); }
     input::placeholder, textarea::placeholder { color: var(--text-dim); }
     textarea { resize: vertical; min-height: 68px; }
     input[type="date"]::-webkit-calendar-picker-indicator,
     input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(.5); cursor: pointer; }
-    select.form-select {
-      width: 100%; background: transparent;
-      border: none; border-bottom: 1px solid var(--border);
-      color: var(--text); font-family: inherit; font-size: 14px;
-      border-radius: 0; padding: 9px 0;
-    }
+    select.form-select { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 14px; border-radius: 0; padding: 9px 0; }
     select.form-select:focus { outline: none; border-color: var(--primary); }
-
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .modal-footer { display: flex; gap: 8px; margin-top: 22px; justify-content: flex-end; align-items: center; }
-
+    .modal-footer { display: flex; gap: 8px; margin-top: 22px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
     .detail-field { margin-bottom: 14px; }
     .detail-label { font-size: 11px; font-weight: 500; color: var(--text-sub); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
     .detail-value { font-size: 14px; color: var(--text); }
-
-    /* Dispo badge */
-    .dispo-badge {
-      display: inline-flex; align-items: center;
-      padding: 3px 10px; border-radius: 12px;
-      font-size: 11px; font-weight: 600; letter-spacing: .04em;
-      text-transform: uppercase;
-    }
-
-    /* Dispo controls in detail modal */
-    .dispo-section {
-      margin-top: 18px; padding-top: 16px;
-      border-top: 1px solid var(--border2);
-    }
-    .dispo-section-label {
-      font-size: 11px; font-weight: 500; color: var(--text-sub);
-      text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px;
-    }
+    .dispo-badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+    .dispo-section { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border2); }
+    .dispo-section-label { font-size: 11px; font-weight: 500; color: var(--text-sub); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
     .dispo-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-    .dispo-btn {
-      padding: 5px 14px; border-radius: 16px; border: 1px solid;
-      font-size: 12px; font-weight: 500; cursor: pointer;
-      font-family: inherit; transition: all .15s; letter-spacing: .02em;
-      background: transparent;
-    }
+    .dispo-btn { padding: 5px 14px; border-radius: 16px; border: 1px solid; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all .15s; letter-spacing: .02em; background: transparent; }
     .dispo-btn[data-d="pending"]     { color: var(--c-pending);     border-color: var(--c-pending);     }
     .dispo-btn[data-d="sold"]        { color: var(--c-sold);         border-color: var(--c-sold);         }
+    .dispo-btn[data-d="not_sold"]    { color: var(--c-not_sold);    border-color: var(--c-not_sold);    }
     .dispo-btn[data-d="rescheduled"] { color: var(--c-rescheduled); border-color: var(--c-rescheduled); }
     .dispo-btn[data-d="no_show"]     { color: var(--c-no_show);     border-color: var(--c-no_show);     }
     .dispo-btn[data-d="canceled"]    { color: var(--c-canceled);    border-color: var(--c-canceled);    }
     .dispo-btn.active { color: #fff !important; }
     .dispo-btn[data-d="pending"].active     { background: var(--c-pending);     }
     .dispo-btn[data-d="sold"].active        { background: var(--c-sold);         }
+    .dispo-btn[data-d="not_sold"].active    { background: var(--c-not_sold);    }
     .dispo-btn[data-d="rescheduled"].active { background: var(--c-rescheduled); }
     .dispo-btn[data-d="no_show"].active     { background: var(--c-no_show);     }
     .dispo-btn[data-d="canceled"].active    { background: var(--c-canceled);    }
     .dispo-btn:not(.active):hover { opacity: .75; }
 
+    /* ── STATS MODAL ── */
+    .stats-modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+    .stats-card { background: var(--surface2); border-radius: 12px; padding: 16px; text-align: center; }
+    .stats-card-num { font-size: 36px; font-weight: 300; line-height: 1; margin-bottom: 4px; }
+    .stats-card-label { font-size: 12px; color: var(--text-sub); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
+    .stats-rate-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border2); font-size: 13px; }
+    .stats-rate-row:last-child { border-bottom: none; }
+    .stats-rate-label { color: var(--text-sub); }
+    .stats-rate-val { font-weight: 600; }
+
     /* Toast */
-    .toast {
-      position: fixed; bottom: 24px; left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 12px 24px;
-      font-size: 14px; font-weight: 500; color: var(--text);
-      box-shadow: 0 8px 30px rgba(0,0,0,.5);
-      transition: transform .25s ease; z-index: 9999; white-space: nowrap;
-    }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 24px; font-size: 14px; font-weight: 500; color: var(--text); box-shadow: 0 8px 30px rgba(0,0,0,.5); transition: transform .25s ease; z-index: 9999; white-space: nowrap; }
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.error { border-color: var(--c-canceled); color: #ff6b6b; }
+    .toast.success { border-color: var(--c-sold); color: #81c995; }
 
-    .loading-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,.5); z-index: 2000;
-      align-items: center; justify-content: center;
-    }
+    .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 2000; align-items: center; justify-content: center; }
     .loading-overlay.show { display: flex; }
-    .spinner {
-      width: 36px; height: 36px;
-      border: 3px solid rgba(255,255,255,.15);
-      border-top-color: var(--primary); border-radius: 50%;
-      animation: spin .7s linear infinite;
-    }
+    .spinner { width: 36px; height: 36px; border: 3px solid rgba(255,255,255,.15); border-top-color: var(--primary); border-radius: 50%; animation: spin .7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -441,6 +288,7 @@
       .view-tab { padding: 5px 10px; font-size: 12px; }
       .period-label { font-size: 16px; min-width: 120px; }
       .tz-label { display: none; }
+      .stats-modal-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -466,6 +314,7 @@
     <option value="Pacific/Honolulu">Hawaii (HST)</option>
     <option value="UTC">UTC</option>
   </select>
+  <button class="btn btn-ghost" style="font-size:13px;padding:7px 14px;" onclick="openStatsModal()">📊 Stats</button>
   <button class="btn btn-primary" onclick="openNewModal()">+ New Appointment</button>
 </div>
 
@@ -483,6 +332,51 @@
     <button class="view-tab" onclick="setView('week')">Week</button>
     <button class="view-tab" onclick="setView('day')">Day</button>
     <button class="view-tab" onclick="setView('agenda')">All</button>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar" id="stats-bar">
+  <div class="stat-pill">
+    <div class="stat-dot" style="background:#9aa0a6"></div>
+    <span class="stat-label">Total</span>
+    <span class="stat-count" id="sb-total">0</span>
+  </div>
+  <div class="stat-sep"></div>
+  <div class="stat-pill">
+    <div class="stat-dot" style="background:var(--c-pending)"></div>
+    <span class="stat-label">Pending</span>
+    <span class="stat-count" id="sb-pending">0</span>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-dot" style="background:var(--c-sold)"></div>
+    <span class="stat-label">Sold</span>
+    <span class="stat-count" id="sb-sold">0</span>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-dot" style="background:var(--c-not_sold)"></div>
+    <span class="stat-label">Not Sold</span>
+    <span class="stat-count" id="sb-not_sold">0</span>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-dot" style="background:var(--c-rescheduled)"></div>
+    <span class="stat-label">Rescheduled</span>
+    <span class="stat-count" id="sb-rescheduled">0</span>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-dot" style="background:var(--c-no_show)"></div>
+    <span class="stat-label">No Show</span>
+    <span class="stat-count" id="sb-no_show">0</span>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-dot" style="background:var(--c-canceled)"></div>
+    <span class="stat-label">Canceled</span>
+    <span class="stat-count" id="sb-canceled">0</span>
+  </div>
+  <div class="stat-sep"></div>
+  <div class="stat-pill" style="background:rgba(15,157,88,.12);border:1px solid rgba(15,157,88,.3);">
+    <span class="stat-label" style="color:#81c995;">Close Rate</span>
+    <span class="stat-count" id="sb-rate" style="color:#81c995;">—</span>
   </div>
 </div>
 
@@ -559,13 +453,17 @@
       </div>
       <button class="modal-close" onclick="closeModal('detail-modal')">&#215;</button>
     </div>
+
     <div class="detail-field">
       <div class="detail-label">Client</div>
       <div class="detail-value" id="detail-client">—</div>
     </div>
     <div class="detail-field">
       <div class="detail-label">Phone</div>
-      <div class="detail-value" id="detail-phone">—</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="detail-value" id="detail-phone">—</div>
+        <button class="btn-call" id="detail-call-btn" onclick="callClient()" disabled>📞 Call</button>
+      </div>
     </div>
     <div class="detail-field">
       <div class="detail-label">Email</div>
@@ -579,19 +477,44 @@
       <div class="detail-label">Notes</div>
       <div class="detail-value" id="detail-notes" style="white-space:pre-wrap;">—</div>
     </div>
+
     <div class="dispo-section">
       <div class="dispo-section-label">Mark as</div>
       <div class="dispo-btns">
         <button class="dispo-btn" data-d="pending"     onclick="setDispo('pending')">Pending</button>
         <button class="dispo-btn" data-d="sold"        onclick="setDispo('sold')">Sold</button>
+        <button class="dispo-btn" data-d="not_sold"    onclick="setDispo('not_sold')">Not Sold</button>
         <button class="dispo-btn" data-d="rescheduled" onclick="setDispo('rescheduled')">Rescheduled</button>
         <button class="dispo-btn" data-d="no_show"     onclick="setDispo('no_show')">No Show</button>
         <button class="dispo-btn" data-d="canceled"    onclick="setDispo('canceled')">Canceled</button>
       </div>
     </div>
+
+    <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border2);">
+      <div class="dispo-section-label">Notification</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <button class="btn-notify" onclick="sendNotification()">📨 Send Notification Now</button>
+        <span style="font-size:12px;color:var(--text-sub);" id="notif-status"></span>
+      </div>
+    </div>
+
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('detail-modal')">Close</button>
       <button class="btn btn-primary" onclick="openEditFromDetail()">Edit</button>
+    </div>
+  </div>
+</div>
+
+<!-- STATS MODAL -->
+<div class="modal-backdrop" id="stats-modal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <span class="modal-title">📊 Appointment Stats</span>
+      <button class="modal-close" onclick="closeModal('stats-modal')">&#215;</button>
+    </div>
+    <div id="stats-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('stats-modal')">Close</button>
     </div>
   </div>
 </div>
@@ -603,10 +526,12 @@
 const WEBHOOK_URL   = "https://hook.us1.make.com/e3av1w86ovv5w89fs3hwq50aln33oq3c";
 const SUPABASE_URL  = "https://rfdvogakvyodixgpvqvz.supabase.co";
 const SUPABASE_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E";
+const QUO_API_KEY   = "3845462ba2868731cad1e93bd94a023b93e9d940df5bd3881ad649810fbc4146";
 
 const DISPO_COLORS = {
   pending:     '#1a73e8',
   sold:        '#0f9d58',
+  not_sold:    '#7c3aed',
   rescheduled: '#f9ab00',
   no_show:     '#e37400',
   canceled:    '#d93025'
@@ -614,6 +539,7 @@ const DISPO_COLORS = {
 const DISPO_LABELS = {
   pending:     'Pending',
   sold:        'Sold',
+  not_sold:    'Not Sold',
   rescheduled: 'Rescheduled',
   no_show:     'No Show',
   canceled:    'Canceled'
@@ -623,10 +549,10 @@ async function sbFetch(path, opts = {}) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     ...opts,
     headers: {
-      apikey:          SUPABASE_KEY,
-      Authorization:   `Bearer ${SUPABASE_KEY}`,
-      "Content-Type":  "application/json",
-      Prefer:          opts.prefer || "return=representation",
+      apikey:         SUPABASE_KEY,
+      Authorization:  `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      Prefer:         opts.prefer || "return=representation",
       ...(opts.headers || {})
     }
   });
@@ -675,8 +601,6 @@ function dateParts(iso, tz) {
   return { year: +g("year"), month: +g("month"), day: +g("day"), hour: +g("hour"), minute: +g("minute") };
 }
 
-function isFuture(iso) { return new Date(iso) > new Date(); }
-
 function fmtHour(h) {
   if (h === 0)  return "12 AM";
   if (h < 12)   return `${h} AM`;
@@ -696,8 +620,6 @@ function dispoBadgeHtml(dispo) {
   return `<span class="dispo-badge" style="background:${c}22;color:${c};border:1px solid ${c}44;">${l}</span>`;
 }
 
-// Strips all non-digit characters, then drops a leading '1' if the result is 11 digits.
-// Returns a clean 10-digit string, or null if the input is empty.
 function sanitizePhone(raw) {
   if (!raw) return null;
   let digits = raw.replace(/\D/g, "");
@@ -705,15 +627,100 @@ function sanitizePhone(raw) {
   return digits || null;
 }
 
+// ─── STATS ───────────────────────────────────────────────────────────────────
+function updateStatsBar() {
+  const counts = { pending:0, sold:0, not_sold:0, rescheduled:0, no_show:0, canceled:0 };
+  appointments.forEach(a => {
+    const d = a.dispo || 'pending';
+    if (counts[d] !== undefined) counts[d]++;
+  });
+  const total = appointments.length;
+  const decided = counts.sold + counts.not_sold;
+  const rate = decided > 0 ? Math.round((counts.sold / decided) * 100) + '%' : '—';
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('sb-total',       total);
+  set('sb-pending',     counts.pending);
+  set('sb-sold',        counts.sold);
+  set('sb-not_sold',    counts.not_sold);
+  set('sb-rescheduled', counts.rescheduled);
+  set('sb-no_show',     counts.no_show);
+  set('sb-canceled',    counts.canceled);
+  set('sb-rate',        rate);
+}
+
+function openStatsModal() {
+  const counts = { pending:0, sold:0, not_sold:0, rescheduled:0, no_show:0, canceled:0 };
+  appointments.forEach(a => {
+    const d = a.dispo || 'pending';
+    if (counts[d] !== undefined) counts[d]++;
+  });
+  const total   = appointments.length;
+  const decided = counts.sold + counts.not_sold;
+  const shown   = counts.sold + counts.not_sold + counts.no_show;
+  const closeRate  = decided > 0 ? Math.round((counts.sold / decided) * 100) : 0;
+  const showRate   = total   > 0 ? Math.round((shown / total) * 100) : 0;
+
+  document.getElementById('stats-modal-body').innerHTML = `
+    <div class="stats-modal-grid">
+      <div class="stats-card">
+        <div class="stats-card-num" style="color:#e8eaed">${total}</div>
+        <div class="stats-card-label">Total Appointments</div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-card-num" style="color:#0f9d58">${counts.sold}</div>
+        <div class="stats-card-label">Sold</div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-card-num" style="color:#7c3aed">${counts.not_sold}</div>
+        <div class="stats-card-label">Not Sold</div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-card-num" style="color:#1a73e8">${counts.pending}</div>
+        <div class="stats-card-label">Pending</div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-card-num" style="color:#f9ab00">${counts.rescheduled}</div>
+        <div class="stats-card-label">Rescheduled</div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-card-num" style="color:#e37400">${counts.no_show}</div>
+        <div class="stats-card-label">No Show</div>
+      </div>
+    </div>
+    <div style="margin-top:20px;background:var(--surface2);border-radius:12px;padding:16px;">
+      <div class="stats-rate-row">
+        <span class="stats-rate-label">Close Rate (Sold ÷ Decided)</span>
+        <span class="stats-rate-val" style="color:#0f9d58">${closeRate}%</span>
+      </div>
+      <div class="stats-rate-row">
+        <span class="stats-rate-label">Show Rate (Showed ÷ Total)</span>
+        <span class="stats-rate-val" style="color:#1a73e8">${showRate}%</span>
+      </div>
+      <div class="stats-rate-row">
+        <span class="stats-rate-label">Canceled</span>
+        <span class="stats-rate-val" style="color:#d93025">${counts.canceled}</span>
+      </div>
+      <div class="stats-rate-row">
+        <span class="stats-rate-label">Decided Appointments</span>
+        <span class="stats-rate-val">${decided}</span>
+      </div>
+    </div>`;
+  openModal('stats-modal');
+}
+
+// ─── LOAD ────────────────────────────────────────────────────────────────────
 async function loadAppointments() {
   showLoading(true);
   try {
     appointments = await sbFetch("appointments?select=*&order=appointment_utc.asc") || [];
+    updateStatsBar();
     render();
   } catch (e) { console.error(e); showToast("Failed to load appointments", "error"); }
   finally { showLoading(false); }
 }
 
+// ─── SAVE (no auto-webhook) ───────────────────────────────────────────────────
 async function saveAppointment() {
   const id     = document.getElementById("edit-id").value;
   const name   = document.getElementById("appt-name").value.trim();
@@ -742,38 +749,75 @@ async function saveAppointment() {
   try {
     if (id) {
       await sbFetch(`appointments?id=eq.${id}`, { method: "PATCH", prefer: "return=minimal", body: JSON.stringify(payload) });
-      showToast("Appointment updated");
+      showToast("Appointment updated — open it to send a notification");
     } else {
       await sbFetch("appointments", { method: "POST", body: JSON.stringify(payload) });
-      showToast("Appointment created");
+      showToast("Appointment saved — open it to send a notification");
     }
-
-    // Only fire webhook for new future appointments — never for past dates
-    const isCreate = !id;
-    if (!isCreate || isFuture(apptUtc)) {
-      fetch(WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action:          id ? "updated" : "created",
-          name:            payload.name,
-          client_name:     payload.client_name,
-          phone:           payload.phone,
-          email:           payload.email,
-          notes:           payload.notes,
-          appointment_utc: payload.appointment_utc,
-          timezone:        payload.timezone,
-          appointment_id:  id || null
-        })
-      }).catch(err => console.warn("Webhook failed:", err));
-    }
-
     closeModal("appt-modal");
     await loadAppointments();
   } catch (e) { console.error(e); showToast("Failed to save", "error"); }
   finally { showLoading(false); }
 }
 
+// ─── MANUAL NOTIFICATION ─────────────────────────────────────────────────────
+async function sendNotification() {
+  const ev = appointments.find(a => a.id === detailEventId);
+  if (!ev) return;
+  const statusEl = document.getElementById('notif-status');
+  statusEl.textContent = 'Sending…';
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action:          "notify",
+        name:            ev.name,
+        client_name:     ev.client_name,
+        phone:           ev.phone,
+        email:           ev.email,
+        notes:           ev.notes,
+        appointment_utc: ev.appointment_utc,
+        timezone:        ev.timezone,
+        appointment_id:  ev.id,
+        dispo:           ev.dispo || 'pending'
+      })
+    });
+    if (!res.ok) throw new Error('Webhook returned ' + res.status);
+    statusEl.textContent = '✅ Sent!';
+    showToast('Notification sent!', 'success');
+    setTimeout(() => { statusEl.textContent = ''; }, 4000);
+  } catch(e) {
+    console.error(e);
+    statusEl.textContent = '❌ Failed';
+    showToast('Notification failed', 'error');
+    setTimeout(() => { statusEl.textContent = ''; }, 4000);
+  }
+}
+
+// ─── CALL CLIENT VIA TEL ──────────────────────────────────────────────────────
+function callClient() {
+  const ev = appointments.find(a => a.id === detailEventId);
+  if (!ev?.phone) return;
+  const digits = ev.phone.replace(/\D/g, '');
+  const a = document.createElement('a');
+  a.href = 'tel:' + digits;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast(`Calling ${ev.phone}…`);
+
+  // Also fire QUO API call if key is present
+  if (QUO_API_KEY && digits) {
+    fetch('https://api.quo.ai/v1/call', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${QUO_API_KEY}` },
+      body: JSON.stringify({ to: digits, client_name: ev.client_name || ev.name, appointment_id: ev.id })
+    }).catch(() => {}); // silent fail if QUO isn't configured
+  }
+}
+
+// ─── DISPO ────────────────────────────────────────────────────────────────────
 async function setDispo(dispo) {
   if (!detailEventId) return;
   showLoading(true);
@@ -787,6 +831,7 @@ async function setDispo(dispo) {
     document.querySelectorAll(".dispo-btn").forEach(b => b.classList.toggle("active", b.dataset.d === dispo));
     document.getElementById("detail-dispo-badge").innerHTML = dispoBadgeHtml(dispo);
     showToast(`Marked as ${DISPO_LABELS[dispo]}`);
+    updateStatsBar();
     render();
   } catch (e) { console.error(e); showToast("Failed to update status", "error"); }
   finally { showLoading(false); }
@@ -813,7 +858,6 @@ async function dragDropMove(apptId, targetDate) {
   const ds = `${targetDate.getFullYear()}-${String(targetDate.getMonth()+1).padStart(2,"0")}-${String(targetDate.getDate()).padStart(2,"0")}`;
   const ts = `${String(p.hour).padStart(2,"0")}:${String(p.minute).padStart(2,"0")}`;
   const newUtc = localToUtc(ds, ts, tz);
-
   showLoading(true);
   try {
     await sbFetch(`appointments?id=eq.${apptId}`, {
@@ -827,6 +871,7 @@ async function dragDropMove(apptId, targetDate) {
   finally { showLoading(false); }
 }
 
+// ─── NAV / VIEW ───────────────────────────────────────────────────────────────
 function navigate(dir) {
   if (currentView === "month" || currentView === "agenda")
     cursor.setMonth(cursor.getMonth() + dir);
@@ -854,10 +899,10 @@ function onTzChange() { displayTz = document.getElementById("tz-select").value; 
 function render() {
   updateLabel();
   const main = document.getElementById("cal-main");
-  if (currentView === "month")       renderMonth(main);
-  else if (currentView === "week")   renderWeek(main);
-  else if (currentView === "day")    renderDay(main);
-  else                               renderAgenda(main);
+  if (currentView === "month")     renderMonth(main);
+  else if (currentView === "week") renderWeek(main);
+  else if (currentView === "day")  renderDay(main);
+  else                             renderAgenda(main);
 }
 
 function updateLabel() {
@@ -872,6 +917,7 @@ function updateLabel() {
   }
 }
 
+// ─── RENDER VIEWS ─────────────────────────────────────────────────────────────
 function renderMonth(container) {
   const year = cursor.getFullYear(), month = cursor.getMonth();
   const today = new Date();
@@ -895,48 +941,33 @@ function renderMonth(container) {
     const isToday = date.toDateString() === today.toDateString();
     const cell = document.createElement("div");
     cell.className = `month-cell${other ? " other-month" : ""}${isToday ? " today" : ""}`;
-
-    cell.addEventListener("click", e => {
-      if (e.target === cell || e.target.classList.contains("cell-day")) openNewModal(date);
-    });
-    cell.addEventListener("dragover", e => { e.preventDefault(); cell.classList.add("drag-over"); });
+    cell.addEventListener("click", e => { if (e.target === cell || e.target.classList.contains("cell-day")) openNewModal(date); });
+    cell.addEventListener("dragover",  e => { e.preventDefault(); cell.classList.add("drag-over"); });
     cell.addEventListener("dragleave", ()  => cell.classList.remove("drag-over"));
     cell.addEventListener("drop", e => {
-      e.preventDefault();
-      cell.classList.remove("drag-over");
+      e.preventDefault(); cell.classList.remove("drag-over");
       if (draggedApptId) { dragDropMove(draggedApptId, date); draggedApptId = null; }
     });
-
     const dayEl = document.createElement("div");
     dayEl.className = "cell-day";
     dayEl.textContent = date.getDate();
     cell.appendChild(dayEl);
-
     const dayEvts = appointments.filter(a => {
       const p = dateParts(a.appointment_utc, displayTz);
       return p.year === date.getFullYear() && p.month === date.getMonth()+1 && p.day === date.getDate();
     });
-
     dayEvts.slice(0, 3).forEach(ev => {
       const pill = document.createElement("div");
       pill.className = "event-pill";
       pill.style.background = dispoColor(ev.dispo || "pending");
       pill.draggable = true;
       pill.textContent = `${fmtTime(ev.appointment_utc, displayTz)} ${ev.name}`;
-      pill.title       = `${ev.name}${ev.client_name ? ` — ${ev.client_name}` : ""}`;
-      pill.addEventListener("dragstart", e => {
-        draggedApptId = ev.id;
-        pill.classList.add("dragging");
-        e.dataTransfer.effectAllowed = "move";
-      });
-      pill.addEventListener("dragend", () => {
-        pill.classList.remove("dragging");
-        draggedApptId = null;
-      });
-      pill.addEventListener("click", e => { e.stopPropagation(); openDetail(ev); });
+      pill.title = `${ev.name}${ev.client_name ? ` — ${ev.client_name}` : ""}`;
+      pill.addEventListener("dragstart", e => { draggedApptId = ev.id; pill.classList.add("dragging"); e.dataTransfer.effectAllowed = "move"; });
+      pill.addEventListener("dragend",   () => { pill.classList.remove("dragging"); draggedApptId = null; });
+      pill.addEventListener("click",     e => { e.stopPropagation(); openDetail(ev); });
       cell.appendChild(pill);
     });
-
     if (dayEvts.length > 3) {
       const more = document.createElement("div");
       more.className = "more-events";
@@ -950,7 +981,7 @@ function renderMonth(container) {
 
 function renderWeek(container) {
   const start = weekStart(cursor), today = new Date();
-  const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const DAYS  = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   let hdr = `<div class="week-gutter"></div>`;
   for (let i = 0; i < 7; i++) {
     const d = new Date(start); d.setDate(d.getDate() + i);
@@ -960,31 +991,26 @@ function renderWeek(container) {
               <div class="week-header-num${isT ? " today" : ""}">${d.getDate()}</div>
             </div>`;
   }
-
   container.innerHTML = `
     <div class="week-view">
       <div class="week-header-row">${hdr}</div>
       <div class="week-body"><div class="week-time-grid" id="wgrid"></div></div>
     </div>`;
   const grid = document.getElementById("wgrid");
-
   for (let h = 0; h < 24; h++) {
     const lbl = document.createElement("div");
     lbl.className = "week-hour-label";
     lbl.textContent = h === 0 ? "" : fmtHour(h);
     grid.appendChild(lbl);
     for (let d = 0; d < 7; d++) {
-      const col  = document.createElement("div");
-      col.className = "week-col";
-      const line = document.createElement("div");
-      line.className = "hour-line";
+      const col  = document.createElement("div"); col.className = "week-col";
+      const line = document.createElement("div"); line.className = "hour-line";
       col.appendChild(line);
       const date = new Date(start); date.setDate(date.getDate() + d);
       col.addEventListener("click", () => openNewModal(date, `${String(h).padStart(2,"0")}:00`));
       grid.appendChild(col);
     }
   }
-
   appointments.forEach(ev => {
     const p = dateParts(ev.appointment_utc, displayTz);
     for (let d = 0; d < 7; d++) {
@@ -1020,22 +1046,16 @@ function renderDay(container) {
         <div class="day-col" id="day-col"></div>
       </div>
     </div>`;
-
   const labelsEl = document.getElementById("day-labels");
   const colEl    = document.getElementById("day-col");
   colEl.style.position = "relative";
-
   for (let h = 0; h < 24; h++) {
-    const lbl = document.createElement("div");
-    lbl.className = "day-label";
-    lbl.textContent = h === 0 ? "" : fmtHour(h);
+    const lbl = document.createElement("div"); lbl.className = "day-label"; lbl.textContent = h === 0 ? "" : fmtHour(h);
     labelsEl.appendChild(lbl);
-    const row = document.createElement("div");
-    row.className = "day-hour-row";
+    const row = document.createElement("div"); row.className = "day-hour-row";
     row.addEventListener("click", () => openNewModal(cursor, `${String(h).padStart(2,"0")}:00`));
     colEl.appendChild(row);
   }
-
   appointments.filter(ev => {
     const p = dateParts(ev.appointment_utc, displayTz);
     return p.year === cursor.getFullYear() && p.month === cursor.getMonth()+1 && p.day === cursor.getDate();
@@ -1054,7 +1074,6 @@ function renderDay(container) {
 
 function renderAgenda(container) {
   const sorted = [...appointments].sort((a, b) => new Date(a.appointment_utc) - new Date(b.appointment_utc));
-
   if (!sorted.length) {
     container.innerHTML = `
       <div class="agenda-view">
@@ -1066,15 +1085,13 @@ function renderAgenda(container) {
       </div>`;
     return;
   }
-
   const groups = {};
   sorted.forEach(ev => {
-    const p   = dateParts(ev.appointment_utc, displayTz);
+    const p = dateParts(ev.appointment_utc, displayTz);
     const key = `${p.year}-${String(p.month).padStart(2,"0")}-${String(p.day).padStart(2,"0")}`;
     if (!groups[key]) groups[key] = { date: new Date(p.year, p.month-1, p.day), events: [] };
     groups[key].events.push(ev);
   });
-
   const today = new Date();
   const html  = Object.entries(groups).map(([, { date, events }]) => {
     const isT  = date.toDateString() === today.toDateString();
@@ -1103,10 +1120,10 @@ function renderAgenda(container) {
         ${evHtml}
       </div>`;
   }).join("");
-
   container.innerHTML = `<div class="agenda-view">${html}</div>`;
 }
 
+// ─── MODALS ───────────────────────────────────────────────────────────────────
 function openNewModal(date, time) {
   document.getElementById("modal-title").textContent = "New Appointment";
   document.getElementById("edit-id").value     = "";
@@ -1145,14 +1162,17 @@ function openDetail(ev) {
   detailEventId = ev.id;
   const dispo   = ev.dispo || "pending";
   document.getElementById("detail-name").textContent = ev.name;
-  document.getElementById("detail-dispo-badge").innerHTML     = dispoBadgeHtml(dispo);
-  document.getElementById("detail-client").textContent        = ev.client_name || "—";
-  document.getElementById("detail-phone").textContent         = ev.phone       || "—";
-  document.getElementById("detail-email").textContent         = ev.email       || "—";
+  document.getElementById("detail-dispo-badge").innerHTML = dispoBadgeHtml(dispo);
+  document.getElementById("detail-client").textContent   = ev.client_name || "—";
+  document.getElementById("detail-phone").textContent    = ev.phone       || "—";
+  document.getElementById("detail-email").textContent    = ev.email       || "—";
+  const callBtn = document.getElementById("detail-call-btn");
+  callBtn.disabled = !ev.phone;
   const tz = ev.timezone || displayTz;
   document.getElementById("detail-datetime").textContent =
     `${fmtDate(ev.appointment_utc, tz)} at ${fmtTime(ev.appointment_utc, tz)} ${tzAbbr(tz)}`;
   document.getElementById("detail-notes").textContent = ev.notes || "—";
+  document.getElementById("notif-status").textContent = "";
   document.querySelectorAll(".dispo-btn").forEach(b => b.classList.toggle("active", b.dataset.d === dispo));
   openModal("detail-modal");
 }
