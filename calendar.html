@@ -696,6 +696,15 @@ function dispoBadgeHtml(dispo) {
   return `<span class="dispo-badge" style="background:${c}22;color:${c};border:1px solid ${c}44;">${l}</span>`;
 }
 
+// Strips all non-digit characters, then drops a leading '1' if the result is 11 digits.
+// Returns a clean 10-digit string, or null if the input is empty.
+function sanitizePhone(raw) {
+  if (!raw) return null;
+  let digits = raw.replace(/\D/g, "");
+  if (digits.length === 11 && digits.charAt(0) === "1") digits = digits.slice(1);
+  return digits || null;
+}
+
 async function loadAppointments() {
   showLoading(true);
   try {
@@ -709,7 +718,7 @@ async function saveAppointment() {
   const id     = document.getElementById("edit-id").value;
   const name   = document.getElementById("appt-name").value.trim();
   const client = document.getElementById("appt-client").value.trim();
-  const phone  = document.getElementById("appt-phone").value.trim();
+  const phone  = sanitizePhone(document.getElementById("appt-phone").value.trim());
   const email  = document.getElementById("appt-email").value.trim();
   const date   = document.getElementById("appt-date").value;
   const time   = document.getElementById("appt-time").value;
