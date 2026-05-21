@@ -77,6 +77,10 @@ tr:hover td{background:#fafafa}
 textarea{resize:vertical;min-height:80px}
 .section-title{font-size:13px;font-weight:600;margin:16px 0 8px;color:var(--gray)}
 .hint{font-size:12px;color:var(--gray);margin-top:4px}
+.file-drop{border:2px dashed var(--border);border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:12px}
+.file-drop:hover,.file-drop.dragover{border-color:var(--blue);background:var(--blue-light)}
+.file-drop p{font-size:14px;color:var(--gray);margin-top:6px}
+.file-drop strong{color:var(--blue)}
 </style>
 </head>
 <body>
@@ -85,7 +89,7 @@ textarea{resize:vertical;min-height:80px}
     <h1>Email Control</h1>
     <p class="sub">Connect your Supabase project. Find these under Supabase → Project Settings → API.</p>
     <div class="form-group"><label>Supabase Project URL</label><input id="cfg-url" type="url" placeholder="https://xxxx.supabase.co"></div>
-    <div class="form-group"><label>Supabase Anon Key</label><input id="cfg-key" placeholder="eyJ..."></div>
+    <div class="form-group"><label>Supabase Service Role Key</label><input id="cfg-key" placeholder="eyJ..."></div>
     <button class="btn btn-primary" style="width:100%" onclick="saveConfig()">Connect</button>
   </div>
 </div>
@@ -214,7 +218,7 @@ async function renderSubscribers(){
     <button class="btn btn-secondary" style="margin-right:8px" onclick="openBulkModal()">Bulk CSV</button>
     <button class="btn btn-primary" onclick="openEnrollModal()">+ Enroll</button>`;
   const badge=s=>({active:'badge-green',paused:'badge-yellow',completed:'badge-blue',unsubscribed:'badge-red'}[s]||'badge-gray');
-  document.getElementById('content').innerHTML=`<div class="panel"><div class="panel-header"><h2>Enrollments (${(enrs||[]).length})</h2></div>${!enrs||!enrs.length?'<div class="empty">No enrollments yet. Use "Import from Listmonk" to pull in your existing subscribers.</div>':`<table><thead><tr><th>Email</th><th>Name</th><th>Sequence</th><th>Step</th><th>Status</th><th>Last Sent</th><th>Actions</th></tr></thead><tbody>${enrs.map(e=>`<tr><td>${e.email}</td><td>${e.name||'—'}</td><td>${e.sequences?.name||'—'}</td><td>Step ${e.current_step}</td><td><span class="badge ${badge(e.status)}">${e.status}</span></td><td>${e.last_sent_at?new Date(e.last_sent_at).toLocaleDateString():'Not yet'}</td><td><div class="actions">${e.status==='active'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','paused')">Pause</button>`:e.status==='paused'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','active')">Resume</button>`:''}<button class="btn btn-danger btn-sm" onclick="removeEnr('${e.id}')">Remove</button></div></td></tr>`).join('')}</tbody></table>`}</div>`;
+  document.getElementById('content').innerHTML=`<div class="panel"><div class="panel-header"><h2>Enrollments (${(enrs||[]).length})</h2></div>${!enrs||!enrs.length?'<div class="empty">No enrollments yet. Use "Import from Listmonk" or "Bulk CSV" to add subscribers.</div>':`<table><thead><tr><th>Email</th><th>Name</th><th>Sequence</th><th>Step</th><th>Status</th><th>Last Sent</th><th>Actions</th></tr></thead><tbody>${enrs.map(e=>`<tr><td>${e.email}</td><td>${e.name||'—'}</td><td>${e.sequences?.name||'—'}</td><td>Step ${e.current_step}</td><td><span class="badge ${badge(e.status)}">${e.status}</span></td><td>${e.last_sent_at?new Date(e.last_sent_at).toLocaleDateString():'Not yet'}</td><td><div class="actions">${e.status==='active'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','paused')">Pause</button>`:e.status==='paused'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','active')">Resume</button>`:''}<button class="btn btn-danger btn-sm" onclick="removeEnr('${e.id}')">Remove</button></div></td></tr>`).join('')}</tbody></table>`}</div>`;
 }
 async function setStatus(id,status){await sb.from('enrollments').update({status}).eq('id',id);renderSubscribers();}
 async function removeEnr(id){if(!confirm('Remove this enrollment?'))return;await sb.from('enrollments').delete().eq('id',id);renderSubscribers();}
@@ -223,8 +227,8 @@ async function openImportModal(){
   const{data:rows}=await sb.from('settings').select('key,value');
   const cfg=Object.fromEntries((rows||[]).map(r=>[r.key,String(r.value).replace(/^"|"$/g,'')]));
   showModal(`<h2>Import from Listmonk</h2>
-    <p style="color:var(--gray);font-size:14px;margin-bottom:16px">Pulls all subscribers from a listmonk list and enrolls them into a sequence. Uses the credentials saved in Settings.</p>
-    <div class="form-group"><label>Listmonk List ID <span style="font-weight:400;color:var(--gray)">(find it in listmonk → Lists → click the list → check the URL)</span></label><input id="im-lid" type="number" min="1" placeholder="e.g. 7 for ATL_RE_AGENTS"></div>
+    <p style="color:var(--gray);font-size:14px;margin-bottom:16px">Pulls all subscribers from a listmonk list. Must be opened as a local file (not hosted online) to avoid CORS errors.</p>
+    <div class="form-group"><label>Listmonk List ID <span style="font-weight:400;color:var(--gray)">(listmonk → Lists → click list → check URL)</span></label><input id="im-lid" type="number" min="1" placeholder="e.g. 7"></div>
     <div class="form-group"><label>Enroll into Sequence</label><select id="im-seq"><option value="">Select a sequence…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
     <div id="im-status" style="font-size:13px;margin-top:8px;min-height:20px"></div>
     <div class="modal-footer">
@@ -238,34 +242,28 @@ async function runImport(lmUrl,lmUser,lmPass){
   const status=document.getElementById('im-status');
   if(!listId||!seqId){alert('List ID and sequence are required');return;}
   if(!lmUrl||!lmUser){alert('Save your Listmonk credentials in Settings first');return;}
-  status.style.color='var(--gray)';
-  status.textContent='Connecting to listmonk…';
+  status.style.color='var(--gray)';status.textContent='Connecting to listmonk…';
   const creds=btoa(`${lmUser}:${lmPass}`);
-  const rows=[];
-  let page=1,total=0;
+  const rows=[];let page=1,total=0;
   try{
     while(true){
       const r=await fetch(`${lmUrl}/api/subscribers?list_id=${listId}&page=${page}&per_page=100`,{headers:{Authorization:`Basic ${creds}`}});
-      if(!r.ok){status.style.color='var(--red)';status.textContent=`Listmonk error ${r.status}: ${r.statusText}. Make sure listmonk is running at ${lmUrl}`;return;}
+      if(!r.ok){status.style.color='var(--red)';status.textContent=`Listmonk error ${r.status}: ${r.statusText}`;return;}
       const json=await r.json();
       const results=json.data?.results||[];
       total=json.data?.total||0;
       rows.push(...results.map(s=>({email:s.email,name:s.name||null,sequence_id:seqId,current_step:0,status:'active'})));
-      status.textContent=`Fetched ${rows.length} of ${total} subscribers…`;
+      status.textContent=`Fetched ${rows.length} of ${total}…`;
       if(!results.length||page*100>=total)break;
       page++;
     }
     if(!rows.length){status.textContent='No subscribers found on that list ID.';return;}
-    status.textContent=`Saving ${rows.length} subscribers to Supabase…`;
+    status.textContent=`Saving ${rows.length} to Supabase…`;
     const{error}=await sb.from('enrollments').upsert(rows,{onConflict:'email,sequence_id',ignoreDuplicates:true});
     if(error){status.style.color='var(--red)';status.textContent=`Supabase error: ${error.message}`;return;}
-    status.style.color='var(--green)';
-    status.textContent=`Done! ${rows.length} subscribers imported.`;
+    status.style.color='var(--green)';status.textContent=`Done! ${rows.length} subscribers imported.`;
     setTimeout(()=>{closeModal();renderSubscribers();},1500);
-  }catch(e){
-    status.style.color='var(--red)';
-    status.textContent=`Error: ${e.message}. Is listmonk running at ${lmUrl}?`;
-  }
+  }catch(e){status.style.color='var(--red)';status.textContent=`Error: ${e.message}`;}
 }
 async function openEnrollModal(){
   const{data:seqs}=await sb.from('sequences').select('id,name').eq('active',true);
@@ -288,18 +286,55 @@ async function openBulkModal(){
   const{data:seqs}=await sb.from('sequences').select('id,name').eq('active',true);
   showModal(`<h2>Bulk Enroll via CSV</h2>
     <div class="form-group"><label>Sequence</label><select id="bl-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
-    <div class="form-group"><label>Paste CSV — one per line: email, Name</label><textarea id="bl-csv" style="min-height:160px" placeholder="john@example.com, John Smith&#10;jane@example.com, Jane Doe"></textarea></div>
+    <div class="file-drop" id="file-drop" onclick="document.getElementById('csv-file').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
+      <svg style="width:32px;height:32px;color:var(--blue);margin:0 auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+      <p><strong>Click to upload</strong> or drag and drop a CSV file</p>
+      <p style="font-size:12px;margin-top:4px">Columns: email, name (header row optional)</p>
+      <input type="file" id="csv-file" accept=".csv" style="display:none" onchange="handleFile(this)">
+    </div>
+    <div id="file-name" style="font-size:13px;color:var(--gray);margin-bottom:8px"></div>
+    <div class="form-group"><label>Or paste CSV directly — one per line: email, Name</label><textarea id="bl-csv" style="min-height:100px" placeholder="john@example.com, John Smith&#10;jane@example.com, Jane Doe"></textarea></div>
+    <div id="bl-status" style="font-size:13px;min-height:18px"></div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="bulkEnroll()">Enroll All</button></div>`);
+}
+function handleFile(input){
+  const file=input.files[0];
+  if(!file)return;
+  document.getElementById('file-name').textContent=`Selected: ${file.name}`;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    let text=e.target.result;
+    const lines=text.split('\n').filter(l=>l.trim());
+    // Skip header row if first cell doesn't look like an email
+    const first=lines[0]?.split(',')[0]?.trim().toLowerCase();
+    if(first&&!first.includes('@'))lines.shift();
+    document.getElementById('bl-csv').value=lines.join('\n');
+  };
+  reader.readAsText(file);
+}
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('file-drop').classList.remove('dragover');
+  const file=e.dataTransfer.files[0];
+  if(!file||!file.name.endsWith('.csv')){alert('Please drop a .csv file');return;}
+  document.getElementById('csv-file').files=e.dataTransfer.files;
+  handleFile(document.getElementById('csv-file'));
 }
 async function bulkEnroll(){
   const seq=document.getElementById('bl-seq').value;
   const csv=document.getElementById('bl-csv').value.trim();
+  const statusEl=document.getElementById('bl-status');
   if(!seq||!csv){alert('Sequence and CSV required');return;}
-  const rows=csv.split('\n').map(line=>{const[email,...rest]=line.split(',').map(s=>s.trim());return email&&email.includes('@')?{email,name:rest.join(' ').trim()||null,sequence_id:seq,current_step:0,status:'active'}:null;}).filter(Boolean);
+  const rows=csv.split('\n').map(line=>{
+    const[email,...rest]=line.split(',').map(s=>s.trim().replace(/^"|"$/g,''));
+    return email&&email.includes('@')?{email,name:rest.join(' ').trim()||null,sequence_id:seq,current_step:0,status:'active'}:null;
+  }).filter(Boolean);
   if(!rows.length){alert('No valid emails found');return;}
+  statusEl.style.color='var(--gray)';statusEl.textContent=`Enrolling ${rows.length} subscribers…`;
   const{error}=await sb.from('enrollments').upsert(rows,{onConflict:'email,sequence_id',ignoreDuplicates:true});
-  if(error){alert(error.message);return;}
-  closeModal();renderSubscribers();
+  if(error){statusEl.style.color='var(--red)';statusEl.textContent=`Error: ${error.message}`;return;}
+  statusEl.style.color='var(--green)';statusEl.textContent=`Done! ${rows.length} subscribers enrolled.`;
+  setTimeout(()=>{closeModal();renderSubscribers();},1500);
 }
 async function renderAnalytics(){
   const{data:logs}=await sb.from('send_log').select('sent_at,step_number,listmonk_campaign_id,status,enrollments(email,sequences(name))').order('sent_at',{ascending:false}).limit(500);
