@@ -21,6 +21,7 @@
     { "source": "/careers-template", "destination": "/careers-template.html" },
     { "source": "/applications-template", "destination": "/applications-template.html" },
     { "source": "/login", "destination": "/Login.html" },
+    { "source": "/email-dashboard", "destination": "/email-dashboard.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
