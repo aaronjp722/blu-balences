@@ -1,16 +1,19 @@
 """
-Blu Balence drip automation — reads config from Supabase, sends via Brevo API.
+Brevo drip automation — reads config from Supabase, sends transactional emails via Brevo.
 
 Setup:
   export SUPABASE_URL=https://xxxx.supabase.co
-  export SUPABASE_SERVICE_KEY=your-service-role-key
+  export SUPABASE_SERVICE_KEY=your-service-role-key   # NOT the anon key
   python listmonk_drip.py
+
+Cron / GitHub Actions (daily 9am UTC):
+  0 14 * * *   (9am ET)
 """
 
 import datetime as dt
+import json
 import logging
 import os
-import re
 import sys
 import time
 
@@ -43,42 +46,46 @@ def supa_patch(base: str, key: str, table: str, qs: str, payload: dict) -> None:
     r.raise_for_status()
 
 
-def parse_from_email(from_email: str):
-    m = re.match(r'^(.+?)\s*<(.+?)>$', from_email.strip())
-    if m:
-        return m.group(1).strip(), m.group(2).strip()
-    return from_email.strip(), from_email.strip()
+def parse_setting(v):
+    if isinstance(v, str):
+        stripped = v.strip()
+        if stripped.startswith('"') and stripped.endswith('"'):
+            try:
+                return json.loads(stripped)
+            except json.JSONDecodeError:
+                pass
+    return v
 
-def personalize(text: str, email: str, name: str) -> str:
-    first = (name or email.split("@")[0]).split()[0]
-    return (text
-        .replace("{{ .Subscriber.FirstName }}", first)
-        .replace("{{ .Subscriber.Name }}", name or first)
-        .replace("{{ .Subscriber.Email }}", email))
 
 def send_email(api_key: str, to_email: str, to_name: str,
-               from_email: str, subject: str, body: str,
-               tags: list[str]) -> str:
-    sender_name, sender_addr = parse_from_email(from_email)
-    content = personalize(body, to_email, to_name or "")
-    subject = personalize(subject, to_email, to_name or "")
+               from_email: str, from_name: str,
+               subject: str, body: str, tags: list) -> str:
+    display_name = to_name or to_email.split("@")[0]
+    personalized = body.replace("{{name}}", display_name).replace("{{email}}", to_email)
 
-    if not re.search(r'<[a-zA-Z]', content):
-        content = "<div>" + content.replace("\n", "<br>\n") + "</div>"
+    if "<" not in personalized:
+        html_body = "<html><body>" + personalized.replace("\n", "<br>") + "</body></html>"
+    else:
+        html_body = personalized
 
     payload = {
-        "sender": {"name": sender_name, "email": sender_addr},
+        "sender": {"email": from_email, "name": from_name or from_email},
         "to": [{"email": to_email, "name": to_name or to_email}],
         "subject": subject,
-        "htmlContent": content,
-        "tags": tags or [],
+        "htmlContent": html_body,
     }
+    if tags:
+        payload["tags"] = tags
+
+    log.info("Sending via Brevo — key length=%d prefix=%s", len(api_key), api_key[:15])
     r = requests.post(
         "https://api.brevo.com/v3/smtp/email",
         json=payload,
         headers={"api-key": api_key, "Content-Type": "application/json"},
         timeout=30,
     )
+    if not r.ok:
+        log.error("Brevo %d error: %s", r.status_code, r.text)
     r.raise_for_status()
     return r.json().get("messageId", "")
 
@@ -100,12 +107,20 @@ def main() -> int:
     def post(table, payload): return supa_post(SUPA_URL, SUPA_KEY, table, payload)
     def patch(table, qs, payload): return supa_patch(SUPA_URL, SUPA_KEY, table, qs, payload)
 
-    cfg = {r["key"]: r["value"].strip('"') if isinstance(r["value"], str) else r["value"]
-           for r in get("settings", "?select=key,value")}
+    raw_cfg = get("settings", "?select=key,value")
+    cfg = {r["key"]: parse_setting(r["value"]) for r in raw_cfg}
 
     brevo_api_key = cfg.get("brevo_api_key", "")
     if not brevo_api_key:
-        log.error("brevo_api_key not set in Supabase settings table")
+        log.error("brevo_api_key not set in settings table")
+        return 1
+
+    log.info("Brevo key loaded: length=%d, prefix=%s", len(brevo_api_key), brevo_api_key[:12])
+
+    from_email = cfg.get("from_email", "")
+    from_name  = cfg.get("from_name", "")
+    if not from_email:
+        log.error("from_email not set in settings table")
         return 1
 
     global_emails_per_minute = float(cfg.get("emails_per_minute", "2"))
@@ -136,10 +151,6 @@ def main() -> int:
             send_interval = (batch_interval_minutes * 60) if batch_interval_minutes > 0 else global_send_interval
 
             step_body = step.get("body") or ""
-            if not step_body.strip():
-                log.warning("  Step %d has no body — skipping", snum)
-                continue
-
             step_tags = [t.strip() for t in (step.get("tags") or "").split(",") if t.strip()]
 
             if snum == 1:
@@ -165,17 +176,25 @@ def main() -> int:
                 due = [e for e in due if e["id"] not in already_sent_ids]
                 skipped = before - len(due)
                 if skipped:
-                    log.info("  Step %d: skipped %d already-sent", snum, skipped)
+                    log.info("  Step %d: skipped %d already-sent enrollment(s)", snum, skipped)
 
             if not due:
                 log.info("  Step %d: all due already sent, skipping", snum)
                 continue
 
             if batch_limit > 0 and len(due) > batch_limit:
-                log.info("  Step %d: capped to %d (batch limit)", snum, batch_limit)
+                log.info("  Step %d: %d due, capped to batch limit of %d", snum, len(due), batch_limit)
                 due = due[:batch_limit]
             else:
-                log.info("  Step %d: %d due", snum, len(due))
+                log.info("  Step %d: %d due (delay was %d min)", snum, len(due), delay_mins)
+
+            if batch_interval_minutes > 0:
+                log.info("  Step %d: interval %d min between emails", snum, batch_interval_minutes)
+            else:
+                log.info("  Step %d: using global rate %.1f emails/min", snum, global_emails_per_minute)
+
+            if step_tags:
+                log.info("  Step %d: tags %s", snum, step_tags)
 
             is_last = snum >= total_steps
 
@@ -185,12 +204,13 @@ def main() -> int:
                         api_key=brevo_api_key,
                         to_email=enr["email"],
                         to_name=enr.get("name") or "",
-                        from_email=step["from_email"],
+                        from_email=from_email,
+                        from_name=from_name,
                         subject=step["subject"],
                         body=step_body,
                         tags=step_tags,
                     )
-                    log.info("  [%d/%d] Sent → %s (id: %s)", i + 1, len(due), enr["email"], msg_id)
+                    log.info("  [%d/%d] Sent → %s (msgId: %s)", i + 1, len(due), enr["email"], msg_id)
 
                     now = dt.datetime.now(dt.timezone.utc).isoformat()
                     post("send_log", {
