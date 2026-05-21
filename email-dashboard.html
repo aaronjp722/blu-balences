@@ -74,301 +74,522 @@ tr:hover td{background:#fafafa}
 .step-card-header{display:flex;align-items:center;justify-content:space-between}
 .step-num{background:var(--blue);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
 .step-meta{font-size:12px;color:var(--gray);margin-top:4px}
+.step-body-preview{font-size:12px;color:#374151;margin-top:4px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:400px}
 textarea{resize:vertical;min-height:80px}
-.section-title{font-size:13px;font-weight:600;margin:16px 0 8px;color:var(--gray)}
+.section-title{font-size:13px;font-weight:600;margin:16px 0 8px;color:var(--gray);text-transform:uppercase;letter-spacing:.04em}
 .hint{font-size:12px;color:var(--gray);margin-top:4px}
-.file-drop{border:2px dashed var(--border);border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:12px}
-.file-drop:hover,.file-drop.dragover{border-color:var(--blue);background:var(--blue-light)}
-.file-drop p{font-size:14px;color:var(--gray);margin-top:6px}
-.file-drop strong{color:var(--blue)}
+.tag-pill{display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:500;background:var(--blue-light);color:var(--blue-dark);margin-right:4px;margin-top:3px}
 </style>
 </head>
 <body>
+
+<!-- Config screen shown on first load -->
 <div id="config-screen">
   <div class="box">
     <h1>Email Control</h1>
-    <p class="sub">Connect your Supabase project. Find these under Supabase → Project Settings → API.</p>
+    <p class="sub">Connect your Supabase project to get started. Find these in Supabase → Project Settings → API.</p>
     <div class="form-group"><label>Supabase Project URL</label><input id="cfg-url" type="url" placeholder="https://xxxx.supabase.co"></div>
-    <div class="form-group"><label>Supabase Service Role Key</label><input id="cfg-key" placeholder="eyJ..."></div>
+    <div class="form-group"><label>Supabase Service Role Key</label><input id="cfg-key" type="text" placeholder="eyJ..."></div>
     <button class="btn btn-primary" style="width:100%" onclick="saveConfig()">Connect</button>
   </div>
 </div>
+
+<!-- Main app -->
 <div id="app">
   <div id="sidebar">
     <div class="logo">Blu Balence<span>Email Control</span></div>
     <nav>
-      <a onclick="navigate('dashboard')" id="nav-dashboard"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
-      <a onclick="navigate('sequences')" id="nav-sequences"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>Sequences</a>
-      <a onclick="navigate('subscribers')" id="nav-subscribers"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Subscribers</a>
-      <a onclick="navigate('analytics')" id="nav-analytics"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Analytics</a>
-      <a onclick="navigate('settings')" id="nav-settings"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</a>
+      <a onclick="navigate('dashboard')" id="nav-dashboard">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Dashboard
+      </a>
+      <a onclick="navigate('sequences')" id="nav-sequences">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        Sequences
+      </a>
+      <a onclick="navigate('subscribers')" id="nav-subscribers">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Subscribers
+      </a>
+      <a onclick="navigate('analytics')" id="nav-analytics">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Analytics
+      </a>
+      <a onclick="navigate('settings')" id="nav-settings">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Settings
+      </a>
     </nav>
   </div>
   <div id="main">
-    <div id="topbar"><h1 id="page-title">Dashboard</h1><div id="topbar-actions"></div></div>
+    <div id="topbar">
+      <h1 id="page-title">Dashboard</h1>
+      <div id="topbar-actions"></div>
+    </div>
     <div id="content"></div>
   </div>
 </div>
 <div id="modals"></div>
+
 <script>
 let sb;
-function saveConfig(){
-  const url=document.getElementById('cfg-url').value.trim();
-  const key=document.getElementById('cfg-key').value.trim();
-  if(!url||!key){alert('Both fields required');return;}
-  localStorage.setItem('sb_url',url);localStorage.setItem('sb_key',key);boot(url,key);
+
+// ── Config ───────────────────────────────────────────────────
+function saveConfig() {
+  const url = document.getElementById('cfg-url').value.trim();
+  const key = document.getElementById('cfg-key').value.trim();
+  if (!url || !key) { alert('Both fields are required'); return; }
+  localStorage.setItem('sb_url', url);
+  localStorage.setItem('sb_key', key);
+  boot(url, key);
 }
-function boot(url,key){
-  sb=supabase.createClient(url,key);
-  document.getElementById('config-screen').style.display='none';
+
+function boot(url, key) {
+  sb = supabase.createClient(url, key);
+  document.getElementById('config-screen').style.display = 'none';
   document.getElementById('app').classList.add('show');
   navigate('dashboard');
 }
-async function navigate(tab){
-  document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
-  const el=document.getElementById('nav-'+tab);if(el)el.classList.add('active');
-  document.getElementById('page-title').textContent={dashboard:'Dashboard',sequences:'Sequences',subscribers:'Subscribers',analytics:'Analytics',settings:'Settings'}[tab];
-  document.getElementById('topbar-actions').innerHTML='';
-  document.getElementById('content').innerHTML='<div style="padding:40px;text-align:center;color:#6b7280">Loading…</div>';
-  if(tab==='dashboard')await renderDashboard();
-  else if(tab==='sequences')await renderSequences();
-  else if(tab==='subscribers')await renderSubscribers();
-  else if(tab==='analytics')await renderAnalytics();
-  else if(tab==='settings')await renderSettings();
+
+// ── Router ───────────────────────────────────────────────────
+async function navigate(tab) {
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  const el = document.getElementById('nav-' + tab);
+  if (el) el.classList.add('active');
+  document.getElementById('page-title').textContent =
+    { dashboard: 'Dashboard', sequences: 'Sequences', subscribers: 'Subscribers', analytics: 'Analytics', settings: 'Settings' }[tab];
+  document.getElementById('topbar-actions').innerHTML = '';
+  document.getElementById('content').innerHTML = '<div style="padding:40px;text-align:center;color:#6b7280">Loading…</div>';
+  if (tab === 'dashboard') await renderDashboard();
+  else if (tab === 'sequences') await renderSequences();
+  else if (tab === 'subscribers') await renderSubscribers();
+  else if (tab === 'analytics') await renderAnalytics();
+  else if (tab === 'settings') await renderSettings();
 }
-async function renderDashboard(){
-  const[{data:seqs},{data:enrs},{data:logs}]=await Promise.all([
+
+// ── Dashboard ────────────────────────────────────────────────
+async function renderDashboard() {
+  const [{ data: seqs }, { data: enrs }, { data: logs }] = await Promise.all([
     sb.from('sequences').select('id,active'),
     sb.from('enrollments').select('status'),
-    sb.from('send_log').select('id,sent_at').order('sent_at',{ascending:false}).limit(200),
+    sb.from('send_log').select('id,sent_at').order('sent_at', { ascending: false }).limit(200),
   ]);
-  const today=new Date().toDateString();
-  const sentToday=(logs||[]).filter(l=>new Date(l.sent_at).toDateString()===today).length;
-  document.getElementById('content').innerHTML=`
+  const today = new Date().toDateString();
+  const sentToday = (logs || []).filter(l => new Date(l.sent_at).toDateString() === today).length;
+  document.getElementById('content').innerHTML = `
     <div class="cards">
       <div class="card"><div class="label">Active Sequences</div><div class="value" style="color:var(--blue)">${(seqs||[]).filter(s=>s.active).length}</div><div class="sub">${(seqs||[]).length} total</div></div>
       <div class="card"><div class="label">Active Enrollments</div><div class="value">${(enrs||[]).filter(e=>e.status==='active').length}</div><div class="sub">${(enrs||[]).filter(e=>e.status==='completed').length} completed</div></div>
       <div class="card"><div class="label">Sent Today</div><div class="value" style="color:var(--green)">${sentToday}</div><div class="sub">emails</div></div>
       <div class="card"><div class="label">Total Sent</div><div class="value">${(logs||[]).length}</div><div class="sub">all time</div></div>
     </div>
-    <div class="panel"><div class="panel-header"><h2>Recent Activity</h2></div><div id="recent-log"><div class="empty">Loading…</div></div></div>`;
-  const{data:recent}=await sb.from('send_log').select('sent_at,step_number,listmonk_campaign_id,enrollments(email,sequences(name))').order('sent_at',{ascending:false}).limit(20);
-  document.getElementById('recent-log').innerHTML=!recent||!recent.length
-    ?'<div class="empty">No sends yet.</div>'
-    :`<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Campaign</th></tr></thead><tbody>${recent.map(l=>`<tr><td>${new Date(l.sent_at).toLocaleString()}</td><td>${l.enrollments?.email||'—'}</td><td>${l.enrollments?.sequences?.name||'—'}</td><td>Step ${l.step_number}</td><td>${l.listmonk_campaign_id?`<span class="badge badge-blue">#${l.listmonk_campaign_id}</span>`:'—'}</td></tr>`).join('')}</tbody></table>`;
+    <div class="panel">
+      <div class="panel-header"><h2>Recent Activity</h2></div>
+      <div id="recent-log"><div class="empty">Loading…</div></div>
+    </div>`;
+  const { data: recent } = await sb.from('send_log')
+    .select('sent_at,step_number,listmonk_campaign_id,enrollments(email,sequences(name))')
+    .order('sent_at', { ascending: false }).limit(20);
+  document.getElementById('recent-log').innerHTML = !recent || !recent.length
+    ? '<div class="empty">No sends yet. Create a sequence and enroll subscribers.</div>'
+    : `<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Campaign</th></tr></thead><tbody>
+      ${recent.map(l=>`<tr>
+        <td>${new Date(l.sent_at).toLocaleString()}</td>
+        <td>${l.enrollments?.email||'—'}</td>
+        <td>${l.enrollments?.sequences?.name||'—'}</td>
+        <td>Step ${l.step_number}</td>
+        <td>${l.listmonk_campaign_id?`<span class="badge badge-blue">#${l.listmonk_campaign_id}</span>`:'—'}</td>
+      </tr>`).join('')}</tbody></table>`;
 }
-async function renderSequences(){
-  const{data:seqs}=await sb.from('sequences').select('*').order('created_at');
-  document.getElementById('topbar-actions').innerHTML=`<button class="btn btn-primary" onclick="openSeqModal()">+ New Sequence</button>`;
-  document.getElementById('content').innerHTML=`<div class="panel"><div class="panel-header"><h2>Sequences</h2></div>${!seqs||!seqs.length?'<div class="empty">No sequences yet.</div>':`<table><thead><tr><th>Name</th><th>Description</th><th>Active</th><th>Actions</th></tr></thead><tbody>${seqs.map(s=>`<tr><td><strong>${s.name}</strong></td><td style="color:var(--gray)">${s.description||'—'}</td><td><label class="toggle"><input type="checkbox" ${s.active?'checked':''} onchange="toggleSeq('${s.id}',this.checked)"><span class="toggle-slider"></span></label></td><td><div class="actions"><button class="btn btn-secondary btn-sm" onclick="openStepsModal('${s.id}','${esc(s.name)}')">Steps</button><button class="btn btn-secondary btn-sm" onclick="openSeqModal('${s.id}','${esc(s.name)}','${esc(s.description||'')}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteSeq('${s.id}')">Delete</button></div></td></tr>`).join('')}</tbody></table>`}</div>`;
+
+// ── Sequences ────────────────────────────────────────────────
+async function renderSequences() {
+  const { data: seqs } = await sb.from('sequences').select('*').order('created_at');
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openSeqModal()">+ New Sequence</button>`;
+  document.getElementById('content').innerHTML = `
+    <div class="panel">
+      <div class="panel-header"><h2>Sequences</h2></div>
+      ${!seqs||!seqs.length ? '<div class="empty">No sequences yet. Create one to get started.</div>' :
+      `<table><thead><tr><th>Name</th><th>Description</th><th>Active</th><th>Actions</th></tr></thead><tbody>
+      ${seqs.map(s=>`<tr>
+        <td><strong>${s.name}</strong></td>
+        <td style="color:var(--gray)">${s.description||'—'}</td>
+        <td><label class="toggle"><input type="checkbox" ${s.active?'checked':''} onchange="toggleSeq('${s.id}',this.checked)"><span class="toggle-slider"></span></label></td>
+        <td><div class="actions">
+          <button class="btn btn-secondary btn-sm" onclick="openStepsModal('${s.id}','${esc(s.name)}')">Steps</button>
+          <button class="btn btn-secondary btn-sm" onclick="openSeqModal('${s.id}','${esc(s.name)}','${esc(s.description||'')}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteSeq('${s.id}')">Delete</button>
+        </div></td>
+      </tr>`).join('')}</tbody></table>`}
+    </div>`;
 }
-async function toggleSeq(id,active){await sb.from('sequences').update({active}).eq('id',id);}
-async function deleteSeq(id){if(!confirm('Delete this sequence and all enrollments?'))return;await sb.from('sequences').delete().eq('id',id);renderSequences();}
-function openSeqModal(id,name,desc){
-  showModal(`<h2>${id?'Edit':'New'} Sequence</h2>
+
+async function toggleSeq(id, active) {
+  await sb.from('sequences').update({ active }).eq('id', id);
+}
+
+async function deleteSeq(id) {
+  if (!confirm('Delete this sequence and all enrollments?')) return;
+  await sb.from('sequences').delete().eq('id', id);
+  renderSequences();
+}
+
+function openSeqModal(id, name, desc) {
+  showModal(`
+    <h2>${id ? 'Edit' : 'New'} Sequence</h2>
     <div class="form-group"><label>Name</label><input id="sq-name" value="${name||''}"></div>
     <div class="form-group"><label>Description</label><textarea id="sq-desc">${desc||''}</textarea></div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveSeq('${id||''}')">Save</button></div>`);
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSeq('${id||''}')">Save</button>
+    </div>`);
 }
-async function saveSeq(id){
-  const name=document.getElementById('sq-name').value.trim();
-  const description=document.getElementById('sq-desc').value.trim();
-  if(!name){alert('Name required');return;}
-  if(id)await sb.from('sequences').update({name,description}).eq('id',id);
-  else await sb.from('sequences').insert({name,description,active:true});
-  closeModal();renderSequences();
+
+async function saveSeq(id) {
+  const name = document.getElementById('sq-name').value.trim();
+  const description = document.getElementById('sq-desc').value.trim();
+  if (!name) { alert('Name required'); return; }
+  if (id) await sb.from('sequences').update({ name, description }).eq('id', id);
+  else await sb.from('sequences').insert({ name, description, active: true });
+  closeModal();
+  renderSequences();
 }
-async function openStepsModal(seqId,seqName){
-  const{data:steps}=await sb.from('steps').select('*').eq('sequence_id',seqId).order('step_number');
-  const nextNum=steps&&steps.length?steps[steps.length-1].step_number+1:1;
-  showModal(`<h2>Steps — ${seqName}</h2>
-    <div id="steps-list">${!steps||!steps.length?'<div class="empty">No steps yet.</div>':steps.map(s=>stepCard(s)).join('')}</div>
+
+// ── Steps ────────────────────────────────────────────────────
+async function openStepsModal(seqId, seqName) {
+  const { data: steps } = await sb.from('steps').select('*').eq('sequence_id', seqId).order('step_number');
+  const nextNum = steps && steps.length ? steps[steps.length - 1].step_number + 1 : 1;
+  showModal(`
+    <h2>Steps — ${seqName}</h2>
+    <div id="steps-list">
+      ${!steps||!steps.length ? '<div class="empty">No steps. Add one below.</div>' : steps.map(s => stepCard(s)).join('')}
+    </div>
     <button class="btn btn-ghost" style="margin-top:12px;width:100%" onclick="openStepForm('${seqId}','${esc(seqName)}',${nextNum},null)">+ Add Step</button>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Done</button></div>`,true);
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Done</button></div>
+  `, true);
 }
-function delay(s){const p=[s.delay_days>0?`${s.delay_days}d`:'',s.delay_hours>0?`${s.delay_hours}h`:'',s.delay_minutes>0?`${s.delay_minutes}m`:''].filter(Boolean);return p.length?p.join(' '):'Send immediately';}
-function stepCard(s){return `<div class="step-card"><div class="step-card-header"><div style="display:flex;align-items:center;gap:10px"><div class="step-num">${s.step_number}</div><div><div style="font-size:14px;font-weight:600">${s.subject}</div><div class="step-meta">Template #${s.template_id} · Wait: ${delay(s)} · ${s.from_email}</div></div></div><div class="actions"><button class="btn btn-secondary btn-sm" onclick="openStepForm('${s.sequence_id}','_',${s.step_number},'${s.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteStep('${s.id}','${s.sequence_id}')">×</button></div></div></div>`;}
-function openStepForm(seqId,seqName,stepNum,stepId){
-  showModal(`<h2>${stepId?'Edit':'New'} Step ${stepNum}</h2>
-    <div class="form-group"><label>Subject Line</label><input id="st-subj" placeholder="Quick question"></div>
+
+function delay(s) {
+  const parts = [s.delay_days>0?`${s.delay_days}d`:'', s.delay_hours>0?`${s.delay_hours}h`:'', s.delay_minutes>0?`${s.delay_minutes}m`:''].filter(Boolean);
+  return parts.length ? parts.join(' ') : 'Immediately';
+}
+
+function stepCard(s) {
+  const batchLimit = s.batch_limit > 0 ? s.batch_limit : null;
+  const interval = s.batch_interval_minutes > 0 ? s.batch_interval_minutes : null;
+  const batchText = batchLimit
+    ? `Batch: ${batchLimit} emails${interval ? `, ${interval} min apart` : ''}`
+    : (interval ? `${interval} min between emails` : 'No batch limit');
+  const tagPills = s.tags ? s.tags.split(',').map(t => t.trim()).filter(Boolean).map(t => `<span class="tag-pill">${t}</span>`).join('') : '';
+  const bodyPreview = s.body ? s.body.replace(/<[^>]+>/g, '').trim().substring(0, 80) + (s.body.length > 80 ? '…' : '') : '';
+  return `<div class="step-card">
+    <div class="step-card-header">
+      <div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0">
+        <div class="step-num" style="margin-top:2px">${s.step_number}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:600">${s.subject}</div>
+          <div class="step-meta">Template #${s.template_id} · Wait: ${delay(s)} · ${s.from_email}</div>
+          ${bodyPreview ? `<div class="step-body-preview">"${bodyPreview}"</div>` : ''}
+          <div class="step-meta" style="margin-top:4px">${batchText}</div>
+          ${tagPills ? `<div style="margin-top:5px">${tagPills}</div>` : ''}
+        </div>
+      </div>
+      <div class="actions" style="flex-shrink:0;margin-left:10px">
+        <button class="btn btn-secondary btn-sm" onclick="openStepForm('${s.sequence_id}','_',${s.step_number},'${s.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteStep('${s.id}','${s.sequence_id}')">×</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function openStepForm(seqId, seqName, stepNum, stepId) {
+  showModal(`
+    <h2>${stepId ? 'Edit' : 'New'} Step ${stepNum}</h2>
+
+    <div class="section-title">Email Details</div>
+    <div class="form-group"><label>Subject Line</label><input id="st-subj" placeholder="Quick question — bookkeeping for realtors"></div>
     <div class="form-group"><label>From Email</label><input id="st-from" value="Aaron &lt;aaron@blubalencebookkeeping.com&gt;"></div>
-    <div class="form-group"><label>Listmonk Template ID</label><input id="st-tmpl" type="number" min="1" placeholder="1"></div>
-    <div class="section-title">Wait before sending this step</div>
+    <div class="form-group"><label>Listmonk Template ID <span style="color:var(--gray);font-weight:400">(Campaigns → Templates in listmonk)</span></label><input id="st-tmpl" type="number" min="1" placeholder="1"></div>
+
+    <div class="section-title">Email Body</div>
+    <div class="form-group">
+      <label>Body Text <span style="color:var(--gray);font-weight:400">(written directly into the campaign — use HTML or plain text)</span></label>
+      <textarea id="st-body" style="min-height:160px;font-family:monospace;font-size:13px" placeholder="Hi {{ .Subscriber.FirstName }},
+
+I noticed you're a realtor in Atlanta and wanted to reach out...
+
+Best,
+Aaron
+Blu Balence Bookkeeping"></textarea>
+      <p class="hint">Use <code>{{ .Subscriber.FirstName }}</code> and <code>{{ .Subscriber.Email }}</code> for personalization. If left blank, the listmonk template body is used.</p>
+    </div>
+
+    <div class="section-title">Wait Before Sending This Step</div>
     <div class="form-row">
       <div class="form-group"><label>Days</label><input id="st-days" type="number" value="0" min="0"></div>
       <div class="form-group"><label>Hours</label><input id="st-hours" type="number" value="0" min="0" max="23"></div>
       <div class="form-group"><label>Minutes</label><input id="st-mins" type="number" value="0" min="0" max="59"></div>
     </div>
-    <p class="hint">Step 1 sends immediately. Delay applies from the previous step's send time.</p>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="openStepsModal('${seqId}','${seqName}')">Back</button><button class="btn btn-primary" onclick="saveStep('${seqId}','${esc(seqName)}',${stepNum},'${stepId||''}')">Save Step</button></div>`);
-  if(stepId){sb.from('steps').select('*').eq('id',stepId).single().then(({data:s})=>{if(!s)return;document.getElementById('st-subj').value=s.subject;document.getElementById('st-from').value=s.from_email;document.getElementById('st-tmpl').value=s.template_id;document.getElementById('st-days').value=s.delay_days;document.getElementById('st-hours').value=s.delay_hours;document.getElementById('st-mins').value=s.delay_minutes;});}
+    <p class="hint">Step 1 always sends immediately on first run. Delay applies from the previous step's send time.</p>
+
+    <div class="section-title">Batch Controls</div>
+    <div class="form-row-2">
+      <div class="form-group">
+        <label>Batch Limit <span style="color:var(--gray);font-weight:400">(max per run)</span></label>
+        <input id="st-batch" type="number" value="0" min="0" placeholder="0 = unlimited">
+      </div>
+      <div class="form-group">
+        <label>Minutes Between Emails</label>
+        <input id="st-interval" type="number" value="0" min="0" placeholder="0 = use global rate">
+      </div>
+    </div>
+    <p class="hint">Example: Batch 5 + 6 min = send 5 emails, one every 6 minutes. Set 0 to use the global Emails/Min from Settings.</p>
+
+    <div class="section-title">Tags</div>
+    <div class="form-group">
+      <label>Tags <span style="color:var(--gray);font-weight:400">(comma-separated — saved in Supabase and applied to the listmonk campaign)</span></label>
+      <input id="st-tags" placeholder="atlanta-realtors, cold-outreach, step-1">
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="openStepsModal('${seqId}','${esc(seqName)}')">Back</button>
+      <button class="btn btn-primary" onclick="saveStep('${seqId}','${esc(seqName)}',${stepNum},'${stepId||''}')">Save Step</button>
+    </div>`, true);
+
+  if (stepId) {
+    sb.from('steps').select('*').eq('id', stepId).single().then(({ data: s }) => {
+      if (!s) return;
+      document.getElementById('st-subj').value = s.subject || '';
+      document.getElementById('st-from').value = s.from_email || '';
+      document.getElementById('st-tmpl').value = s.template_id || '';
+      document.getElementById('st-days').value = s.delay_days || 0;
+      document.getElementById('st-hours').value = s.delay_hours || 0;
+      document.getElementById('st-mins').value = s.delay_minutes || 0;
+      document.getElementById('st-body').value = s.body || '';
+      document.getElementById('st-batch').value = s.batch_limit || 0;
+      document.getElementById('st-interval').value = s.batch_interval_minutes || 0;
+      document.getElementById('st-tags').value = s.tags || '';
+    });
+  }
 }
-async function saveStep(seqId,seqName,stepNum,stepId){
-  const payload={sequence_id:seqId,step_number:stepNum,subject:document.getElementById('st-subj').value.trim(),from_email:document.getElementById('st-from').value.trim(),template_id:parseInt(document.getElementById('st-tmpl').value),delay_days:parseInt(document.getElementById('st-days').value)||0,delay_hours:parseInt(document.getElementById('st-hours').value)||0,delay_minutes:parseInt(document.getElementById('st-mins').value)||0};
-  if(!payload.subject||!payload.from_email||!payload.template_id){alert('Subject, From, and Template ID required');return;}
-  if(stepId)await sb.from('steps').update(payload).eq('id',stepId);
-  else await sb.from('steps').insert(payload);
-  openStepsModal(seqId,seqName);
+
+async function saveStep(seqId, seqName, stepNum, stepId) {
+  const payload = {
+    sequence_id: seqId,
+    step_number: stepNum,
+    subject: document.getElementById('st-subj').value.trim(),
+    from_email: document.getElementById('st-from').value.trim(),
+    template_id: parseInt(document.getElementById('st-tmpl').value) || 1,
+    delay_days: parseInt(document.getElementById('st-days').value) || 0,
+    delay_hours: parseInt(document.getElementById('st-hours').value) || 0,
+    delay_minutes: parseInt(document.getElementById('st-mins').value) || 0,
+    body: document.getElementById('st-body').value,
+    batch_limit: parseInt(document.getElementById('st-batch').value) || 0,
+    batch_interval_minutes: parseInt(document.getElementById('st-interval').value) || 0,
+    tags: document.getElementById('st-tags').value.trim(),
+  };
+  if (!payload.subject || !payload.from_email) { alert('Subject and From email are required'); return; }
+  let error;
+  if (stepId) ({ error } = await sb.from('steps').update(payload).eq('id', stepId));
+  else ({ error } = await sb.from('steps').insert(payload));
+  if (error) { alert('Save failed: ' + error.message); return; }
+  openStepsModal(seqId, seqName);
 }
-async function deleteStep(stepId,seqId){if(!confirm('Delete this step?'))return;await sb.from('steps').delete().eq('id',stepId);const{data:seq}=await sb.from('sequences').select('name').eq('id',seqId).single();openStepsModal(seqId,seq?.name||'');}
-async function renderSubscribers(){
-  const{data:enrs}=await sb.from('enrollments').select('*,sequences(name)').order('enrolled_at',{ascending:false});
-  document.getElementById('topbar-actions').innerHTML=`
-    <button class="btn btn-secondary" style="margin-right:8px" onclick="openImportModal()">Import from Listmonk</button>
+
+async function deleteStep(stepId, seqId) {
+  if (!confirm('Delete this step?')) return;
+  await sb.from('steps').delete().eq('id', stepId);
+  const { data: seq } = await sb.from('sequences').select('name').eq('id', seqId).single();
+  openStepsModal(seqId, seq?.name || '');
+}
+
+// ── Subscribers ───────────────────────────────────────────────
+async function renderSubscribers() {
+  const { data: enrs } = await sb.from('enrollments').select('*,sequences(name)').order('enrolled_at', { ascending: false });
+  document.getElementById('topbar-actions').innerHTML = `
     <button class="btn btn-secondary" style="margin-right:8px" onclick="openBulkModal()">Bulk CSV</button>
     <button class="btn btn-primary" onclick="openEnrollModal()">+ Enroll</button>`;
-  const badge=s=>({active:'badge-green',paused:'badge-yellow',completed:'badge-blue',unsubscribed:'badge-red'}[s]||'badge-gray');
-  document.getElementById('content').innerHTML=`<div class="panel"><div class="panel-header"><h2>Enrollments (${(enrs||[]).length})</h2></div>${!enrs||!enrs.length?'<div class="empty">No enrollments yet. Use "Import from Listmonk" or "Bulk CSV" to add subscribers.</div>':`<table><thead><tr><th>Email</th><th>Name</th><th>Sequence</th><th>Step</th><th>Status</th><th>Last Sent</th><th>Actions</th></tr></thead><tbody>${enrs.map(e=>`<tr><td>${e.email}</td><td>${e.name||'—'}</td><td>${e.sequences?.name||'—'}</td><td>Step ${e.current_step}</td><td><span class="badge ${badge(e.status)}">${e.status}</span></td><td>${e.last_sent_at?new Date(e.last_sent_at).toLocaleDateString():'Not yet'}</td><td><div class="actions">${e.status==='active'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','paused')">Pause</button>`:e.status==='paused'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','active')">Resume</button>`:''}<button class="btn btn-danger btn-sm" onclick="removeEnr('${e.id}')">Remove</button></div></td></tr>`).join('')}</tbody></table>`}</div>`;
+  const badge = s => ({ active:'badge-green', paused:'badge-yellow', completed:'badge-blue', unsubscribed:'badge-red' }[s] || 'badge-gray');
+  document.getElementById('content').innerHTML = `
+    <div class="panel">
+      <div class="panel-header"><h2>Enrollments (${(enrs||[]).length})</h2></div>
+      ${!enrs||!enrs.length ? '<div class="empty">No enrollments yet.</div>' :
+      `<table><thead><tr><th>Email</th><th>Name</th><th>Sequence</th><th>Step</th><th>Status</th><th>Last Sent</th><th>Actions</th></tr></thead><tbody>
+      ${enrs.map(e=>`<tr>
+        <td>${e.email}</td>
+        <td>${e.name||'—'}</td>
+        <td>${e.sequences?.name||'—'}</td>
+        <td>Step ${e.current_step}</td>
+        <td><span class="badge ${badge(e.status)}">${e.status}</span></td>
+        <td>${e.last_sent_at ? new Date(e.last_sent_at).toLocaleDateString() : 'Not yet'}</td>
+        <td><div class="actions">
+          ${e.status==='active'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','paused')">Pause</button>`:
+            e.status==='paused'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','active')">Resume</button>`:''}
+          <button class="btn btn-danger btn-sm" onclick="removeEnr('${e.id}')">Remove</button>
+        </div></td>
+      </tr>`).join('')}</tbody></table>`}
+    </div>`;
 }
-async function setStatus(id,status){await sb.from('enrollments').update({status}).eq('id',id);renderSubscribers();}
-async function removeEnr(id){if(!confirm('Remove this enrollment?'))return;await sb.from('enrollments').delete().eq('id',id);renderSubscribers();}
-async function openImportModal(){
-  const{data:seqs}=await sb.from('sequences').select('id,name').eq('active',true);
-  const{data:rows}=await sb.from('settings').select('key,value');
-  const cfg=Object.fromEntries((rows||[]).map(r=>[r.key,String(r.value).replace(/^"|"$/g,'')]));
-  showModal(`<h2>Import from Listmonk</h2>
-    <p style="color:var(--gray);font-size:14px;margin-bottom:16px">Pulls all subscribers from a listmonk list. Must be opened as a local file (not hosted online) to avoid CORS errors.</p>
-    <div class="form-group"><label>Listmonk List ID <span style="font-weight:400;color:var(--gray)">(listmonk → Lists → click list → check URL)</span></label><input id="im-lid" type="number" min="1" placeholder="e.g. 7"></div>
-    <div class="form-group"><label>Enroll into Sequence</label><select id="im-seq"><option value="">Select a sequence…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
-    <div id="im-status" style="font-size:13px;margin-top:8px;min-height:20px"></div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="runImport('${cfg.listmonk_url}','${cfg.listmonk_username}','${cfg.listmonk_password}')">Import</button>
-    </div>`);
+
+async function setStatus(id, status) {
+  await sb.from('enrollments').update({ status }).eq('id', id);
+  renderSubscribers();
 }
-async function runImport(lmUrl,lmUser,lmPass){
-  const listId=document.getElementById('im-lid').value;
-  const seqId=document.getElementById('im-seq').value;
-  const status=document.getElementById('im-status');
-  if(!listId||!seqId){alert('List ID and sequence are required');return;}
-  if(!lmUrl||!lmUser){alert('Save your Listmonk credentials in Settings first');return;}
-  status.style.color='var(--gray)';status.textContent='Connecting to listmonk…';
-  const creds=btoa(`${lmUser}:${lmPass}`);
-  const rows=[];let page=1,total=0;
-  try{
-    while(true){
-      const r=await fetch(`${lmUrl}/api/subscribers?list_id=${listId}&page=${page}&per_page=100`,{headers:{Authorization:`Basic ${creds}`}});
-      if(!r.ok){status.style.color='var(--red)';status.textContent=`Listmonk error ${r.status}: ${r.statusText}`;return;}
-      const json=await r.json();
-      const results=json.data?.results||[];
-      total=json.data?.total||0;
-      rows.push(...results.map(s=>({email:s.email,name:s.name||null,sequence_id:seqId,current_step:0,status:'active'})));
-      status.textContent=`Fetched ${rows.length} of ${total}…`;
-      if(!results.length||page*100>=total)break;
-      page++;
-    }
-    if(!rows.length){status.textContent='No subscribers found on that list ID.';return;}
-    status.textContent=`Saving ${rows.length} to Supabase…`;
-    const{error}=await sb.from('enrollments').upsert(rows,{onConflict:'email,sequence_id',ignoreDuplicates:true});
-    if(error){status.style.color='var(--red)';status.textContent=`Supabase error: ${error.message}`;return;}
-    status.style.color='var(--green)';status.textContent=`Done! ${rows.length} subscribers imported.`;
-    setTimeout(()=>{closeModal();renderSubscribers();},1500);
-  }catch(e){status.style.color='var(--red)';status.textContent=`Error: ${e.message}`;}
+
+async function removeEnr(id) {
+  if (!confirm('Remove this enrollment?')) return;
+  await sb.from('enrollments').delete().eq('id', id);
+  renderSubscribers();
 }
-async function openEnrollModal(){
-  const{data:seqs}=await sb.from('sequences').select('id,name').eq('active',true);
-  showModal(`<h2>Enroll Subscriber</h2>
+
+async function openEnrollModal() {
+  const { data: seqs } = await sb.from('sequences').select('id,name').eq('active', true);
+  showModal(`
+    <h2>Enroll Subscriber</h2>
     <div class="form-group"><label>Email</label><input id="en-email" type="email" placeholder="prospect@example.com"></div>
     <div class="form-group"><label>Name</label><input id="en-name" placeholder="First Last"></div>
     <div class="form-group"><label>Sequence</label><select id="en-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="enrollOne()">Enroll</button></div>`);
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="enrollOne()">Enroll</button>
+    </div>`);
 }
-async function enrollOne(){
-  const email=document.getElementById('en-email').value.trim();
-  const name=document.getElementById('en-name').value.trim();
-  const sequence_id=document.getElementById('en-seq').value;
-  if(!email||!sequence_id){alert('Email and sequence required');return;}
-  const{error}=await sb.from('enrollments').insert({email,name,sequence_id,current_step:0,status:'active'});
-  if(error){alert(error.message);return;}
-  closeModal();renderSubscribers();
+
+async function enrollOne() {
+  const email = document.getElementById('en-email').value.trim();
+  const name = document.getElementById('en-name').value.trim();
+  const sequence_id = document.getElementById('en-seq').value;
+  if (!email || !sequence_id) { alert('Email and sequence required'); return; }
+  const { error } = await sb.from('enrollments').insert({ email, name, sequence_id, current_step: 0, status: 'active' });
+  if (error) { alert(error.message); return; }
+  closeModal();
+  renderSubscribers();
 }
-async function openBulkModal(){
-  const{data:seqs}=await sb.from('sequences').select('id,name').eq('active',true);
-  showModal(`<h2>Bulk Enroll via CSV</h2>
+
+async function openBulkModal() {
+  const { data: seqs } = await sb.from('sequences').select('id,name').eq('active', true);
+  showModal(`
+    <h2>Bulk Enroll via CSV</h2>
     <div class="form-group"><label>Sequence</label><select id="bl-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
-    <div class="file-drop" id="file-drop" onclick="document.getElementById('csv-file').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
-      <svg style="width:32px;height:32px;color:var(--blue);margin:0 auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-      <p><strong>Click to upload</strong> or drag and drop a CSV file</p>
-      <p style="font-size:12px;margin-top:4px">Columns: email, name (header row optional)</p>
-      <input type="file" id="csv-file" accept=".csv" style="display:none" onchange="handleFile(this)">
+    <div class="form-group">
+      <label>Paste CSV — one per line: <code>email, First Last</code></label>
+      <textarea id="bl-csv" style="min-height:160px" placeholder="john@example.com, John Smith&#10;jane@example.com, Jane Doe"></textarea>
     </div>
-    <div id="file-name" style="font-size:13px;color:var(--gray);margin-bottom:8px"></div>
-    <div class="form-group"><label>Or paste CSV directly — one per line: email, Name</label><textarea id="bl-csv" style="min-height:100px" placeholder="john@example.com, John Smith&#10;jane@example.com, Jane Doe"></textarea></div>
-    <div id="bl-status" style="font-size:13px;min-height:18px"></div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="bulkEnroll()">Enroll All</button></div>`);
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="bulkEnroll()">Enroll All</button>
+    </div>`);
 }
-function handleFile(input){
-  const file=input.files[0];
-  if(!file)return;
-  document.getElementById('file-name').textContent=`Selected: ${file.name}`;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    let text=e.target.result;
-    const lines=text.split('\n').filter(l=>l.trim());
-    // Skip header row if first cell doesn't look like an email
-    const first=lines[0]?.split(',')[0]?.trim().toLowerCase();
-    if(first&&!first.includes('@'))lines.shift();
-    document.getElementById('bl-csv').value=lines.join('\n');
-  };
-  reader.readAsText(file);
-}
-function handleDrop(e){
-  e.preventDefault();
-  document.getElementById('file-drop').classList.remove('dragover');
-  const file=e.dataTransfer.files[0];
-  if(!file||!file.name.endsWith('.csv')){alert('Please drop a .csv file');return;}
-  document.getElementById('csv-file').files=e.dataTransfer.files;
-  handleFile(document.getElementById('csv-file'));
-}
-async function bulkEnroll(){
-  const seq=document.getElementById('bl-seq').value;
-  const csv=document.getElementById('bl-csv').value.trim();
-  const statusEl=document.getElementById('bl-status');
-  if(!seq||!csv){alert('Sequence and CSV required');return;}
-  const rows=csv.split('\n').map(line=>{
-    const[email,...rest]=line.split(',').map(s=>s.trim().replace(/^"|"$/g,''));
-    return email&&email.includes('@')?{email,name:rest.join(' ').trim()||null,sequence_id:seq,current_step:0,status:'active'}:null;
+
+async function bulkEnroll() {
+  const seq = document.getElementById('bl-seq').value;
+  const csv = document.getElementById('bl-csv').value.trim();
+  if (!seq || !csv) { alert('Sequence and CSV required'); return; }
+  const rows = csv.split('\n').map(line => {
+    const [email, ...rest] = line.split(',').map(s => s.trim());
+    return email && email.includes('@') ? { email, name: rest.join(' ').trim() || null, sequence_id: seq, current_step: 0, status: 'active' } : null;
   }).filter(Boolean);
-  if(!rows.length){alert('No valid emails found');return;}
-  statusEl.style.color='var(--gray)';statusEl.textContent=`Enrolling ${rows.length} subscribers…`;
-  const{error}=await sb.from('enrollments').upsert(rows,{onConflict:'email,sequence_id',ignoreDuplicates:true});
-  if(error){statusEl.style.color='var(--red)';statusEl.textContent=`Error: ${error.message}`;return;}
-  statusEl.style.color='var(--green)';statusEl.textContent=`Done! ${rows.length} subscribers enrolled.`;
-  setTimeout(()=>{closeModal();renderSubscribers();},1500);
+  if (!rows.length) { alert('No valid emails found'); return; }
+  const { error } = await sb.from('enrollments').upsert(rows, { onConflict: 'email,sequence_id', ignoreDuplicates: true });
+  if (error) { alert(error.message); return; }
+  closeModal();
+  renderSubscribers();
 }
-async function renderAnalytics(){
-  const{data:logs}=await sb.from('send_log').select('sent_at,step_number,listmonk_campaign_id,status,enrollments(email,sequences(name))').order('sent_at',{ascending:false}).limit(500);
-  document.getElementById('content').innerHTML=`<div class="panel"><div class="panel-header"><h2>Send Log</h2></div>${!logs||!logs.length?'<div class="empty">No sends logged yet.</div>':`<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Campaign ID</th></tr></thead><tbody>${logs.map(l=>`<tr><td>${new Date(l.sent_at).toLocaleString()}</td><td>${l.enrollments?.email||'—'}</td><td>${l.enrollments?.sequences?.name||'—'}</td><td>Step ${l.step_number}</td><td>${l.listmonk_campaign_id?`<span class="badge badge-blue">#${l.listmonk_campaign_id}</span>`:'—'}</td></tr>`).join('')}</tbody></table>`}</div>`;
+
+// ── Analytics ─────────────────────────────────────────────────
+async function renderAnalytics() {
+  const { data: logs } = await sb.from('send_log')
+    .select('sent_at,step_number,listmonk_campaign_id,status,enrollments(email,sequences(name))')
+    .order('sent_at', { ascending: false }).limit(500);
+  document.getElementById('content').innerHTML = `
+    <div class="panel">
+      <div class="panel-header"><h2>Send Log</h2></div>
+      ${!logs||!logs.length ? '<div class="empty">No sends logged yet.</div>' :
+      `<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Campaign ID</th><th>Status</th></tr></thead><tbody>
+      ${logs.map(l=>`<tr>
+        <td>${new Date(l.sent_at).toLocaleString()}</td>
+        <td>${l.enrollments?.email||'—'}</td>
+        <td>${l.enrollments?.sequences?.name||'—'}</td>
+        <td>Step ${l.step_number}</td>
+        <td>${l.listmonk_campaign_id?`<span class="badge badge-blue">#${l.listmonk_campaign_id}</span>`:'—'}</td>
+        <td><span class="badge badge-green">${l.status}</span></td>
+      </tr>`).join('')}</tbody></table>`}
+    </div>`;
 }
-async function renderSettings(){
-  const{data:rows}=await sb.from('settings').select('key,value');
-  const cfg=Object.fromEntries((rows||[]).map(r=>[r.key,String(r.value).replace(/^"|"$/g,'')]));
-  document.getElementById('content').innerHTML=`<div style="max-width:560px">
-    <div class="panel" style="margin-bottom:20px"><div class="panel-header"><h2>Listmonk Connection</h2></div><div style="padding:20px">
-      <div class="form-group"><label>Listmonk URL</label><input id="s-url" value="${cfg.listmonk_url||'http://localhost:9000'}"></div>
-      <div class="form-row-2"><div class="form-group"><label>Username</label><input id="s-user" value="${cfg.listmonk_username||'admin'}"></div><div class="form-group"><label>Password</label><input id="s-pass" type="password" value="${cfg.listmonk_password||''}"></div></div>
-    </div></div>
-    <div class="panel" style="margin-bottom:20px"><div class="panel-header"><h2>Send Rate</h2></div><div style="padding:20px">
-      <div class="form-row">
-        <div class="form-group"><label>Emails / Min</label><input id="s-rate" type="number" min="1" max="60" value="${cfg.emails_per_minute||'2'}"></div>
-        <div class="form-group"><label>Batch Size</label><input id="s-batch" type="number" min="1" value="${cfg.batch_size||'50'}"></div>
-        <div class="form-group"><label>Daily Limit</label><input id="s-daily" type="number" value="${cfg.daily_limit||'300'}"></div>
+
+// ── Settings ──────────────────────────────────────────────────
+async function renderSettings() {
+  const { data: rows } = await sb.from('settings').select('key,value');
+  const cfg = Object.fromEntries((rows||[]).map(r=>[r.key,r.value]));
+  document.getElementById('content').innerHTML = `
+    <div style="max-width:560px">
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><h2>Listmonk Connection</h2></div>
+        <div style="padding:20px">
+          <div class="form-group"><label>Listmonk URL</label><input id="s-url" value="${cfg.listmonk_url||'http://localhost:9000'}"></div>
+          <div class="form-row-2">
+            <div class="form-group"><label>Username</label><input id="s-user" value="${cfg.listmonk_username||'admin'}"></div>
+            <div class="form-group"><label>Password</label><input id="s-pass" type="password" value="${cfg.listmonk_password||''}"></div>
+          </div>
+        </div>
       </div>
-      <p class="hint">Brevo free plan: 300/day. Paid: 9,000/day.</p>
-    </div></div>
-    <div style="display:flex;gap:10px"><button class="btn btn-primary" onclick="saveSettings()">Save Settings</button><button class="btn btn-secondary" onclick="resetConn()">Change Supabase Connection</button></div>
-  </div>`;
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><h2>Send Rate (Global Defaults)</h2></div>
+        <div style="padding:20px">
+          <div class="form-row">
+            <div class="form-group"><label>Emails / Min</label><input id="s-rate" type="number" min="1" max="60" value="${cfg.emails_per_minute||'2'}"></div>
+            <div class="form-group"><label>Batch Size</label><input id="s-batch" type="number" min="1" value="${cfg.batch_size||'50'}"></div>
+            <div class="form-group"><label>Daily Limit</label><input id="s-daily" type="number" value="${cfg.daily_limit||'300'}"></div>
+          </div>
+          <p class="hint">These are global defaults. Each step can override batch size and interval in its own settings.</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+        <button class="btn btn-secondary" onclick="resetConn()">Change Supabase Connection</button>
+      </div>
+    </div>`;
 }
-async function saveSettings(){
-  const kvs=[['listmonk_url',document.getElementById('s-url').value.trim()],['listmonk_username',document.getElementById('s-user').value.trim()],['listmonk_password',document.getElementById('s-pass').value],['emails_per_minute',document.getElementById('s-rate').value],['batch_size',document.getElementById('s-batch').value],['daily_limit',document.getElementById('s-daily').value]];
-  for(const[key,value]of kvs)await sb.from('settings').upsert({key,value},{onConflict:'key'});
+
+async function saveSettings() {
+  const kvs = [
+    ['listmonk_url', document.getElementById('s-url').value.trim()],
+    ['listmonk_username', document.getElementById('s-user').value.trim()],
+    ['listmonk_password', document.getElementById('s-pass').value],
+    ['emails_per_minute', document.getElementById('s-rate').value],
+    ['batch_size', document.getElementById('s-batch').value],
+    ['daily_limit', document.getElementById('s-daily').value],
+  ];
+  for (const [key, value] of kvs) {
+    await sb.from('settings').upsert({ key, value }, { onConflict: 'key' });
+  }
   alert('Settings saved!');
 }
-function resetConn(){localStorage.removeItem('sb_url');localStorage.removeItem('sb_key');location.reload();}
-function showModal(html,wide){const o=document.createElement('div');o.className='modal-overlay';o.innerHTML=`<div class="modal" style="${wide?'width:680px':''}">${html}</div>`;o.addEventListener('click',e=>{if(e.target===o)closeModal();});document.getElementById('modals').innerHTML='';document.getElementById('modals').appendChild(o);}
-function closeModal(){document.getElementById('modals').innerHTML='';}
-function esc(s){return(s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
-(function(){const url=localStorage.getItem('sb_url');const key=localStorage.getItem('sb_key');if(url&&key)boot(url,key);})();
+
+function resetConn() {
+  localStorage.removeItem('sb_url');
+  localStorage.removeItem('sb_key');
+  location.reload();
+}
+
+// ── Modal helpers ─────────────────────────────────────────────
+function showModal(html, wide) {
+  const o = document.createElement('div');
+  o.className = 'modal-overlay';
+  o.innerHTML = `<div class="modal" style="${wide?'width:720px':''}">${html}</div>`;
+  o.addEventListener('click', e => { if (e.target === o) closeModal(); });
+  document.getElementById('modals').innerHTML = '';
+  document.getElementById('modals').appendChild(o);
+}
+function closeModal() { document.getElementById('modals').innerHTML = ''; }
+function esc(s) { return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+// ── Boot ──────────────────────────────────────────────────────
+(function() {
+  const url = localStorage.getItem('sb_url');
+  const key = localStorage.getItem('sb_key');
+  if (url && key) boot(url, key);
+})();
 </script>
 </body>
 </html>
