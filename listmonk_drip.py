@@ -216,30 +216,29 @@ def main() -> int:
             if step_tags:
                 log.info("  Step %d: tags %s", snum, step_tags)
 
-            list_name = f"_drip_{seq['name'][:24]}_s{snum}_{dt.date.today()}"
-            temp_list_id = lm.create_list(list_name)
+            is_last = snum >= total_steps
 
-            try:
-                for enr in due:
+            for i, enr in enumerate(due):
+                temp_list_id = None
+                try:
+                    list_name = f"_drip_{seq['name'][:20]}_s{snum}_{enr['id'][:8]}"
+                    temp_list_id = lm.create_list(list_name)
                     lm.upsert_subscriber(enr["email"], enr.get("name") or "", temp_list_id)
-                    time.sleep(send_interval)
 
-                campaign_id = lm.create_campaign(
-                    name=f"{seq['name']} Step {snum} {dt.date.today()}",
-                    subject=step["subject"],
-                    from_email=step["from_email"],
-                    list_ids=[temp_list_id],
-                    template_id=step["template_id"],
-                    body=step_body,
-                    tags=step_tags,
-                )
-                lm.start_campaign(campaign_id)
-                log.info("  Campaign #%d started (tags: %s)", campaign_id, step_tags or "none")
+                    campaign_id = lm.create_campaign(
+                        name=f"{seq['name']} Step {snum} {enr['email']}",
+                        subject=step["subject"],
+                        from_email=step["from_email"],
+                        list_ids=[temp_list_id],
+                        template_id=step["template_id"],
+                        body=step_body,
+                        tags=step_tags,
+                    )
+                    lm.start_campaign(campaign_id)
+                    log.info("  [%d/%d] Campaign #%d → %s (tags: %s)",
+                             i + 1, len(due), campaign_id, enr["email"], step_tags or "none")
 
-                now = dt.datetime.now(dt.timezone.utc).isoformat()
-                is_last = snum >= total_steps
-
-                for enr in due:
+                    now = dt.datetime.now(dt.timezone.utc).isoformat()
                     post("send_log", {
                         "enrollment_id": enr["id"],
                         "step_id": step["id"],
@@ -253,9 +252,14 @@ def main() -> int:
                         "status": "completed" if is_last else "active",
                     })
 
-            except Exception:
-                log.exception("  Step %d failed — removing temp list", snum)
-                lm.delete_list(temp_list_id)
+                except Exception:
+                    log.exception("  [%d/%d] Failed for %s", i + 1, len(due), enr["email"])
+                    if temp_list_id:
+                        lm.delete_list(temp_list_id)
+
+                if i < len(due) - 1:
+                    log.info("  Waiting %.0f seconds before next email…", send_interval)
+                    time.sleep(send_interval)
 
     return 0
 
