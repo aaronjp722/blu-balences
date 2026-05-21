@@ -209,12 +209,64 @@ async function saveStep(seqId,seqName,stepNum,stepId){
 async function deleteStep(stepId,seqId){if(!confirm('Delete this step?'))return;await sb.from('steps').delete().eq('id',stepId);const{data:seq}=await sb.from('sequences').select('name').eq('id',seqId).single();openStepsModal(seqId,seq?.name||'');}
 async function renderSubscribers(){
   const{data:enrs}=await sb.from('enrollments').select('*,sequences(name)').order('enrolled_at',{ascending:false});
-  document.getElementById('topbar-actions').innerHTML=`<button class="btn btn-secondary" style="margin-right:8px" onclick="openBulkModal()">Bulk CSV</button><button class="btn btn-primary" onclick="openEnrollModal()">+ Enroll</button>`;
+  document.getElementById('topbar-actions').innerHTML=`
+    <button class="btn btn-secondary" style="margin-right:8px" onclick="openImportModal()">Import from Listmonk</button>
+    <button class="btn btn-secondary" style="margin-right:8px" onclick="openBulkModal()">Bulk CSV</button>
+    <button class="btn btn-primary" onclick="openEnrollModal()">+ Enroll</button>`;
   const badge=s=>({active:'badge-green',paused:'badge-yellow',completed:'badge-blue',unsubscribed:'badge-red'}[s]||'badge-gray');
-  document.getElementById('content').innerHTML=`<div class="panel"><div class="panel-header"><h2>Enrollments (${(enrs||[]).length})</h2></div>${!enrs||!enrs.length?'<div class="empty">No enrollments yet.</div>':`<table><thead><tr><th>Email</th><th>Name</th><th>Sequence</th><th>Step</th><th>Status</th><th>Last Sent</th><th>Actions</th></tr></thead><tbody>${enrs.map(e=>`<tr><td>${e.email}</td><td>${e.name||'—'}</td><td>${e.sequences?.name||'—'}</td><td>Step ${e.current_step}</td><td><span class="badge ${badge(e.status)}">${e.status}</span></td><td>${e.last_sent_at?new Date(e.last_sent_at).toLocaleDateString():'Not yet'}</td><td><div class="actions">${e.status==='active'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','paused')">Pause</button>`:e.status==='paused'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','active')">Resume</button>`:''}<button class="btn btn-danger btn-sm" onclick="removeEnr('${e.id}')">Remove</button></div></td></tr>`).join('')}</tbody></table>`}</div>`;
+  document.getElementById('content').innerHTML=`<div class="panel"><div class="panel-header"><h2>Enrollments (${(enrs||[]).length})</h2></div>${!enrs||!enrs.length?'<div class="empty">No enrollments yet. Use "Import from Listmonk" to pull in your existing subscribers.</div>':`<table><thead><tr><th>Email</th><th>Name</th><th>Sequence</th><th>Step</th><th>Status</th><th>Last Sent</th><th>Actions</th></tr></thead><tbody>${enrs.map(e=>`<tr><td>${e.email}</td><td>${e.name||'—'}</td><td>${e.sequences?.name||'—'}</td><td>Step ${e.current_step}</td><td><span class="badge ${badge(e.status)}">${e.status}</span></td><td>${e.last_sent_at?new Date(e.last_sent_at).toLocaleDateString():'Not yet'}</td><td><div class="actions">${e.status==='active'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','paused')">Pause</button>`:e.status==='paused'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','active')">Resume</button>`:''}<button class="btn btn-danger btn-sm" onclick="removeEnr('${e.id}')">Remove</button></div></td></tr>`).join('')}</tbody></table>`}</div>`;
 }
 async function setStatus(id,status){await sb.from('enrollments').update({status}).eq('id',id);renderSubscribers();}
 async function removeEnr(id){if(!confirm('Remove this enrollment?'))return;await sb.from('enrollments').delete().eq('id',id);renderSubscribers();}
+async function openImportModal(){
+  const{data:seqs}=await sb.from('sequences').select('id,name').eq('active',true);
+  const{data:rows}=await sb.from('settings').select('key,value');
+  const cfg=Object.fromEntries((rows||[]).map(r=>[r.key,String(r.value).replace(/^"|"$/g,'')]));
+  showModal(`<h2>Import from Listmonk</h2>
+    <p style="color:var(--gray);font-size:14px;margin-bottom:16px">Pulls all subscribers from a listmonk list and enrolls them into a sequence. Uses the credentials saved in Settings.</p>
+    <div class="form-group"><label>Listmonk List ID <span style="font-weight:400;color:var(--gray)">(find it in listmonk → Lists → click the list → check the URL)</span></label><input id="im-lid" type="number" min="1" placeholder="e.g. 7 for ATL_RE_AGENTS"></div>
+    <div class="form-group"><label>Enroll into Sequence</label><select id="im-seq"><option value="">Select a sequence…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
+    <div id="im-status" style="font-size:13px;margin-top:8px;min-height:20px"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="runImport('${cfg.listmonk_url}','${cfg.listmonk_username}','${cfg.listmonk_password}')">Import</button>
+    </div>`);
+}
+async function runImport(lmUrl,lmUser,lmPass){
+  const listId=document.getElementById('im-lid').value;
+  const seqId=document.getElementById('im-seq').value;
+  const status=document.getElementById('im-status');
+  if(!listId||!seqId){alert('List ID and sequence are required');return;}
+  if(!lmUrl||!lmUser){alert('Save your Listmonk credentials in Settings first');return;}
+  status.style.color='var(--gray)';
+  status.textContent='Connecting to listmonk…';
+  const creds=btoa(`${lmUser}:${lmPass}`);
+  const rows=[];
+  let page=1,total=0;
+  try{
+    while(true){
+      const r=await fetch(`${lmUrl}/api/subscribers?list_id=${listId}&page=${page}&per_page=100`,{headers:{Authorization:`Basic ${creds}`}});
+      if(!r.ok){status.style.color='var(--red)';status.textContent=`Listmonk error ${r.status}: ${r.statusText}. Make sure listmonk is running at ${lmUrl}`;return;}
+      const json=await r.json();
+      const results=json.data?.results||[];
+      total=json.data?.total||0;
+      rows.push(...results.map(s=>({email:s.email,name:s.name||null,sequence_id:seqId,current_step:0,status:'active'})));
+      status.textContent=`Fetched ${rows.length} of ${total} subscribers…`;
+      if(!results.length||page*100>=total)break;
+      page++;
+    }
+    if(!rows.length){status.textContent='No subscribers found on that list ID.';return;}
+    status.textContent=`Saving ${rows.length} subscribers to Supabase…`;
+    const{error}=await sb.from('enrollments').upsert(rows,{onConflict:'email,sequence_id',ignoreDuplicates:true});
+    if(error){status.style.color='var(--red)';status.textContent=`Supabase error: ${error.message}`;return;}
+    status.style.color='var(--green)';
+    status.textContent=`Done! ${rows.length} subscribers imported.`;
+    setTimeout(()=>{closeModal();renderSubscribers();},1500);
+  }catch(e){
+    status.style.color='var(--red)';
+    status.textContent=`Error: ${e.message}. Is listmonk running at ${lmUrl}?`;
+  }
+}
 async function openEnrollModal(){
   const{data:seqs}=await sb.from('sequences').select('id,name').eq('active',true);
   showModal(`<h2>Enroll Subscriber</h2>
@@ -255,7 +307,7 @@ async function renderAnalytics(){
 }
 async function renderSettings(){
   const{data:rows}=await sb.from('settings').select('key,value');
-  const cfg=Object.fromEntries((rows||[]).map(r=>[r.key,r.value]));
+  const cfg=Object.fromEntries((rows||[]).map(r=>[r.key,String(r.value).replace(/^"|"$/g,'')]));
   document.getElementById('content').innerHTML=`<div style="max-width:560px">
     <div class="panel" style="margin-bottom:20px"><div class="panel-header"><h2>Listmonk Connection</h2></div><div style="padding:20px">
       <div class="form-group"><label>Listmonk URL</label><input id="s-url" value="${cfg.listmonk_url||'http://localhost:9000'}"></div>
