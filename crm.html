@@ -8,7 +8,6 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Roboto',sans-serif;background:#202124;color:#e8eaed;min-height:100vh;display:flex;flex-direction:column}
-
 .nav{background:#292a2d;border-bottom:1px solid #3c4043;padding:0 20px;height:56px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
 .nav-logo{font-size:18px;font-weight:500;color:#e8eaed;white-space:nowrap}
 .nav-logo span{color:#1a73e8}
@@ -27,7 +26,6 @@ body{font-family:'Roboto',sans-serif;background:#202124;color:#e8eaed;min-height
 .btn-warn:hover{background:#b45309}
 .btn-green{background:#0f9d58;color:#fff}
 .btn-green:hover{background:#0b8044}
-
 .stats-bar{background:#292a2d;border-bottom:1px solid #3c4043;padding:12px 20px;display:flex;gap:20px;overflow-x:auto;flex-shrink:0}
 .stat-pill{display:flex;align-items:center;gap:8px;background:#35363a;border-radius:16px;padding:6px 14px;cursor:pointer;transition:all .2s;white-space:nowrap;border:2px solid transparent}
 .stat-pill:hover{background:#3c4043}
@@ -35,14 +33,12 @@ body{font-family:'Roboto',sans-serif;background:#202124;color:#e8eaed;min-height
 .stat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .stat-label{font-size:12px;color:#9aa0a6}
 .stat-count{font-size:13px;font-weight:500;color:#e8eaed}
-
 .toolbar{padding:12px 20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;flex-shrink:0}
 .search-wrap{position:relative;flex:1;min-width:200px;max-width:380px}
 .search-wrap input{width:100%;background:#292a2d;border:1px solid #5f6368;border-radius:20px;padding:8px 12px 8px 36px;color:#e8eaed;font-family:'Roboto',sans-serif;font-size:13px;outline:none}
 .search-wrap input:focus{border-color:#1a73e8}
 .search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;opacity:.5}
 .sort-select{background:#292a2d;border:1px solid #5f6368;border-radius:8px;padding:8px 12px;color:#e8eaed;font-family:'Roboto',sans-serif;font-size:13px;outline:none;cursor:pointer}
-
 .main{display:flex;flex:1;overflow:hidden}
 .table-area{flex:1;overflow-y:auto;padding:0 20px 20px}
 table{width:100%;border-collapse:collapse;font-size:13px}
@@ -56,7 +52,6 @@ td{padding:10px 12px;vertical-align:middle;max-width:200px;overflow:hidden;text-
 .rating-stars{color:#fbbc04;font-size:12px}
 .phone-link{color:#8ab4f8;text-decoration:none}
 .phone-link:hover{text-decoration:underline}
-
 .side-panel{width:0;background:#292a2d;border-left:1px solid #3c4043;overflow:hidden;transition:width .25s ease;display:flex;flex-direction:column;flex-shrink:0}
 .side-panel.open{width:440px}
 .panel-header{padding:16px 20px;border-bottom:1px solid #3c4043;display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0}
@@ -68,7 +63,6 @@ td{padding:10px 12px;vertical-align:middle;max-width:200px;overflow:hidden;text-
 .panel-tab.active{color:#8ab4f8;border-bottom-color:#1a73e8}
 .panel-body{flex:1;overflow-y:auto;padding:16px}
 .panel-footer{padding:12px 16px;border-top:1px solid #3c4043;display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
-
 .field-group{margin-bottom:14px}
 .field-label{font-size:11px;color:#9aa0a6;margin-bottom:4px;display:block;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
 .field-input{width:100%;background:transparent;border:none;border-bottom:1px solid #5f6368;padding:6px 2px;color:#e8eaed;font-family:'Roboto',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
@@ -78,12 +72,10 @@ textarea.field-input{resize:vertical;min-height:80px;border:1px solid #5f6368;bo
 textarea.field-input:focus{border-color:#1a73e8}
 select.field-input{background:#35363a;border:1px solid #5f6368;border-radius:8px;padding:6px 8px;cursor:pointer}
 select.field-input:focus{border-color:#1a73e8;outline:none}
-
 .dispo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
 .dispo-btn{padding:8px 4px;border-radius:10px;border:2px solid transparent;font-size:12px;font-weight:500;cursor:pointer;text-align:center;transition:all .2s;color:#fff;opacity:.7}
 .dispo-btn:hover{opacity:1;transform:translateY(-1px)}
 .dispo-btn.active{opacity:1;border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.3)}
-
 .activity-item{display:flex;gap:10px;margin-bottom:14px}
 .activity-dot{width:8px;height:8px;border-radius:50%;background:#5f6368;flex-shrink:0;margin-top:5px}
 .activity-dot.dispo{background:#1a73e8}
@@ -91,13 +83,11 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
 .activity-content{flex:1}
 .activity-text{font-size:13px;color:#e8eaed}
 .activity-time{font-size:11px;color:#9aa0a6;margin-top:2px}
-
 .email-section{margin-bottom:16px}
 .email-section-title{font-size:12px;font-weight:500;color:#9aa0a6;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
 .template-btns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
 .tpl-btn{padding:4px 10px;border-radius:12px;border:1px solid #5f6368;background:transparent;color:#9aa0a6;font-size:12px;cursor:pointer;transition:all .2s}
 .tpl-btn:hover{border-color:#8ab4f8;color:#8ab4f8}
-
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:center;justify-content:center}
 .modal-backdrop.open{display:flex}
 .modal{background:#292a2d;border-radius:16px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;border:1px solid #5f6368}
@@ -106,30 +96,24 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
 .modal-title{font-size:16px;font-weight:500}
 .modal-body{padding:20px}
 .modal-footer{padding:0 20px 20px;display:flex;justify-content:flex-end;gap:10px}
-
 .drop-zone{border:2px dashed #5f6368;border-radius:12px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s}
 .drop-zone:hover,.drop-zone.drag-over{border-color:#1a73e8;background:#1a73e810}
 .drop-zone p{color:#9aa0a6;font-size:14px;margin-top:8px}
-
 .dedup-group{background:#35363a;border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid #5f6368}
 .dedup-group-title{font-size:13px;font-weight:500;margin-bottom:8px;color:#fbbc04}
 .dedup-row{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #3c4043;font-size:12px}
 .dedup-row:last-child{border-bottom:none}
 .dedup-keep{background:#1a73e820;border-radius:6px;padding:2px 6px;font-size:11px;color:#8ab4f8}
-
 .toast-container{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:1000}
 .toast{background:#35363a;border-radius:10px;padding:12px 18px;font-size:14px;box-shadow:0 4px 16px rgba(0,0,0,.4);border-left:3px solid #1a73e8;animation:slideIn .25s ease;max-width:320px}
 .toast.success{border-left-color:#0f9d58}
 .toast.error{border-left-color:#d93025}
 @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:none;opacity:1}}
-
 .empty-state{text-align:center;padding:60px 20px;color:#9aa0a6}
 .empty-state svg{opacity:.3;margin-bottom:16px}
 .empty-state p{font-size:15px}
-
 .spinner{width:32px;height:32px;border:3px solid #3c4043;border-top-color:#1a73e8;border-radius:50%;animation:spin .8s linear infinite;margin:40px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 
@@ -148,10 +132,14 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
 .d-controls{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:18px;min-width:0}
 .d-biz-name{font-size:22px;font-weight:500;color:#e8eaed;line-height:1.2;margin-bottom:4px}
 .d-contact{font-size:14px;color:#9aa0a6;margin-bottom:10px}
-.d-phone-big{font-size:26px;font-weight:300;color:#8ab4f8;margin:8px 0 16px;letter-spacing:.5px}
 .d-info-row{display:flex;align-items:flex-start;gap:8px;padding:3px 0;font-size:13px;color:#c0c4cc}
 .d-info-icon{color:#9aa0a6;font-size:13px;width:18px;text-align:center;flex-shrink:0;margin-top:1px}
 .d-section-label{font-size:10px;color:#9aa0a6;font-weight:500;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.d-phone-edit{width:100%;background:#35363a;border:2px solid #5f6368;border-radius:10px;padding:12px;color:#8ab4f8;font-family:'Roboto',sans-serif;font-size:20px;font-weight:300;outline:none;letter-spacing:.5px;text-align:center;margin-bottom:10px;transition:border-color .2s}
+.d-phone-edit:focus{border-color:#1a73e8}
+.d-phone-edit:disabled{opacity:.35;color:#5f6368}
+.d-email-input{width:100%;background:#35363a;border:1px solid #5f6368;border-radius:8px;padding:9px 10px;color:#e8eaed;font-family:'Roboto',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+.d-email-input:focus{border-color:#1a73e8}
 .d-call-btn{width:100%;padding:18px;border-radius:14px;border:none;font-size:17px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Roboto',sans-serif}
 .d-call-btn.ready{background:#0f9d58;color:#fff}
 .d-call-btn.ready:hover{background:#0b8044;transform:translateY(-1px)}
@@ -163,7 +151,7 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
 .d-dispo-btn{padding:10px 4px;border-radius:10px;border:2px solid transparent;font-size:12px;font-weight:500;cursor:pointer;text-align:center;transition:all .2s;color:#fff;opacity:.75;font-family:'Roboto',sans-serif}
 .d-dispo-btn:hover{opacity:1;transform:translateY(-1px)}
 .d-dispo-btn.set{opacity:1;border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
-.d-auto-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.d-auto-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
 .d-toggle{width:38px;height:22px;border-radius:11px;border:none;cursor:pointer;position:relative;transition:background .2s;background:#3c4043;flex-shrink:0}
 .d-toggle.on{background:#1a73e8}
 .d-toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s}
@@ -198,6 +186,7 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
 .tag-name-edit{flex:1;background:transparent;border:none;border-bottom:1px solid transparent;color:#e8eaed;font-family:'Roboto',sans-serif;font-size:13px;outline:none;padding:2px 4px}
 .tag-name-edit:focus{border-bottom-color:#1a73e8}
 .tag-count-lbl{font-size:11px;color:#9aa0a6;white-space:nowrap}
+
 /* ─── ACTIVITY BAR ────────────────────────────────────────────────────────────── */
 .act-bar{background:#292a2d;border-bottom:1px solid #3c4043;padding:8px 20px;display:flex;align-items:center;gap:6px;overflow-x:auto;flex-shrink:0}
 .act-bar-lbl{font-size:11px;color:#9aa0a6;font-weight:500;white-space:nowrap;margin-right:4px}
@@ -298,10 +287,7 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
 </div>
 
 <div class="main">
-  <div class="table-area" id="table-area">
-    <div class="spinner"></div>
-  </div>
-
+  <div class="table-area" id="table-area"><div class="spinner"></div></div>
   <div class="side-panel" id="side-panel">
     <div class="panel-header">
       <div>
@@ -331,81 +317,31 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
     </div>
     <div class="modal-body">
       <div class="grid-2">
-        <div class="field-group">
-          <label class="field-label">Business Name *</label>
-          <input class="field-input" id="m-business_name" placeholder="Company name">
-        </div>
-        <div class="field-group">
-          <label class="field-label">Contact Name</label>
-          <input class="field-input" id="m-contact_name" placeholder="First Last">
-        </div>
+        <div class="field-group"><label class="field-label">Business Name *</label><input class="field-input" id="m-business_name" placeholder="Company name"></div>
+        <div class="field-group"><label class="field-label">Contact Name</label><input class="field-input" id="m-contact_name" placeholder="First Last"></div>
       </div>
       <div class="grid-2">
-        <div class="field-group">
-          <label class="field-label">Phone</label>
-          <input class="field-input" id="m-phone" placeholder="(513) 000-0000" type="tel">
-        </div>
-        <div class="field-group">
-          <label class="field-label">Email</label>
-          <input class="field-input" id="m-email" placeholder="name@email.com" type="email">
-        </div>
+        <div class="field-group"><label class="field-label">Phone</label><input class="field-input" id="m-phone" placeholder="(513) 000-0000" type="tel"></div>
+        <div class="field-group"><label class="field-label">Email</label><input class="field-input" id="m-email" placeholder="name@email.com" type="email"></div>
       </div>
-      <div class="field-group">
-        <label class="field-label">Address</label>
-        <input class="field-input" id="m-address" placeholder="Street address">
-      </div>
+      <div class="field-group"><label class="field-label">Address</label><input class="field-input" id="m-address" placeholder="Street address"></div>
       <div class="grid-3">
-        <div class="field-group">
-          <label class="field-label">City</label>
-          <input class="field-input" id="m-city" placeholder="Cincinnati">
-        </div>
-        <div class="field-group">
-          <label class="field-label">State</label>
-          <input class="field-input" id="m-state" placeholder="OH">
-        </div>
-        <div class="field-group">
-          <label class="field-label">County</label>
-          <input class="field-input" id="m-county" placeholder="Hamilton">
-        </div>
+        <div class="field-group"><label class="field-label">City</label><input class="field-input" id="m-city" placeholder="Cincinnati"></div>
+        <div class="field-group"><label class="field-label">State</label><input class="field-input" id="m-state" placeholder="OH"></div>
+        <div class="field-group"><label class="field-label">County</label><input class="field-input" id="m-county" placeholder="Hamilton"></div>
       </div>
-      <div class="field-group">
-        <label class="field-label">Website</label>
-        <input class="field-input" id="m-website" placeholder="https://...">
+      <div class="field-group"><label class="field-label">Website</label><input class="field-input" id="m-website" placeholder="https://..."></div>
+      <div class="grid-2">
+        <div class="field-group"><label class="field-label">Rating</label><input class="field-input" id="m-rating" type="number" min="0" max="5" step="0.1" placeholder="4.5"></div>
+        <div class="field-group"><label class="field-label">Reviews</label><input class="field-input" id="m-reviews" type="number" placeholder="100"></div>
       </div>
       <div class="grid-2">
-        <div class="field-group">
-          <label class="field-label">Rating</label>
-          <input class="field-input" id="m-rating" type="number" min="0" max="5" step="0.1" placeholder="4.5">
-        </div>
-        <div class="field-group">
-          <label class="field-label">Reviews</label>
-          <input class="field-input" id="m-reviews" type="number" placeholder="100">
-        </div>
+        <div class="field-group"><label class="field-label">Call Back Date</label><input class="field-input" id="m-follow_up_date" type="date"></div>
+        <div class="field-group"><label class="field-label">Appointment Date</label><input class="field-input" id="m-appointment_date" type="date"></div>
       </div>
-      <div class="grid-2">
-        <div class="field-group">
-          <label class="field-label">Call Back Date</label>
-          <input class="field-input" id="m-follow_up_date" type="date">
-        </div>
-        <div class="field-group">
-          <label class="field-label">Appointment Date</label>
-          <input class="field-input" id="m-appointment_date" type="date">
-        </div>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Industry</label>
-        <input class="field-input" id="m-industry" placeholder="Car detailing service" value="Car detailing service">
-      </div>
-      <div class="field-group">
-        <label class="field-label">Dispo</label>
-        <select class="field-input" id="m-dispo">
-          <option value="new">New Lead</option>
-        </select>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Notes</label>
-        <textarea class="field-input" id="m-notes" placeholder="Initial notes..."></textarea>
-      </div>
+      <div class="field-group"><label class="field-label">Industry</label><input class="field-input" id="m-industry" placeholder="Car detailing service" value="Car detailing service"></div>
+      <div class="field-group"><label class="field-label">Dispo</label><select class="field-input" id="m-dispo"><option value="new">New Lead</option></select></div>
+      <div class="field-group"><label class="field-label">Notes</label><textarea class="field-input" id="m-notes" placeholder="Initial notes..."></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeAddModal()">Cancel</button>
@@ -423,14 +359,8 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
     </div>
     <div class="modal-body">
       <p style="font-size:13px;color:#9aa0a6;margin-bottom:16px">Set appointment details for <strong id="cal-biz-name"></strong></p>
-      <div class="field-group">
-        <label class="field-label">Appointment Date & Time</label>
-        <input class="field-input" id="cal-datetime" type="datetime-local">
-      </div>
-      <div class="field-group">
-        <label class="field-label">Service / Notes</label>
-        <textarea class="field-input" id="cal-notes" placeholder="What service are they booking?"></textarea>
-      </div>
+      <div class="field-group"><label class="field-label">Appointment Date & Time</label><input class="field-input" id="cal-datetime" type="datetime-local"></div>
+      <div class="field-group"><label class="field-label">Service / Notes</label><textarea class="field-input" id="cal-notes" placeholder="What service are they booking?"></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="document.getElementById('cal-modal').classList.remove('open')">Cancel</button>
@@ -504,9 +434,7 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
       <div class="modal-title">Remove Duplicate Phone Numbers</div>
       <button class="btn-ghost" onclick="document.getElementById('dedup-modal').classList.remove('open')">✕</button>
     </div>
-    <div class="modal-body">
-      <div id="dedup-content"><div class="spinner"></div></div>
-    </div>
+    <div class="modal-body"><div id="dedup-content"><div class="spinner"></div></div></div>
     <div class="modal-footer" id="dedup-footer"></div>
   </div>
 </div>
@@ -524,6 +452,10 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
     <div class="modal-body">
       <p style="font-size:13px;color:#9aa0a6;margin-bottom:14px">Select which leads to queue for this calling session:</p>
       <div id="dialer-dispo-checks"></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid #3c4043">
+        <div style="font-size:12px;font-weight:500;color:#9aa0a6;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Also include by Tag</div>
+        <div id="dialer-tag-checks" style="display:flex;flex-wrap:wrap;gap:6px;min-height:22px"></div>
+      </div>
       <div style="margin-top:14px;padding-top:14px;border-top:1px solid #3c4043">
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;color:#9aa0a6">
           <input type="checkbox" id="dialer-use-filter" style="width:14px;height:14px;cursor:pointer" onchange="updateDialerCount()">
@@ -564,127 +496,73 @@ select.field-input:focus{border-color:#1a73e8;outline:none}
 
 <div class="toast-container" id="toast-container"></div>
 
-<script>
+  <script>
 const SUPABASE_URL = "https://rfdvogakvyodixgpvqvz.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E";
-
 const GHL_WEBHOOK      = "https://hook.us1.make.com/YOUR_GHL_WEBHOOK";
 const EMAIL_WEBHOOK    = "https://hook.us1.make.com/YOUR_EMAIL_WEBHOOK";
 const CALENDAR_WEBHOOK = "https://hook.us1.make.com/YOUR_CALENDAR_WEBHOOK";
 const QUO_API_KEY      = "3845462ba2868731cad1e93bd94a023b93e9d940df5bd3881ad649810fbc4146";
 
 const DISPOS = {
-  new:           { label: "New Lead",       color: "#5f6368" },
-  no_pick_up:    { label: "No Pick Up",     color: "#78716c" },
-  voicemail:     { label: "Voicemail",      color: "#7c3aed" },
-  call_back:     { label: "Call Back",      color: "#16a34a" },
-  gate_keeper:   { label: "Gate Keeper",    color: "#d93025" },
-  follow_up:     { label: "Follow Up",      color: "#d97706" },
-  email:         { label: "Email Sent",     color: "#1a73e8" },
-  text:          { label: "Text Sent",      color: "#1d4ed8" },
-  appointment:   { label: "Appointment",    color: "#0f9d58" },
-  not_interested:{ label: "Not Interested", color: "#0f766e" },
-  dnc:           { label: "DNC",            color: "#374151" },
-  bad_number:    { label: "Bad Number",     color: "#92400e" },
+  new:           { label:"New Lead",       color:"#5f6368" },
+  no_pick_up:    { label:"No Pick Up",     color:"#78716c" },
+  voicemail:     { label:"Voicemail",      color:"#7c3aed" },
+  call_back:     { label:"Call Back",      color:"#16a34a" },
+  gate_keeper:   { label:"Gate Keeper",    color:"#d93025" },
+  follow_up:     { label:"Follow Up",      color:"#d97706" },
+  email:         { label:"Email Sent",     color:"#1a73e8" },
+  text:          { label:"Text Sent",      color:"#1d4ed8" },
+  appointment:   { label:"Appointment",   color:"#0f9d58" },
+  not_interested:{ label:"Not Interested", color:"#0f766e" },
+  dnc:           { label:"DNC",            color:"#374151" },
+  bad_number:    { label:"Bad Number",     color:"#92400e" },
 };
 
-const CSV_COLS = [
-  "business_name","rating","reviews","industry","phone","notes","dispo",
-  "follow_up_date","contact_name","email","last_called_date","appointment_date",
-  "address","website","city","state","county"
-];
+const CSV_COLS = ["business_name","rating","reviews","industry","phone","notes","dispo","follow_up_date","contact_name","email","last_called_date","appointment_date","address","website","city","state","county"];
 
 const EMAIL_TEMPLATES = {
-  intro: {
-    label: "Intro",
-    subject: "Quick question about your detailing business",
-    body: `Hey {{name}},\n\nMy name is Aaron with Blu Balances — we help car detailing businesses save time and close more customers through simple digital tools.\n\nI noticed {{business}} and wanted to reach out. Would you have 15 minutes this week for a quick call?\n\nLooking forward to connecting,\nAaron\nBlu Balances`
-  },
-  followup: {
-    label: "Follow Up",
-    subject: "Following up — Blu Balances",
-    body: `Hey {{name}},\n\nJust wanted to follow up on my previous message. I know things get busy!\n\nWe've helped several detailing shops in the Cincinnati area streamline their booking and customer communication. I'd love to show you how it works.\n\nDo you have 10 minutes this week?\n\nAaron\nBlu Balances`
-  },
-  appointment: {
-    label: "Appointment Confirm",
-    subject: "Confirmed — our call on {{date}}",
-    body: `Hey {{name}},\n\nJust confirming our call on {{date}}. Looking forward to learning more about {{business}} and sharing how Blu Balances can help.\n\nIf you need to reschedule, just reply to this email.\n\nTalk soon,\nAaron\nBlu Balances`
-  },
-  value: {
-    label: "Value Prop",
-    subject: "Save time on admin — Blu Balances",
-    body: `Hey {{name}},\n\nQuick question — how much time does {{business}} spend each week on scheduling, invoicing, or chasing down customers?\n\nMost detailers we work with get that time back and see more repeat bookings within 60 days.\n\nHappy to show you a quick demo. Are you free for a 15-minute call?\n\nAaron\nBlu Balances`
-  },
+  intro:{label:"Intro",subject:"Quick question about your detailing business",body:`Hey {{name}},\n\nMy name is Aaron with Blu Balances — we help car detailing businesses save time and close more customers through simple digital tools.\n\nI noticed {{business}} and wanted to reach out. Would you have 15 minutes this week for a quick call?\n\nLooking forward to connecting,\nAaron\nBlu Balances`},
+  followup:{label:"Follow Up",subject:"Following up — Blu Balances",body:`Hey {{name}},\n\nJust wanted to follow up on my previous message. I know things get busy!\n\nWe've helped several detailing shops in the Cincinnati area streamline their booking and customer communication. I'd love to show you how it works.\n\nDo you have 10 minutes this week?\n\nAaron\nBlu Balances`},
+  appointment:{label:"Appointment Confirm",subject:"Confirmed — our call on {{date}}",body:`Hey {{name}},\n\nJust confirming our call on {{date}}. Looking forward to learning more about {{business}} and sharing how Blu Balances can help.\n\nIf you need to reschedule, just reply to this email.\n\nTalk soon,\nAaron\nBlu Balances`},
+  value:{label:"Value Prop",subject:"Save time on admin — Blu Balances",body:`Hey {{name}},\n\nQuick question — how much time does {{business}} spend each week on scheduling, invoicing, or chasing down customers?\n\nMost detailers we work with get that time back and see more repeat bookings within 60 days.\n\nHappy to show you a quick demo. Are you free for a 15-minute call?\n\nAaron\nBlu Balances`},
 };
 
-let allLeads = [];
-let filteredLeads = [];
-let currentLead = null;
-let currentTab = "info";
-let activeDispo = null;
-let editingLead = null;
+let allLeads = [], filteredLeads = [], currentLead = null, currentTab = "info", activeDispo = null, editingLead = null;
 
-// ─── TAGS STATE ───────────────────────────────────────────────────────────────
 const TAG_COLORS = ['#1a73e8','#0f9d58','#d93025','#d97706','#7c3aed','#0891b2','#be185d','#0f766e','#92400e','#374151','#16a34a','#ea580c'];
-let allTags = [], leadTagsMap = {};
-let selectedNewTagColor = TAG_COLORS[0];
-let importTagIds = [];
-
-// ─── DAILY ACTIVITY STATE ────────────────────────────────────────────────────
+let allTags = [], leadTagsMap = {}, selectedNewTagColor = TAG_COLORS[0], importTagIds = [];
 let todayActivity = { dials:0, talk_time_secs:0, connected:0, voicemail:0, no_answer:0, appointments:0 };
 let activityDbId = null, actSaveTimer = null;
 
 const db  = path => `${SUPABASE_URL}/rest/v1/${path}`;
-const hdr = extra => ({
-  "Content-Type": "application/json",
-  "apikey": SUPABASE_KEY,
-  "Authorization": `Bearer ${SUPABASE_KEY}`,
-  "Prefer": "return=representation",
-  ...extra
-});
+const hdr = extra => ({ "Content-Type":"application/json", "apikey":SUPABASE_KEY, "Authorization":`Bearer ${SUPABASE_KEY}`, "Prefer":"return=representation", ...extra });
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-function normalizePhone(p) {
-  return (p || "").replace(/\D/g, "");
-}
+function normalizePhone(p) { return (p || "").replace(/\D/g, ""); }
 
-function showToast(msg, type = "info") {
+function showToast(msg, type="info") {
   const c = document.getElementById("toast-container");
   const t = document.createElement("div");
-  t.className = `toast ${type}`;
-  t.textContent = msg;
-  c.appendChild(t);
-  setTimeout(() => t.remove(), 3500);
+  t.className = `toast ${type}`; t.textContent = msg;
+  c.appendChild(t); setTimeout(() => t.remove(), 3500);
 }
 
 function fieldScore(lead) {
-  const fields = ["business_name","contact_name","phone","email","address","city","state","county",
-    "website","rating","reviews","notes","follow_up_date","appointment_date","last_called_date","google_maps_link"];
-  return fields.filter(f => lead[f] != null && lead[f] !== "").length;
+  return ["business_name","contact_name","phone","email","address","city","state","county","website","rating","reviews","notes","follow_up_date","appointment_date","last_called_date","google_maps_link"].filter(f => lead[f] != null && lead[f] !== "").length;
 }
 
 function mergeLeads(group) {
-  const sorted = [...group].sort((a, b) => {
-    const sd = fieldScore(b) - fieldScore(a);
-    return sd !== 0 ? sd : new Date(b.updated_at || 0) - new Date(a.updated_at || 0);
-  });
+  const sorted = [...group].sort((a,b) => { const sd = fieldScore(b)-fieldScore(a); return sd !== 0 ? sd : new Date(b.updated_at||0)-new Date(a.updated_at||0); });
   const winner = { ...sorted[0] };
-  const mergeable = ["contact_name","email","address","city","state","county","website",
-    "rating","reviews","notes","google_maps_link","industry","follow_up_date","appointment_date","last_called_date"];
+  const mergeable = ["contact_name","email","address","city","state","county","website","rating","reviews","notes","google_maps_link","industry","follow_up_date","appointment_date","last_called_date"];
   for (const donor of sorted.slice(1)) {
-    for (const f of mergeable) {
-      if ((winner[f] == null || winner[f] === "") && donor[f] != null && donor[f] !== "") {
-        winner[f] = donor[f];
-      }
-    }
-    if (sorted[0].notes && donor.notes && donor.notes !== sorted[0].notes) {
-      winner.notes = (winner.notes || "") + "\n---\n" + donor.notes;
-    }
+    for (const f of mergeable) { if ((winner[f]==null||winner[f]==="") && donor[f]!=null && donor[f]!=="") winner[f]=donor[f]; }
+    if (sorted[0].notes && donor.notes && donor.notes !== sorted[0].notes) winner.notes = (winner.notes||"") + "\n---\n" + donor.notes;
   }
   return { winner, duplicates: sorted.slice(1) };
 }
 
-// ─── LOAD ────────────────────────────────────────────────────────────────────
 async function loadLeads() {
   try {
     const today = new Date().toISOString().split('T')[0];
@@ -699,914 +577,353 @@ async function loadLeads() {
     allTags = tagsRes.ok ? await tagsRes.json() : [];
     const ltRows = leadTagsRes.ok ? await leadTagsRes.json() : [];
     leadTagsMap = {};
-    ltRows.forEach(r => {
-      if (!leadTagsMap[r.lead_id]) leadTagsMap[r.lead_id] = [];
-      leadTagsMap[r.lead_id].push(r.tag_id);
-    });
-    if (actRes.ok) {
-      const actRows = await actRes.json();
-      if (actRows.length) {
-        const row = actRows[0];
-        activityDbId = row.id;
-        todayActivity = { dials: row.dials, talk_time_secs: row.talk_time_secs, connected: row.connected, voicemail: row.voicemail, no_answer: row.no_answer, appointments: row.appointments };
-      }
-    }
-    buildTagFilter();
-    buildStats();
-    applyFilter();
-    renderActivityBar();
-  } catch (e) {
-    console.error(e);
-    document.getElementById("table-area").innerHTML = `<div class="empty-state"><p>Could not load leads — check console</p></div>`;
-  }
+    ltRows.forEach(r => { if (!leadTagsMap[r.lead_id]) leadTagsMap[r.lead_id]=[]; leadTagsMap[r.lead_id].push(r.tag_id); });
+    if (actRes.ok) { const actRows = await actRes.json(); if (actRows.length) { const row=actRows[0]; activityDbId=row.id; todayActivity={dials:row.dials,talk_time_secs:row.talk_time_secs,connected:row.connected,voicemail:row.voicemail,no_answer:row.no_answer,appointments:row.appointments}; } }
+    buildTagFilter(); buildStats(); applyFilter(); renderActivityBar();
+  } catch(e) { console.error(e); document.getElementById("table-area").innerHTML=`<div class="empty-state"><p>Could not load leads — check console</p></div>`; }
 }
 
-// ─── STATS ───────────────────────────────────────────────────────────────────
 function buildStats() {
   const bar = document.getElementById("stats-bar");
   const counts = {};
-  allLeads.forEach(l => { counts[l.dispo] = (counts[l.dispo] || 0) + 1; });
-  const allBtn = `<div class="stat-pill ${!activeDispo?'active':''}" onclick="filterDispo(null)">
-    <span class="stat-dot" style="background:#1a73e8"></span>
-    <span class="stat-label">All</span>
-    <span class="stat-count">${allLeads.length}</span>
-  </div>`;
-  const pills = Object.entries(DISPOS).map(([key, d]) => {
-    const n = counts[key] || 0;
-    return `<div class="stat-pill ${activeDispo===key?'active':''}" onclick="filterDispo('${key}')">
-      <span class="stat-dot" style="background:${d.color}"></span>
-      <span class="stat-label">${d.label}</span>
-      <span class="stat-count">${n}</span>
-    </div>`;
-  }).join("");
+  allLeads.forEach(l => { counts[l.dispo] = (counts[l.dispo]||0)+1; });
+  const allBtn = `<div class="stat-pill ${!activeDispo?'active':''}" onclick="filterDispo(null)"><span class="stat-dot" style="background:#1a73e8"></span><span class="stat-label">All</span><span class="stat-count">${allLeads.length}</span></div>`;
+  const pills = Object.entries(DISPOS).map(([key,d]) => { const n=counts[key]||0; return `<div class="stat-pill ${activeDispo===key?'active':''}" onclick="filterDispo('${key}')"><span class="stat-dot" style="background:${d.color}"></span><span class="stat-label">${d.label}</span><span class="stat-count">${n}</span></div>`; }).join("");
   bar.innerHTML = allBtn + pills;
 }
 
-function filterDispo(key) {
-  activeDispo = key;
-  buildStats();
-  applyFilter();
-  document.getElementById("filter-clear").style.display = key ? "inline-flex" : "none";
-}
+function filterDispo(key) { activeDispo=key; buildStats(); applyFilter(); document.getElementById("filter-clear").style.display=key?"inline-flex":"none"; }
 
-function clearFilter() {
-  activeDispo = null;
-  document.getElementById("search-input").value = "";
-  const tf = document.getElementById("tag-filter");
-  if (tf) tf.value = "";
-  document.getElementById("filter-clear").style.display = "none";
-  buildStats();
-  applyFilter();
-}
+function clearFilter() { activeDispo=null; document.getElementById("search-input").value=""; const tf=document.getElementById("tag-filter"); if(tf)tf.value=""; document.getElementById("filter-clear").style.display="none"; buildStats(); applyFilter(); }
 
-// ─── FILTER ──────────────────────────────────────────────────────────────────
 function applyFilter() {
-  const q = (document.getElementById("search-input").value || "").toLowerCase();
-  const sort = document.getElementById("sort-select").value;
-  const tagId = document.getElementById("tag-filter")?.value || "";
-  let leads = allLeads.filter(l => {
-    if (activeDispo && l.dispo !== activeDispo) return false;
-    if (tagId && !(leadTagsMap[l.id] || []).includes(tagId)) return false;
-    if (!q) return true;
-    return [l.business_name,l.contact_name,l.phone,l.email,l.address,l.city,l.state,l.notes]
-      .join(" ").toLowerCase().includes(q);
+  const q=(document.getElementById("search-input").value||"").toLowerCase();
+  const sort=document.getElementById("sort-select").value;
+  const tagId=document.getElementById("tag-filter")?.value||"";
+  let leads=allLeads.filter(l => {
+    if(activeDispo && l.dispo!==activeDispo) return false;
+    if(tagId && !(leadTagsMap[l.id]||[]).includes(tagId)) return false;
+    if(!q) return true;
+    return [l.business_name,l.contact_name,l.phone,l.email,l.address,l.city,l.state,l.notes].join(" ").toLowerCase().includes(q);
   });
-  leads.sort((a, b) => {
-    if (sort === "business_name")   return (a.business_name||"").localeCompare(b.business_name||"");
-    if (sort === "rating_desc")     return (b.rating||0) - (a.rating||0);
-    if (sort === "reviews_desc")    return (b.reviews||0) - (a.reviews||0);
-    if (sort === "created_at_desc") return new Date(b.created_at) - new Date(a.created_at);
-    if (sort === "updated_at_desc") return new Date(b.updated_at) - new Date(a.updated_at);
+  leads.sort((a,b) => {
+    if(sort==="business_name") return (a.business_name||"").localeCompare(b.business_name||"");
+    if(sort==="rating_desc")   return (b.rating||0)-(a.rating||0);
+    if(sort==="reviews_desc")  return (b.reviews||0)-(a.reviews||0);
+    if(sort==="created_at_desc") return new Date(b.created_at)-new Date(a.created_at);
+    if(sort==="updated_at_desc") return new Date(b.updated_at)-new Date(a.updated_at);
     return 0;
   });
-  filteredLeads = leads;
-  document.getElementById("lead-count").textContent = `${leads.length} lead${leads.length !== 1?"s":""}`;
+  filteredLeads=leads;
+  document.getElementById("lead-count").textContent=`${leads.length} lead${leads.length!==1?"s":""}`;
   renderTable();
 }
 
-// ─── TABLE ───────────────────────────────────────────────────────────────────
 function renderTable() {
-  const area = document.getElementById("table-area");
-  if (!filteredLeads.length) {
-    area.innerHTML = `<div class="empty-state">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <p>No leads found</p>
-    </div>`;
-    return;
-  }
-  const rows = filteredLeads.map(l => {
-    const d = DISPOS[l.dispo] || DISPOS.new;
-    const stars = l.rating ? "★".repeat(Math.round(l.rating)) + `<span style="color:#9aa0a6"> ${l.rating}</span>` : "—";
-    const loc = [l.city, l.state].filter(Boolean).join(", ") || "—";
-    const sel = currentLead?.id === l.id ? "selected" : "";
-    const tagChips = (leadTagsMap[l.id] || []).map(tid => {
-      const tag = allTags.find(t => t.id === tid);
-      return tag ? `<span class="tag-chip" style="background:${tag.color}">${esc(tag.name)}</span>` : '';
-    }).join('');
-    return `<tr class="${sel}" onclick="openLead('${l.id}')">
-      <td style="font-weight:500;white-space:normal">${esc(l.business_name)}${tagChips ? `<div class="tag-chips-row">${tagChips}</div>` : ''}</td>
-      <td>${esc(l.contact_name || "—")}</td>
-      <td><a class="phone-link" href="tel:${esc(l.phone)}" onclick="event.stopPropagation()">${esc(l.phone || "—")}</a></td>
-      <td>${esc(loc)}</td>
-      <td><span class="rating-stars">${stars}</span></td>
-      <td><span class="dispo-badge" style="background:${d.color}">${d.label}</span></td>
-      <td style="color:#9aa0a6;font-size:12px">${l.updated_at ? new Date(l.updated_at).toLocaleDateString() : "—"}</td>
-    </tr>`;
+  const area=document.getElementById("table-area");
+  if(!filteredLeads.length){area.innerHTML=`<div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>No leads found</p></div>`;return;}
+  const rows=filteredLeads.map(l=>{
+    const d=DISPOS[l.dispo]||DISPOS.new;
+    const stars=l.rating?"★".repeat(Math.round(l.rating))+`<span style="color:#9aa0a6"> ${l.rating}</span>`:"—";
+    const loc=[l.city,l.state].filter(Boolean).join(", ")||"—";
+    const sel=currentLead?.id===l.id?"selected":"";
+    const tagChips=(leadTagsMap[l.id]||[]).map(tid=>{const tag=allTags.find(t=>t.id===tid);return tag?`<span class="tag-chip" style="background:${tag.color}">${esc(tag.name)}</span>`:''}).join('');
+    return `<tr class="${sel}" onclick="openLead('${l.id}')"><td style="font-weight:500;white-space:normal">${esc(l.business_name)}${tagChips?`<div class="tag-chips-row">${tagChips}</div>`:''}</td><td>${esc(l.contact_name||"—")}</td><td><a class="phone-link" href="tel:${esc(l.phone)}" onclick="event.stopPropagation()">${esc(l.phone||"—")}</a></td><td>${esc(loc)}</td><td><span class="rating-stars">${stars}</span></td><td><span class="dispo-badge" style="background:${d.color}">${d.label}</span></td><td style="color:#9aa0a6;font-size:12px">${l.updated_at?new Date(l.updated_at).toLocaleDateString():"—"}</td></tr>`;
   }).join("");
-  area.innerHTML = `<table>
-    <thead><tr>
-      <th>Business</th><th>Contact</th><th>Phone</th><th>Location</th>
-      <th>Rating</th><th>Dispo</th><th>Updated</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table>`;
+  area.innerHTML=`<table><thead><tr><th>Business</th><th>Contact</th><th>Phone</th><th>Location</th><th>Rating</th><th>Dispo</th><th>Updated</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-// ─── PANEL ───────────────────────────────────────────────────────────────────
 async function openLead(id) {
-  const lead = allLeads.find(l => l.id === id);
-  if (!lead) return;
-  currentLead = lead;
-  currentTab = "info";
+  const lead=allLeads.find(l=>l.id===id); if(!lead)return;
+  currentLead=lead; currentTab="info";
   document.getElementById("side-panel").classList.add("open");
-  document.getElementById("panel-name").textContent = lead.business_name;
-  const d = DISPOS[lead.dispo] || DISPOS.new;
-  document.getElementById("panel-sub").innerHTML = `<span class="dispo-badge" style="background:${d.color}">${d.label}</span>`;
-  updateTabUI();
-  renderTable();
-  await renderTab();
+  document.getElementById("panel-name").textContent=lead.business_name;
+  const d=DISPOS[lead.dispo]||DISPOS.new;
+  document.getElementById("panel-sub").innerHTML=`<span class="dispo-badge" style="background:${d.color}">${d.label}</span>`;
+  updateTabUI(); renderTable(); await renderTab();
 }
 
-function closePanel() {
-  document.getElementById("side-panel").classList.remove("open");
-  currentLead = null;
-  renderTable();
-}
-
-function switchTab(tab) {
-  currentTab = tab;
-  updateTabUI();
-  renderTab();
-}
-
-function updateTabUI() {
-  document.querySelectorAll(".panel-tab").forEach((t, i) => {
-    t.classList.toggle("active", ["info","dispo","notes","email","activity"][i] === currentTab);
-  });
-}
+function closePanel() { document.getElementById("side-panel").classList.remove("open"); currentLead=null; renderTable(); }
+function switchTab(tab) { currentTab=tab; updateTabUI(); renderTab(); }
+function updateTabUI() { document.querySelectorAll(".panel-tab").forEach((t,i)=>{ t.classList.toggle("active",["info","dispo","notes","email","activity"][i]===currentTab); }); }
 
 async function renderTab() {
-  if (!currentLead) return;
-  if      (currentTab === "info")     renderInfoTab();
-  else if (currentTab === "dispo")    renderDispoTab();
-  else if (currentTab === "notes")    renderNotesTab();
-  else if (currentTab === "email")    renderEmailTab();
-  else if (currentTab === "activity") await renderActivityTab();
+  if(!currentLead)return;
+  if(currentTab==="info")         renderInfoTab();
+  else if(currentTab==="dispo")   renderDispoTab();
+  else if(currentTab==="notes")   renderNotesTab();
+  else if(currentTab==="email")   renderEmailTab();
+  else if(currentTab==="activity") await renderActivityTab();
 }
 
-// INFO TAB
 function renderInfoTab() {
-  const l = currentLead;
-  const mapsLink = l.google_maps_link
-    ? `<a href="${esc(l.google_maps_link)}" target="_blank" style="color:#8ab4f8;font-size:12px;text-decoration:none">📍 Maps</a>` : "";
-  const webLink = l.website
-    ? `<a href="${esc(l.website)}" target="_blank" style="color:#8ab4f8;font-size:12px;text-decoration:none">🌐 Website</a>` : "";
-
-  document.getElementById("panel-body").innerHTML = `
-    <div class="field-group"><label class="field-label">Business Name</label>
-      <input class="field-input" id="e-business_name" value="${esc(l.business_name)}"></div>
-    <div class="grid-2">
-      <div class="field-group"><label class="field-label">Contact Name</label>
-        <input class="field-input" id="e-contact_name" value="${esc(l.contact_name||'')}"></div>
-      <div class="field-group"><label class="field-label">Phone</label>
-        <input class="field-input" id="e-phone" value="${esc(l.phone||'')}"></div>
-    </div>
-    <div class="field-group"><label class="field-label">Email</label>
-      <input class="field-input" id="e-email" type="email" value="${esc(l.email||'')}"></div>
-    <div class="field-group"><label class="field-label">Address</label>
-      <input class="field-input" id="e-address" value="${esc(l.address||'')}"></div>
-    <div class="grid-3">
-      <div class="field-group"><label class="field-label">City</label>
-        <input class="field-input" id="e-city" value="${esc(l.city||'')}"></div>
-      <div class="field-group"><label class="field-label">State</label>
-        <input class="field-input" id="e-state" value="${esc(l.state||'')}"></div>
-      <div class="field-group"><label class="field-label">County</label>
-        <input class="field-input" id="e-county" value="${esc(l.county||'')}"></div>
-    </div>
-    <div class="field-group"><label class="field-label">Website</label>
-      <input class="field-input" id="e-website" value="${esc(l.website||'')}"></div>
-    <div class="grid-2">
-      <div class="field-group"><label class="field-label">Rating</label>
-        <input class="field-input" id="e-rating" type="number" step="0.1" min="0" max="5" value="${l.rating||''}"></div>
-      <div class="field-group"><label class="field-label">Reviews</label>
-        <input class="field-input" id="e-reviews" type="number" value="${l.reviews||''}"></div>
-    </div>
-    <div class="grid-2">
-      <div class="field-group"><label class="field-label">Call Back Date</label>
-        <input class="field-input" id="e-follow_up_date" type="date" value="${l.follow_up_date||''}"></div>
-      <div class="field-group"><label class="field-label">Appointment Date</label>
-        <input class="field-input" id="e-appointment_date" type="date" value="${l.appointment_date||''}"></div>
-    </div>
-    <div class="field-group"><label class="field-label">Last Called Date</label>
-      <input class="field-input" id="e-last_called_date" type="date" value="${l.last_called_date||''}"></div>
-    <div class="field-group"><label class="field-label">Google Maps Link</label>
-      <input class="field-input" id="e-google_maps_link" value="${esc(l.google_maps_link||'')}"></div>
+  const l=currentLead;
+  const mapsLink=l.google_maps_link?`<a href="${esc(l.google_maps_link)}" target="_blank" style="color:#8ab4f8;font-size:12px;text-decoration:none">📍 Maps</a>`:"";
+  const webLink=l.website?`<a href="${esc(l.website)}" target="_blank" style="color:#8ab4f8;font-size:12px;text-decoration:none">🌐 Website</a>`:"";
+  document.getElementById("panel-body").innerHTML=`
+    <div class="field-group"><label class="field-label">Business Name</label><input class="field-input" id="e-business_name" value="${esc(l.business_name)}"></div>
+    <div class="grid-2"><div class="field-group"><label class="field-label">Contact Name</label><input class="field-input" id="e-contact_name" value="${esc(l.contact_name||'')}"></div><div class="field-group"><label class="field-label">Phone</label><input class="field-input" id="e-phone" value="${esc(l.phone||'')}"></div></div>
+    <div class="field-group"><label class="field-label">Email</label><input class="field-input" id="e-email" type="email" value="${esc(l.email||'')}"></div>
+    <div class="field-group"><label class="field-label">Address</label><input class="field-input" id="e-address" value="${esc(l.address||'')}"></div>
+    <div class="grid-3"><div class="field-group"><label class="field-label">City</label><input class="field-input" id="e-city" value="${esc(l.city||'')}"></div><div class="field-group"><label class="field-label">State</label><input class="field-input" id="e-state" value="${esc(l.state||'')}"></div><div class="field-group"><label class="field-label">County</label><input class="field-input" id="e-county" value="${esc(l.county||'')}"></div></div>
+    <div class="field-group"><label class="field-label">Website</label><input class="field-input" id="e-website" value="${esc(l.website||'')}"></div>
+    <div class="grid-2"><div class="field-group"><label class="field-label">Rating</label><input class="field-input" id="e-rating" type="number" step="0.1" min="0" max="5" value="${l.rating||''}"></div><div class="field-group"><label class="field-label">Reviews</label><input class="field-input" id="e-reviews" type="number" value="${l.reviews||''}"></div></div>
+    <div class="grid-2"><div class="field-group"><label class="field-label">Call Back Date</label><input class="field-input" id="e-follow_up_date" type="date" value="${l.follow_up_date||''}"></div><div class="field-group"><label class="field-label">Appointment Date</label><input class="field-input" id="e-appointment_date" type="date" value="${l.appointment_date||''}"></div></div>
+    <div class="field-group"><label class="field-label">Last Called Date</label><input class="field-input" id="e-last_called_date" type="date" value="${l.last_called_date||''}"></div>
+    <div class="field-group"><label class="field-label">Google Maps Link</label><input class="field-input" id="e-google_maps_link" value="${esc(l.google_maps_link||'')}"></div>
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">${mapsLink}${webLink}</div>
-    <div class="field-group" style="margin-top:14px">
-      <label class="field-label">Tags</label>
-      <div id="lead-tags-editor"></div>
-    </div>`;
+    <div class="field-group" style="margin-top:14px"><label class="field-label">Tags</label><div id="lead-tags-editor"></div></div>`;
   renderLeadTagsEditor(l.id);
-
-  document.getElementById("panel-footer").innerHTML = `
-    <button class="btn btn-primary btn-sm" onclick="saveCurrentLead()">Save Changes</button>
-    <button class="btn btn-outline btn-sm" onclick="openCalModal()">📅 Calendar</button>
-    <button class="btn btn-outline btn-sm" onclick="quickGHL()">📲 GHL</button>
-    <button class="btn btn-danger btn-sm" onclick="deleteLead()">Delete</button>`;
+  document.getElementById("panel-footer").innerHTML=`<button class="btn btn-primary btn-sm" onclick="saveCurrentLead()">Save Changes</button><button class="btn btn-outline btn-sm" onclick="openCalModal()">📅 Calendar</button><button class="btn btn-outline btn-sm" onclick="quickGHL()">📲 GHL</button><button class="btn btn-danger btn-sm" onclick="deleteLead()">Delete</button>`;
 }
 
-// DISPO TAB
 function renderDispoTab() {
-  const btns = Object.entries(DISPOS).map(([key, d]) => `
-    <button class="dispo-btn ${currentLead.dispo===key?'active':''}"
-      style="background:${d.color}" onclick="setDispo('${key}')">${d.label}</button>`).join("");
-  document.getElementById("panel-body").innerHTML = `
-    <p style="font-size:13px;color:#9aa0a6;margin-bottom:16px">Select the current disposition:</p>
-    <div class="dispo-grid">${btns}</div>
-    <div class="field-group" style="margin-top:20px">
-      <label class="field-label">Activity Note (optional)</label>
-      <textarea class="field-input" id="dispo-note" placeholder="Note about this status change..."></textarea>
-    </div>`;
-  document.getElementById("panel-footer").innerHTML = "";
+  const btns=Object.entries(DISPOS).map(([key,d])=>`<button class="dispo-btn ${currentLead.dispo===key?'active':''}" style="background:${d.color}" onclick="setDispo('${key}')">${d.label}</button>`).join("");
+  document.getElementById("panel-body").innerHTML=`<p style="font-size:13px;color:#9aa0a6;margin-bottom:16px">Select the current disposition:</p><div class="dispo-grid">${btns}</div><div class="field-group" style="margin-top:20px"><label class="field-label">Activity Note (optional)</label><textarea class="field-input" id="dispo-note" placeholder="Note about this status change..."></textarea></div>`;
+  document.getElementById("panel-footer").innerHTML="";
 }
 
-// NOTES TAB
 function renderNotesTab() {
-  document.getElementById("panel-body").innerHTML = `
-    <div class="field-group">
-      <label class="field-label">Notes</label>
-      <textarea class="field-input" id="e-notes" style="min-height:200px"
-        placeholder="Add notes about this lead...">${esc(currentLead.notes||'')}</textarea>
-    </div>`;
-  document.getElementById("panel-footer").innerHTML = `
-    <button class="btn btn-primary btn-sm" onclick="saveNotes()">Save Notes</button>`;
+  document.getElementById("panel-body").innerHTML=`<div class="field-group"><label class="field-label">Notes</label><textarea class="field-input" id="e-notes" style="min-height:200px" placeholder="Add notes about this lead...">${esc(currentLead.notes||'')}</textarea></div>`;
+  document.getElementById("panel-footer").innerHTML=`<button class="btn btn-primary btn-sm" onclick="saveNotes()">Save Notes</button>`;
 }
 
-// EMAIL TAB
 function renderEmailTab() {
-  const tplBtns = Object.entries(EMAIL_TEMPLATES).map(([key, t]) =>
-    `<button class="tpl-btn" onclick="applyTemplate('${key}')">${t.label}</button>`).join("");
-  document.getElementById("panel-body").innerHTML = `
-    <div class="email-section">
-      <div class="email-section-title">Template</div>
-      <div class="template-btns">${tplBtns}</div>
-    </div>
-    <div class="field-group">
-      <label class="field-label">To</label>
-      <input class="field-input" id="email-to" value="${esc(currentLead.email||'')}" placeholder="recipient@email.com">
-    </div>
-    <div class="field-group">
-      <label class="field-label">Subject</label>
-      <input class="field-input" id="email-subject" placeholder="Subject line...">
-    </div>
-    <div class="field-group">
-      <label class="field-label">Body</label>
-      <textarea class="field-input" id="email-body" style="min-height:180px" placeholder="Write your email..."></textarea>
-    </div>`;
-  document.getElementById("panel-footer").innerHTML = `
-    <button class="btn btn-primary btn-sm" onclick="sendEmail()">Send Email</button>`;
+  const tplBtns=Object.entries(EMAIL_TEMPLATES).map(([key,t])=>`<button class="tpl-btn" onclick="applyTemplate('${key}')">${t.label}</button>`).join("");
+  document.getElementById("panel-body").innerHTML=`<div class="email-section"><div class="email-section-title">Template</div><div class="template-btns">${tplBtns}</div></div><div class="field-group"><label class="field-label">To</label><input class="field-input" id="email-to" value="${esc(currentLead.email||'')}" placeholder="recipient@email.com"></div><div class="field-group"><label class="field-label">Subject</label><input class="field-input" id="email-subject" placeholder="Subject line..."></div><div class="field-group"><label class="field-label">Body</label><textarea class="field-input" id="email-body" style="min-height:180px" placeholder="Write your email..."></textarea></div>`;
+  document.getElementById("panel-footer").innerHTML=`<button class="btn btn-primary btn-sm" onclick="sendEmail()">Send Email</button>`;
 }
 
-// ACTIVITY TAB
 async function renderActivityTab() {
-  document.getElementById("panel-body").innerHTML = `<div class="spinner"></div>`;
-  document.getElementById("panel-footer").innerHTML = `
-    <textarea class="field-input" id="act-note" placeholder="Add a note..." style="flex:1;min-height:60px"></textarea>
-    <button class="btn btn-primary btn-sm" onclick="addActivity()">Add Note</button>`;
+  document.getElementById("panel-body").innerHTML=`<div class="spinner"></div>`;
+  document.getElementById("panel-footer").innerHTML=`<textarea class="field-input" id="act-note" placeholder="Add a note..." style="flex:1;min-height:60px"></textarea><button class="btn btn-primary btn-sm" onclick="addActivity()">Add Note</button>`;
   try {
-    const res = await fetch(db(`crm_activity?lead_id=eq.${currentLead.id}&order=created_at.desc&limit=50`), { headers: hdr() });
-    const acts = res.ok ? await res.json() : [];
-    if (!acts.length) {
-      document.getElementById("panel-body").innerHTML = `<p style="color:#9aa0a6;font-size:13px">No activity yet.</p>`;
-      return;
-    }
-    document.getElementById("panel-body").innerHTML = acts.map(a => {
-      const isDispo = a.activity_type === "dispo_change";
-      const text = isDispo
-        ? `Dispo changed: <strong>${DISPOS[a.old_dispo]?.label||a.old_dispo}</strong> → <strong>${DISPOS[a.new_dispo]?.label||a.new_dispo}</strong>${a.body?`<br><em>${esc(a.body)}</em>`:""}`
-        : esc(a.body);
-      return `<div class="activity-item">
-        <div class="activity-dot ${isDispo?'dispo':'note'}"></div>
-        <div class="activity-content">
-          <div class="activity-text">${text}</div>
-          <div class="activity-time">${new Date(a.created_at).toLocaleString()}</div>
-        </div>
-      </div>`;
+    const res=await fetch(db(`crm_activity?lead_id=eq.${currentLead.id}&order=created_at.desc&limit=50`),{headers:hdr()});
+    const acts=res.ok?await res.json():[];
+    if(!acts.length){document.getElementById("panel-body").innerHTML=`<p style="color:#9aa0a6;font-size:13px">No activity yet.</p>`;return;}
+    document.getElementById("panel-body").innerHTML=acts.map(a=>{
+      const isDispo=a.activity_type==="dispo_change";
+      const text=isDispo?`Dispo changed: <strong>${DISPOS[a.old_dispo]?.label||a.old_dispo}</strong> → <strong>${DISPOS[a.new_dispo]?.label||a.new_dispo}</strong>${a.body?`<br><em>${esc(a.body)}</em>`:""}`:esc(a.body);
+      return `<div class="activity-item"><div class="activity-dot ${isDispo?'dispo':'note'}"></div><div class="activity-content"><div class="activity-text">${text}</div><div class="activity-time">${new Date(a.created_at).toLocaleString()}</div></div></div>`;
     }).join("");
-  } catch(e) {
-    document.getElementById("panel-body").innerHTML = `<p style="color:#d93025;font-size:13px">Error loading activity</p>`;
-  }
+  } catch(e){document.getElementById("panel-body").innerHTML=`<p style="color:#d93025;font-size:13px">Error loading activity</p>`;}
 }
 
-// ─── ACTIONS ─────────────────────────────────────────────────────────────────
 async function setDispo(newDispo) {
-  if (!currentLead) return;
-  const oldDispo = currentLead.dispo;
-  const note = document.getElementById("dispo-note")?.value || "";
-  if (oldDispo === newDispo) return;
+  if(!currentLead)return;
+  const oldDispo=currentLead.dispo, note=document.getElementById("dispo-note")?.value||"";
+  if(oldDispo===newDispo)return;
   try {
-    await fetch(db(`crm_leads?id=eq.${currentLead.id}`), {
-      method: "PATCH", headers: hdr(),
-      body: JSON.stringify({ dispo: newDispo, last_contacted_at: new Date().toISOString() })
-    });
-    await fetch(db("crm_activity"), {
-      method: "POST", headers: hdr(),
-      body: JSON.stringify({ lead_id: currentLead.id, activity_type: "dispo_change", old_dispo: oldDispo, new_dispo: newDispo, body: note || null })
-    });
-    currentLead.dispo = newDispo;
-    const idx = allLeads.findIndex(l => l.id === currentLead.id);
-    if (idx !== -1) allLeads[idx].dispo = newDispo;
-    const d = DISPOS[newDispo];
-    document.getElementById("panel-sub").innerHTML = `<span class="dispo-badge" style="background:${d.color}">${d.label}</span>`;
-    buildStats();
-    renderDispoTab();
-    renderTable();
-    showToast(`Dispo → ${d.label}`, "success");
-  } catch(e) {
-    showToast("Failed to update dispo", "error");
-  }
+    await fetch(db(`crm_leads?id=eq.${currentLead.id}`),{method:"PATCH",headers:hdr(),body:JSON.stringify({dispo:newDispo,last_contacted_at:new Date().toISOString()})});
+    await fetch(db("crm_activity"),{method:"POST",headers:hdr(),body:JSON.stringify({lead_id:currentLead.id,activity_type:"dispo_change",old_dispo:oldDispo,new_dispo:newDispo,body:note||null})});
+    currentLead.dispo=newDispo;
+    const idx=allLeads.findIndex(l=>l.id===currentLead.id); if(idx!==-1)allLeads[idx].dispo=newDispo;
+    const d=DISPOS[newDispo];
+    document.getElementById("panel-sub").innerHTML=`<span class="dispo-badge" style="background:${d.color}">${d.label}</span>`;
+    buildStats(); renderDispoTab(); renderTable(); showToast(`Dispo → ${d.label}`,"success");
+  } catch(e){showToast("Failed to update dispo","error");}
 }
 
 async function saveCurrentLead() {
-  if (!currentLead) return;
-  const payload = {
-    business_name:    document.getElementById("e-business_name").value.trim(),
-    contact_name:     document.getElementById("e-contact_name").value.trim() || null,
-    phone:            document.getElementById("e-phone").value.trim() || null,
-    email:            document.getElementById("e-email").value.trim() || null,
-    address:          document.getElementById("e-address").value.trim() || null,
-    city:             document.getElementById("e-city").value.trim() || null,
-    state:            document.getElementById("e-state").value.trim() || null,
-    county:           document.getElementById("e-county").value.trim() || null,
-    website:          document.getElementById("e-website").value.trim() || null,
-    rating:           parseFloat(document.getElementById("e-rating").value) || null,
-    reviews:          parseInt(document.getElementById("e-reviews").value) || null,
-    follow_up_date:   document.getElementById("e-follow_up_date").value || null,
-    appointment_date: document.getElementById("e-appointment_date").value || null,
-    last_called_date: document.getElementById("e-last_called_date").value || null,
-    google_maps_link: document.getElementById("e-google_maps_link").value.trim() || null,
-  };
-  if (!payload.business_name) { showToast("Business name required", "error"); return; }
+  if(!currentLead)return;
+  const payload={business_name:document.getElementById("e-business_name").value.trim(),contact_name:document.getElementById("e-contact_name").value.trim()||null,phone:document.getElementById("e-phone").value.trim()||null,email:document.getElementById("e-email").value.trim()||null,address:document.getElementById("e-address").value.trim()||null,city:document.getElementById("e-city").value.trim()||null,state:document.getElementById("e-state").value.trim()||null,county:document.getElementById("e-county").value.trim()||null,website:document.getElementById("e-website").value.trim()||null,rating:parseFloat(document.getElementById("e-rating").value)||null,reviews:parseInt(document.getElementById("e-reviews").value)||null,follow_up_date:document.getElementById("e-follow_up_date").value||null,appointment_date:document.getElementById("e-appointment_date").value||null,last_called_date:document.getElementById("e-last_called_date").value||null,google_maps_link:document.getElementById("e-google_maps_link").value.trim()||null};
+  if(!payload.business_name){showToast("Business name required","error");return;}
   try {
-    const res = await fetch(db(`crm_leads?id=eq.${currentLead.id}`), {
-      method: "PATCH", headers: hdr(), body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(await res.text());
-    Object.assign(currentLead, payload);
-    const idx = allLeads.findIndex(l => l.id === currentLead.id);
-    if (idx !== -1) Object.assign(allLeads[idx], payload);
-    document.getElementById("panel-name").textContent = payload.business_name;
-    buildStats();
-    applyFilter();
-    showToast("Lead saved", "success");
-  } catch(e) {
-    showToast("Save failed: " + e.message, "error");
-  }
+    const res=await fetch(db(`crm_leads?id=eq.${currentLead.id}`),{method:"PATCH",headers:hdr(),body:JSON.stringify(payload)});
+    if(!res.ok)throw new Error(await res.text());
+    Object.assign(currentLead,payload);
+    const idx=allLeads.findIndex(l=>l.id===currentLead.id); if(idx!==-1)Object.assign(allLeads[idx],payload);
+    document.getElementById("panel-name").textContent=payload.business_name;
+    buildStats(); applyFilter(); showToast("Lead saved","success");
+  } catch(e){showToast("Save failed: "+e.message,"error");}
 }
 
 async function saveNotes() {
-  if (!currentLead) return;
-  const notes = document.getElementById("e-notes").value;
+  if(!currentLead)return;
+  const notes=document.getElementById("e-notes").value;
   try {
-    await fetch(db(`crm_leads?id=eq.${currentLead.id}`), {
-      method: "PATCH", headers: hdr(), body: JSON.stringify({ notes })
-    });
-    currentLead.notes = notes;
-    const idx = allLeads.findIndex(l => l.id === currentLead.id);
-    if (idx !== -1) allLeads[idx].notes = notes;
-    await fetch(db("crm_activity"), {
-      method: "POST", headers: hdr(),
-      body: JSON.stringify({ lead_id: currentLead.id, activity_type: "note", body: "Notes updated" })
-    });
-    showToast("Notes saved", "success");
-  } catch(e) { showToast("Failed to save notes", "error"); }
+    await fetch(db(`crm_leads?id=eq.${currentLead.id}`),{method:"PATCH",headers:hdr(),body:JSON.stringify({notes})});
+    currentLead.notes=notes; const idx=allLeads.findIndex(l=>l.id===currentLead.id); if(idx!==-1)allLeads[idx].notes=notes;
+    await fetch(db("crm_activity"),{method:"POST",headers:hdr(),body:JSON.stringify({lead_id:currentLead.id,activity_type:"note",body:"Notes updated"})});
+    showToast("Notes saved","success");
+  } catch(e){showToast("Failed to save notes","error");}
 }
 
 async function addActivity() {
-  const note = document.getElementById("act-note")?.value?.trim();
-  if (!note || !currentLead) return;
+  const note=document.getElementById("act-note")?.value?.trim();
+  if(!note||!currentLead)return;
   try {
-    await fetch(db("crm_activity"), {
-      method: "POST", headers: hdr(),
-      body: JSON.stringify({ lead_id: currentLead.id, activity_type: "note", body: note })
-    });
-    document.getElementById("act-note").value = "";
-    await renderActivityTab();
-    showToast("Note added", "success");
-  } catch(e) { showToast("Failed to add note", "error"); }
+    await fetch(db("crm_activity"),{method:"POST",headers:hdr(),body:JSON.stringify({lead_id:currentLead.id,activity_type:"note",body:note})});
+    document.getElementById("act-note").value="";
+    await renderActivityTab(); showToast("Note added","success");
+  } catch(e){showToast("Failed to add note","error");}
 }
 
 async function deleteLead() {
-  if (!currentLead) return;
-  if (!confirm(`Delete "${currentLead.business_name}"? This cannot be undone.`)) return;
+  if(!currentLead)return;
+  if(!confirm(`Delete "${currentLead.business_name}"? This cannot be undone.`))return;
   try {
-    await fetch(db(`crm_leads?id=eq.${currentLead.id}`), { method: "DELETE", headers: hdr() });
-    allLeads = allLeads.filter(l => l.id !== currentLead.id);
-    delete leadTagsMap[currentLead.id];
-    closePanel();
-    buildStats();
-    applyFilter();
-    showToast("Lead deleted", "success");
-  } catch(e) { showToast("Delete failed", "error"); }
+    await fetch(db(`crm_leads?id=eq.${currentLead.id}`),{method:"DELETE",headers:hdr()});
+    allLeads=allLeads.filter(l=>l.id!==currentLead.id); delete leadTagsMap[currentLead.id];
+    closePanel(); buildStats(); applyFilter(); showToast("Lead deleted","success");
+  } catch(e){showToast("Delete failed","error");}
 }
 
-// ─── ADD MODAL ───────────────────────────────────────────────────────────────
 function openAddModal() {
-  editingLead = null;
-  document.getElementById("add-modal-title").textContent = "Add Lead";
-  ["business_name","contact_name","phone","email","address","city","state","county",
-   "website","rating","reviews","google_maps_link","notes","follow_up_date","appointment_date"].forEach(f => {
-    const el = document.getElementById("m-" + f);
-    if (el) el.value = "";
-  });
-  document.getElementById("m-industry").value = "Car detailing service";
-  const sel = document.getElementById("m-dispo");
-  sel.innerHTML = Object.entries(DISPOS).map(([k,d]) => `<option value="${k}">${d.label}</option>`).join("");
-  sel.value = "new";
+  editingLead=null; document.getElementById("add-modal-title").textContent="Add Lead";
+  ["business_name","contact_name","phone","email","address","city","state","county","website","rating","reviews","google_maps_link","notes","follow_up_date","appointment_date"].forEach(f=>{const el=document.getElementById("m-"+f);if(el)el.value="";});
+  document.getElementById("m-industry").value="Car detailing service";
+  const sel=document.getElementById("m-dispo"); sel.innerHTML=Object.entries(DISPOS).map(([k,d])=>`<option value="${k}">${d.label}</option>`).join(""); sel.value="new";
   document.getElementById("add-modal").classList.add("open");
 }
-
-function closeAddModal() {
-  document.getElementById("add-modal").classList.remove("open");
-}
+function closeAddModal(){document.getElementById("add-modal").classList.remove("open");}
 
 async function saveLeadModal() {
-  const g = id => document.getElementById(id)?.value?.trim() || null;
-  const payload = {
-    business_name:    g("m-business_name"),
-    contact_name:     g("m-contact_name"),
-    phone:            g("m-phone"),
-    email:            g("m-email"),
-    address:          g("m-address"),
-    city:             g("m-city"),
-    state:            g("m-state"),
-    county:           g("m-county"),
-    website:          g("m-website"),
-    rating:           parseFloat(document.getElementById("m-rating").value) || null,
-    reviews:          parseInt(document.getElementById("m-reviews").value) || null,
-    follow_up_date:   document.getElementById("m-follow_up_date").value || null,
-    appointment_date: document.getElementById("m-appointment_date").value || null,
-    google_maps_link: g("m-google_maps_link"),
-    industry:         g("m-industry"),
-    dispo:            document.getElementById("m-dispo").value,
-    notes:            g("m-notes"),
-    source:           "manual",
-  };
-  if (!payload.business_name) { showToast("Business name required", "error"); return; }
+  const g=id=>document.getElementById(id)?.value?.trim()||null;
+  const payload={business_name:g("m-business_name"),contact_name:g("m-contact_name"),phone:g("m-phone"),email:g("m-email"),address:g("m-address"),city:g("m-city"),state:g("m-state"),county:g("m-county"),website:g("m-website"),rating:parseFloat(document.getElementById("m-rating").value)||null,reviews:parseInt(document.getElementById("m-reviews").value)||null,follow_up_date:document.getElementById("m-follow_up_date").value||null,appointment_date:document.getElementById("m-appointment_date").value||null,google_maps_link:g("m-google_maps_link"),industry:g("m-industry"),dispo:document.getElementById("m-dispo").value,notes:g("m-notes"),source:"manual"};
+  if(!payload.business_name){showToast("Business name required","error");return;}
   try {
-    const res = await fetch(db("crm_leads"), {
-      method: "POST", headers: hdr(), body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(await res.text());
-    const [newLead] = await res.json();
-    allLeads.unshift(newLead);
-    closeAddModal();
-    buildStats();
-    applyFilter();
-    showToast("Lead added", "success");
-    openLead(newLead.id);
-  } catch(e) { showToast("Failed to add lead: " + e.message, "error"); }
+    const res=await fetch(db("crm_leads"),{method:"POST",headers:hdr(),body:JSON.stringify(payload)});
+    if(!res.ok)throw new Error(await res.text());
+    const [newLead]=await res.json(); allLeads.unshift(newLead); closeAddModal(); buildStats(); applyFilter(); showToast("Lead added","success"); openLead(newLead.id);
+  } catch(e){showToast("Failed to add lead: "+e.message,"error");}
 }
 
-// ─── CALENDAR ────────────────────────────────────────────────────────────────
 function openCalModal() {
-  if (!currentLead) return;
-  document.getElementById("cal-biz-name").textContent = currentLead.business_name;
-  const now = new Date(); now.setMinutes(0,0,0); now.setHours(now.getHours() + 1);
-  document.getElementById("cal-datetime").value = now.toISOString().slice(0,16);
-  document.getElementById("cal-notes").value = "";
-  document.getElementById("cal-modal").classList.add("open");
+  if(!currentLead)return;
+  document.getElementById("cal-biz-name").textContent=currentLead.business_name;
+  const now=new Date(); now.setMinutes(0,0,0); now.setHours(now.getHours()+1);
+  document.getElementById("cal-datetime").value=now.toISOString().slice(0,16);
+  document.getElementById("cal-notes").value=""; document.getElementById("cal-modal").classList.add("open");
 }
 
 async function confirmPushToCalendar() {
-  if (!currentLead) return;
-  const dt = document.getElementById("cal-datetime").value;
-  const notes = document.getElementById("cal-notes").value;
-  if (!dt) { showToast("Please select a date/time", "error"); return; }
-  const payload = {
-    lead_id: currentLead.id, business_name: currentLead.business_name,
-    contact_name: currentLead.contact_name, phone: currentLead.phone,
-    email: currentLead.email, appointment_utc: new Date(dt).toISOString(), notes
-  };
+  if(!currentLead)return;
+  const dt=document.getElementById("cal-datetime").value, notes=document.getElementById("cal-notes").value;
+  if(!dt){showToast("Please select a date/time","error");return;}
+  const payload={lead_id:currentLead.id,business_name:currentLead.business_name,contact_name:currentLead.contact_name,phone:currentLead.phone,email:currentLead.email,appointment_utc:new Date(dt).toISOString(),notes};
   try {
-    await fetch(CALENDAR_WEBHOOK, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(payload) });
-    const dateOnly = dt.split("T")[0];
-    await fetch(db(`crm_leads?id=eq.${currentLead.id}`), {
-      method: "PATCH", headers: hdr(), body: JSON.stringify({ appointment_date: dateOnly })
-    });
-    currentLead.appointment_date = dateOnly;
-    await setDispo("appointment");
-    document.getElementById("cal-modal").classList.remove("open");
-    showToast("Pushed to calendar!", "success");
-  } catch(e) { showToast("Calendar push failed", "error"); }
+    await fetch(CALENDAR_WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+    const dateOnly=dt.split("T")[0];
+    await fetch(db(`crm_leads?id=eq.${currentLead.id}`),{method:"PATCH",headers:hdr(),body:JSON.stringify({appointment_date:dateOnly})});
+    currentLead.appointment_date=dateOnly; await setDispo("appointment");
+    document.getElementById("cal-modal").classList.remove("open"); showToast("Pushed to calendar!","success");
+  } catch(e){showToast("Calendar push failed","error");}
 }
 
-// ─── GHL ─────────────────────────────────────────────────────────────────────
 async function quickGHL() {
-  if (!currentLead) return;
+  if(!currentLead)return;
   try {
-    const res = await fetch(GHL_WEBHOOK, {
-      method: "POST", headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ phone: currentLead.phone, business_name: currentLead.business_name,
-        contact_name: currentLead.contact_name, email: currentLead.email })
-    });
-    if (!res.ok) throw new Error("Webhook error");
-    showToast("Sent to GoHighLevel!", "success");
-    await fetch(db("crm_activity"), {
-      method: "POST", headers: hdr(),
-      body: JSON.stringify({ lead_id: currentLead.id, activity_type: "note", body: "Pushed to GoHighLevel" })
-    });
-  } catch(e) { showToast("GHL send failed", "error"); }
+    const res=await fetch(GHL_WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({phone:currentLead.phone,business_name:currentLead.business_name,contact_name:currentLead.contact_name,email:currentLead.email})});
+    if(!res.ok)throw new Error("Webhook error"); showToast("Sent to GoHighLevel!","success");
+    await fetch(db("crm_activity"),{method:"POST",headers:hdr(),body:JSON.stringify({lead_id:currentLead.id,activity_type:"note",body:"Pushed to GoHighLevel"})});
+  } catch(e){showToast("GHL send failed","error");}
 }
 
-// ─── EMAIL ────────────────────────────────────────────────────────────────────
 function applyTemplate(key) {
-  const tpl = EMAIL_TEMPLATES[key];
-  if (!tpl || !currentLead) return;
-  const r = s => s
-    .replace(/{{name}}/g, currentLead.contact_name || currentLead.business_name || "there")
-    .replace(/{{business}}/g, currentLead.business_name || "your business")
-    .replace(/{{date}}/g, currentLead.follow_up_date ? new Date(currentLead.follow_up_date).toLocaleDateString() : "our scheduled time");
-  document.getElementById("email-subject").value = r(tpl.subject);
-  document.getElementById("email-body").value = r(tpl.body);
+  const tpl=EMAIL_TEMPLATES[key]; if(!tpl||!currentLead)return;
+  const r=s=>s.replace(/{{name}}/g,currentLead.contact_name||currentLead.business_name||"there").replace(/{{business}}/g,currentLead.business_name||"your business").replace(/{{date}}/g,currentLead.follow_up_date?new Date(currentLead.follow_up_date).toLocaleDateString():"our scheduled time");
+  document.getElementById("email-subject").value=r(tpl.subject); document.getElementById("email-body").value=r(tpl.body);
 }
 
 async function sendEmail() {
-  const to = document.getElementById("email-to").value.trim();
-  const subject = document.getElementById("email-subject").value.trim();
-  const body = document.getElementById("email-body").value.trim();
-  if (!to || !subject || !body) { showToast("Fill in all email fields", "error"); return; }
+  const to=document.getElementById("email-to").value.trim(), subject=document.getElementById("email-subject").value.trim(), body=document.getElementById("email-body").value.trim();
+  if(!to||!subject||!body){showToast("Fill in all email fields","error");return;}
   try {
-    const res = await fetch(EMAIL_WEBHOOK, {
-      method: "POST", headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ to, subject, body, lead_id: currentLead?.id, business_name: currentLead?.business_name })
-    });
-    if (!res.ok) throw new Error("Webhook error");
-    if (currentLead) {
-      await fetch(db("crm_activity"), {
-        method: "POST", headers: hdr(),
-        body: JSON.stringify({ lead_id: currentLead.id, activity_type: "note", body: `Email sent: "${subject}"` })
-      });
-      if (currentLead.dispo === "new" || currentLead.dispo === "no_pick_up") await setDispo("email");
-    }
-    showToast("Email sent!", "success");
-  } catch(e) { showToast("Email send failed", "error"); }
+    const res=await fetch(EMAIL_WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({to,subject,body,lead_id:currentLead?.id,business_name:currentLead?.business_name})});
+    if(!res.ok)throw new Error("Webhook error");
+    if(currentLead){await fetch(db("crm_activity"),{method:"POST",headers:hdr(),body:JSON.stringify({lead_id:currentLead.id,activity_type:"note",body:`Email sent: "${subject}"`})});if(currentLead.dispo==="new"||currentLead.dispo==="no_pick_up")await setDispo("email");}
+    showToast("Email sent!","success");
+  } catch(e){showToast("Email send failed","error");}
 }
 
-// ─── CSV IMPORT ───────────────────────────────────────────────────────────────
-function openImportModal() {
-  importTagIds = [];
-  document.getElementById("import-modal").classList.add("open");
-  document.getElementById("import-status").textContent = "";
-  document.getElementById("csv-file-input").value = "";
-  document.getElementById("import-tags-section").style.display = "block";
-  renderImportTagPicker();
-}
-
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById("drop-zone").classList.remove("drag-over");
-  const file = e.dataTransfer?.files?.[0];
-  if (file) processCSVFile(file);
-}
-
-function handleCSVFile(e) {
-  const file = e.target.files?.[0];
-  if (file) processCSVFile(file);
-}
-
-function processCSVFile(file) {
-  const reader = new FileReader();
-  reader.onload = e => importCSV(e.target.result);
-  reader.readAsText(file);
-}
+function openImportModal() { importTagIds=[]; document.getElementById("import-modal").classList.add("open"); document.getElementById("import-status").textContent=""; document.getElementById("csv-file-input").value=""; document.getElementById("import-tags-section").style.display="block"; renderImportTagPicker(); }
+function handleDrop(e) { e.preventDefault(); document.getElementById("drop-zone").classList.remove("drag-over"); const file=e.dataTransfer?.files?.[0]; if(file)processCSVFile(file); }
+function handleCSVFile(e) { const file=e.target.files?.[0]; if(file)processCSVFile(file); }
+function processCSVFile(file) { const reader=new FileReader(); reader.onload=e=>importCSV(e.target.result); reader.readAsText(file); }
 
 function parseCSVLine(line) {
-  const result = []; let cur = "", inQ = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
-    else if (c === ',' && !inQ) { result.push(cur); cur = ""; }
-    else cur += c;
-  }
-  result.push(cur);
-  return result.map(s => s.trim());
+  const result=[]; let cur="", inQ=false;
+  for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}else if(c===','&&!inQ){result.push(cur);cur="";}else cur+=c;}
+  result.push(cur); return result.map(s=>s.trim());
 }
 
 function detectColumns(headerCols) {
-  const h = headerCols.map(c => c.toLowerCase().replace(/[^a-z]/g, ""));
-  if (h[4] === "phone" || h[4] === "phonenumber") return "new";
-  if (h[3] === "phone" || h[3] === "phonenumber") return "old";
-  return "new";
+  const h=headerCols.map(c=>c.toLowerCase().replace(/[^a-z]/g,""));
+  if(h[4]==="phone"||h[4]==="phonenumber")return"new";
+  if(h[3]==="phone"||h[3]==="phonenumber")return"old";
+  return"new";
 }
 
-function parseDate(s) {
-  if (!s || !s.trim()) return null;
-  const t = s.trim();
-  const parts = t.split('/');
-  if (parts.length === 3) {
-    const [m, d, y] = parts;
-    if (y.length === 4) return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
-  }
-  return t || null;
-}
+function parseDate(s) { if(!s||!s.trim())return null; const t=s.trim(); const parts=t.split('/'); if(parts.length===3){const[m,d,y]=parts;if(y.length===4)return`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;} return t||null; }
 
 function parseRow(cols, format) {
-  if (format === "old") {
-    return {
-      business_name:    cols[0] || null,
-      rating:           parseFloat(cols[1]) || null,
-      reviews:          parseInt(cols[2]) || null,
-      phone:            cols[3] || null,
-      industry:         cols[4] || "Car detailing service",
-      address:          cols[5] || null,
-      website:          cols[6] || null,
-      google_maps_link: cols[7] || null,
-    };
-  }
-  const dispoParsed = cols[6] ? cols[6].toLowerCase().replace(/\s+/g,"_") : null;
-  const validDispo = dispoParsed && DISPOS[dispoParsed] ? dispoParsed : null;
-  return {
-    business_name:    cols[0] || null,
-    rating:           parseFloat(cols[1]) || null,
-    reviews:          parseInt(cols[2]) || null,
-    industry:         cols[3] || "Car detailing service",
-    phone:            cols[4] || null,
-    notes:            cols[5] || null,
-    dispo:            validDispo || "new",
-    follow_up_date:   parseDate(cols[7]),
-    contact_name:     cols[8] || null,
-    email:            cols[9] || null,
-    last_called_date: parseDate(cols[10]),
-    appointment_date: parseDate(cols[11]),
-    address:          cols[12] || null,
-    website:          cols[13] || null,
-    city:             cols[14] || null,
-    state:            cols[15] || null,
-    county:           cols[16] || null,
-  };
+  if(format==="old")return{business_name:cols[0]||null,rating:parseFloat(cols[1])||null,reviews:parseInt(cols[2])||null,phone:cols[3]||null,industry:cols[4]||"Car detailing service",address:cols[5]||null,website:cols[6]||null,google_maps_link:cols[7]||null};
+  const dispoParsed=cols[6]?cols[6].toLowerCase().replace(/\s+/g,"_"):null;
+  const validDispo=dispoParsed&&DISPOS[dispoParsed]?dispoParsed:null;
+  return{business_name:cols[0]||null,rating:parseFloat(cols[1])||null,reviews:parseInt(cols[2])||null,industry:cols[3]||"Car detailing service",phone:cols[4]||null,notes:cols[5]||null,dispo:validDispo||"new",follow_up_date:parseDate(cols[7]),contact_name:cols[8]||null,email:cols[9]||null,last_called_date:parseDate(cols[10]),appointment_date:parseDate(cols[11]),address:cols[12]||null,website:cols[13]||null,city:cols[14]||null,state:cols[15]||null,county:cols[16]||null};
 }
 
 async function importCSV(text) {
-  const importStartTime = new Date().toISOString();
-  const status = document.getElementById("import-status");
-  status.innerHTML = "Parsing CSV...";
-  const lines = text.split(/\r?\n/).filter(l => l.trim());
-  if (!lines.length) { status.textContent = "Empty file."; return; }
-
-  const firstCols = parseCSVLine(lines[0]);
-  const firstLower = firstCols[0].toLowerCase();
-  const hasHeader = firstLower === "title" || firstLower === "business" || firstLower === "business_name" || firstLower === "name";
-  const format = hasHeader ? detectColumns(firstCols) : "new";
-  const dataLines = hasHeader ? lines.slice(1) : lines;
-
-  const parsed = [];
-  for (const line of dataLines) {
-    if (!line.trim()) continue;
-    const cols = parseCSVLine(line);
-    const row = parseRow(cols, format);
-    if (!row.business_name) continue;
-    parsed.push(row);
-  }
-
-  if (!parsed.length) { status.textContent = "No valid rows found."; return; }
-
-  status.innerHTML = `Found ${parsed.length} rows. Checking for existing records...`;
-
-  const existingByPhone = {};
-  let page = 0;
-  const PAGE_SIZE = 1000;
-  while (true) {
-    const res = await fetch(
-      db(`crm_leads?select=id,phone&limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`),
-      { headers: hdr() }
-    );
-    if (!res.ok) break;
-    const batch = await res.json();
-    if (!batch.length) break;
-    batch.forEach(l => {
-      const n = normalizePhone(l.phone);
-      if (n.length >= 7) existingByPhone[n] = l.id;
-    });
-    if (batch.length < PAGE_SIZE) break;
-    page++;
-  }
-
-  const fillable = ["business_name","contact_name","email","address","city","state","county",
-    "website","rating","reviews","industry","google_maps_link","notes",
-    "follow_up_date","appointment_date","last_called_date","dispo"];
-
-  let inserted = 0, updated = 0, skipped = 0, errors = 0;
-  const toInsert = [];
-  const toUpdate = [];
-
-  for (const row of parsed) {
-    const nPhone = normalizePhone(row.phone);
-    const existingId = nPhone.length >= 7 ? existingByPhone[nPhone] : null;
-
-    if (existingId) {
-      const patch = {};
-      let changed = false;
-      for (const f of fillable) {
-        if (row[f] != null && row[f] !== "") { patch[f] = row[f]; changed = true; }
-      }
-      if (changed) toUpdate.push({ id: existingId, patch });
-      else skipped++;
-    } else {
-      toInsert.push({ ...row, source: "csv_import" });
-    }
-  }
-
-  status.innerHTML = `${toInsert.length} new · ${toUpdate.length} to update · ${skipped} skipped<br>Inserting...`;
-
-  const BATCH = 50;
-  for (let i = 0; i < toInsert.length; i += BATCH) {
-    const batch = toInsert.slice(i, i + BATCH);
-    try {
-      const res = await fetch(db("crm_leads"), {
-        method: "POST",
-        headers: { ...hdr(), "Prefer": "return=minimal" },
-        body: JSON.stringify(batch)
-      });
-      if (!res.ok) {
-        const errText = await res.text().catch(()=>'');
-        console.error('Insert error:', res.status, errText);
-        errors += batch.length;
-        if (errors <= batch.length) status.innerHTML += `<br><small style="color:#f28b82">Insert error ${res.status}: ${errText.slice(0,200)}</small>`;
-      } else { inserted += batch.length; }
-    } catch(e) { console.error('Insert exception:', e); errors += batch.length; }
-    status.innerHTML = `Inserted ${inserted}/${toInsert.length} new · ${toUpdate.length} to update...`;
-  }
-
-  const PARALLEL = 15;
-  for (let i = 0; i < toUpdate.length; i += PARALLEL) {
-    const chunk = toUpdate.slice(i, i + PARALLEL);
-    const results = await Promise.allSettled(chunk.map(({ id, patch }) =>
-      fetch(db(`crm_leads?id=eq.${id}`), {
-        method: "PATCH",
-        headers: { ...hdr(), "Prefer": "return=minimal" },
-        body: JSON.stringify(patch)
-      })
-    ));
-    results.forEach(r => { if (r.status === "fulfilled" && r.value.ok) updated++; else errors++; });
-    status.innerHTML = `Inserted ${inserted} new · Updated ${updated}/${toUpdate.length}...`;
-  }
-
-  if (importTagIds.length && inserted > 0) {
-    try {
-      const newLeadsRes = await fetch(db(`crm_leads?created_at=gte.${encodeURIComponent(importStartTime)}&source=eq.csv_import&select=id`), { headers: hdr() });
-      if (newLeadsRes.ok) {
-        const newLeads = await newLeadsRes.json();
-        const ltRows = [];
-        newLeads.forEach(nl => importTagIds.forEach(tid => ltRows.push({ lead_id: nl.id, tag_id: tid })));
-        if (ltRows.length) {
-          await fetch(db("crm_lead_tags"), {
-            method: "POST",
-            headers: { ...hdr(), "Prefer": "return=minimal", "on-conflict": "lead_id,tag_id" },
-            body: JSON.stringify(ltRows)
-          });
-        }
-      }
-    } catch(e) { console.error('Tag apply error:', e); }
-  }
-
-  const parts = [];
-  if (inserted) parts.push(`✅ ${inserted} inserted`);
-  if (updated)  parts.push(`🔄 ${updated} updated`);
-  if (skipped)  parts.push(`⏭ ${skipped} skipped`);
-  if (errors)   parts.push(`❌ ${errors} errors`);
-  status.innerHTML = parts.join(" &nbsp;·&nbsp; ");
-  await loadLeads();
+  const importStartTime=new Date().toISOString();
+  const status=document.getElementById("import-status");
+  status.innerHTML="Parsing CSV...";
+  const lines=text.split(/\r?\n/).filter(l=>l.trim());
+  if(!lines.length){status.textContent="Empty file.";return;}
+  const firstCols=parseCSVLine(lines[0]);
+  const firstLower=firstCols[0].toLowerCase();
+  const hasHeader=firstLower==="title"||firstLower==="business"||firstLower==="business_name"||firstLower==="name";
+  const format=hasHeader?detectColumns(firstCols):"new";
+  const dataLines=hasHeader?lines.slice(1):lines;
+  const parsed=[];
+  for(const line of dataLines){if(!line.trim())continue;const cols=parseCSVLine(line);const row=parseRow(cols,format);if(!row.business_name)continue;parsed.push(row);}
+  if(!parsed.length){status.textContent="No valid rows found.";return;}
+  status.innerHTML=`Found ${parsed.length} rows. Checking for existing records...`;
+  const existingByPhone={};let page=0;const PAGE_SIZE=1000;
+  while(true){const res=await fetch(db(`crm_leads?select=id,phone&limit=${PAGE_SIZE}&offset=${page*PAGE_SIZE}`),{headers:hdr()});if(!res.ok)break;const batch=await res.json();if(!batch.length)break;batch.forEach(l=>{const n=normalizePhone(l.phone);if(n.length>=7)existingByPhone[n]=l.id;});if(batch.length<PAGE_SIZE)break;page++;}
+  const fillable=["business_name","contact_name","email","address","city","state","county","website","rating","reviews","industry","google_maps_link","notes","follow_up_date","appointment_date","last_called_date","dispo"];
+  let inserted=0,updated=0,skipped=0,errors=0;const toInsert=[],toUpdate=[];
+  for(const row of parsed){const nPhone=normalizePhone(row.phone);const existingId=nPhone.length>=7?existingByPhone[nPhone]:null;if(existingId){const patch={};let changed=false;for(const f of fillable){if(row[f]!=null&&row[f]!==""){patch[f]=row[f];changed=true;}}if(changed)toUpdate.push({id:existingId,patch});else skipped++;}else{toInsert.push({...row,source:"csv_import"});}}
+  status.innerHTML=`${toInsert.length} new · ${toUpdate.length} to update · ${skipped} skipped<br>Inserting...`;
+  const BATCH=50;
+  for(let i=0;i<toInsert.length;i+=BATCH){const batch=toInsert.slice(i,i+BATCH);try{const res=await fetch(db("crm_leads"),{method:"POST",headers:{...hdr(),"Prefer":"return=minimal"},body:JSON.stringify(batch)});if(!res.ok){const errText=await res.text().catch(()=>'');console.error('Insert error:',res.status,errText);errors+=batch.length;}else{inserted+=batch.length;}}catch(e){console.error('Insert exception:',e);errors+=batch.length;}status.innerHTML=`Inserted ${inserted}/${toInsert.length} new · ${toUpdate.length} to update...`;}
+  const PARALLEL=15;
+  for(let i=0;i<toUpdate.length;i+=PARALLEL){const chunk=toUpdate.slice(i,i+PARALLEL);const results=await Promise.allSettled(chunk.map(({id,patch})=>fetch(db(`crm_leads?id=eq.${id}`),{method:"PATCH",headers:{...hdr(),"Prefer":"return=minimal"},body:JSON.stringify(patch)})));results.forEach(r=>{if(r.status==="fulfilled"&&r.value.ok)updated++;else errors++;});status.innerHTML=`Inserted ${inserted} new · Updated ${updated}/${toUpdate.length}...`;}
+  if(importTagIds.length&&inserted>0){try{const newLeadsRes=await fetch(db(`crm_leads?created_at=gte.${encodeURIComponent(importStartTime)}&source=eq.csv_import&select=id`),{headers:hdr()});if(newLeadsRes.ok){const newLeads=await newLeadsRes.json();const ltRows=[];newLeads.forEach(nl=>importTagIds.forEach(tid=>ltRows.push({lead_id:nl.id,tag_id:tid})));if(ltRows.length){await fetch(db("crm_lead_tags"),{method:"POST",headers:{...hdr(),"Prefer":"return=minimal","on-conflict":"lead_id,tag_id"},body:JSON.stringify(ltRows)});}}}catch(e){console.error('Tag apply error:',e);}}
+  const parts=[];if(inserted)parts.push(`✅ ${inserted} inserted`);if(updated)parts.push(`🔄 ${updated} updated`);if(skipped)parts.push(`⏭ ${skipped} skipped`);if(errors)parts.push(`❌ ${errors} errors`);
+  status.innerHTML=parts.join(" &nbsp;·&nbsp; "); await loadLeads();
 }
 
-// ─── DEDUP ────────────────────────────────────────────────────────────────────
-function openDedupModal() {
-  document.getElementById("dedup-modal").classList.add("open");
-  document.getElementById("dedup-footer").innerHTML = "";
-  renderDedupContent();
-}
+function openDedupModal() { document.getElementById("dedup-modal").classList.add("open"); document.getElementById("dedup-footer").innerHTML=""; renderDedupContent(); }
 
 function renderDedupContent() {
-  const content = document.getElementById("dedup-content");
-
-  const groups = {};
-  allLeads.forEach(l => {
-    const n = normalizePhone(l.phone);
-    if (!n || n.length < 7) return;
-    if (!groups[n]) groups[n] = [];
-    groups[n].push(l);
-  });
-
-  const dupGroups = Object.values(groups).filter(g => g.length > 1);
-
-  if (!dupGroups.length) {
-    content.innerHTML = `<div style="text-align:center;padding:30px;color:#9aa0a6">
-      <p style="font-size:32px;margin-bottom:12px">✅</p>
-      <p>No duplicate phone numbers found!</p>
-    </div>`;
-    document.getElementById("dedup-footer").innerHTML = `
-      <button class="btn btn-ghost" onclick="document.getElementById('dedup-modal').classList.remove('open')">Close</button>`;
-    return;
-  }
-
-  const totalDups = dupGroups.reduce((s, g) => s + g.length - 1, 0);
-  let html = `<p style="font-size:13px;color:#9aa0a6;margin-bottom:16px">
-    Found <strong style="color:#fbbc04">${dupGroups.length} duplicate group${dupGroups.length>1?"s":""}</strong>
-    — ${totalDups} extra record${totalDups>1?"s":""} will be removed.
-    The record with the most data is kept; blank fields are filled from duplicates.
-  </p>`;
-
-  dupGroups.forEach(group => {
-    const { winner, duplicates } = mergeLeads(group);
-    html += `<div class="dedup-group">
-      <div class="dedup-group-title">📞 ${esc(winner.phone || group[0].phone)}</div>`;
-    group.forEach(l => {
-      const isWinner = l.id === winner.id;
-      const loc = [l.city, l.state].filter(Boolean).join(", ");
-      html += `<div class="dedup-row">
-        ${isWinner ? '<span class="dedup-keep">KEEP</span>' : '<span style="font-size:11px;color:#d93025;padding:2px 6px">REMOVE</span>'}
-        <div style="flex:1">
-          <strong>${esc(l.business_name)}</strong>
-          ${l.contact_name ? `· ${esc(l.contact_name)}` : ""}
-          ${loc ? `· ${esc(loc)}` : ""}
-          <span style="color:#5f6368"> · Score: ${fieldScore(l)}</span>
-        </div>
-      </div>`;
-    });
-    html += `</div>`;
-  });
-
-  content.innerHTML = html;
-  document.getElementById("dedup-footer").innerHTML = `
-    <button class="btn btn-ghost" onclick="document.getElementById('dedup-modal').classList.remove('open')">Cancel</button>
-    <button class="btn btn-warn" onclick="runAutoDedup()">Merge & Remove ${totalDups} Duplicate${totalDups>1?"s":""}</button>`;
+  const content=document.getElementById("dedup-content");
+  const groups={};
+  allLeads.forEach(l=>{const n=normalizePhone(l.phone);if(!n||n.length<7)return;if(!groups[n])groups[n]=[];groups[n].push(l);});
+  const dupGroups=Object.values(groups).filter(g=>g.length>1);
+  if(!dupGroups.length){content.innerHTML=`<div style="text-align:center;padding:30px;color:#9aa0a6"><p style="font-size:32px;margin-bottom:12px">✅</p><p>No duplicate phone numbers found!</p></div>`;document.getElementById("dedup-footer").innerHTML=`<button class="btn btn-ghost" onclick="document.getElementById('dedup-modal').classList.remove('open')">Close</button>`;return;}
+  const totalDups=dupGroups.reduce((s,g)=>s+g.length-1,0);
+  let html=`<p style="font-size:13px;color:#9aa0a6;margin-bottom:16px">Found <strong style="color:#fbbc04">${dupGroups.length} duplicate group${dupGroups.length>1?"s":""}</strong> — ${totalDups} extra record${totalDups>1?"s":""} will be removed.</p>`;
+  dupGroups.forEach(group=>{const{winner,duplicates}=mergeLeads(group);html+=`<div class="dedup-group"><div class="dedup-group-title">📞 ${esc(winner.phone||group[0].phone)}</div>`;group.forEach(l=>{const isWinner=l.id===winner.id;const loc=[l.city,l.state].filter(Boolean).join(", ");html+=`<div class="dedup-row">${isWinner?'<span class="dedup-keep">KEEP</span>':'<span style="font-size:11px;color:#d93025;padding:2px 6px">REMOVE</span>'}<div style="flex:1"><strong>${esc(l.business_name)}</strong>${l.contact_name?` · ${esc(l.contact_name)}`:""}${loc?` · ${esc(loc)}`:""}<span style="color:#5f6368"> · Score: ${fieldScore(l)}</span></div></div>`;});html+=`</div>`;});
+  content.innerHTML=html;
+  document.getElementById("dedup-footer").innerHTML=`<button class="btn btn-ghost" onclick="document.getElementById('dedup-modal').classList.remove('open')">Cancel</button><button class="btn btn-warn" onclick="runAutoDedup()">Merge & Remove ${totalDups} Duplicate${totalDups>1?"s":""}</button>`;
 }
 
 async function runAutoDedup() {
-  const content = document.getElementById("dedup-content");
-  document.getElementById("dedup-footer").innerHTML = "";
-  content.innerHTML = `<div class="spinner"></div><p style="text-align:center;color:#9aa0a6;margin-top:8px">Merging duplicates...</p>`;
-
-  const groups = {};
-  allLeads.forEach(l => {
-    const n = normalizePhone(l.phone);
-    if (!n || n.length < 7) return;
-    if (!groups[n]) groups[n] = [];
-    groups[n].push(l);
-  });
-  const dupGroups = Object.values(groups).filter(g => g.length > 1);
-
-  let merged = 0, removed = 0, errors = 0;
-
-  for (const group of dupGroups) {
-    const { winner, duplicates } = mergeLeads(group);
-    try {
-      const patchFields = ["contact_name","email","address","city","state","county","website",
-        "rating","reviews","notes","google_maps_link","industry","follow_up_date","appointment_date","last_called_date"];
-      const patch = {};
-      patchFields.forEach(f => { if (winner[f] != null && winner[f] !== "") patch[f] = winner[f]; });
-      await fetch(db(`crm_leads?id=eq.${winner.id}`), {
-        method: "PATCH", headers: hdr(), body: JSON.stringify(patch)
-      });
-      merged++;
-    } catch { errors++; }
-
-    for (const dup of duplicates) {
-      try {
-        await fetch(db(`crm_leads?id=eq.${dup.id}`), { method: "DELETE", headers: hdr() });
-        removed++;
-      } catch { errors++; }
-    }
-  }
-
-  content.innerHTML = `<div style="text-align:center;padding:30px">
-    <p style="font-size:32px;margin-bottom:12px">✅</p>
-    <p style="font-size:15px;color:#e8eaed">${merged} group${merged>1?"s":""} merged, ${removed} duplicate${removed>1?"s":""} removed${errors?`, ${errors} errors`:""}</p>
-  </div>`;
-  document.getElementById("dedup-footer").innerHTML = `
-    <button class="btn btn-primary" onclick="document.getElementById('dedup-modal').classList.remove('open')">Done</button>`;
-
+  const content=document.getElementById("dedup-content"); document.getElementById("dedup-footer").innerHTML="";
+  content.innerHTML=`<div class="spinner"></div><p style="text-align:center;color:#9aa0a6;margin-top:8px">Merging duplicates...</p>`;
+  const groups={};allLeads.forEach(l=>{const n=normalizePhone(l.phone);if(!n||n.length<7)return;if(!groups[n])groups[n]=[];groups[n].push(l);});
+  const dupGroups=Object.values(groups).filter(g=>g.length>1);
+  let merged=0,removed=0,errors=0;
+  for(const group of dupGroups){const{winner,duplicates}=mergeLeads(group);try{const patchFields=["contact_name","email","address","city","state","county","website","rating","reviews","notes","google_maps_link","industry","follow_up_date","appointment_date","last_called_date"];const patch={};patchFields.forEach(f=>{if(winner[f]!=null&&winner[f]!=="")patch[f]=winner[f];});await fetch(db(`crm_leads?id=eq.${winner.id}`),{method:"PATCH",headers:hdr(),body:JSON.stringify(patch)});merged++;}catch{errors++;}for(const dup of duplicates){try{await fetch(db(`crm_leads?id=eq.${dup.id}`),{method:"DELETE",headers:hdr()});removed++;}catch{errors++;}}}
+  content.innerHTML=`<div style="text-align:center;padding:30px"><p style="font-size:32px;margin-bottom:12px">✅</p><p style="font-size:15px;color:#e8eaed">${merged} group${merged>1?"s":""} merged, ${removed} duplicate${removed>1?"s":""} removed${errors?`, ${errors} errors`:""}</p></div>`;
+  document.getElementById("dedup-footer").innerHTML=`<button class="btn btn-primary" onclick="document.getElementById('dedup-modal').classList.remove('open')">Done</button>`;
   await loadLeads();
 }
 
-// ─── MODAL BACKDROPS ──────────────────────────────────────────────────────────
-["add-modal","cal-modal","import-modal","dedup-modal","dialer-setup-modal","tags-modal"].forEach(id => {
-  document.getElementById(id).addEventListener("click", e => {
-    if (e.target === e.currentTarget) e.currentTarget.classList.remove("open");
-  });
-});
+["add-modal","cal-modal","import-modal","dedup-modal","dialer-setup-modal","tags-modal"].forEach(id=>{document.getElementById(id).addEventListener("click",e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove("open");});});
 
-// ─── AUTO DIALER ──────────────────────────────────────────────────────────────
+// ─── AUTO DIALER STATE ────────────────────────────────────────────────────────
 let dialerQueue    = [];
 let dialerIndex    = 0;
 let dialerStats    = { called:0, connected:0, voicemail:0, noAnswer:0, appointments:0 };
@@ -1616,53 +933,80 @@ let autoAdvanceOn  = true;
 let autoAdvanceSec = 3;
 let autoAdvanceTmo = null;
 let countdownInt   = null;
+let autoDialOn     = true;
+let autoDialDelaySec = 2;
+let autoDialTmo    = null;
+let dialerTagIds   = [];
 
-const CONNECTED_DISPOS  = new Set(['call_back','gate_keeper','follow_up','appointment','not_interested']);
-const VOICEMAIL_DISPOS  = new Set(['voicemail']);
-const NO_ANSWER_DISPOS  = new Set(['no_pick_up','bad_number']);
+const CONNECTED_DISPOS = new Set(['call_back','gate_keeper','follow_up','appointment','not_interested']);
+const VOICEMAIL_DISPOS = new Set(['voicemail']);
+const NO_ANSWER_DISPOS = new Set(['no_pick_up','bad_number']);
 
 function openDialerSetup() {
-  const counts = {};
-  allLeads.forEach(l => { counts[l.dispo] = (counts[l.dispo]||0) + 1; });
-  const defaultOn = new Set(['new','no_pick_up','voicemail','call_back','follow_up']);
+  dialerTagIds = [];
+  const counts={};
+  allLeads.forEach(l=>{counts[l.dispo]=(counts[l.dispo]||0)+1;});
+  const defaultOn=new Set(['new','no_pick_up','voicemail','call_back','follow_up']);
 
-  document.getElementById('dialer-dispo-checks').innerHTML = Object.entries(DISPOS).map(([key, d]) => {
-    const n = counts[key] || 0;
-    const checked = defaultOn.has(key) && n > 0;
-    return `<label style="display:flex;align-items:center;gap:10px;padding:5px 0;cursor:pointer;font-size:13px;${n===0?'opacity:.4':''}">
-      <input type="checkbox" class="dd-check" value="${key}" ${checked?'checked':''} ${n===0?'disabled':''}
-        onchange="updateDialerCount()" style="width:14px;height:14px;cursor:pointer;flex-shrink:0">
-      <span class="dispo-badge" style="background:${d.color}">${d.label}</span>
-      <span style="color:#9aa0a6">${n} lead${n!==1?'s':''}</span>
-    </label>`;
+  document.getElementById('dialer-dispo-checks').innerHTML=Object.entries(DISPOS).map(([key,d])=>{
+    const n=counts[key]||0, checked=defaultOn.has(key)&&n>0;
+    return `<label style="display:flex;align-items:center;gap:10px;padding:5px 0;cursor:pointer;font-size:13px;${n===0?'opacity:.4':''}"><input type="checkbox" class="dd-check" value="${key}" ${checked?'checked':''} ${n===0?'disabled':''} onchange="updateDialerCount()" style="width:14px;height:14px;cursor:pointer;flex-shrink:0"><span class="dispo-badge" style="background:${d.color}">${d.label}</span><span style="color:#9aa0a6">${n} lead${n!==1?'s':''}</span></label>`;
   }).join('');
 
-  document.getElementById('dialer-use-filter').checked = false;
+  const tagEl=document.getElementById('dialer-tag-checks');
+  if(tagEl){
+    tagEl.innerHTML=allTags.length?allTags.map(t=>
+      `<span id="dtag-${t.id}" class="tag-chip" style="background:#35363a;border:2px solid ${t.color};color:#9aa0a6;cursor:pointer;padding:4px 10px" onclick="toggleDialerTag('${t.id}')">${esc(t.name)}</span>`
+    ).join(''):'<span style="font-size:12px;color:#5f6368">No tags yet</span>';
+  }
+
+  document.getElementById('dialer-use-filter').checked=false;
   updateDialerCount();
   document.getElementById('dialer-setup-modal').classList.add('open');
 }
 
+function toggleDialerTag(tagId) {
+  const tag=allTags.find(t=>t.id===tagId);
+  const el=document.getElementById(`dtag-${tagId}`);
+  if(dialerTagIds.includes(tagId)){
+    dialerTagIds=dialerTagIds.filter(t=>t!==tagId);
+    if(el&&tag){el.style.background='#35363a';el.style.color='#9aa0a6';}
+  } else {
+    dialerTagIds.push(tagId);
+    if(el&&tag){el.style.background=tag.color;el.style.color='#fff';}
+  }
+  updateDialerCount();
+}
+
 function updateDialerCount() {
-  const useFilter = document.getElementById('dialer-use-filter').checked;
-  const count = useFilter
-    ? filteredLeads.length
-    : allLeads.filter(l => [...document.querySelectorAll('.dd-check:checked')].some(el => el.value === l.dispo)).length;
-  document.getElementById('dialer-queue-count').textContent = count;
-  document.getElementById('dialer-start-btn').disabled = count === 0;
+  const useFilter=document.getElementById('dialer-use-filter').checked;
+  let count;
+  if(useFilter){count=filteredLeads.length;}
+  else{
+    const selDispos=new Set([...document.querySelectorAll('.dd-check:checked')].map(el=>el.value));
+    count=allLeads.filter(l=>{
+      const matchDispo=selDispos.has(l.dispo);
+      const matchTag=dialerTagIds.length>0&&dialerTagIds.some(tid=>(leadTagsMap[l.id]||[]).includes(tid));
+      return matchDispo||matchTag;
+    }).length;
+  }
+  document.getElementById('dialer-queue-count').textContent=count;
+  document.getElementById('dialer-start-btn').disabled=count===0;
 }
 
 function startDialerSession() {
-  const useFilter = document.getElementById('dialer-use-filter').checked;
-  if (useFilter) {
-    dialerQueue = [...filteredLeads];
-  } else {
-    const sel = new Set([...document.querySelectorAll('.dd-check:checked')].map(el => el.value));
-    dialerQueue = allLeads.filter(l => sel.has(l.dispo));
+  const useFilter=document.getElementById('dialer-use-filter').checked;
+  if(useFilter){dialerQueue=[...filteredLeads];}
+  else{
+    const selDispos=new Set([...document.querySelectorAll('.dd-check:checked')].map(el=>el.value));
+    dialerQueue=allLeads.filter(l=>{
+      const matchDispo=selDispos.has(l.dispo);
+      const matchTag=dialerTagIds.length>0&&dialerTagIds.some(tid=>(leadTagsMap[l.id]||[]).includes(tid));
+      return matchDispo||matchTag;
+    });
   }
-  if (!dialerQueue.length) { showToast('No leads to dial','error'); return; }
-
-  dialerIndex   = 0;
-  dialerStats   = { called:0, connected:0, voicemail:0, noAnswer:0, appointments:0 };
+  if(!dialerQueue.length){showToast('No leads to dial','error');return;}
+  dialerIndex=0; dialerStats={called:0,connected:0,voicemail:0,noAnswer:0,appointments:0};
   document.getElementById('dialer-setup-modal').classList.remove('open');
   document.getElementById('dialer-overlay').classList.add('open');
   renderDialerLead();
@@ -1671,68 +1015,62 @@ function startDialerSession() {
 function renderDialerLead() {
   clearDialerTimers();
 
-  if (dialerIndex >= dialerQueue.length) {
-    document.getElementById('d-lead-panel').innerHTML = '';
-    document.getElementById('d-controls-panel').innerHTML = `
-      <div class="d-end-screen">
-        <div style="font-size:52px">🎉</div>
-        <div style="font-size:20px;color:#e8eaed;font-weight:500">Session Complete!</div>
-        <div style="font-size:14px">Called ${dialerStats.called} lead${dialerStats.called!==1?'s':''} &nbsp;·&nbsp; ${dialerStats.appointments} appointment${dialerStats.appointments!==1?'s':''}</div>
-        <button class="btn btn-primary" onclick="endDialerSession()" style="margin-top:8px">Back to CRM</button>
-      </div>`;
-    document.getElementById('d-progress-text').textContent = 'Done!';
-    document.getElementById('d-prog-fill').style.width = '100%';
-    renderDialerStats();
-    return;
+  if(dialerIndex>=dialerQueue.length){
+    document.getElementById('d-lead-panel').innerHTML='';
+    document.getElementById('d-controls-panel').innerHTML=`<div class="d-end-screen"><div style="font-size:52px">🎉</div><div style="font-size:20px;color:#e8eaed;font-weight:500">Session Complete!</div><div style="font-size:14px">Called ${dialerStats.called} lead${dialerStats.called!==1?'s':''} &nbsp;·&nbsp; ${dialerStats.appointments} appointment${dialerStats.appointments!==1?'s':''}</div><button class="btn btn-primary" onclick="endDialerSession()" style="margin-top:8px">Back to CRM</button></div>`;
+    document.getElementById('d-progress-text').textContent='Done!';
+    document.getElementById('d-prog-fill').style.width='100%';
+    renderDialerStats(); return;
   }
 
-  const lead = dialerQueue[dialerIndex];
-  const d    = DISPOS[lead.dispo] || DISPOS.new;
-  const pct  = (dialerIndex / dialerQueue.length) * 100;
-  const loc  = [lead.city, lead.state].filter(Boolean).join(', ');
-  const stars = lead.rating ? '★'.repeat(Math.round(lead.rating)) : '';
+  const lead=dialerQueue[dialerIndex];
+  const d=DISPOS[lead.dispo]||DISPOS.new;
+  const pct=(dialerIndex/dialerQueue.length)*100;
+  const loc=[lead.city,lead.state].filter(Boolean).join(', ');
+  const stars=lead.rating?'★'.repeat(Math.round(lead.rating)):'';
 
-  document.getElementById('d-progress-text').textContent = `Lead ${dialerIndex+1} of ${dialerQueue.length}`;
-  document.getElementById('d-prog-fill').style.width = pct + '%';
-  document.getElementById('d-footer-remaining').textContent = `${dialerQueue.length - dialerIndex - 1} remaining`;
+  document.getElementById('d-progress-text').textContent=`Lead ${dialerIndex+1} of ${dialerQueue.length}`;
+  document.getElementById('d-prog-fill').style.width=pct+'%';
+  document.getElementById('d-footer-remaining').textContent=`${dialerQueue.length-dialerIndex-1} remaining`;
   renderDialerStats();
 
-  document.getElementById('d-lead-panel').innerHTML = `
+  document.getElementById('d-lead-panel').innerHTML=`
     <div style="margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <span class="dispo-badge" style="background:${d.color}">${d.label}</span>
-      ${stars ? `<span style="color:#fbbc04;font-size:12px">${stars} ${lead.rating}</span>` : ''}
-      ${lead.reviews ? `<span style="color:#9aa0a6;font-size:11px">(${lead.reviews} reviews)</span>` : ''}
+      ${stars?`<span style="color:#fbbc04;font-size:12px">${stars} ${lead.rating}</span>`:''}
+      ${lead.reviews?`<span style="color:#9aa0a6;font-size:11px">(${lead.reviews} reviews)</span>`:''}
     </div>
     <div class="d-biz-name">${esc(lead.business_name)}</div>
-    <div class="d-contact">${lead.contact_name ? esc(lead.contact_name) : '<span style="font-style:italic;color:#5f6368">No contact name</span>'}</div>
-    <div class="d-phone-big">${lead.phone ? esc(lead.phone) : '<span style="font-size:16px;color:#5f6368">No phone number</span>'}</div>
-    ${loc ? `<div class="d-info-row"><span class="d-info-icon">📍</span>${esc(loc)}</div>` : ''}
-    ${lead.address ? `<div class="d-info-row"><span class="d-info-icon">🏠</span>${esc(lead.address)}</div>` : ''}
-    ${lead.email ? `<div class="d-info-row"><span class="d-info-icon">✉</span>${esc(lead.email)}</div>` : ''}
-    ${lead.website ? `<div class="d-info-row"><span class="d-info-icon">🌐</span><a href="${esc(lead.website)}" target="_blank" style="color:#8ab4f8;font-size:13px;word-break:break-all">${esc(lead.website)}</a></div>` : ''}
-    ${lead.google_maps_link ? `<div class="d-info-row"><span class="d-info-icon">🗺</span><a href="${esc(lead.google_maps_link)}" target="_blank" style="color:#8ab4f8;font-size:13px">Open Maps</a></div>` : ''}
-    ${lead.follow_up_date ? `<div class="d-info-row"><span class="d-info-icon">📅</span>Call back: ${lead.follow_up_date}</div>` : ''}
-    ${lead.notes ? `
-    <div style="margin-top:14px">
-      <div class="d-section-label">Notes</div>
-      <div class="d-notes-box">${esc(lead.notes)}</div>
-    </div>` : ''}
-    <div style="margin-top:16px">
-      <div class="d-section-label">Quick Note</div>
-      <textarea id="d-quick-note" class="d-quick-note" placeholder="Note about this call..."></textarea>
-    </div>`;
+    <div class="d-contact">${lead.contact_name?esc(lead.contact_name):'<span style="font-style:italic;color:#5f6368">No contact name</span>'}</div>
+    ${loc?`<div class="d-info-row"><span class="d-info-icon">📍</span>${esc(loc)}</div>`:''}
+    ${lead.address?`<div class="d-info-row"><span class="d-info-icon">🏠</span>${esc(lead.address)}</div>`:''}
+    ${lead.email?`<div class="d-info-row"><span class="d-info-icon">✉</span>${esc(lead.email)}</div>`:''}
+    ${lead.website?`<div class="d-info-row"><span class="d-info-icon">🌐</span><a href="${esc(lead.website)}" target="_blank" style="color:#8ab4f8;font-size:13px;word-break:break-all">${esc(lead.website)}</a></div>`:''}
+    ${lead.google_maps_link?`<div class="d-info-row"><span class="d-info-icon">🗺</span><a href="${esc(lead.google_maps_link)}" target="_blank" style="color:#8ab4f8;font-size:13px">Open Maps</a></div>`:''}
+    ${lead.follow_up_date?`<div class="d-info-row"><span class="d-info-icon">📅</span>Call back: ${lead.follow_up_date}</div>`:''}
+    ${lead.notes?`<div style="margin-top:14px"><div class="d-section-label">Notes</div><div class="d-notes-box">${esc(lead.notes)}</div></div>`:''}
+    <div style="margin-top:16px"><div class="d-section-label">Quick Note</div><textarea id="d-quick-note" class="d-quick-note" placeholder="Note about this call..."></textarea></div>`;
 
-  const dispoGrid = Object.entries(DISPOS).filter(([k]) => k !== 'new').map(([key, dsp]) =>
+  const dispoGrid=Object.entries(DISPOS).filter(([k])=>k!=='new').map(([key,dsp])=>
     `<button class="d-dispo-btn" style="background:${dsp.color}" id="d-dispo-${key}" onclick="dialerSetDispo('${key}')">${dsp.label}</button>`
   ).join('');
 
-  document.getElementById('d-controls-panel').innerHTML = `
+  document.getElementById('d-controls-panel').innerHTML=`
     <div>
-      <div class="d-section-label">Call</div>
+      <div class="d-section-label">Number to Dial</div>
+      <input type="tel" id="d-phone-select" class="d-phone-edit"
+        value="${esc(lead.phone||'')}" placeholder="No phone number"
+        ${!lead.phone?'disabled':''}>
       <button class="d-call-btn ready" id="d-call-btn" onclick="dialerCall()" ${!lead.phone?'disabled':''}>
-        📞 ${lead.phone ? esc(lead.phone) : 'No phone'}
+        📞 Call Now
       </button>
       <div class="d-timer" id="d-timer">—</div>
+      <div class="d-countdown" id="d-auto-dial-cd"></div>
+    </div>
+    <div>
+      <div class="d-section-label">Email</div>
+      <input type="email" id="d-email-field" class="d-email-input"
+        value="${esc(lead.email||'')}" placeholder="Email address">
     </div>
     <div>
       <div class="d-section-label">Disposition</div>
@@ -1740,13 +1078,19 @@ function renderDialerLead() {
       <div class="d-countdown" id="d-countdown"></div>
     </div>
     <div>
-      <div class="d-section-label">Auto-Advance</div>
-      <div class="d-auto-row">
-        <button class="d-toggle ${autoAdvanceOn?'on':''}" id="d-toggle" onclick="dialerToggleAuto()"></button>
-        <span style="font-size:13px;color:#9aa0a6" id="d-auto-label">${autoAdvanceOn?'On':'Off'}</span>
-        ${autoAdvanceOn ? `<span style="font-size:12px;color:#9aa0a6">after <input type="number" id="d-delay" value="${autoAdvanceSec}" min="1" max="15" class="d-delay-input" oninput="autoAdvanceSec=Math.max(1,parseInt(this.value)||3)"> s</span>` : ''}
-      </div>
+      <div class="d-section-label">Session Settings</div>
+      <div id="d-auto-section"></div>
     </div>`;
+
+  renderDialerAutoSection();
+
+  if(autoDialOn&&lead.phone){
+    let rem=autoDialDelaySec;
+    const tick=()=>{const el=document.getElementById('d-auto-dial-cd');if(el)el.textContent=rem>0?`Auto-dialing in ${rem}s… (edit number above to change)`:'';if(rem<=0)return;rem--;};
+    tick();
+    const cdInt=setInterval(()=>{tick();if(rem<=0)clearInterval(cdInt);},1000);
+    autoDialTmo=setTimeout(()=>{clearInterval(cdInt);const el=document.getElementById('d-auto-dial-cd');if(el)el.textContent='';dialerCall();},autoDialDelaySec*1000);
+  }
 }
 
 function renderDialerStats() {
@@ -1763,17 +1107,58 @@ function renderDialerStats() {
   </div>`).join('');
 }
 
+function renderDialerAutoSection() {
+  const el = document.getElementById('d-auto-section');
+  if (!el) return;
+  el.innerHTML = `
+    <div>
+      <div class="d-section-label">Auto-Dial</div>
+      <div class="d-auto-row">
+        <button class="d-toggle ${autoDialOn?'on':''}" onclick="dialerToggleAutoDial()"></button>
+        <span style="font-size:13px;color:#9aa0a6">${autoDialOn?'On':'Off'}</span>
+        ${autoDialOn ? `<span style="font-size:12px;color:#9aa0a6">after <input type="number" value="${autoDialDelaySec}" min="1" max="15" class="d-delay-input" oninput="autoDialDelaySec=Math.max(1,parseInt(this.value)||2)"> s</span>` : ''}
+      </div>
+    </div>
+    <div>
+      <div class="d-section-label">Auto-Advance after Dispo</div>
+      <div class="d-auto-row">
+        <button class="d-toggle ${autoAdvanceOn?'on':''}" onclick="dialerToggleAuto()"></button>
+        <span style="font-size:13px;color:#9aa0a6">${autoAdvanceOn?'On':'Off'}</span>
+        ${autoAdvanceOn ? `<span style="font-size:12px;color:#9aa0a6">after <input type="number" value="${autoAdvanceSec}" min="1" max="15" class="d-delay-input" oninput="autoAdvanceSec=Math.max(1,parseInt(this.value)||3)"> s</span>` : ''}
+      </div>
+    </div>`;
+}
+
+function dialerToggleAutoDial() {
+  if (autoDialTmo) { clearTimeout(autoDialTmo); autoDialTmo = null; }
+  const cdEl = document.getElementById('d-auto-dial-cd');
+  if (cdEl) cdEl.textContent = '';
+  autoDialOn = !autoDialOn;
+  renderDialerAutoSection();
+}
+
+function dialerToggleAuto() {
+  autoAdvanceOn = !autoAdvanceOn;
+  renderDialerAutoSection();
+}
+
 async function dialerCall() {
+  if (autoDialTmo) { clearTimeout(autoDialTmo); autoDialTmo = null; }
+  const cdEl = document.getElementById('d-auto-dial-cd');
+  if (cdEl) cdEl.textContent = '';
+
   const lead = dialerQueue[dialerIndex];
-  if (!lead?.phone) return;
+  if (!lead) return;
+  const phoneInput = document.getElementById('d-phone-select');
+  const phone = phoneInput ? phoneInput.value.trim() : lead.phone;
+  if (!phone) return;
 
   const a = document.createElement('a');
-  a.href = 'tel:' + lead.phone.replace(/\D/g,'');
+  a.href = 'tel:' + phone.replace(/\D/g,'');
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
 
-  clearDialerTimers();
   callStartTime = Date.now();
   dialerStats.called++;
   todayActivity.dials++;
@@ -1811,9 +1196,29 @@ async function dialerSetDispo(newDispo) {
   const lead = dialerQueue[dialerIndex];
   if (!lead) return;
 
+  // Cancel all timers and reset call UI immediately
+  if (autoDialTmo)  { clearTimeout(autoDialTmo);   autoDialTmo  = null; }
+  if (autoAdvanceTmo){ clearTimeout(autoAdvanceTmo); autoAdvanceTmo = null; }
+  if (countdownInt) { clearInterval(countdownInt);  countdownInt = null; }
+  if (callTimerInt) {
+    clearInterval(callTimerInt);
+    callTimerInt = null;
+    if (callStartTime) {
+      const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+      if (elapsed > 0) { todayActivity.talk_time_secs += elapsed; renderActivityBar(); debounceSaveActivity(); }
+    }
+    callStartTime = null;
+  }
+  const btn = document.getElementById('d-call-btn');
+  if (btn) { btn.className = 'd-call-btn ready'; btn.textContent = '📞 Call Now'; }
+  const timerEl = document.getElementById('d-timer');
+  if (timerEl) { timerEl.className = 'd-timer'; timerEl.textContent = '—'; }
+  const adcd = document.getElementById('d-auto-dial-cd');
+  if (adcd) adcd.textContent = '';
+
   document.querySelectorAll('.d-dispo-btn').forEach(b => b.classList.remove('set'));
-  const btn = document.getElementById(`d-dispo-${newDispo}`);
-  if (btn) btn.classList.add('set');
+  const dispBtn = document.getElementById(`d-dispo-${newDispo}`);
+  if (dispBtn) dispBtn.classList.add('set');
 
   if (CONNECTED_DISPOS.has(newDispo))  { dialerStats.connected++;    todayActivity.connected++; }
   if (VOICEMAIL_DISPOS.has(newDispo))  { dialerStats.voicemail++;    todayActivity.voicemail++; }
@@ -1861,19 +1266,6 @@ async function dialerSetDispo(newDispo) {
   }
 }
 
-function dialerToggleAuto() {
-  autoAdvanceOn = !autoAdvanceOn;
-  const btn   = document.getElementById('d-toggle');
-  const label = document.getElementById('d-auto-label');
-  if (btn)   btn.classList.toggle('on', autoAdvanceOn);
-  if (label) label.textContent = autoAdvanceOn ? 'On' : 'Off';
-  const row = document.querySelector('.d-auto-row');
-  if (row) row.innerHTML = `
-    <button class="d-toggle ${autoAdvanceOn?'on':''}" id="d-toggle" onclick="dialerToggleAuto()"></button>
-    <span style="font-size:13px;color:#9aa0a6" id="d-auto-label">${autoAdvanceOn?'On':'Off'}</span>
-    ${autoAdvanceOn ? `<span style="font-size:12px;color:#9aa0a6">after <input type="number" id="d-delay" value="${autoAdvanceSec}" min="1" max="15" class="d-delay-input" oninput="autoAdvanceSec=Math.max(1,parseInt(this.value)||3)"> s</span>` : ''}`;
-}
-
 function dialerNext() {
   clearDialerTimers();
   dialerIndex++;
@@ -1894,6 +1286,7 @@ function dialerSkip() {
 }
 
 function clearDialerTimers() {
+  if (autoDialTmo)   { clearTimeout(autoDialTmo);   autoDialTmo   = null; }
   if (callTimerInt) {
     clearInterval(callTimerInt);
     callTimerInt = null;
@@ -1902,8 +1295,8 @@ function clearDialerTimers() {
       if (elapsed > 0) { todayActivity.talk_time_secs += elapsed; renderActivityBar(); debounceSaveActivity(); }
     }
   }
-  if (autoAdvanceTmo){ clearTimeout(autoAdvanceTmo);  autoAdvanceTmo= null; }
-  if (countdownInt)  { clearInterval(countdownInt);   countdownInt  = null; }
+  if (autoAdvanceTmo){ clearTimeout(autoAdvanceTmo);  autoAdvanceTmo = null; }
+  if (countdownInt)  { clearInterval(countdownInt);   countdownInt   = null; }
   callStartTime = null;
 }
 
