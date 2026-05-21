@@ -184,15 +184,34 @@ async function renderDashboard() {
     <div class="panel" style="margin-bottom:20px">
       <div class="panel-header"><h2>Send Drip Emails</h2></div>
       <div style="padding:20px">
-        <p style="font-size:14px;color:var(--gray);margin-bottom:16px">Triggers the drip script on GitHub — sends the next batch via Brevo and updates Supabase automatically.</p>
-        <button class="btn btn-primary" id="send-btn" onclick="sendNow()">&#9654; Send Now</button>
-        <span id="send-status" style="margin-left:14px;font-size:14px;color:var(--gray)"></span>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <button class="btn btn-primary" id="send-btn" onclick="sendNow()">&#9654; Send Now</button>
+          <span id="send-status" style="font-size:14px;color:var(--gray)"></span>
+        </div>
+        <div id="run-status-box" style="margin-top:16px;display:none;background:var(--gray-light);border-radius:8px;padding:14px 16px;font-size:13px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span id="run-status-dot" style="width:10px;height:10px;border-radius:50%;flex-shrink:0;background:#d1d5db"></span>
+            <div>
+              <div id="run-status-text" style="font-weight:600">Checking…</div>
+              <div id="run-status-time" style="color:var(--gray);margin-top:2px"></div>
+            </div>
+            <a id="run-status-link" href="#" target="_blank" style="margin-left:auto;font-size:12px;color:var(--blue)">View on GitHub →</a>
+          </div>
+        </div>
       </div>
     </div>
     <div class="panel">
-      <div class="panel-header"><h2>Recent Activity</h2></div>
+      <div class="panel-header">
+        <h2>Recent Activity</h2>
+        <button class="btn btn-secondary btn-sm" onclick="refreshLog()">Refresh</button>
+      </div>
       <div id="recent-log"><div class="empty">Loading…</div></div>
     </div>`;
+  await refreshLog();
+  checkRunStatus();
+}
+
+async function refreshLog() {
   const { data: recent } = await sb.from('send_log')
     .select('sent_at,step_number,brevo_message_id,enrollments(email,sequences(name))')
     .order('sent_at', { ascending: false }).limit(20);
@@ -208,6 +227,57 @@ async function renderDashboard() {
       </tr>`).join('')}</tbody></table>`;
 }
 
+async function checkRunStatus(poll) {
+  const { data: rows } = await sb.from('settings').select('key,value');
+  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
+  const token = cfg.github_token;
+  const repo = cfg.github_repo;
+  if (!token || !repo) return;
+
+  const box = document.getElementById('run-status-box');
+  const dot = document.getElementById('run-status-dot');
+  const text = document.getElementById('run-status-text');
+  const time = document.getElementById('run-status-time');
+  const link = document.getElementById('run-status-link');
+  if (!box) return;
+
+  try {
+    const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/drip.yml/runs?per_page=1`, {
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+    });
+    const data = await r.json();
+    const run = data.workflow_runs?.[0];
+    if (!run) { box.style.display = 'none'; return; }
+
+    box.style.display = 'block';
+    link.href = run.html_url;
+
+    const started = new Date(run.created_at).toLocaleString();
+
+    if (run.status === 'in_progress' || run.status === 'queued') {
+      dot.style.background = '#f59e0b';
+      text.textContent = run.status === 'queued' ? 'Queued — starting soon…' : 'Running — emails sending now…';
+      time.textContent = `Started ${started}`;
+      if (poll !== false) setTimeout(() => checkRunStatus(true), 10000);
+    } else if (run.conclusion === 'success') {
+      dot.style.background = '#10b981';
+      text.textContent = 'Completed successfully';
+      time.textContent = `Finished ${new Date(run.updated_at).toLocaleString()}`;
+      if (poll) refreshLog();
+    } else if (run.conclusion === 'failure') {
+      dot.style.background = '#ef4444';
+      text.textContent = 'Run failed — check GitHub Actions for details';
+      time.textContent = `Failed ${new Date(run.updated_at).toLocaleString()}`;
+    } else {
+      dot.style.background = '#d1d5db';
+      text.textContent = `Last run: ${run.conclusion || run.status}`;
+      time.textContent = started;
+    }
+  } catch(e) {
+    box.style.display = 'none';
+  }
+}
+
 async function sendNow() {
   const btn = document.getElementById('send-btn');
   const status = document.getElementById('send-status');
@@ -217,7 +287,6 @@ async function sendNow() {
 
   const { data: rows } = await sb.from('settings').select('key,value');
   const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
-
   const token = cfg.github_token;
   const repo = cfg.github_repo;
 
@@ -239,8 +308,9 @@ async function sendNow() {
       body: JSON.stringify({ ref: 'main' }),
     });
     if (r.status === 204) {
-      status.textContent = '✓ Triggered! Check GitHub Actions for progress.';
+      status.textContent = '✓ Triggered!';
       status.style.color = 'var(--green)';
+      setTimeout(() => checkRunStatus(true), 3000);
     } else {
       const err = await r.json();
       status.textContent = 'Error: ' + (err.message || r.status);
