@@ -14,6 +14,7 @@ import datetime as dt
 import json
 import logging
 import os
+import re
 import sys
 import time
 
@@ -77,7 +78,6 @@ def send_email(api_key: str, to_email: str, to_name: str,
     if tags:
         payload["tags"] = tags
 
-    log.info("Sending via Brevo — key length=%d prefix=%s", len(api_key), api_key[:15])
     r = requests.post(
         "https://api.brevo.com/v3/smtp/email",
         json=payload,
@@ -122,6 +122,12 @@ def main() -> int:
     if not from_email:
         log.error("from_email not set in settings table")
         return 1
+
+    m = re.match(r'^(.+?)\s*<(.+?)>\s*$', from_email)
+    if m:
+        from_name  = from_name or m.group(1).strip()
+        from_email = m.group(2).strip()
+    log.info("Sending from: %s <%s>", from_name, from_email)
 
     global_emails_per_minute = float(cfg.get("emails_per_minute", "2"))
     global_send_interval = 60.0 / global_emails_per_minute
