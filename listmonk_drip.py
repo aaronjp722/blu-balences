@@ -19,8 +19,6 @@ import requests
 log = logging.getLogger("drip")
 
 
-# ── Supabase REST helpers ────────────────────────────────────
-
 def _supa_headers(key: str) -> dict:
     return {
         "apikey": key,
@@ -45,8 +43,6 @@ def supa_patch(base: str, key: str, table: str, qs: str, payload: dict) -> None:
     r.raise_for_status()
 
 
-# ── Brevo sender ─────────────────────────────────────────────
-
 def parse_from_email(from_email: str):
     m = re.match(r'^(.+?)\s*<(.+?)>$', from_email.strip())
     if m:
@@ -67,7 +63,6 @@ def send_email(api_key: str, to_email: str, to_name: str,
     content = personalize(body, to_email, to_name or "")
     subject = personalize(subject, to_email, to_name or "")
 
-    # Wrap plain text in simple HTML if no tags detected
     if not re.search(r'<[a-zA-Z]', content):
         content = "<div>" + content.replace("\n", "<br>\n") + "</div>"
 
@@ -88,8 +83,6 @@ def send_email(api_key: str, to_email: str, to_name: str,
     return r.json().get("messageId", "")
 
 
-# ── Main ─────────────────────────────────────────────────────
-
 def main() -> int:
     logging.basicConfig(
         level=logging.INFO,
@@ -107,12 +100,13 @@ def main() -> int:
     def post(table, payload): return supa_post(SUPA_URL, SUPA_KEY, table, payload)
     def patch(table, qs, payload): return supa_patch(SUPA_URL, SUPA_KEY, table, qs, payload)
 
-    cfg = {r["key"]: r["value"] for r in get("settings", "?select=key,value")}
+    cfg = {r["key"]: r["value"].strip('"') if isinstance(r["value"], str) else r["value"]
+           for r in get("settings", "?select=key,value")}
 
-    brevo_api_key = cfg.get("brevo_api_key", "").strip('"')
-if not brevo_api_key:
-    log.error("brevo_api_key not set in Supabase settings table")
-    return 1
+    brevo_api_key = cfg.get("brevo_api_key", "")
+    if not brevo_api_key:
+        log.error("brevo_api_key not set in Supabase settings table")
+        return 1
 
     global_emails_per_minute = float(cfg.get("emails_per_minute", "2"))
     global_send_interval = 60.0 / global_emails_per_minute
