@@ -109,7 +109,7 @@ def main() -> int:
 
     cfg = {r["key"]: r["value"] for r in get("settings", "?select=key,value")}
 
-    brevo_api_key = cfg.get("brevo_api_key", "")
+    brevo_api_key = cfg.get("brevo_api_key", "").strip('"')
     if not brevo_api_key:
         log.error("brevo_api_key not set in Supabase settings table")
         return 1
