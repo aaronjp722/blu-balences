@@ -83,7 +83,6 @@ textarea{resize:vertical;min-height:80px}
 </head>
 <body>
 
-<!-- Config screen shown on first load -->
 <div id="config-screen">
   <div class="box">
     <h1>Email Control</h1>
@@ -94,7 +93,6 @@ textarea{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- Main app -->
 <div id="app">
   <div id="sidebar">
     <div class="logo">Blu Balence<span>Email Control</span></div>
@@ -134,7 +132,6 @@ textarea{resize:vertical;min-height:80px}
 <script>
 let sb;
 
-// ── Config ───────────────────────────────────────────────────
 function saveConfig() {
   const url = document.getElementById('cfg-url').value.trim();
   const key = document.getElementById('cfg-key').value.trim();
@@ -151,7 +148,6 @@ function boot(url, key) {
   navigate('dashboard');
 }
 
-// ── Router ───────────────────────────────────────────────────
 async function navigate(tab) {
   document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
   const el = document.getElementById('nav-' + tab);
@@ -167,7 +163,9 @@ async function navigate(tab) {
   else if (tab === 'settings') await renderSettings();
 }
 
-// ── Dashboard ────────────────────────────────────────────────
+// strip JSON quotes from settings values
+function cfgVal(v) { return typeof v === 'string' ? v.replace(/^"|"$/g, '') : (v || ''); }
+
 async function renderDashboard() {
   const [{ data: seqs }, { data: enrs }, { data: logs }] = await Promise.all([
     sb.from('sequences').select('id,active'),
@@ -183,26 +181,78 @@ async function renderDashboard() {
       <div class="card"><div class="label">Sent Today</div><div class="value" style="color:var(--green)">${sentToday}</div><div class="sub">emails</div></div>
       <div class="card"><div class="label">Total Sent</div><div class="value">${(logs||[]).length}</div><div class="sub">all time</div></div>
     </div>
+    <div class="panel" style="margin-bottom:20px">
+      <div class="panel-header"><h2>Send Drip Emails</h2></div>
+      <div style="padding:20px">
+        <p style="font-size:14px;color:var(--gray);margin-bottom:16px">Triggers the drip script on GitHub — sends the next batch via Brevo and updates Supabase automatically.</p>
+        <button class="btn btn-primary" id="send-btn" onclick="sendNow()">&#9654; Send Now</button>
+        <span id="send-status" style="margin-left:14px;font-size:14px;color:var(--gray)"></span>
+      </div>
+    </div>
     <div class="panel">
       <div class="panel-header"><h2>Recent Activity</h2></div>
       <div id="recent-log"><div class="empty">Loading…</div></div>
     </div>`;
   const { data: recent } = await sb.from('send_log')
-    .select('sent_at,step_number,listmonk_campaign_id,enrollments(email,sequences(name))')
+    .select('sent_at,step_number,brevo_message_id,enrollments(email,sequences(name))')
     .order('sent_at', { ascending: false }).limit(20);
   document.getElementById('recent-log').innerHTML = !recent || !recent.length
     ? '<div class="empty">No sends yet. Create a sequence and enroll subscribers.</div>'
-    : `<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Campaign</th></tr></thead><tbody>
+    : `<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Message ID</th></tr></thead><tbody>
       ${recent.map(l=>`<tr>
         <td>${new Date(l.sent_at).toLocaleString()}</td>
         <td>${l.enrollments?.email||'—'}</td>
         <td>${l.enrollments?.sequences?.name||'—'}</td>
         <td>Step ${l.step_number}</td>
-        <td>${l.listmonk_campaign_id?`<span class="badge badge-blue">#${l.listmonk_campaign_id}</span>`:'—'}</td>
+        <td style="font-size:11px;color:var(--gray)">${l.brevo_message_id||'—'}</td>
       </tr>`).join('')}</tbody></table>`;
 }
 
-// ── Sequences ────────────────────────────────────────────────
+async function sendNow() {
+  const btn = document.getElementById('send-btn');
+  const status = document.getElementById('send-status');
+  btn.disabled = true;
+  status.textContent = 'Triggering…';
+  status.style.color = 'var(--gray)';
+
+  const { data: rows } = await sb.from('settings').select('key,value');
+  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
+
+  const token = cfg.github_token;
+  const repo = cfg.github_repo;
+
+  if (!token || !repo) {
+    status.textContent = 'GitHub token and repo not set in Settings.';
+    status.style.color = 'var(--red)';
+    btn.disabled = false;
+    return;
+  }
+
+  try {
+    const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/drip.yml/dispatches`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ref: 'main' }),
+    });
+    if (r.status === 204) {
+      status.textContent = '✓ Triggered! Check GitHub Actions for progress.';
+      status.style.color = 'var(--green)';
+    } else {
+      const err = await r.json();
+      status.textContent = 'Error: ' + (err.message || r.status);
+      status.style.color = 'var(--red)';
+    }
+  } catch (e) {
+    status.textContent = 'Failed: ' + e.message;
+    status.style.color = 'var(--red)';
+  }
+  btn.disabled = false;
+}
+
 async function renderSequences() {
   const { data: seqs } = await sb.from('sequences').select('*').order('created_at');
   document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openSeqModal()">+ New Sequence</button>`;
@@ -255,7 +305,6 @@ async function saveSeq(id) {
   renderSequences();
 }
 
-// ── Steps ────────────────────────────────────────────────────
 async function openStepsModal(seqId, seqName) {
   const { data: steps } = await sb.from('steps').select('*').eq('sequence_id', seqId).order('step_number');
   const nextNum = steps && steps.length ? steps[steps.length - 1].step_number + 1 : 1;
@@ -288,7 +337,7 @@ function stepCard(s) {
         <div class="step-num" style="margin-top:2px">${s.step_number}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:14px;font-weight:600">${s.subject}</div>
-          <div class="step-meta">Template #${s.template_id} · Wait: ${delay(s)} · ${s.from_email}</div>
+          <div class="step-meta">Wait: ${delay(s)} · ${s.from_email}</div>
           ${bodyPreview ? `<div class="step-body-preview">"${bodyPreview}"</div>` : ''}
           <div class="step-meta" style="margin-top:4px">${batchText}</div>
           ${tagPills ? `<div style="margin-top:5px">${tagPills}</div>` : ''}
@@ -305,15 +354,12 @@ function stepCard(s) {
 function openStepForm(seqId, seqName, stepNum, stepId) {
   showModal(`
     <h2>${stepId ? 'Edit' : 'New'} Step ${stepNum}</h2>
-
     <div class="section-title">Email Details</div>
-    <div class="form-group"><label>Subject Line</label><input id="st-subj" placeholder="Quick question — bookkeeping for realtors"></div>
+    <div class="form-group"><label>Subject Line</label><input id="st-subj" placeholder="Quick question"></div>
     <div class="form-group"><label>From Email</label><input id="st-from" value="Aaron &lt;aaron@blubalencebookkeeping.com&gt;"></div>
-    <div class="form-group"><label>Listmonk Template ID <span style="color:var(--gray);font-weight:400">(Campaigns → Templates in listmonk)</span></label><input id="st-tmpl" type="number" min="1" placeholder="1"></div>
-
     <div class="section-title">Email Body</div>
     <div class="form-group">
-      <label>Body Text <span style="color:var(--gray);font-weight:400">(written directly into the campaign — use HTML or plain text)</span></label>
+      <label>Body Text <span style="color:var(--gray);font-weight:400">(HTML or plain text)</span></label>
       <textarea id="st-body" style="min-height:160px;font-family:monospace;font-size:13px" placeholder="Hi {{ .Subscriber.FirstName }},
 
 I noticed you're a realtor in Atlanta and wanted to reach out...
@@ -321,9 +367,8 @@ I noticed you're a realtor in Atlanta and wanted to reach out...
 Best,
 Aaron
 Blu Balence Bookkeeping"></textarea>
-      <p class="hint">Use <code>{{ .Subscriber.FirstName }}</code> and <code>{{ .Subscriber.Email }}</code> for personalization. If left blank, the listmonk template body is used.</p>
+      <p class="hint">Use <code>{{ .Subscriber.FirstName }}</code> and <code>{{ .Subscriber.Email }}</code> for personalization.</p>
     </div>
-
     <div class="section-title">Wait Before Sending This Step</div>
     <div class="form-row">
       <div class="form-group"><label>Days</label><input id="st-days" type="number" value="0" min="0"></div>
@@ -331,7 +376,6 @@ Blu Balence Bookkeeping"></textarea>
       <div class="form-group"><label>Minutes</label><input id="st-mins" type="number" value="0" min="0" max="59"></div>
     </div>
     <p class="hint">Step 1 always sends immediately on first run. Delay applies from the previous step's send time.</p>
-
     <div class="section-title">Batch Controls</div>
     <div class="form-row-2">
       <div class="form-group">
@@ -343,14 +387,12 @@ Blu Balence Bookkeeping"></textarea>
         <input id="st-interval" type="number" value="0" min="0" placeholder="0 = use global rate">
       </div>
     </div>
-    <p class="hint">Example: Batch 5 + 6 min = send 5 emails, one every 6 minutes. Set 0 to use the global Emails/Min from Settings.</p>
-
+    <p class="hint">Example: Batch 5 + 10 min = send 5 emails, one every 10 minutes.</p>
     <div class="section-title">Tags</div>
     <div class="form-group">
-      <label>Tags <span style="color:var(--gray);font-weight:400">(comma-separated — saved in Supabase and applied to the listmonk campaign)</span></label>
+      <label>Tags <span style="color:var(--gray);font-weight:400">(comma-separated)</span></label>
       <input id="st-tags" placeholder="atlanta-realtors, cold-outreach, step-1">
     </div>
-
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="openStepsModal('${seqId}','${esc(seqName)}')">Back</button>
       <button class="btn btn-primary" onclick="saveStep('${seqId}','${esc(seqName)}',${stepNum},'${stepId||''}')">Save Step</button>
@@ -361,7 +403,6 @@ Blu Balence Bookkeeping"></textarea>
       if (!s) return;
       document.getElementById('st-subj').value = s.subject || '';
       document.getElementById('st-from').value = s.from_email || '';
-      document.getElementById('st-tmpl').value = s.template_id || '';
       document.getElementById('st-days').value = s.delay_days || 0;
       document.getElementById('st-hours').value = s.delay_hours || 0;
       document.getElementById('st-mins').value = s.delay_minutes || 0;
@@ -379,7 +420,7 @@ async function saveStep(seqId, seqName, stepNum, stepId) {
     step_number: stepNum,
     subject: document.getElementById('st-subj').value.trim(),
     from_email: document.getElementById('st-from').value.trim(),
-    template_id: parseInt(document.getElementById('st-tmpl').value) || 1,
+    template_id: 1,
     delay_days: parseInt(document.getElementById('st-days').value) || 0,
     delay_hours: parseInt(document.getElementById('st-hours').value) || 0,
     delay_minutes: parseInt(document.getElementById('st-mins').value) || 0,
@@ -403,7 +444,6 @@ async function deleteStep(stepId, seqId) {
   openStepsModal(seqId, seq?.name || '');
 }
 
-// ── Subscribers ───────────────────────────────────────────────
 async function renderSubscribers() {
   const { data: enrs } = await sb.from('enrollments').select('*,sequences(name)').order('enrolled_at', { ascending: false });
   document.getElementById('topbar-actions').innerHTML = `
@@ -496,31 +536,29 @@ async function bulkEnroll() {
   renderSubscribers();
 }
 
-// ── Analytics ─────────────────────────────────────────────────
 async function renderAnalytics() {
   const { data: logs } = await sb.from('send_log')
-    .select('sent_at,step_number,listmonk_campaign_id,status,enrollments(email,sequences(name))')
+    .select('sent_at,step_number,brevo_message_id,status,enrollments(email,sequences(name))')
     .order('sent_at', { ascending: false }).limit(500);
   document.getElementById('content').innerHTML = `
     <div class="panel">
       <div class="panel-header"><h2>Send Log</h2></div>
       ${!logs||!logs.length ? '<div class="empty">No sends logged yet.</div>' :
-      `<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Campaign ID</th><th>Status</th></tr></thead><tbody>
+      `<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Message ID</th><th>Status</th></tr></thead><tbody>
       ${logs.map(l=>`<tr>
         <td>${new Date(l.sent_at).toLocaleString()}</td>
         <td>${l.enrollments?.email||'—'}</td>
         <td>${l.enrollments?.sequences?.name||'—'}</td>
         <td>Step ${l.step_number}</td>
-        <td>${l.listmonk_campaign_id?`<span class="badge badge-blue">#${l.listmonk_campaign_id}</span>`:'—'}</td>
+        <td style="font-size:11px;color:var(--gray)">${l.brevo_message_id||'—'}</td>
         <td><span class="badge badge-green">${l.status}</span></td>
       </tr>`).join('')}</tbody></table>`}
     </div>`;
 }
 
-// ── Settings ──────────────────────────────────────────────────
 async function renderSettings() {
   const { data: rows } = await sb.from('settings').select('key,value');
-  const cfg = Object.fromEntries((rows||[]).map(r=>[r.key,r.value]));
+  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
   document.getElementById('content').innerHTML = `
     <div style="max-width:560px">
       <div class="panel" style="margin-bottom:20px">
@@ -529,11 +567,25 @@ async function renderSettings() {
           <div class="form-group">
             <label>Brevo API Key</label>
             <input id="s-brevo" type="password" value="${cfg.brevo_api_key||''}" placeholder="xkeysib-...">
-            <p class="hint">Brevo dashboard → API Keys → Generate. This is NOT the SMTP key — it's the API key.</p>
+            <p class="hint">Brevo dashboard → API Keys → Generate. NOT the SMTP key — the API key.</p>
           </div>
           <div class="form-group">
             <label>From Email (default)</label>
             <input id="s-from" value="${cfg.from_email||'Aaron <aaron@blubalencebookkeeping.com>'}">
+          </div>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><h2>GitHub Actions</h2></div>
+        <div style="padding:20px">
+          <div class="form-group">
+            <label>GitHub Repo <span style="color:var(--gray);font-weight:400">(owner/repo)</span></label>
+            <input id="s-repo" value="${cfg.github_repo||'aaronjp722/blu-balences'}">
+          </div>
+          <div class="form-group">
+            <label>GitHub Token <span style="color:var(--gray);font-weight:400">(needs workflow scope)</span></label>
+            <input id="s-ghtoken" type="password" value="${cfg.github_token||''}" placeholder="ghp_...">
+            <p class="hint">GitHub → Settings → Developer settings → Personal access tokens → Generate (check workflow scope).</p>
           </div>
         </div>
       </div>
@@ -545,7 +597,7 @@ async function renderSettings() {
             <div class="form-group"><label>Batch Size</label><input id="s-batch" type="number" min="1" value="${cfg.batch_size||'50'}"></div>
             <div class="form-group"><label>Daily Limit</label><input id="s-daily" type="number" value="${cfg.daily_limit||'300'}"></div>
           </div>
-          <p class="hint">Brevo free plan: 300/day. Paid: 9,000/day. Each step can override batch size and interval.</p>
+          <p class="hint">Brevo free plan: 300/day. Each step can override batch size and interval.</p>
         </div>
       </div>
       <div style="display:flex;gap:10px">
@@ -559,6 +611,8 @@ async function saveSettings() {
   const kvs = [
     ['brevo_api_key', document.getElementById('s-brevo').value.trim()],
     ['from_email', document.getElementById('s-from').value.trim()],
+    ['github_repo', document.getElementById('s-repo').value.trim()],
+    ['github_token', document.getElementById('s-ghtoken').value.trim()],
     ['emails_per_minute', document.getElementById('s-rate').value],
     ['batch_size', document.getElementById('s-batch').value],
     ['daily_limit', document.getElementById('s-daily').value],
@@ -575,7 +629,6 @@ function resetConn() {
   location.reload();
 }
 
-// ── Modal helpers ─────────────────────────────────────────────
 function showModal(html, wide) {
   const o = document.createElement('div');
   o.className = 'modal-overlay';
@@ -587,7 +640,6 @@ function showModal(html, wide) {
 function closeModal() { document.getElementById('modals').innerHTML = ''; }
 function esc(s) { return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
 
-// ── Boot ──────────────────────────────────────────────────────
 (function() {
   const url = localStorage.getItem('sb_url');
   const key = localStorage.getItem('sb_key');
