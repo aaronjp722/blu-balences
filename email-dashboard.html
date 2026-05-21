@@ -524,12 +524,16 @@ async function renderSettings() {
   document.getElementById('content').innerHTML = `
     <div style="max-width:560px">
       <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><h2>Listmonk Connection</h2></div>
+        <div class="panel-header"><h2>Brevo Connection</h2></div>
         <div style="padding:20px">
-          <div class="form-group"><label>Listmonk URL</label><input id="s-url" value="${cfg.listmonk_url||'http://localhost:9000'}"></div>
-          <div class="form-row-2">
-            <div class="form-group"><label>Username</label><input id="s-user" value="${cfg.listmonk_username||'admin'}"></div>
-            <div class="form-group"><label>Password</label><input id="s-pass" type="password" value="${cfg.listmonk_password||''}"></div>
+          <div class="form-group">
+            <label>Brevo API Key</label>
+            <input id="s-brevo" type="password" value="${cfg.brevo_api_key||''}" placeholder="xkeysib-...">
+            <p class="hint">Brevo dashboard → API Keys → Generate. This is NOT the SMTP key — it's the API key.</p>
+          </div>
+          <div class="form-group">
+            <label>From Email (default)</label>
+            <input id="s-from" value="${cfg.from_email||'Aaron <aaron@blubalencebookkeeping.com>'}">
           </div>
         </div>
       </div>
@@ -541,7 +545,7 @@ async function renderSettings() {
             <div class="form-group"><label>Batch Size</label><input id="s-batch" type="number" min="1" value="${cfg.batch_size||'50'}"></div>
             <div class="form-group"><label>Daily Limit</label><input id="s-daily" type="number" value="${cfg.daily_limit||'300'}"></div>
           </div>
-          <p class="hint">These are global defaults. Each step can override batch size and interval in its own settings.</p>
+          <p class="hint">Brevo free plan: 300/day. Paid: 9,000/day. Each step can override batch size and interval.</p>
         </div>
       </div>
       <div style="display:flex;gap:10px">
@@ -553,9 +557,8 @@ async function renderSettings() {
 
 async function saveSettings() {
   const kvs = [
-    ['listmonk_url', document.getElementById('s-url').value.trim()],
-    ['listmonk_username', document.getElementById('s-user').value.trim()],
-    ['listmonk_password', document.getElementById('s-pass').value],
+    ['brevo_api_key', document.getElementById('s-brevo').value.trim()],
+    ['from_email', document.getElementById('s-from').value.trim()],
     ['emails_per_minute', document.getElementById('s-rate').value],
     ['batch_size', document.getElementById('s-batch').value],
     ['daily_limit', document.getElementById('s-daily').value],
