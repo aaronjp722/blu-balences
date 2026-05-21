@@ -110,9 +110,9 @@ def main() -> int:
     cfg = {r["key"]: r["value"] for r in get("settings", "?select=key,value")}
 
     brevo_api_key = cfg.get("brevo_api_key", "").strip('"')
-    if not brevo_api_key:
-        log.error("brevo_api_key not set in Supabase settings table")
-        return 1
+if not brevo_api_key:
+    log.error("brevo_api_key not set in Supabase settings table")
+    return 1
 
     global_emails_per_minute = float(cfg.get("emails_per_minute", "2"))
     global_send_interval = 60.0 / global_emails_per_minute
