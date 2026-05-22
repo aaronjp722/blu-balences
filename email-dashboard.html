@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--blue:#1a56db;--blue-dark:#1141a8;--blue-light:#e8f0fe;--gray:#6b7280;--gray-light:#f3f4f6;--border:#e5e7eb;--text:#111827;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--purple:#8b5cf6}
+:root{--blue:#1a56db;--blue-dark:#1141a8;--blue-light:#e8f0fe;--gray:#6b7280;--gray-light:#f3f4f6;--border:#e5e7eb;--text:#111827;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--purple:#8b5cf6;--orange:#f97316}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--gray-light);color:var(--text);height:100vh;overflow:hidden}
 #config-screen{position:fixed;inset:0;background:var(--gray-light);display:flex;align-items:center;justify-content:center;z-index:200}
 #config-screen .box{background:#fff;border-radius:12px;padding:32px;width:440px;box-shadow:0 4px 24px rgba(0,0,0,.1)}
@@ -63,6 +63,7 @@ tr:hover td{background:#fafafa}
 .badge-red{background:#fee2e2;color:#991b1b}
 .badge-blue{background:var(--blue-light);color:var(--blue-dark)}
 .badge-purple{background:#ede9fe;color:#5b21b6}
+.badge-orange{background:#ffedd5;color:#9a3412}
 .toggle{position:relative;width:40px;height:22px;display:inline-block}
 .toggle input{opacity:0;width:0;height:0}
 .toggle-slider{position:absolute;inset:0;background:#d1d5db;border-radius:22px;cursor:pointer;transition:background .2s}
@@ -89,7 +90,6 @@ textarea{resize:vertical;min-height:80px}
 .priority-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600}
 .priority-later{background:#fef3c7;color:#92400e}
 .priority-seq{background:#e0e7ff;color:#3730a3}
-/* NEW */
 .tab-bar{display:flex;gap:2px;background:var(--gray-light);border-radius:8px;padding:3px;margin-bottom:20px;width:fit-content;border:1px solid var(--border)}
 .tab-btn{padding:7px 18px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--gray);transition:all .15s;font-family:inherit}
 .tab-btn.active{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1);font-weight:600}
@@ -98,9 +98,9 @@ textarea{resize:vertical;min-height:80px}
 .fg label{font-size:12px;font-weight:600;color:var(--gray);white-space:nowrap}
 .fg select,.fg input[type=text]{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff;font-family:inherit;outline:none}
 .fg select:focus,.fg input:focus{border-color:var(--blue)}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
-.stat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;text-align:center}
-.stat-card .sv{font-size:28px;font-weight:800;margin-bottom:3px;font-variant-numeric:tabular-nums;line-height:1}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.stat-card .sv{font-size:26px;font-weight:800;margin-bottom:3px;font-variant-numeric:tabular-nums;line-height:1}
 .stat-card .sl{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.05em}
 .stat-card .ss{font-size:11px;color:var(--gray);margin-top:3px}
 .days-grid{display:flex;gap:6px;flex-wrap:wrap}
@@ -170,7 +170,16 @@ textarea{resize:vertical;min-height:80px}
 let sb;
 let countdownInterval = null;
 let currentSubTab = 'contacts';
-let aF = { days: '30', seqId: '', status: '', search: '' }; // analytics filters
+let aF = { days: '30', seqId: '', status: '', search: '' };
+
+const BADGE_CLASS = {
+  opened:'badge-green', unique_opened:'badge-green', first_opening:'badge-green',
+  clicked:'badge-purple',
+  hard_bounce:'badge-yellow', soft_bounce:'badge-yellow',
+  spam:'badge-red', blocked:'badge-red', invalid:'badge-red', error:'badge-red',
+  deferred:'badge-gray', unsubscribe:'badge-gray', sent:'badge-gray',
+  proxy:'badge-blue', delivered:'badge-green',
+};
 
 function saveConfig() {
   const url = document.getElementById('cfg-url').value.trim();
@@ -207,7 +216,6 @@ async function navigate(tab) {
   else if (tab==='settings') await renderSettings();
 }
 
-// ── COUNTDOWN ────────────────────────────────────────────────────────────────
 function getNextSendMs(timeStr, tz) {
   if (!timeStr) return null;
   try {
@@ -230,7 +238,7 @@ function startCountdown(timeStr, tz) {
   tick(); countdownInterval = setInterval(tick, 1000);
 }
 function formatTime12(t) { if (!t) return ''; const [h,m]=t.split(':').map(Number); return `${h%12||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`; }
-function tzLabel(tz) { return ({  'America/New_York':'ET','America/Chicago':'CT','America/Denver':'MT','America/Los_Angeles':'PT','America/Anchorage':'AKT','Pacific/Honolulu':'HT' })[tz]||tz; }
+function tzLabel(tz) { return ({'America/New_York':'ET','America/Chicago':'CT','America/Denver':'MT','America/Los_Angeles':'PT'})[tz]||tz; }
 
 // ── DASHBOARD ────────────────────────────────────────────────────────────────
 async function renderDashboard() {
@@ -378,7 +386,6 @@ async function openSeqModal(id) {
           <option value="">None</option>
           ${(lists||[]).map(l=>`<option value="${l.id}" ${seq?.list_id===l.id?'selected':''}>${l.name}</option>`).join('')}
         </select>
-        <p class="hint">Use "Enroll List" in Subscribers to add members.</p>
       </div>
     </div>
     <div class="modal-footer">
@@ -445,7 +452,7 @@ async function saveStep(seqId,seqName,stepNum,stepId) {
 
 async function deleteStep(stepId,seqId){if(!confirm('Delete step?'))return;await sb.from('steps').delete().eq('id',stepId);const{data:seq}=await sb.from('sequences').select('name').eq('id',seqId).single();openStepsModal(seqId,seq?.name||'');}
 
-// ── SUBSCRIBERS (3 tabs) ─────────────────────────────────────────────────────
+// ── SUBSCRIBERS ───────────────────────────────────────────────────────────────
 async function renderSubscribers() {
   document.getElementById('topbar-actions').innerHTML = `
     <button class="btn btn-secondary" style="margin-right:8px" onclick="openBulkModal()">Bulk CSV</button>
@@ -464,462 +471,48 @@ function subAddBtn(){if(currentSubTab==='contacts')openContactModal();else if(cu
 function switchSubTab(t){currentSubTab=t;renderSubscribers();}
 async function loadSubTab(t){if(t==='contacts')await renderContactsTab();else if(t==='lists')await renderListsTab();else await renderEnrollmentsTab();}
 
-// CONTACTS TAB
 async function renderContactsTab() {
   const [{ data: contacts },{ data: unsubs }] = await Promise.all([
     sb.from('contacts').select('*').order('created_at',{ascending:false}),
     sb.from('unsubscribes').select('email'),
   ]);
   const bl = new Set((unsubs||[]).map(r=>r.email.toLowerCase()));
-  const el = document.getElementById('sub-content');
-  el.innerHTML = `
+  document.getElementById('sub-content').innerHTML = `
     <div class="panel">
       <div class="panel-header"><h2>Contacts (${(contacts||[]).length})</h2><button class="btn btn-secondary btn-sm" onclick="openBulkContactsModal()">Import CSV</button></div>
-      ${!contacts||!contacts.length ? '<div class="empty">No contacts yet. Add contacts manually or import via CSV.</div>' :
+      ${!contacts||!contacts.length ? '<div class="empty">No contacts yet.</div>' :
       `<table><thead><tr><th>Email</th><th>Name</th><th>Company</th><th>Status</th><th>Actions</th></tr></thead><tbody>
       ${(contacts||[]).map(c=>{const isbl=bl.has(c.email.toLowerCase())||c.status==='blacklisted';return`<tr>
-        <td>${c.email}</td>
-        <td>${[c.first_name,c.last_name].filter(Boolean).join(' ')||'—'}</td>
-        <td>${c.company||'—'}</td>
+        <td>${c.email}</td><td>${[c.first_name,c.last_name].filter(Boolean).join(' ')||'—'}</td><td>${c.company||'—'}</td>
         <td><span class="badge ${isbl?'badge-red':'badge-green'}">${isbl?'Blacklisted':'Active'}</span></td>
         <td><div class="actions">
           <button class="btn btn-secondary btn-sm" onclick="openContactModal('${c.id}')">Edit</button>
           <button class="btn btn-secondary btn-sm" onclick="addToListPrompt('${c.email}','${esc([c.first_name,c.last_name].filter(Boolean).join(' '))}')">+ List</button>
           ${isbl?`<button class="btn btn-secondary btn-sm" onclick="unBlacklist('${c.email}')">Unblock</button>`:`<button class="btn btn-danger btn-sm" onclick="blacklistContact('${c.email}')">Blacklist</button>`}
         </div></td>
-      </tr>`}).join('')}
-      </tbody></table>`}
+      </tr>`}).join('')}</tbody></table>`}
     </div>`;
 }
 
-function openContactModal(id) {
-  showModal(`<h2>${id?'Edit':'Add'} Contact</h2>
-    <div class="form-row-2"><div class="form-group"><label>First Name</label><input id="ct-fn"></div><div class="form-group"><label>Last Name</label><input id="ct-ln"></div></div>
-    <div class="form-group"><label>Email</label><input id="ct-email" type="email" ${id?'readonly style="opacity:.7"':''}></div>
-    <div class="form-group"><label>Company</label><input id="ct-co"></div>
-    <div class="form-group"><label>Phone</label><input id="ct-ph"></div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveContact('${id||''}')">Save</button></div>`);
-  if (id) sb.from('contacts').select('*').eq('id',id).single().then(({data:c})=>{if(!c)return;document.getElementById('ct-fn').value=c.first_name||'';document.getElementById('ct-ln').value=c.last_name||'';document.getElementById('ct-email').value=c.email||'';document.getElementById('ct-co').value=c.company||'';document.getElementById('ct-ph').value=c.phone||'';});
-}
+function openContactModal(id){showModal(`<h2>${id?'Edit':'Add'} Contact</h2><div class="form-row-2"><div class="form-group"><label>First Name</label><input id="ct-fn"></div><div class="form-group"><label>Last Name</label><input id="ct-ln"></div></div><div class="form-group"><label>Email</label><input id="ct-email" type="email" ${id?'readonly style="opacity:.7"':''}></div><div class="form-group"><label>Company</label><input id="ct-co"></div><div class="form-group"><label>Phone</label><input id="ct-ph"></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveContact('${id||''}')">Save</button></div>`);if(id)sb.from('contacts').select('*').eq('id',id).single().then(({data:c})=>{if(!c)return;document.getElementById('ct-fn').value=c.first_name||'';document.getElementById('ct-ln').value=c.last_name||'';document.getElementById('ct-email').value=c.email||'';document.getElementById('ct-co').value=c.company||'';document.getElementById('ct-ph').value=c.phone||'';});}
 
-async function saveContact(id) {
-  const payload={first_name:document.getElementById('ct-fn').value.trim(),last_name:document.getElementById('ct-ln').value.trim(),email:document.getElementById('ct-email').value.trim().toLowerCase(),company:document.getElementById('ct-co').value.trim(),phone:document.getElementById('ct-ph').value.trim()};
-  if (!payload.email){alert('Email required');return;}
-  let error;
-  if (id)({error}=await sb.from('contacts').update(payload).eq('id',id));
-  else({error}=await sb.from('contacts').insert(payload));
-  if (error){alert(error.message);return;}
-  closeModal();renderContactsTab();
-}
-
+async function saveContact(id){const payload={first_name:document.getElementById('ct-fn').value.trim(),last_name:document.getElementById('ct-ln').value.trim(),email:document.getElementById('ct-email').value.trim().toLowerCase(),company:document.getElementById('ct-co').value.trim(),phone:document.getElementById('ct-ph').value.trim()};if(!payload.email){alert('Email required');return;}let error;if(id)({error}=await sb.from('contacts').update(payload).eq('id',id));else({error}=await sb.from('contacts').insert(payload));if(error){alert(error.message);return;}closeModal();renderContactsTab();}
 async function blacklistContact(email){if(!confirm(`Blacklist ${email}?`))return;await sb.from('unsubscribes').upsert({email,unsubscribed_at:new Date().toISOString()},{onConflict:'email'});await sb.from('enrollments').update({status:'unsubscribed'}).eq('email',email);renderContactsTab();}
 async function unBlacklist(email){if(!confirm(`Remove ${email} from blacklist?`))return;await sb.from('unsubscribes').delete().eq('email',email);renderContactsTab();}
 
-async function addToListPrompt(email,name) {
-  const { data: lists } = await sb.from('lists').select('id,name').order('name');
-  showModal(`<h2>Add to List</h2>
-    <p style="font-size:14px;color:var(--gray);margin-bottom:16px">Adding: <strong>${email}</strong></p>
-    <div class="form-group"><label>Select List</label><select id="atl-list"><option value="">Select…</option>${(lists||[]).map(l=>`<option value="${l.id}">${l.name}</option>`).join('')}</select></div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doAddToList('${email}','${esc(name)}')">Add</button></div>`);
-}
+async function addToListPrompt(email,name){const{data:lists}=await sb.from('lists').select('id,name').order('name');showModal(`<h2>Add to List</h2><p style="font-size:14px;color:var(--gray);margin-bottom:16px">Adding: <strong>${email}</strong></p><div class="form-group"><label>Select List</label><select id="atl-list"><option value="">Select…</option>${(lists||[]).map(l=>`<option value="${l.id}">${l.name}</option>`).join('')}</select></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doAddToList('${email}','${esc(name)}')">Add</button></div>`);}
+async function doAddToList(email,name){const listId=document.getElementById('atl-list').value;if(!listId){alert('Select a list');return;}const{error}=await sb.from('list_contacts').upsert({list_id:parseInt(listId),email,name:name||null},{onConflict:'list_id,email',ignoreDuplicates:true});if(error){alert(error.message);return;}closeModal();}
 
-async function doAddToList(email,name){const listId=document.getElementById('atl-list').value;if(!listId){alert('Select a list');return;}const{error}=await sb.from('list_contacts').upsert({list_id:listId,email,name:name||null},{onConflict:'list_id,email',ignoreDuplicates:true});if(error){alert(error.message);return;}closeModal();}
-
-async function openBulkContactsModal() {
-  showModal(`<h2>Import Contacts via CSV</h2>
-    <div class="form-group"><label>One per line: <code>email, First Last, Company</code></label><textarea id="bct-csv" style="min-height:160px" placeholder="john@example.com, John Smith, Acme Realty&#10;jane@example.com, Jane Doe"></textarea></div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doBulkContacts()">Import</button></div>`);
-}
-
+async function openBulkContactsModal(){showModal(`<h2>Import Contacts via CSV</h2><div class="form-group"><label>One per line: email, First Last, Company</label><textarea id="bct-csv" style="min-height:160px" placeholder="john@example.com, John Smith, Acme&#10;jane@example.com, Jane Doe"></textarea></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doBulkContacts()">Import</button></div>`);}
 async function doBulkContacts(){const csv=document.getElementById('bct-csv').value.trim();if(!csv)return;const rows=csv.split('\n').map(line=>{const[email,...rest]=line.split(',').map(s=>s.trim());if(!email||!email.includes('@'))return null;const[first,...lrest]=((rest[0]||'').split(' '));return{email:email.toLowerCase(),first_name:first||null,last_name:lrest.join(' ')||null,company:rest[1]||null};}).filter(Boolean);if(!rows.length){alert('No valid emails');return;}const{error}=await sb.from('contacts').upsert(rows,{onConflict:'email',ignoreDuplicates:true});if(error){alert(error.message);return;}closeModal();renderContactsTab();}
 
-// LISTS TAB
-async function renderListsTab() {
-  const { data: lists } = await sb.from('lists').select('id,name,description,created_at').order('created_at');
-  const el = document.getElementById('sub-content');
-  el.innerHTML = `
-    <div class="panel">
-      <div class="panel-header"><h2>Lists</h2><button class="btn btn-primary btn-sm" onclick="openListModal()">+ New List</button></div>
-      ${!lists||!lists.length ? '<div class="empty">No lists yet. Create a list to organize contacts.</div>' :
-      `<table><thead><tr><th>Name</th><th>Description</th><th>Members</th><th>Actions</th></tr></thead><tbody>
-      ${lists.map(l=>`<tr>
-        <td><strong>${l.name}</strong></td>
-        <td style="color:var(--gray)">${l.description||'—'}</td>
-        <td id="lc-${l.id}">—</td>
-        <td><div class="actions">
-          <button class="btn btn-secondary btn-sm" onclick="viewListMembers('${l.id}','${esc(l.name)}')">Members</button>
-          <button class="btn btn-ghost btn-sm" onclick="enrollListToSeq('${l.id}','${esc(l.name)}')">Enroll to Sequence</button>
-          <button class="btn btn-secondary btn-sm" onclick="openListModal('${l.id}','${esc(l.name)}','${esc(l.description||'')}')">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteList('${l.id}')">Delete</button>
-        </div></td>
-      </tr>`).join('')}
-      </tbody></table>`}
-    </div>`;
-  (lists||[]).forEach(async l=>{const{count}=await sb.from('list_contacts').select('id',{count:'exact',head:true}).eq('list_id',l.id);const e=document.getElementById(`lc-${l.id}`);if(e)e.textContent=count||0;});
-}
+async function renderListsTab(){const{data:lists}=await sb.from('lists').select('id,name,description,created_at').order('created_at');document.getElementById('sub-content').innerHTML=`<div class="panel"><div class="panel-header"><h2>Lists</h2><button class="btn btn-primary btn-sm" onclick="openListModal()">+ New List</button></div>${!lists||!lists.length?'<div class="empty">No lists yet.</div>':`<table><thead><tr><th>Name</th><th>Description</th><th>Members</th><th>Actions</th></tr></thead><tbody>${lists.map(l=>`<tr><td><strong>${l.name}</strong></td><td style="color:var(--gray)">${l.description||'—'}</td><td id="lc-${l.id}">—</td><td><div class="actions"><button class="btn btn-secondary btn-sm" onclick="viewListMembers('${l.id}','${esc(l.name)}')">Members</button><button class="btn btn-ghost btn-sm" onclick="enrollListToSeq('${l.id}','${esc(l.name)}')">Enroll to Sequence</button><button class="btn btn-secondary btn-sm" onclick="openListModal('${l.id}','${esc(l.name)}','${esc(l.description||'')}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteList('${l.id}')">Delete</button></div></td></tr>`).join('')}</tbody></table>`}</div>`;(lists||[]).forEach(async l=>{const{count}=await sb.from('list_contacts').select('id',{count:'exact',head:true}).eq('list_id',l.id);const e=document.getElementById(`lc-${l.id}`);if(e)e.textContent=count||0;});}
 
 function openListModal(id,name,desc){showModal(`<h2>${id?'Edit':'New'} List</h2><div class="form-group"><label>Name</label><input id="ls-name" value="${name||''}"></div><div class="form-group"><label>Description</label><textarea id="ls-desc">${desc||''}</textarea></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveList('${id||''}')">Save</button></div>`);}
-
 async function saveList(id){const name=document.getElementById('ls-name').value.trim(),description=document.getElementById('ls-desc').value.trim();if(!name){alert('Name required');return;}let error;if(id)({error}=await sb.from('lists').update({name,description}).eq('id',id));else({error}=await sb.from('lists').insert({name,description}));if(error){alert(error.message);return;}closeModal();renderListsTab();}
-async function deleteList(id){if(!confirm('Delete list? Members are not deleted.'))return;await sb.from('lists').delete().eq('id',id);renderListsTab();}
+async function deleteList(id){if(!confirm('Delete list?'))return;await sb.from('lists').delete().eq('id',id);renderListsTab();}
 
-async function viewListMembers(listId,listName) {
-  const { data: members } = await sb.from('list_contacts').select('id,email,name,company,added_at').eq('list_id',listId).order('added_at',{ascending:false});
-  showModal(`<h2>${listName} (${(members||[]).length} members)</h2>
-    <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button class="btn btn-primary btn-sm" onclick="bulkAddToListModal('${listId}','${esc(listName)}')">+ Bulk CSV</button>
-    </div>
-    ${!members||!members.length?'<div class="empty">No members.</div>':`<table><thead><tr><th>Email</th><th>Name</th><th>Company</th><th></th></tr></thead><tbody>${members.map(m=>`<tr><td>${m.email}</td><td>${m.name||'—'}</td><td>${m.company||'—'}</td><td><button class="btn btn-danger btn-sm" onclick="removeListMember('${m.id}','${listId}','${esc(listName)}')">Remove</button></td></tr>`).join('')}</tbody></table>`}
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Close</button></div>`,true);
-}
-
+async function viewListMembers(listId,listName){const{data:members}=await sb.from('list_contacts').select('id,email,name,added_at').eq('list_id',listId).order('added_at',{ascending:false});showModal(`<h2>${listName} (${(members||[]).length} members)</h2><div style="margin-bottom:16px"><button class="btn btn-primary btn-sm" onclick="bulkAddToListModal('${listId}','${esc(listName)}')">+ Bulk CSV</button></div>${!members||!members.length?'<div class="empty">No members.</div>':`<table><thead><tr><th>Email</th><th>Name</th><th></th></tr></thead><tbody>${members.map(m=>`<tr><td>${m.email}</td><td>${m.name||'—'}</td><td><button class="btn btn-danger btn-sm" onclick="removeListMember('${m.id}','${listId}','${esc(listName)}')">Remove</button></td></tr>`).join('')}</tbody></table>`}<div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Close</button></div>`,true);}
 async function removeListMember(id,listId,listName){await sb.from('list_contacts').delete().eq('id',id);viewListMembers(listId,listName);}
-
-async function bulkAddToListModal(listId,listName){showModal(`<h2>Bulk Add to "${listName}"</h2><div class="form-group"><label>One per line: <code>email, Name, Company</code></label><textarea id="batl-csv" style="min-height:160px" placeholder="john@example.com, John Smith&#10;jane@example.com"></textarea></div><div class="modal-footer"><button class="btn btn-secondary" onclick="viewListMembers('${listId}','${esc(listName)}')">Back</button><button class="btn btn-primary" onclick="doBulkAddToList('${listId}','${esc(listName)}')">Add All</button></div>`);}
-
-async function doBulkAddToList(listId,listName){const csv=document.getElementById('batl-csv').value.trim();if(!csv)return;const rows=csv.split('\n').map(line=>{const[email,...rest]=line.split(',').map(s=>s.trim());return email&&email.includes('@')?{list_id:listId,email,name:rest[0]||null,company:rest[1]||null}:null;}).filter(Boolean);if(!rows.length){alert('No valid emails');return;}const{error}=await sb.from('list_contacts').upsert(rows,{onConflict:'list_id,email',ignoreDuplicates:true});if(error){alert(error.message);return;}viewListMembers(listId,listName);}
-
-async function enrollListToSeq(listId,listName) {
-  const { data: seqs } = await sb.from('sequences').select('id,name').eq('active',true);
-  showModal(`<h2>Enroll "${listName}" to Sequence</h2>
-    <p style="font-size:14px;color:var(--gray);margin-bottom:16px">All contacts in this list will be enrolled in the selected sequence.</p>
-    <div class="form-group"><label>Sequence</label><select id="els-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doEnrollList('${listId}')">Enroll All</button></div>`);
-}
-
-async function doEnrollList(listId){const seqId=document.getElementById('els-seq').value;if(!seqId){alert('Select a sequence');return;}const{data:members}=await sb.from('list_contacts').select('email,name').eq('list_id',listId);if(!members||!members.length){alert('No members in list');return;}const rows=members.map(m=>({email:m.email,name:m.name||null,sequence_id:seqId,current_step:0,status:'active'}));const{error}=await sb.from('enrollments').upsert(rows,{onConflict:'email,sequence_id',ignoreDuplicates:true});if(error){alert(error.message);return;}alert(`Enrolled ${members.length} contact(s)!`);closeModal();}
-
-// ENROLLMENTS TAB
-async function renderEnrollmentsTab() {
-  const { data: enrs } = await sb.from('enrollments').select('*,sequences(name)').order('enrolled_at',{ascending:false});
-  const badge = s=>({active:'badge-green',paused:'badge-yellow',completed:'badge-blue',unsubscribed:'badge-red'}[s]||'badge-gray');
-  document.getElementById('sub-content').innerHTML = `
-    <div class="panel">
-      <div class="panel-header"><h2>Enrollments (${(enrs||[]).length})</h2></div>
-      ${!enrs||!enrs.length?'<div class="empty">No enrollments yet.</div>':
-      `<table><thead><tr><th>Email</th><th>Name</th><th>Sequence</th><th>Step</th><th>Status</th><th>Last Sent</th><th>Actions</th></tr></thead><tbody>
-      ${enrs.map(e=>`<tr>
-        <td>${e.email}</td><td>${e.name||'—'}</td><td>${e.sequences?.name||'—'}</td>
-        <td>Step ${e.current_step}</td>
-        <td><span class="badge ${badge(e.status)}">${e.status}</span></td>
-        <td>${e.last_sent_at?new Date(e.last_sent_at).toLocaleDateString():'Not yet'}</td>
-        <td><div class="actions">
-          ${e.status==='active'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','paused')">Pause</button>`:e.status==='paused'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','active')">Resume</button>`:''}
-          <button class="btn btn-danger btn-sm" onclick="removeEnr('${e.id}')">Remove</button>
-        </div></td>
-      </tr>`).join('')}
-      </tbody></table>`}
-    </div>`;
-}
-
-async function setStatus(id,status){await sb.from('enrollments').update({status}).eq('id',id);renderEnrollmentsTab();}
-async function removeEnr(id){if(!confirm('Remove enrollment?'))return;await sb.from('enrollments').delete().eq('id',id);renderEnrollmentsTab();}
-
-async function openEnrollModal(){const{data:seqs}=await sb.from('sequences').select('id,name').eq('active',true);showModal(`<h2>Enroll Subscriber</h2><div class="form-group"><label>Email</label><input id="en-email" type="email"></div><div class="form-group"><label>Name</label><input id="en-name"></div><div class="form-group"><label>Sequence</label><select id="en-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="enrollOne()">Enroll</button></div>`);}
-async function enrollOne(){const email=document.getElementById('en-email').value.trim(),name=document.getElementById('en-name').value.trim(),sequence_id=document.getElementById('en-seq').value;if(!email||!sequence_id){alert('Email and sequence required');return;}const{error}=await sb.from('enrollments').insert({email,name,sequence_id,current_step:0,status:'active'});if(error){alert(error.message);return;}closeModal();renderEnrollmentsTab();}
-async function openBulkModal(){const{data:seqs}=await sb.from('sequences').select('id,name').eq('active',true);showModal(`<h2>Bulk Enroll via CSV</h2><div class="form-group"><label>Sequence</label><select id="bl-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div><div class="form-group"><label>One per line: <code>email, Name</code></label><textarea id="bl-csv" style="min-height:160px"></textarea></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="bulkEnroll()">Enroll All</button></div>`);}
-async function bulkEnroll(){const seq=document.getElementById('bl-seq').value,csv=document.getElementById('bl-csv').value.trim();if(!seq||!csv){alert('Sequence and CSV required');return;}const rows=csv.split('\n').map(line=>{const[email,...rest]=line.split(',').map(s=>s.trim());return email&&email.includes('@')?{email,name:rest.join(' ').trim()||null,sequence_id:seq,current_step:0,status:'active'}:null;}).filter(Boolean);if(!rows.length){alert('No valid emails');return;}const{error}=await sb.from('enrollments').upsert(rows,{onConflict:'email,sequence_id',ignoreDuplicates:true});if(error){alert(error.message);return;}closeModal();renderEnrollmentsTab();}
-
-// ── ANALYTICS ────────────────────────────────────────────────────────────────
-async function renderAnalytics() {
-  let logQ = sb.from('send_log').select('id,sent_at,step_number,brevo_message_id,enrollments(email,sequences(id,name))').order('sent_at',{ascending:false}).limit(2000);
-  if (aF.days!=='all') logQ=logQ.gte('sent_at',new Date(Date.now()-parseInt(aF.days)*86400000).toISOString());
-  const [{ data: logs },{ data: seqs },{ data: events }] = await Promise.all([
-    logQ,
-    sb.from('sequences').select('id,name'),
-    sb.from('email_events').select('event_type,email,message_id').limit(10000),
-  ]);
-
-  let filtered = (logs||[]);
-  if (aF.seqId) filtered=filtered.filter(l=>l.enrollments?.sequences?.id===aF.seqId);
-  if (aF.search){const s=aF.search.toLowerCase();filtered=filtered.filter(l=>(l.enrollments?.email||'').toLowerCase().includes(s));}
-
-  const evtMap={};
-  (events||[]).forEach(e=>{if(!e.message_id)return;if(!evtMap[e.message_id])evtMap[e.message_id]=[];evtMap[e.message_id].push(e.event_type);});
-
-  let opened=0,clicked=0,bounced=0,spam=0;
-  if (aF.status&&aF.status!=='all') filtered=filtered.filter(l=>(evtMap[l.brevo_message_id]||[]).includes(aF.status));
-  filtered.forEach(l=>{const ev=evtMap[l.brevo_message_id]||[];if(ev.includes('opened'))opened++;if(ev.includes('clicked'))clicked++;if(ev.includes('bounced'))bounced++;if(ev.includes('spam'))spam++;});
-
-  const total=filtered.length;
-  const pct=n=>total?(n/total*100).toFixed(1)+'%':'—';
-  const hasEv=(events||[]).length>0;
-
-  // per-sequence breakdown
-  const bySeq={};
-  filtered.forEach(l=>{const k=l.enrollments?.sequences?.name||'(none)';if(!bySeq[k])bySeq[k]={sent:0,opened:0,clicked:0,bounced:0,spam:0};bySeq[k].sent++;const ev=evtMap[l.brevo_message_id]||[];if(ev.includes('opened'))bySeq[k].opened++;if(ev.includes('clicked'))bySeq[k].clicked++;if(ev.includes('bounced'))bySeq[k].bounced++;if(ev.includes('spam'))bySeq[k].spam++;});
-
-  // per-receiving-domain
-  const byDom={};
-  filtered.forEach(l=>{const e=l.enrollments?.email||'';const d=e.split('@')[1]||'unknown';if(!byDom[d])byDom[d]={sent:0,opened:0};byDom[d].sent++;if((evtMap[l.brevo_message_id]||[]).includes('opened'))byDom[d].opened++;});
-  const topDoms=Object.entries(byDom).sort((a,b)=>b[1].sent-a[1].sent).slice(0,10);
-
-  document.getElementById('content').innerHTML = `
-    ${!hasEv?`<div class="info-banner"><strong>Webhook tracking not set up.</strong> Open rate, click rate, and spam rate require Brevo webhooks → a Supabase Edge Function that inserts into the <code>email_events</code> table. Without it, send counts are still tracked.</div>`:''}
-
-    <div class="filter-bar">
-      <div class="fg"><label>Range</label><select onchange="aF.days=this.value;renderAnalytics()">
-        <option value="7" ${aF.days==='7'?'selected':''}>Last 7 days</option>
-        <option value="30" ${aF.days==='30'?'selected':''}>Last 30 days</option>
-        <option value="90" ${aF.days==='90'?'selected':''}>Last 90 days</option>
-        <option value="all" ${aF.days==='all'?'selected':''}>All time</option>
-      </select></div>
-      <div class="fg"><label>Sequence</label><select onchange="aF.seqId=this.value;renderAnalytics()">
-        <option value="">All</option>${(seqs||[]).map(s=>`<option value="${s.id}" ${aF.seqId===s.id?'selected':''}>${s.name}</option>`).join('')}
-      </select></div>
-      <div class="fg"><label>Status</label><select onchange="aF.status=this.value;renderAnalytics()">
-        <option value="">All</option>
-        <option value="opened" ${aF.status==='opened'?'selected':''}>Opened</option>
-        <option value="clicked" ${aF.status==='clicked'?'selected':''}>Clicked</option>
-        <option value="bounced" ${aF.status==='bounced'?'selected':''}>Bounced</option>
-        <option value="spam" ${aF.status==='spam'?'selected':''}>Spam</option>
-      </select></div>
-      <div class="fg"><label>Search</label><input type="text" placeholder="Filter by email…" value="${aF.search}" oninput="aF.search=this.value;renderAnalytics()" style="width:180px"></div>
-      <button class="btn btn-secondary btn-sm" onclick="aF={days:'30',seqId:'',status:'',search:''};renderAnalytics()">Reset</button>
-    </div>
-
-    <div class="stat-grid">
-      <div class="stat-card"><div class="sv" style="color:var(--blue)">${total.toLocaleString()}</div><div class="sl">Sent</div></div>
-      <div class="stat-card"><div class="sv" style="color:${hasEv?'var(--green)':'var(--gray)'}">${hasEv?pct(opened):'—'}</div><div class="sl">Open Rate</div><div class="ss">${hasEv?opened+' opened':'Webhooks needed'}</div></div>
-      <div class="stat-card"><div class="sv" style="color:${hasEv?'var(--purple)':'var(--gray)'}">${hasEv?pct(clicked):'—'}</div><div class="sl">Click Rate</div><div class="ss">${hasEv?clicked+' clicked':'Webhooks needed'}</div></div>
-      <div class="stat-card"><div class="sv" style="color:${hasEv?'var(--yellow)':'var(--gray)'}">${hasEv?pct(bounced):'—'}</div><div class="sl">Bounce Rate</div><div class="ss">${hasEv?bounced+' bounced':'Webhooks needed'}</div></div>
-      <div class="stat-card"><div class="sv" style="color:${hasEv?'var(--red)':'var(--gray)'}">${hasEv?pct(spam):'—'}</div><div class="sl">Spam Rate</div><div class="ss">${hasEv?spam+' reported':'Webhooks needed'}</div></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-header"><h2>By Sequence</h2></div>
-      ${Object.keys(bySeq).length===0?'<div class="empty">No data</div>':`<table><thead><tr><th>Sequence</th><th>Sent</th><th>Open%</th><th>Click%</th><th>Bounce%</th><th>Spam%</th></tr></thead><tbody>
-      ${Object.entries(bySeq).sort((a,b)=>b[1].sent-a[1].sent).map(([name,d])=>{const p=n=>d.sent?((n/d.sent)*100).toFixed(1)+'%':'—';return`<tr><td><strong>${name}</strong></td><td>${d.sent}</td><td>${hasEv?p(d.opened):'—'}</td><td>${hasEv?p(d.clicked):'—'}</td><td>${hasEv?p(d.bounced):'—'}</td><td>${hasEv?p(d.spam):'—'}</td></tr>`;}).join('')}
-      </tbody></table>`}
-    </div>
-
-    <div class="panel">
-      <div class="panel-header"><h2>By Receiving Domain (top 10)</h2></div>
-      ${topDoms.length===0?'<div class="empty">No data</div>':`<table><thead><tr><th>Domain</th><th>Sent</th><th>Open Rate</th></tr></thead><tbody>
-      ${topDoms.map(([dom,d])=>`<tr><td>@${dom}</td><td>${d.sent}</td><td>${hasEv&&d.sent?((d.opened/d.sent)*100).toFixed(1)+'%':'—'}</td></tr>`).join('')}
-      </tbody></table>`}
-    </div>
-
-    <div class="panel">
-      <div class="panel-header"><h2>Send Log (${filtered.length})</h2><button class="btn btn-secondary btn-sm" onclick="renderAnalytics()">Refresh</button></div>
-      ${filtered.length===0?'<div class="empty">No sends match filters.</div>':`<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Events</th><th>Message ID</th></tr></thead><tbody>
-      ${filtered.slice(0,300).map(l=>{const ev=[...new Set(evtMap[l.brevo_message_id]||[])];const evBadges=ev.map(t=>`<span class="badge ${{opened:'badge-green',clicked:'badge-purple',bounced:'badge-yellow',spam:'badge-red'}[t]||'badge-gray'}">${t}</span>`).join(' ');return`<tr><td>${new Date(l.sent_at).toLocaleString()}</td><td>${l.enrollments?.email||'—'}</td><td>${l.enrollments?.sequences?.name||'—'}</td><td>Step ${l.step_number}</td><td>${evBadges||'<span class="badge badge-gray">sent</span>'}</td><td style="font-size:11px;color:var(--gray)">${l.brevo_message_id||'—'}</td></tr>`;}).join('')}
-      </tbody></table>`}
-    </div>`;
-}
-
-// ── TEST EMAIL ────────────────────────────────────────────────────────────────
-async function renderTestEmail() {
-  const { data: rows } = await sb.from('settings').select('key,value');
-  const cfg = Object.fromEntries((rows||[]).map(r=>[r.key,cfgVal(r.value)]));
-  document.getElementById('content').innerHTML = `
-    <div style="max-width:600px">
-      <div class="panel">
-        <div class="panel-header"><h2>Send a Test Email</h2><span style="font-size:12px;color:var(--gray)">Sends directly via Brevo — no sequences</span></div>
-        <div style="padding:24px">
-          <div class="form-group"><label>To</label><input id="te-to" type="email" placeholder="you@example.com"></div>
-          <div class="form-group"><label>From</label><input id="te-from" value="${cfg.from_email||'Aaron <aaron@blubalencebookkeeping.com>'}"></div>
-          <div class="form-group"><label>Subject</label><input id="te-subject" placeholder="Test from Blu Balence"></div>
-          <div class="form-group"><label>Body</label><textarea id="te-body" style="min-height:200px" placeholder="Hi there,&#10;&#10;This is a test.&#10;&#10;Best, Aaron"></textarea></div>
-          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-            <button class="btn btn-primary" id="te-btn" onclick="sendTestEmail()">&#9654; Send Test</button>
-            <span id="te-status" style="font-size:14px;color:var(--gray)"></span>
-          </div>
-          <div id="te-result" class="test-result"></div>
-        </div>
-      </div>
-      <div class="panel" style="margin-top:20px">
-        <div class="panel-header"><h2>Recent Test Sends</h2></div>
-        <div id="te-log"><div class="empty">Loading…</div></div>
-      </div>
-    </div>`;
-  await refreshTestLog();
-}
-
-async function refreshTestLog() {
-  const el = document.getElementById('te-log'); if (!el) return;
-  const { data: logs } = await sb.from('test_send_log').select('*').order('sent_at',{ascending:false}).limit(20);
-  if (!logs||!logs.length){el.innerHTML='<div class="empty">No test emails yet.</div>';return;}
-  el.innerHTML=`<table><thead><tr><th>Sent At</th><th>To</th><th>Subject</th><th>Status</th><th>Message ID</th></tr></thead><tbody>${logs.map(l=>`<tr><td>${new Date(l.sent_at).toLocaleString()}</td><td>${l.to_email}</td><td>${l.subject}</td><td><span class="badge ${l.status==='sent'?'badge-green':'badge-red'}">${l.status}</span></td><td style="font-size:11px;color:var(--gray)">${l.message_id||'—'}</td></tr>`).join('')}</tbody></table>`;
-}
-
-async function sendTestEmail() {
-  const btn=document.getElementById('te-btn'),statusEl=document.getElementById('te-status'),resultEl=document.getElementById('te-result');
-  const to=document.getElementById('te-to').value.trim(),fromRaw=document.getElementById('te-from').value.trim(),subject=document.getElementById('te-subject').value.trim(),body=document.getElementById('te-body').value.trim();
-  if (!to||!subject||!body){statusEl.textContent='To, Subject, and Body required.';statusEl.style.color='var(--red)';return;}
-  const fm=fromRaw.match(/^(.+?)\s*<(.+?)>$/);
-  const fromName=fm?fm[1].trim():'';const fromEmail=fm?fm[2].trim():fromRaw;
-  const { data: rows } = await sb.from('settings').select('key,value');
-  const cfg=Object.fromEntries((rows||[]).map(r=>[r.key,cfgVal(r.value)]));
-  const apiKey=cfg.brevo_api_key;
-  if (!apiKey){statusEl.textContent='Brevo API key not set in Settings.';statusEl.style.color='var(--red)';return;}
-  btn.disabled=true;statusEl.textContent='Sending…';statusEl.style.color='var(--gray)';resultEl.style.display='none';
-  const isHtml=body.trim().startsWith('<');
-  try {
-    const res=await fetch('https://api.brevo.com/v3/smtp/email',{method:'POST',headers:{'api-key':apiKey,'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({sender:{name:fromName||'Blu Balence',email:fromEmail},to:[{email:to}],subject,...(isHtml?{htmlContent:body}:{textContent:body})})});
-    const json=await res.json();
-    if (res.ok&&json.messageId){statusEl.textContent='';resultEl.className='test-result success';resultEl.textContent=`✓ Sent! Message ID: ${json.messageId}`;resultEl.style.display='block';await sb.from('test_send_log').insert({to_email:to,from_email:fromEmail,subject,status:'sent',message_id:json.messageId,sent_at:new Date().toISOString()});refreshTestLog();}
-    else{resultEl.className='test-result error';resultEl.textContent=`✗ Failed: ${json.message||JSON.stringify(json)}`;resultEl.style.display='block';await sb.from('test_send_log').insert({to_email:to,from_email:fromEmail,subject,status:'failed',message_id:null,sent_at:new Date().toISOString()});refreshTestLog();}
-  } catch(e){resultEl.className='test-result error';resultEl.textContent=`✗ Request failed: ${e.message}`;resultEl.style.display='block';}
-  btn.disabled=false;
-}
-
-// ── SETTINGS ─────────────────────────────────────────────────────────────────
-async function renderSettings() {
-  const { data: rows } = await sb.from('settings').select('key,value');
-  const cfg = Object.fromEntries((rows||[]).map(r=>[r.key,cfgVal(r.value)]));
-  const activeDays = (cfg.send_days||'mon,tue,wed,thu,fri').split(',').map(d=>d.trim());
-  const days=[{v:'mon',l:'Mon'},{v:'tue',l:'Tue'},{v:'wed',l:'Wed'},{v:'thu',l:'Thu'},{v:'fri',l:'Fri'},{v:'sat',l:'Sat'},{v:'sun',l:'Sun'}];
-
-  document.getElementById('content').innerHTML = `
-    <div style="max-width:680px">
-
-      <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><h2>Daily Send Schedule</h2></div>
-        <div style="padding:20px">
-          <div class="form-row-2">
-            <div class="form-group"><label>Send Time (24hr)</label><input id="s-time" type="time" value="${cfg.send_time||'09:00'}"><p class="hint">Match your drip.yml cron schedule.</p></div>
-            <div class="form-group"><label>Timezone</label><select id="s-tz">
-              <option value="America/New_York" ${(cfg.send_timezone||'America/New_York')==='America/New_York'?'selected':''}>Eastern (ET)</option>
-              <option value="America/Chicago" ${cfg.send_timezone==='America/Chicago'?'selected':''}>Central (CT)</option>
-              <option value="America/Denver" ${cfg.send_timezone==='America/Denver'?'selected':''}>Mountain (MT)</option>
-              <option value="America/Los_Angeles" ${cfg.send_timezone==='America/Los_Angeles'?'selected':''}>Pacific (PT)</option>
-            </select></div>
-          </div>
-          <div class="form-group">
-            <label>Send Days</label>
-            <div class="days-grid" id="days-grid">
-              ${days.map(d=>`<button type="button" class="day-chip ${activeDays.includes(d.v)?'on':''}" data-day="${d.v}" onclick="this.classList.toggle('on')">${d.l}</button>`).join('')}
-            </div>
-            <p class="hint">The drip script checks this before sending. Default Mon–Fri.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><h2>Brevo Connection (Default)</h2></div>
-        <div style="padding:20px">
-          <div class="form-group"><label>Brevo API Key</label><input id="s-brevo" type="password" value="${cfg.brevo_api_key||''}" placeholder="xkeysib-..."></div>
-          <div class="form-group"><label>From Email</label><input id="s-from" value="${cfg.from_email||'Aaron <aaron@blubalencebookkeeping.com>'}"></div>
-        </div>
-      </div>
-
-      <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><h2>Sending Accounts (Inboxes)</h2><button class="btn btn-primary btn-sm" onclick="openAccountModal()">+ Add Inbox</button></div>
-        <div style="padding:16px 20px"><div id="accounts-list"><div style="color:var(--gray);font-size:14px;padding:8px 0">Loading…</div></div></div>
-        <div style="padding:12px 16px;background:#fffbeb;border-top:1px solid var(--border);font-size:13px;color:#92400e">Add multiple sending accounts (different domains/inboxes). Assign one to a sequence for per-inbox volume control.</div>
-      </div>
-
-      <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><h2>Per-Domain Receiving Limits</h2><button class="btn btn-secondary btn-sm" onclick="openDomainLimitModal()">+ Add Limit</button></div>
-        <div id="domain-limits-list"><div style="padding:20px;color:var(--gray);font-size:14px">Loading…</div></div>
-        <div style="padding:12px 16px;background:#fffbeb;border-top:1px solid var(--border);font-size:13px;color:#92400e">Limit daily sends to a receiving domain. Example: gmail.com = 20/day prevents Gmail spam filters.</div>
-      </div>
-
-      <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><h2>GitHub Actions</h2></div>
-        <div style="padding:20px">
-          <div class="form-group"><label>GitHub Repo</label><input id="s-repo" value="${cfg.github_repo||'aaronjp722/blu-balences'}"></div>
-          <div class="form-group"><label>GitHub Token</label><input id="s-ghtoken" type="password" value="${cfg.github_token||''}" placeholder="ghp_..."><p class="hint">Needs workflow scope.</p></div>
-        </div>
-      </div>
-
-      <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><h2>Send Rate (Global Defaults)</h2></div>
-        <div style="padding:20px">
-          <div class="form-row">
-            <div class="form-group"><label>Emails / Min</label><input id="s-rate" type="number" min="1" max="60" value="${cfg.emails_per_minute||'2'}"></div>
-            <div class="form-group"><label>Batch Size</label><input id="s-batch" type="number" value="${cfg.batch_size||'50'}"></div>
-            <div class="form-group"><label>Daily Limit</label><input id="s-daily" type="number" value="${cfg.daily_limit||'300'}"></div>
-          </div>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:10px">
-        <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
-        <button class="btn btn-secondary" onclick="resetConn()">Change Supabase Connection</button>
-      </div>
-    </div>`;
-
-  loadAccounts();
-  loadDomainLimits();
-}
-
-async function saveSettings() {
-  const sendDays = [...document.querySelectorAll('.day-chip.on')].map(b=>b.dataset.day).join(',');
-  const kvs = [
-    ['send_time', document.getElementById('s-time').value],
-    ['send_timezone', document.getElementById('s-tz').value],
-    ['send_days', sendDays],
-    ['brevo_api_key', document.getElementById('s-brevo').value.trim()],
-    ['from_email', document.getElementById('s-from').value.trim()],
-    ['github_repo', document.getElementById('s-repo').value.trim()],
-    ['github_token', document.getElementById('s-ghtoken').value.trim()],
-    ['emails_per_minute', document.getElementById('s-rate').value],
-    ['batch_size', document.getElementById('s-batch').value],
-    ['daily_limit', document.getElementById('s-daily').value],
-  ];
-  for (const [key,value] of kvs) await sb.from('settings').upsert({key,value},{onConflict:'key'});
-  alert('Settings saved!');
-}
-
-// SENDING ACCOUNTS
-async function loadAccounts() {
-  const el=document.getElementById('accounts-list'); if (!el) return;
-  const { data: accs } = await sb.from('sending_accounts').select('*').order('created_at');
-  if (!accs||!accs.length){el.innerHTML='<div style="color:var(--gray);font-size:14px;padding:8px 0">No extra accounts. Default is the Brevo key above.</div>';return;}
-  el.innerHTML=accs.map(a=>`<div class="account-card"><div class="account-info"><div class="account-name">${a.name}</div><div class="account-meta">${a.from_name?a.from_name+' ':''}&lt;${a.from_email}&gt; · Daily limit: ${a.daily_limit}</div></div><div style="display:flex;align-items:center;gap:8px"><span class="badge ${a.active?'badge-green':'badge-gray'}">${a.active?'Active':'Paused'}</span><button class="btn btn-secondary btn-sm" onclick="openAccountModal('${a.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteAccount('${a.id}')">Delete</button></div></div>`).join('');
-}
-
-function openAccountModal(id) {
-  showModal(`<h2>${id?'Edit':'Add'} Sending Account</h2>
-    <div class="form-group"><label>Account Name</label><input id="ac-name" placeholder="Primary, Gmail Backup, etc."></div>
-    <div class="form-row-2">
-      <div class="form-group"><label>From Email</label><input id="ac-email" placeholder="aaron@domain.com"></div>
-      <div class="form-group"><label>From Name</label><input id="ac-fname" placeholder="Aaron Parker"></div>
-    </div>
-    <div class="form-group"><label>Brevo API Key</label><input id="ac-key" type="password" placeholder="xkeysib-..."></div>
-    <div class="form-row-2">
-      <div class="form-group"><label>Daily Send Limit</label><input id="ac-daily" type="number" value="300" min="1"></div>
-      <div class="form-group"><label style="display:flex;align-items:center;gap:8px;margin-bottom:10px">Active <label class="toggle" style="margin:0"><input type="checkbox" id="ac-active" checked><span class="toggle-slider"></span></label></label></div>
-    </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveAccount('${id||''}')">Save</button></div>`);
-  if (id) sb.from('sending_accounts').select('*').eq('id',id).single().then(({data:a})=>{if(!a)return;document.getElementById('ac-name').value=a.name||'';document.getElementById('ac-email').value=a.from_email||'';document.getElementById('ac-fname').value=a.from_name||'';document.getElementById('ac-key').value=a.brevo_api_key||'';document.getElementById('ac-daily').value=a.daily_limit||300;document.getElementById('ac-active').checked=a.active!==false;});
-}
-
-async function saveAccount(id) {
-  const payload={name:document.getElementById('ac-name').value.trim(),from_email:document.getElementById('ac-email').value.trim(),from_name:document.getElementById('ac-fname').value.trim(),brevo_api_key:document.getElementById('ac-key').value.trim(),daily_limit:parseInt(document.getElementById('ac-daily').value)||300,active:document.getElementById('ac-active').checked};
-  if (!payload.name||!payload.from_email||!payload.brevo_api_key){alert('Name, From Email, and API Key required');return;}
-  let error;
-  if (id)({error}=await sb.from('sending_accounts').update(payload).eq('id',id));
-  else({error}=await sb.from('sending_accounts').insert(payload));
-  if (error){alert(error.message);return;}
-  closeModal();loadAccounts();
-}
-
-async function deleteAccount(id){if(!confirm('Delete this account?'))return;await sb.from('sending_accounts').delete().eq('id',id);loadAccounts();}
-
-// DOMAIN LIMITS
-async function loadDomainLimits() {
-  const el=document.getElementById('domain-limits-list'); if (!el) return;
-  const { data: limits } = await sb.from('domain_limits').select('*').order('domain');
-  if (!limits||!limits.length){el.innerHTML='<div style="padding:20px;color:var(--gray);font-size:14px">No domain limits set.</div>';return;}
-  el.innerHTML=`<table><thead><tr><th>Domain</th><th>Daily Limit</th><th>Status</th><th>Actions</th></tr></thead><tbody>${limits.map(l=>`<tr><td>@${l.domain}</td><td>${l.daily_limit}/day</td><td><span class="badge ${l.active?'badge-green':'badge-gray'}">${l.active?'Active':'Off'}</span></td><td><div class="actions"><button class="btn btn-secondary btn-sm" onclick="openDomainLimitModal('${l.id}','${l.domain}','${l.daily_limit}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteDomainLimit('${l.id}')">Delete</button></div></td></tr>`).join('')}</tbody></table>`;
-}
-
-function openDomainLimitModal(id,domain,limit){showModal(`<h2>${id?'Edit':'Add'} Domain Limit</h2><div class="form-group"><label>Domain</label><input id="dl-dom" value="${domain||''}" placeholder="gmail.com"><p class="hint">Just the domain — no @ symbol. e.g. gmail.com, yahoo.com</p></div><div class="form-group"><label>Daily Limit</label><input id="dl-lim" type="number" value="${limit||20}" min="1"><p class="hint">Max emails/day to this domain. Recommended: 20 for Gmail, 10 for Yahoo.</p></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveDomainLimit('${id||''}')">Save</button></div>`);}
-
-async function saveDomainLimit(id){const domain=document.getElementById('dl-dom').value.trim().toLowerCase().replace('@',''),daily_limit=parseInt(document.getElementById('dl-lim').value);if(!domain){alert('Domain required');return;}let error;if(id)({error}=await sb.from('domain_limits').update({domain,daily_limit}).eq('id',id));else({error}=await sb.from('domain_limits').insert({domain,daily_limit,active:true}));if(error){alert(error.message);return;}closeModal();loadDomainLimits();}
-async function deleteDomainLimit(id){if(!confirm('Remove limit?'))return;await sb.from('domain_limits').delete().eq('id',id);loadDomainLimits();}
-
-function resetConn(){localStorage.removeItem('sb_url');localStorage.removeItem('sb_key');location.reload();}
-
-// ── HELPERS ──────────────────────────────────────────────────────────────────
-function showModal(html,wide){const o=document.createElement('div');o.className='modal-overlay';o.innerHTML=`<div class="modal" style="${wide?'width:720px':''}">${html}</div>`;o.addEventListener('click',e=>{if(e.target===o)closeModal();});document.getElementById('modals').innerHTML='';document.getElementById('modals').appendChild(o);}
-function closeModal(){document.getElementById('modals').innerHTML='';}
-function esc(s){return(s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
-
-(function(){const url=localStorage.getItem('sb_url'),key=localStorage.getItem('sb_key');if(url&&key)boot(url,key);})();
-</script>
-</body>
-</html>
+async function bulkAddToListModal(listId,listName){showModal(`<h2>Bulk Add to "${listName}"</h2><div class="form-group"><label>One per line: email, Name</label><textarea id="batl-csv" style="min-height:160px" placeholder="john@example.com, John Smith&#10;jane@example.com"></textarea></div><div class="modal-footer"><button class="btn btn-secondary" onclick="viewListMembers('${listId}','${esc(listName)}')">Back</button><button class="btn btn-primary" onclick="doBulkAddToList('${listId}','${esc(listName)}')">Add All</button></div>`);}
+async function doBulkAddToList(listId,listName){const csv=document.getElementById('batl-csv').value.trim();if(!csv)return;const rows=csv.split('\n').map(line=>{const[email,...rest]=line.split(',').map(s=>s.trim());return email&&email.includes('@
