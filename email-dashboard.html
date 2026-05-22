@@ -752,3 +752,438 @@ async function bulkEnroll() {
   if (error) { alert(error.message); return; }
   closeModal(); renderSubscribers();
 }
+/* ─── ANALYTICS ─── */
+async function renderAnalytics() {
+  const BADGE = {
+    opened:'badge-green', clicked:'badge-purple', bounced:'badge-yellow',
+    softBounce:'badge-yellow', hardBounce:'badge-yellow', spam:'badge-red',
+    unsubscribed:'badge-red', delivered:'badge-blue', deferred:'badge-yellow',
+    error:'badge-red', sent:'badge-gray', blocked:'badge-yellow', invalid_email:'badge-red',
+  };
+  const cutoff = aF.days ? new Date(Date.now() - parseInt(aF.days) * 86400000).toISOString() : null;
+  const [{ data: seqs }, { data: logs }, { data: evts }] = await Promise.all([
+    sb.from('sequences').select('id,name').order('name'),
+    sb.from('send_log').select('id,sent_at,step_number,brevo_message_id,enrollment_id,enrollments(email,name,sequence_id,sequences(name))').order('sent_at', { ascending: false }).limit(1000),
+    sb.from('email_events').select('message_id,email,event_type,event_at').limit(2000),
+  ]);
+  const evByMsg = {};
+  (evts||[]).forEach(e => { if (!evByMsg[e.message_id]) evByMsg[e.message_id] = []; evByMsg[e.message_id].push(e); });
+  let filteredLogs = logs || [];
+  if (cutoff) filteredLogs = filteredLogs.filter(l => l.sent_at >= cutoff);
+  if (aF.seqId) filteredLogs = filteredLogs.filter(l => l.enrollments?.sequence_id === aF.seqId);
+  if (aF.search) { const q = aF.search.toLowerCase(); filteredLogs = filteredLogs.filter(l => (l.enrollments?.email||'').toLowerCase().includes(q) || (l.enrollments?.sequences?.name||'').toLowerCase().includes(q)); }
+  const totalSent = filteredLogs.length;
+  const evCounts = {};
+  filteredLogs.forEach(l => { (evByMsg[l.brevo_message_id]||[]).forEach(e => { evCounts[e.event_type] = (evCounts[e.event_type]||0)+1; }); });
+  const opens=evCounts['opened']||0, clicks=evCounts['clicked']||0;
+  const bounces=(evCounts['bounced']||0)+(evCounts['softBounce']||0)+(evCounts['hardBounce']||0);
+  const unsubs=evCounts['unsubscribed']||0, spam=evCounts['spam']||0, delivered=evCounts['delivered']||0;
+  const hasWebhook = evts && evts.length > 0;
+  const openRate=totalSent>0?(opens/totalSent*100).toFixed(1):'0.0';
+  const clickRate=totalSent>0?(clicks/totalSent*100).toFixed(1):'0.0';
+  const bounceRate=totalSent>0?(bounces/totalSent*100).toFixed(1):'0.0';
+  const bySeq = {};
+  filteredLogs.forEach(l => {
+    const sid=l.enrollments?.sequence_id||'unknown', sname=l.enrollments?.sequences?.name||'Unknown';
+    if (!bySeq[sid]) bySeq[sid]={name:sname,sent:0,opens:0,clicks:0};
+    bySeq[sid].sent++;
+    (evByMsg[l.brevo_message_id]||[]).forEach(e => { if(e.event_type==='opened') bySeq[sid].opens++; if(e.event_type==='clicked') bySeq[sid].clicks++; });
+  });
+  const domainMap = {};
+  filteredLogs.forEach(l => { const dom=(l.enrollments?.email||'').split('@')[1]||'unknown'; domainMap[dom]=(domainMap[dom]||0)+1; });
+  const topDomains = Object.entries(domainMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+
+  document.getElementById('content').innerHTML = `
+    ${!hasWebhook?`<div class="info-banner">ℹ️ <strong>Open &amp; click tracking requires Brevo webhooks.</strong> Set up the <code>brevo-webhook</code> Supabase Edge Function and point your Brevo webhook URL there.</div>`:''}
+    <div class="filter-bar">
+      <div class="fg"><label>Date Range</label>
+        <select onchange="aF.days=this.value;renderAnalytics()">
+          <option value="7" ${aF.days==='7'?'selected':''}>Last 7 days</option>
+          <option value="30" ${aF.days==='30'?'selected':''}>Last 30 days</option>
+          <option value="90" ${aF.days==='90'?'selected':''}>Last 90 days</option>
+          <option value="" ${aF.days===''?'selected':''}>All time</option>
+        </select>
+      </div>
+      <div class="fg"><label>Sequence</label>
+        <select onchange="aF.seqId=this.value;renderAnalytics()">
+          <option value="">All sequences</option>
+          ${(seqs||[]).map(s=>`<option value="${s.id}" ${aF.seqId===s.id?'selected':''}>${s.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg"><label>Search email</label>
+        <input type="text" placeholder="Search…" value="${aF.search||''}" oninput="aF.search=this.value;renderAnalytics()" style="width:180px">
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="sv">${totalSent}</div><div class="sl">Sent</div></div>
+      <div class="stat-card"><div class="sv" style="color:var(--blue)">${delivered}</div><div class="sl">Delivered</div></div>
+      <div class="stat-card"><div class="sv" style="color:var(--green)">${opens}</div><div class="sl">Opened</div><div class="ss">${openRate}%</div></div>
+      <div class="stat-card"><div class="sv" style="color:var(--purple)">${clicks}</div><div class="sl">Clicked</div><div class="ss">${clickRate}%</div></div>
+      <div class="stat-card"><div class="sv" style="color:var(--yellow)">${bounces}</div><div class="sl">Bounced</div><div class="ss">${bounceRate}%</div></div>
+      <div class="stat-card"><div class="sv" style="color:var(--red)">${unsubs}</div><div class="sl">Unsubs</div></div>
+      <div class="stat-card"><div class="sv" style="color:var(--red)">${spam}</div><div class="sl">Spam</div></div>
+    </div>
+    ${Object.keys(bySeq).length>1?`<div class="panel" style="margin-bottom:20px"><div class="panel-header"><h2>By Sequence</h2></div>
+      <table><thead><tr><th>Sequence</th><th>Sent</th><th>Opens</th><th>Open Rate</th><th>Clicks</th><th>Click Rate</th></tr></thead><tbody>
+      ${Object.values(bySeq).sort((a,b)=>b.sent-a.sent).map(s=>`<tr><td><strong>${s.name}</strong></td><td>${s.sent}</td><td>${s.opens}</td><td>${s.sent>0?(s.opens/s.sent*100).toFixed(1):0}%</td><td>${s.clicks}</td><td>${s.sent>0?(s.clicks/s.sent*100).toFixed(1):0}%</td></tr>`).join('')}
+      </tbody></table></div>`:''}
+    ${topDomains.length?`<div class="panel" style="margin-bottom:20px"><div class="panel-header"><h2>Top Domains</h2></div>
+      <table><thead><tr><th>Domain</th><th>Count</th></tr></thead><tbody>
+      ${topDomains.map(([d,c])=>`<tr><td>${d}</td><td>${c}</td></tr>`).join('')}
+      </tbody></table></div>`:''}
+    <div class="panel"><div class="panel-header"><h2>Send Log</h2></div>
+      ${!filteredLogs.length?'<div class="empty">No sends found for the selected filters.</div>':
+      `<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Events</th></tr></thead><tbody>
+      ${filteredLogs.slice(0,200).map(l=>{
+        const evs=evByMsg[l.brevo_message_id]||[];
+        const badges=evs.map(e=>`<span class="badge ${BADGE[e.event_type]||'badge-gray'}">${e.event_type}</span>`).join(' ');
+        return `<tr><td>${new Date(l.sent_at).toLocaleString()}</td><td>${l.enrollments?.email||'—'}</td><td>${l.enrollments?.sequences?.name||'—'}</td><td>Step ${l.step_number}</td><td>${badges||'<span class="badge badge-gray">sent</span>'}</td></tr>`;
+      }).join('')}</tbody></table>`}
+    </div>`;
+}
+
+/* ─── SETTINGS ─── */
+async function renderSettings() {
+  const { data: rows } = await sb.from('settings').select('key,value');
+  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
+  const activeDays = (cfg.send_days || 'mon,tue,wed,thu,fri').split(',').map(d => d.trim());
+  const days = [{v:'mon',l:'Mon'},{v:'tue',l:'Tue'},{v:'wed',l:'Wed'},{v:'thu',l:'Thu'},{v:'fri',l:'Fri'},{v:'sat',l:'Sat'},{v:'sun',l:'Sun'}];
+  document.getElementById('content').innerHTML = `
+    <div style="max-width:560px">
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><h2>Brevo Connection</h2></div>
+        <div style="padding:20px">
+          <div class="form-group"><label>Brevo API Key</label><input id="s-brevo" type="password" value="${cfg.brevo_api_key||''}" placeholder="xkeysib-..."><p class="hint">Brevo dashboard → API Keys → Generate.</p></div>
+          <div class="form-group"><label>From Email (default)</label><input id="s-from" value="${cfg.from_email||'Aaron <aaron@blubalencebookkeeping.com>'}"></div>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><h2>GitHub Actions</h2></div>
+        <div style="padding:20px">
+          <div class="form-group"><label>GitHub Repo <span style="color:var(--gray);font-weight:400">(owner/repo)</span></label><input id="s-repo" value="${cfg.github_repo||'aaronjp722/blu-balences'}"></div>
+          <div class="form-group"><label>GitHub Token <span style="color:var(--gray);font-weight:400">(needs workflow scope)</span></label><input id="s-ghtoken" type="password" value="${cfg.github_token||''}" placeholder="ghp_..."><p class="hint">GitHub → Settings → Developer settings → Personal access tokens.</p></div>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><h2>Daily Send Schedule</h2></div>
+        <div style="padding:20px">
+          <div class="form-row-2">
+            <div class="form-group"><label>Send Time</label><input id="s-time" type="time" value="${cfg.send_time||'09:00'}"><p class="hint">Global auto-trigger time (tab must be open).</p></div>
+            <div class="form-group"><label>Timezone</label>
+              <select id="s-tz">${['America/New_York','America/Chicago','America/Denver','America/Los_Angeles','America/Phoenix','UTC'].map(tz=>`<option value="${tz}" ${(cfg.send_timezone||'America/New_York')===tz?'selected':''}>${tz}</option>`).join('')}</select>
+            </div>
+          </div>
+          <div class="form-group"><label>Send Days</label>
+            <div class="days-grid">${days.map(d=>`<button type="button" class="day-chip ${activeDays.includes(d.v)?'on':''}" data-day="${d.v}" onclick="this.classList.toggle('on')">${d.l}</button>`).join('')}</div>
+            <p class="hint" style="margin-top:8px">Blue = active. Per-sequence schedules are set in Sequences → Edit.</p>
+          </div>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><h2>Send Rate (Global Defaults)</h2></div>
+        <div style="padding:20px">
+          <div class="form-row">
+            <div class="form-group"><label>Emails / Min</label><input id="s-rate" type="number" min="1" max="60" value="${cfg.emails_per_minute||'2'}"></div>
+            <div class="form-group"><label>Batch Size</label><input id="s-batch" type="number" min="1" value="${cfg.batch_size||'50'}"></div>
+            <div class="form-group"><label>Daily Limit</label><input id="s-daily" type="number" value="${cfg.daily_limit||'300'}"></div>
+          </div>
+          <p class="hint">Brevo free plan: 300/day.</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+        <button class="btn btn-secondary" onclick="resetConn()">Change Supabase Connection</button>
+      </div>
+    </div>`;
+}
+
+async function saveSettings() {
+  const sendDays = Array.from(document.querySelectorAll('.day-chip.on')).map(el => el.dataset.day).join(',');
+  const kvs = [
+    ['brevo_api_key', document.getElementById('s-brevo').value.trim()],
+    ['from_email', document.getElementById('s-from').value.trim()],
+    ['github_repo', document.getElementById('s-repo').value.trim()],
+    ['github_token', document.getElementById('s-ghtoken').value.trim()],
+    ['emails_per_minute', document.getElementById('s-rate').value],
+    ['batch_size', document.getElementById('s-batch').value],
+    ['daily_limit', document.getElementById('s-daily').value],
+    ['send_time', document.getElementById('s-time').value],
+    ['send_timezone', document.getElementById('s-tz').value],
+    ['send_days', sendDays],
+  ];
+  for (const [key, value] of kvs) await sb.from('settings').upsert({ key, value }, { onConflict: 'key' });
+  alert('Settings saved!');
+  initAutoSend();
+}
+
+function resetConn() { localStorage.removeItem('sb_url'); localStorage.removeItem('sb_key'); location.reload(); }
+
+/* ─── AUTO-SEND ─── */
+async function triggerDrip(token, repo) {
+  const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/drip.yml/dispatches`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ref: 'main' }),
+  });
+  return r.status === 204;
+}
+
+function initAutoSend() {
+  if (window._autoSendTimer) clearInterval(window._autoSendTimer);
+  window._autoSendTimer = setInterval(async () => {
+    try {
+      const { data: rows } = await sb.from('settings').select('key,value');
+      const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
+      const token = cfg.github_token || '', repo = cfg.github_repo || '';
+      if (!token || !repo) return;
+      const tz = cfg.send_timezone || 'America/New_York';
+      const now = new Date();
+      const str = now.toLocaleString('en-US', { timeZone: tz, hour12: false, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', weekday:'short' });
+      const m = str.match(/(\w+),\s+(\d+)\/(\d+)\/(\d+),\s+(\d+):(\d+)/);
+      if (!m) return;
+      const [, dayName, month, day, year, hour, minute] = m;
+      const currentTime = `${hour.padStart(2,'0')}:${minute.padStart(2,'0')}`;
+      const dayMap = {Sun:'sun',Mon:'mon',Tue:'tue',Wed:'wed',Thu:'thu',Fri:'fri',Sat:'sat'};
+      const currentDay = dayMap[dayName] || '';
+      const dateKey = `${year}-${month}-${day}`;
+
+      // Global schedule
+      const globalTime = cfg.send_time || '';
+      if (globalTime) {
+        const globalDays = (cfg.send_days||'mon,tue,wed,thu,fri').split(',').map(d=>d.trim());
+        const sk = `auto_sent_${dateKey}_${globalTime}`;
+        if (currentTime === globalTime && globalDays.includes(currentDay) && !sessionStorage.getItem(sk)) {
+          sessionStorage.setItem(sk, '1');
+          const ok = await triggerDrip(token, repo);
+          console.log(`[auto-send] Global trigger: ${ok ? 'ok' : 'failed'}`);
+        }
+      }
+
+      // Per-sequence schedules
+      const { data: seqRows } = await sb.from('sequences').select('id,name,send_time,send_days,active').eq('active', true);
+      for (const seq of (seqRows||[])) {
+        if (!seq.send_time) continue;
+        const seqDays = (seq.send_days || cfg.send_days || 'mon,tue,wed,thu,fri').split(',').map(d=>d.trim());
+        const sk = `auto_sent_seq_${seq.id}_${dateKey}_${seq.send_time}`;
+        if (currentTime === seq.send_time && seqDays.includes(currentDay) && !sessionStorage.getItem(sk)) {
+          sessionStorage.setItem(sk, '1');
+          const ok = await triggerDrip(token, repo);
+          console.log(`[auto-send] Seq "${seq.name}" trigger: ${ok ? 'ok' : 'failed'}`);
+        }
+      }
+    } catch(e) { console.warn('[auto-send] error:', e.message); }
+  }, 30000);
+}
+  /* ─── INBOXES ─── */
+async function renderInboxes() {
+  const { data: inboxes } = await sb.from('inboxes').select('*').order('created_at');
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openInboxModal()">+ Add Inbox</button>`;
+  document.getElementById('content').innerHTML = `
+    <div class="info-banner">ℹ️ Each inbox is a sending email address with its own Brevo API key. Use multiple inboxes to rotate senders or manage separate accounts.</div>
+    ${!inboxes||!inboxes.length ? '<div class="panel"><div class="empty">No inboxes yet. Add one to get started.</div></div>' :
+    (inboxes.map(inbox => `
+      <div class="inbox-card">
+        <div class="inbox-info">
+          <div class="inbox-name">${inbox.name}</div>
+          <div class="inbox-email">${inbox.email}${inbox.reply_to?` · Reply-To: ${inbox.reply_to}`:''}</div>
+          <div class="inbox-hint">API Key: ${inbox.brevo_api_key ? '••••••••' + inbox.brevo_api_key.slice(-4) : 'not set'} · ${inbox.active?'<span style="color:var(--green)">Active</span>':'<span style="color:var(--gray)">Inactive</span>'}</div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-secondary btn-sm" onclick="openInboxModal('${inbox.id}','${esc(inbox.name)}','${esc(inbox.email)}','${esc(inbox.reply_to||'')}','${esc(inbox.brevo_api_key||'')}',${inbox.active})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteInbox('${inbox.id}')">Delete</button>
+        </div>
+      </div>`).join(''))}`;
+}
+
+function openInboxModal(id, name, email, replyTo, apiKey, active) {
+  showModal(`
+    <h2>${id ? 'Edit' : 'New'} Inbox</h2>
+    <div class="form-group"><label>Display Name</label><input id="ib-name" value="${name||''}" placeholder="Aaron — Blu Balence"></div>
+    <div class="form-group"><label>From Email</label><input id="ib-email" value="${email||''}" placeholder="aaron@blubalencebookkeeping.com"></div>
+    <div class="form-group"><label>Reply-To <span style="color:var(--gray);font-weight:400">(optional)</span></label><input id="ib-replyto" value="${replyTo||''}" placeholder="replies@yourdomain.com"></div>
+    <div class="form-group"><label>Brevo API Key <span style="color:var(--gray);font-weight:400">(leave blank to use global)</span></label><input id="ib-apikey" type="password" value="${apiKey||''}" placeholder="xkeysib-..."></div>
+    <div class="form-group" style="display:flex;align-items:center;gap:10px">
+      <label class="toggle"><input id="ib-active" type="checkbox" ${active!==false?'checked':''}><span class="toggle-slider"></span></label>
+      <span style="font-size:14px">Active</span>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveInbox('${id||''}')">Save</button>
+    </div>`);
+}
+
+async function saveInbox(id) {
+  const payload = {
+    name: document.getElementById('ib-name').value.trim(),
+    email: document.getElementById('ib-email').value.trim(),
+    reply_to: document.getElementById('ib-replyto').value.trim() || null,
+    brevo_api_key: document.getElementById('ib-apikey').value.trim() || null,
+    active: document.getElementById('ib-active').checked,
+  };
+  if (!payload.name || !payload.email) { alert('Name and email are required'); return; }
+  let error;
+  if (id) ({ error } = await sb.from('inboxes').update(payload).eq('id', id));
+  else ({ error } = await sb.from('inboxes').insert(payload));
+  if (error) { alert('Save failed: ' + error.message); return; }
+  closeModal(); renderInboxes();
+}
+
+async function deleteInbox(id) {
+  if (!confirm('Delete this inbox?')) return;
+  await sb.from('inboxes').delete().eq('id', id);
+  renderInboxes();
+}
+
+/* ─── REPLIES ─── */
+let replyFilter = 'all';
+
+async function refreshUnreadBadge() {
+  try {
+    const { count } = await sb.from('replies').select('id', { count: 'exact', head: true }).eq('read', false);
+    const badge = document.getElementById('nav-replies-badge');
+    if (!badge) return;
+    if (count > 0) { badge.textContent = count; badge.style.display = 'inline-block'; }
+    else badge.style.display = 'none';
+  } catch(e) {}
+}
+
+async function renderReplies() {
+  let query = sb.from('replies').select('*').order('received_at', { ascending: false }).limit(200);
+  if (replyFilter === 'unread') query = query.eq('read', false);
+  if (replyFilter === 'replied') query = query.not('replied_at', 'is', null);
+  const { data: replies } = await query;
+
+  const { data: inboxes } = await sb.from('inboxes').select('id,name,email,brevo_api_key').eq('active', true);
+  const { data: settRows } = await sb.from('settings').select('key,value');
+  const cfg = Object.fromEntries((settRows||[]).map(r => [r.key, cfgVal(r.value)]));
+  window._replyInboxes = inboxes || [];
+  window._replyCfg = cfg;
+
+  const unread = (replies||[]).filter(r => !r.read).length;
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-secondary btn-sm" onclick="renderReplies()">Refresh</button>`;
+
+  document.getElementById('content').innerHTML = `
+    <div class="info-banner">ℹ️ Replies are stored in Supabase when someone replies to your emails. You need the <code>replies</code> table and a webhook/forwarding rule to populate it. See SQL below.</div>
+    <div class="filter-bar" style="margin-bottom:16px">
+      <button class="btn ${replyFilter==='all'?'btn-primary':'btn-secondary'} btn-sm" onclick="replyFilter='all';renderReplies()">All (${(replies||[]).length})</button>
+      <button class="btn ${replyFilter==='unread'?'btn-primary':'btn-secondary'} btn-sm" onclick="replyFilter='unread';renderReplies()">Unread${unread>0?` (${unread})`:''}</button>
+      <button class="btn ${replyFilter==='replied'?'btn-primary':'btn-secondary'} btn-sm" onclick="replyFilter='replied';renderReplies()">Replied</button>
+    </div>
+    ${!replies||!replies.length ? '<div class="panel"><div class="empty">No replies yet.</div></div>' :
+    replies.map(r => `
+      <div class="reply-card ${!r.read?'unread':''}" onclick="openReplyModal('${r.id}')">
+        <div class="reply-meta">
+          <div class="reply-from">${r.from_name||r.from_email} ${!r.read?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--blue);margin-left:4px;vertical-align:middle"></span>':''}</div>
+          <div class="reply-subj">${r.subject||'(no subject)'}</div>
+          <div class="reply-preview">${(r.body_text||'').replace(/\n/g,' ').slice(0,120)}</div>
+          ${r.replied_at?`<div style="margin-top:6px"><span class="badge badge-green" style="font-size:11px">Replied ${new Date(r.replied_at).toLocaleDateString()}</span></div>`:''}
+        </div>
+        <div class="reply-time">${new Date(r.received_at).toLocaleDateString()}<br><span style="color:var(--gray)">${new Date(r.received_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span></div>
+      </div>`).join('')}`;
+
+  refreshUnreadBadge();
+}
+
+async function openReplyModal(replyId) {
+  // Mark as read
+  await sb.from('replies').update({ read: true }).eq('id', replyId);
+  const { data: r } = await sb.from('replies').select('*').eq('id', replyId).single();
+  if (!r) return;
+
+  const inboxOpts = window._replyInboxes && window._replyInboxes.length
+    ? window._replyInboxes.map(ib => `<option value="${ib.id}">${ib.name} &lt;${ib.email}&gt;</option>`).join('')
+    : `<option value="">Global (${window._replyCfg?.from_email||'from settings'})</option>`;
+
+  showModal(`
+    <h2>Reply to ${r.from_name||r.from_email}</h2>
+    <div style="font-size:13px;color:var(--gray);margin-bottom:12px">
+      <strong>From:</strong> ${r.from_name ? `${r.from_name} &lt;${r.from_email}&gt;` : r.from_email}<br>
+      <strong>To:</strong> ${r.to_email||'—'}<br>
+      <strong>Subject:</strong> ${r.subject||'(no subject)'}<br>
+      <strong>Received:</strong> ${new Date(r.received_at).toLocaleString()}
+    </div>
+    <div class="reply-thread">${(r.body_text||r.body_html||'(empty)').replace(/</g,'&lt;')}</div>
+    ${r.replied_at ? `<div class="info-banner" style="margin-bottom:12px">✓ You replied on ${new Date(r.replied_at).toLocaleString()}<br><em>${(r.reply_body||'').slice(0,200)}</em></div>` : ''}
+    <div class="section-title">Compose Reply</div>
+    ${window._replyInboxes && window._replyInboxes.length > 1 ? `<div class="form-group"><label>Send From</label><select id="rp-inbox">${inboxOpts}</select></div>` : ''}
+    <div class="form-group"><label>Subject</label><input id="rp-subj" value="Re: ${esc(r.subject||'')}"></div>
+    <div class="form-group"><label>Message</label><textarea id="rp-body" style="min-height:140px" placeholder="Hi ${r.from_name||'there'},
+
+Thanks for your response...
+
+Best,
+Aaron
+Blu Balence Bookkeeping"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+      <button class="btn btn-primary" onclick="sendReplyEmail('${r.id}','${esc(r.from_email)}')">Send Reply</button>
+    </div>`, true);
+
+  refreshUnreadBadge();
+}
+
+async function sendReplyEmail(replyId, toEmail) {
+  const subject = document.getElementById('rp-subj').value.trim();
+  const body = document.getElementById('rp-body').value.trim();
+  if (!body) { alert('Message is required'); return; }
+
+  const inboxEl = document.getElementById('rp-inbox');
+  let fromEmail, fromName, brevoKey;
+
+  if (inboxEl && inboxEl.value) {
+    const inbox = (window._replyInboxes||[]).find(ib => ib.id === inboxEl.value);
+    if (inbox) {
+      fromEmail = inbox.email;
+      fromName = inbox.name;
+      brevoKey = inbox.brevo_api_key || window._replyCfg?.brevo_api_key;
+    }
+  }
+  if (!fromEmail) {
+    const raw = window._replyCfg?.from_email || '';
+    const m = raw.match(/^(.+?)\s*<(.+?)>\s*$/);
+    fromEmail = m ? m[2] : raw;
+    fromName = m ? m[1] : '';
+    brevoKey = window._replyCfg?.brevo_api_key;
+  }
+  if (!brevoKey) { alert('No Brevo API key found. Add one in Settings or to the inbox.'); return; }
+
+  const htmlBody = '<html><body>' + body.replace(/\n/g,'<br>') + '</body></html>';
+  try {
+    const r = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: { 'api-key': brevoKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sender: { email: fromEmail, name: fromName || fromEmail },
+        to: [{ email: toEmail }],
+        subject,
+        htmlContent: htmlBody,
+      }),
+    });
+    if (!r.ok) { const e = await r.text(); alert('Send failed: ' + e); return; }
+    await sb.from('replies').update({ replied_at: new Date().toISOString(), reply_body: body }).eq('id', replyId);
+    closeModal();
+    renderReplies();
+    alert('Reply sent!');
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+/* ─── SHARED ─── */
+function showModal(html, wide) {
+  const o = document.createElement('div');
+  o.className = 'modal-overlay';
+  o.innerHTML = `<div class="modal" style="${wide?'width:720px':''}">${html}</div>`;
+  o.addEventListener('click', e => { if (e.target === o) closeModal(); });
+  document.getElementById('modals').innerHTML = '';
+  document.getElementById('modals').appendChild(o);
+}
+function closeModal() { document.getElementById('modals').innerHTML = ''; }
+function esc(s) { return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+(function() {
+  const url = localStorage.getItem('sb_url');
+  const key = localStorage.getItem('sb_key');
+  if (url && key) boot(url, key);
+})();
+</script>
+</body>
+</html>
