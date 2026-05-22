@@ -696,4 +696,59 @@ async function renderSubscribers() {
 }
 
 async function setStatus(id, status) { await sb.from('enrollments').update({ status }).eq('id', id); renderSubscribers(); }
-async
+async function removeEnr(id) {
+  if (!confirm('Remove this enrollment?')) return;
+  sb.from('enrollments').delete().eq('id', id).then(() => renderSubscribers());
+}
+
+async function openEnrollModal() {
+  const { data: seqs } = await sb.from('sequences').select('id,name').eq('active', true);
+  showModal(`
+    <h2>Enroll Subscriber</h2>
+    <div class="form-group"><label>Email</label><input id="en-email" type="email" placeholder="prospect@example.com"></div>
+    <div class="form-group"><label>Name</label><input id="en-name" placeholder="First Last"></div>
+    <div class="form-group"><label>Sequence</label><select id="en-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="enrollOne()">Enroll</button>
+    </div>`);
+}
+
+async function enrollOne() {
+  const email = document.getElementById('en-email').value.trim();
+  const name = document.getElementById('en-name').value.trim();
+  const sequence_id = document.getElementById('en-seq').value;
+  if (!email || !sequence_id) { alert('Email and sequence required'); return; }
+  const { error } = await sb.from('enrollments').insert({ email, name, sequence_id, current_step: 0, status: 'active' });
+  if (error) { alert(error.message); return; }
+  closeModal(); renderSubscribers();
+}
+
+async function openBulkModal() {
+  const { data: seqs } = await sb.from('sequences').select('id,name').eq('active', true);
+  showModal(`
+    <h2>Bulk Enroll via CSV</h2>
+    <div class="form-group"><label>Sequence</label><select id="bl-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
+    <div class="form-group">
+      <label>Paste CSV — one per line: <code>email, First Last</code></label>
+      <textarea id="bl-csv" style="min-height:160px" placeholder="john@example.com, John Smith&#10;jane@example.com, Jane Doe"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="bulkEnroll()">Enroll All</button>
+    </div>`);
+}
+
+async function bulkEnroll() {
+  const seq = document.getElementById('bl-seq').value;
+  const csv = document.getElementById('bl-csv').value.trim();
+  if (!seq || !csv) { alert('Sequence and CSV required'); return; }
+  const rows = csv.split('\n').map(line => {
+    const [email, ...rest] = line.split(',').map(s => s.trim());
+    return email && email.includes('@') ? { email, name: rest.join(' ').trim() || null, sequence_id: seq, current_step: 0, status: 'active' } : null;
+  }).filter(Boolean);
+  if (!rows.length) { alert('No valid emails found'); return; }
+  const { error } = await sb.from('enrollments').upsert(rows, { onConflict: 'email,sequence_id', ignoreDuplicates: true });
+  if (error) { alert(error.message); return; }
+  closeModal(); renderSubscribers();
+}
