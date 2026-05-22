@@ -612,14 +612,121 @@ async function bulkEnroll() {
 }
 
 async function renderAnalytics() {
-  const [{ data: logs }, { data: events }] = await Promise.all([
-    sb.from('send_log')
-      .select('id,sent_at,step_number,brevo_message_id,enrollments(email,sequences(name))')
-      .order('sent_at', { ascending: false }).limit(500),
-    sb.from('email_events')
-      .select('message_id,event,event_at')
-      .order('event_at', { ascending: false }),
+  let logQ = sb.from('send_log')
+    .select('id,sent_at,step_number,brevo_message_id,enrollments(email,sequences(id,name))')
+    .order('sent_at',{ascending:false}).limit(2000);
+  if (aF.days!=='all') logQ=logQ.gte('sent_at',new Date(Date.now()-parseInt(aF.days)*86400000).toISOString());
+  const [{ data: logs },{ data: seqs },{ data: events }] = await Promise.all([
+    logQ,
+    sb.from('sequences').select('id,name'),
+    sb.from('email_events').select('event_type,email,message_id').limit(10000),
   ]);
+
+  let filtered = (logs||[]);
+  if (aF.seqId) filtered=filtered.filter(l=>l.enrollments?.sequences?.id===aF.seqId);
+  if (aF.search){const s=aF.search.toLowerCase();filtered=filtered.filter(l=>(l.enrollments?.email||'').toLowerCase().includes(s));}
+
+  const evtMap={};
+  (events||[]).forEach(e=>{if(!e.message_id)return;if(!evtMap[e.message_id])evtMap[e.message_id]=[];evtMap[e.message_id].push(e.event_type);});
+
+  let opened=0,clicked=0,bounced=0,spam=0,unsubscribed=0,delivered=0,deferred=0;
+  if (aF.status&&aF.status!=='all') filtered=filtered.filter(l=>(evtMap[l.brevo_message_id]||[]).includes(aF.status));
+  filtered.forEach(l=>{
+    const ev=evtMap[l.brevo_message_id]||[];
+    if(ev.includes('opened'))opened++;
+    if(ev.includes('clicked'))clicked++;
+    if(ev.includes('bounced'))bounced++;
+    if(ev.includes('spam'))spam++;
+    if(ev.includes('unsubscribed'))unsubscribed++;
+    if(ev.includes('delivered'))delivered++;
+    if(ev.includes('deferred'))deferred++;
+  });
+
+  const total=filtered.length;
+  const pct=n=>total?(n/total*100).toFixed(1)+'%':'—';
+  const hasEv=(events||[]).length>0;
+
+  const bySeq={};
+  filtered.forEach(l=>{
+    const k=l.enrollments?.sequences?.name||'(none)';
+    if(!bySeq[k])bySeq[k]={sent:0,opened:0,clicked:0,bounced:0,spam:0,unsubscribed:0};
+    bySeq[k].sent++;
+    const ev=evtMap[l.brevo_message_id]||[];
+    if(ev.includes('opened'))bySeq[k].opened++;
+    if(ev.includes('clicked'))bySeq[k].clicked++;
+    if(ev.includes('bounced'))bySeq[k].bounced++;
+    if(ev.includes('spam'))bySeq[k].spam++;
+    if(ev.includes('unsubscribed'))bySeq[k].unsubscribed++;
+  });
+
+  const byDom={};
+  filtered.forEach(l=>{
+    const e=l.enrollments?.email||'';const d=e.split('@')[1]||'unknown';
+    if(!byDom[d])byDom[d]={sent:0,opened:0};
+    byDom[d].sent++;
+    if((evtMap[l.brevo_message_id]||[]).includes('opened'))byDom[d].opened++;
+  });
+  const topDoms=Object.entries(byDom).sort((a,b)=>b[1].sent-a[1].sent).slice(0,10);
+
+  const BADGE={opened:'badge-green',clicked:'badge-purple',bounced:'badge-yellow',spam:'badge-red',unsubscribed:'badge-red',delivered:'badge-blue',deferred:'badge-yellow',error:'badge-red',sent:'badge-gray'};
+
+  document.getElementById('content').innerHTML = `
+    ${!hasEv?`<div class="info-banner"><strong>Webhook tracking not set up.</strong> Open rate, click rate, and event badges require Brevo webhooks → a Supabase Edge Function inserting into <code>email_events</code>. Send counts are still tracked.</div>`:''}
+
+    <div class="filter-bar">
+      <div class="fg"><label>Range</label><select onchange="aF.days=this.value;renderAnalytics()">
+        <option value="7" ${aF.days==='7'?'selected':''}>Last 7 days</option>
+        <option value="30" ${aF.days==='30'?'selected':''}>Last 30 days</option>
+        <option value="90" ${aF.days==='90'?'selected':''}>Last 90 days</option>
+        <option value="all" ${aF.days==='all'?'selected':''}>All time</option>
+      </select></div>
+      <div class="fg"><label>Sequence</label><select onchange="aF.seqId=this.value;renderAnalytics()">
+        <option value="">All</option>${(seqs||[]).map(s=>`<option value="${s.id}" ${aF.seqId===s.id?'selected':''}>${s.name}</option>`).join('')}
+      </select></div>
+      <div class="fg"><label>Status</label><select onchange="aF.status=this.value;renderAnalytics()">
+        <option value="">All</option>
+        <option value="opened" ${aF.status==='opened'?'selected':''}>Opened</option>
+        <option value="clicked" ${aF.status==='clicked'?'selected':''}>Clicked</option>
+        <option value="bounced" ${aF.status==='bounced'?'selected':''}>Bounced</option>
+        <option value="spam" ${aF.status==='spam'?'selected':''}>Spam</option>
+        <option value="unsubscribed" ${aF.status==='unsubscribed'?'selected':''}>Unsubscribed</option>
+        <option value="delivered" ${aF.status==='delivered'?'selected':''}>Delivered</option>
+        <option value="deferred" ${aF.status==='deferred'?'selected':''}>Deferred</option>
+      </select></div>
+      <div class="fg"><label>Search</label><input type="text" placeholder="Filter by email…" value="${aF.search}" oninput="aF.search=this.value;renderAnalytics()" style="width:180px"></div>
+      <button class="btn btn-secondary btn-sm" onclick="aF={days:'30',seqId:'',status:'',search:''};renderAnalytics()">Reset</button>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="sv" style="color:var(--blue)">${total.toLocaleString()}</div><div class="sl">Sent</div></div>
+      <div class="stat-card"><div class="sv" style="color:${hasEv?'var(--green)':'var(--gray)'}">${hasEv?pct(opened):'—'}</div><div class="sl">Open Rate</div><div class="ss">${hasEv?opened+' opened':'Webhooks needed'}</div></div>
+      <div class="stat-card"><div class="sv" style="color:${hasEv?'var(--purple)':'var(--gray)'}">${hasEv?pct(clicked):'—'}</div><div class="sl">Click Rate</div><div class="ss">${hasEv?clicked+' clicked':'Webhooks needed'}</div></div>
+      <div class="stat-card"><div class="sv" style="color:${hasEv?'var(--yellow)':'var(--gray)'}">${hasEv?pct(bounced):'—'}</div><div class="sl">Bounce Rate</div><div class="ss">${hasEv?bounced+' bounced':'Webhooks needed'}</div></div>
+      <div class="stat-card"><div class="sv" style="color:${hasEv?'var(--red)':'var(--gray)'}">${hasEv?pct(spam):'—'}</div><div class="sl">Spam Rate</div><div class="ss">${hasEv?spam+' reported':'Webhooks needed'}</div></div>
+      <div class="stat-card"><div class="sv" style="color:${hasEv?'var(--red)':'var(--gray)'}">${hasEv?unsubscribed:'—'}</div><div class="sl">Unsubscribed</div><div class="ss">${hasEv?pct(unsubscribed):'Webhooks needed'}</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><h2>By Sequence</h2></div>
+      ${Object.keys(bySeq).length===0?'<div class="empty">No data</div>':`<table><thead><tr><th>Sequence</th><th>Sent</th><th>Open%</th><th>Click%</th><th>Bounce%</th><th>Spam%</th><th>Unsub%</th></tr></thead><tbody>
+      ${Object.entries(bySeq).sort((a,b)=>b[1].sent-a[1].sent).map(([name,d])=>{const p=n=>d.sent?((n/d.sent)*100).toFixed(1)+'%':'—';return`<tr><td><strong>${name}</strong></td><td>${d.sent}</td><td>${hasEv?p(d.opened):'—'}</td><td>${hasEv?p(d.clicked):'—'}</td><td>${hasEv?p(d.bounced):'—'}</td><td>${hasEv?p(d.spam):'—'}</td><td>${hasEv?p(d.unsubscribed):'—'}</td></tr>`;}).join('')}
+      </tbody></table>`}
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><h2>By Receiving Domain (top 10)</h2></div>
+      ${topDoms.length===0?'<div class="empty">No data</div>':`<table><thead><tr><th>Domain</th><th>Sent</th><th>Open Rate</th></tr></thead><tbody>
+      ${topDoms.map(([dom,d])=>`<tr><td>@${dom}</td><td>${d.sent}</td><td>${hasEv&&d.sent?((d.opened/d.sent)*100).toFixed(1)+'%':'—'}</td></tr>`).join('')}
+      </tbody></table>`}
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><h2>Send Log (${filtered.length})</h2><button class="btn btn-secondary btn-sm" onclick="renderAnalytics()">Refresh</button></div>
+      ${filtered.length===0?'<div class="empty">No sends match filters.</div>':`<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Events</th><th>Message ID</th></tr></thead><tbody>
+      ${filtered.slice(0,300).map(l=>{const ev=[...new Set(evtMap[l.brevo_message_id]||[])];const evBadges=ev.map(t=>`<span class="badge ${BADGE[t]||'badge-gray'}">${t}</span>`).join(' ');return`<tr><td>${new Date(l.sent_at).toLocaleString()}</td><td>${l.enrollments?.email||'—'}</td><td>${l.enrollments?.sequences?.name||'—'}</td><td>Step ${l.step_number}</td><td>${evBadges||'<span class="badge badge-gray">sent</span>'}</td><td style="font-size:11px;color:var(--gray)">${l.brevo_message_id||'—'}</td></tr>`;}).join('')}
+      </tbody></table>`}
+    </div>`;
+}
 
   // build per-message-id event list
   const eventMap = {};
