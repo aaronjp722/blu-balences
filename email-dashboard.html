@@ -82,6 +82,12 @@ textarea{resize:vertical;min-height:80px}
 .test-result{padding:14px 16px;border-radius:8px;font-size:14px;margin-top:16px;display:none}
 .test-result.success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
 .test-result.error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.countdown-box{background:linear-gradient(135deg,#1a56db,#1141a8);border-radius:10px;padding:20px 24px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.countdown-time{font-size:32px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.countdown-label{font-size:12px;opacity:.75;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.priority-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600}
+.priority-later{background:#fef3c7;color:#92400e}
+.priority-seq{background:#e0e7ff;color:#3730a3}
 </style>
 </head>
 <body>
@@ -138,6 +144,7 @@ textarea{resize:vertical;min-height:80px}
 
 <script>
 let sb;
+let countdownInterval = null;
 
 function saveConfig() {
   const url = document.getElementById('cfg-url').value.trim();
@@ -156,11 +163,12 @@ function boot(url, key) {
 }
 
 async function navigate(tab) {
+  if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
   document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
   const el = document.getElementById('nav-' + tab);
   if (el) el.classList.add('active');
   document.getElementById('page-title').textContent =
-    { dashboard: 'Dashboard', sequences: 'Sequences', subscribers: 'Subscribers', analytics: 'Analytics', testemail: 'Test Email', settings: 'Settings' }[tab];
+    { dashboard:'Dashboard', sequences:'Sequences', subscribers:'Subscribers', analytics:'Analytics', testemail:'Test Email', settings:'Settings' }[tab];
   document.getElementById('topbar-actions').innerHTML = '';
   document.getElementById('content').innerHTML = '<div style="padding:40px;text-align:center;color:#6b7280">Loading…</div>';
   if (tab === 'dashboard') await renderDashboard();
@@ -173,14 +181,66 @@ async function navigate(tab) {
 
 function cfgVal(v) { return typeof v === 'string' ? v.replace(/^"|"$/g, '') : (v || ''); }
 
+// ── COUNTDOWN HELPERS ────────────────────────────────────────────────────────
+
+function getNextSendMs(timeStr, tz) {
+  if (!timeStr) return null;
+  try {
+    const [hh, mm] = timeStr.split(':').map(Number);
+    const now = new Date();
+    // Build today's target in the configured timezone
+    const todayStr = now.toLocaleDateString('en-CA', { timeZone: tz }); // YYYY-MM-DD
+    const targetStr = `${todayStr}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
+    // Parse that as local time in the target tz
+    const targetLocal = new Date(new Date(targetStr).toLocaleString('en-US', { timeZone: tz }));
+    const targetUtc = new Date(new Date(targetStr).getTime() + (new Date(targetStr) - targetLocal));
+    let next = new Date(targetStr); // approximate — good enough for display
+    // If already past, add 1 day
+    if (next <= now) next = new Date(next.getTime() + 86400000);
+    return next.getTime() - now.getTime();
+  } catch { return null; }
+}
+
+function formatCountdown(ms) {
+  if (ms === null) return '--:--:--';
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function startCountdown(timeStr, tz) {
+  if (countdownInterval) clearInterval(countdownInterval);
+  function tick() {
+    const el = document.getElementById('countdown-timer');
+    if (!el) { clearInterval(countdownInterval); return; }
+    const ms = getNextSendMs(timeStr, tz);
+    el.textContent = formatCountdown(ms);
+  }
+  tick();
+  countdownInterval = setInterval(tick, 1000);
+}
+
+// ── DASHBOARD ────────────────────────────────────────────────────────────────
+
 async function renderDashboard() {
-  const [{ data: seqs }, { data: enrs }, { data: logs }] = await Promise.all([
+  const [{ data: seqs }, { data: enrs }, { data: logs }, { data: rows }] = await Promise.all([
     sb.from('sequences').select('id,active'),
     sb.from('enrollments').select('status'),
     sb.from('send_log').select('id,sent_at').order('sent_at', { ascending: false }).limit(200),
+    sb.from('settings').select('key,value'),
   ]);
+  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
+  const sendTime = cfg.send_time || '';
+  const sendTz = cfg.send_timezone || 'America/New_York';
   const today = new Date().toDateString();
   const sentToday = (logs || []).filter(l => new Date(l.sent_at).toDateString() === today).length;
+
+  const scheduleDisplay = sendTime
+    ? `Daily at ${formatTime12(sendTime)} (${tzLabel(sendTz)})`
+    : 'Not scheduled — set a time in Settings';
+
   document.getElementById('content').innerHTML = `
     <div class="cards">
       <div class="card"><div class="label">Active Sequences</div><div class="value" style="color:var(--blue)">${(seqs||[]).filter(s=>s.active).length}</div><div class="sub">${(seqs||[]).length} total</div></div>
@@ -188,14 +248,25 @@ async function renderDashboard() {
       <div class="card"><div class="label">Sent Today</div><div class="value" style="color:var(--green)">${sentToday}</div><div class="sub">emails</div></div>
       <div class="card"><div class="label">Total Sent</div><div class="value">${(logs||[]).length}</div><div class="sub">all time</div></div>
     </div>
+
     <div class="panel" style="margin-bottom:20px">
-      <div class="panel-header"><h2>Send Drip Emails</h2></div>
+      <div class="panel-header">
+        <h2>Scheduled Send</h2>
+        <button class="btn btn-secondary btn-sm" onclick="navigate('settings')">Change Schedule</button>
+      </div>
       <div style="padding:20px">
-        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-          <button class="btn btn-primary" id="send-btn" onclick="sendNow()">&#9654; Send Now</button>
-          <span id="send-status" style="font-size:14px;color:var(--gray)"></span>
+        <div class="countdown-box">
+          <div>
+            <div class="countdown-label">Next send in</div>
+            <div class="countdown-time" id="countdown-timer">--:--:--</div>
+            <div class="countdown-label" style="margin-top:6px">${scheduleDisplay}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+            <button class="btn" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3)" id="send-btn" onclick="sendNow()">&#9654; Send Now</button>
+            <span id="send-status" style="font-size:12px;opacity:.85"></span>
+          </div>
         </div>
-        <div id="run-status-box" style="margin-top:16px;display:none;background:var(--gray-light);border-radius:8px;padding:14px 16px;font-size:13px">
+        <div id="run-status-box" style="margin-top:14px;display:none;background:var(--gray-light);border-radius:8px;padding:14px 16px;font-size:13px">
           <div style="display:flex;align-items:center;gap:10px">
             <span id="run-status-dot" style="width:10px;height:10px;border-radius:50%;flex-shrink:0;background:#d1d5db"></span>
             <div>
@@ -207,6 +278,7 @@ async function renderDashboard() {
         </div>
       </div>
     </div>
+
     <div class="panel">
       <div class="panel-header">
         <h2>Recent Activity</h2>
@@ -214,8 +286,27 @@ async function renderDashboard() {
       </div>
       <div id="recent-log"><div class="empty">Loading…</div></div>
     </div>`;
+
+  if (sendTime) startCountdown(sendTime, sendTz);
   await refreshLog();
   checkRunStatus();
+}
+
+function formatTime12(t) {
+  if (!t) return '';
+  const [h, m] = t.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+
+function tzLabel(tz) {
+  const map = {
+    'America/New_York': 'ET', 'America/Chicago': 'CT',
+    'America/Denver': 'MT', 'America/Los_Angeles': 'PT',
+    'America/Anchorage': 'AKT', 'Pacific/Honolulu': 'HT'
+  };
+  return map[tz] || tz;
 }
 
 async function refreshLog() {
@@ -255,11 +346,9 @@ async function checkRunStatus(poll) {
     const data = await r.json();
     const run = data.workflow_runs?.[0];
     if (!run) { box.style.display = 'none'; return; }
-
     box.style.display = 'block';
     link.href = run.html_url;
     const started = new Date(run.created_at).toLocaleString();
-
     if (run.status === 'in_progress' || run.status === 'queued') {
       dot.style.background = '#f59e0b';
       text.textContent = run.status === 'queued' ? 'Queued — starting soon…' : 'Running — emails sending now…';
@@ -279,9 +368,7 @@ async function checkRunStatus(poll) {
       text.textContent = `Last run: ${run.conclusion || run.status}`;
       time.textContent = started;
     }
-  } catch(e) {
-    box.style.display = 'none';
-  }
+  } catch(e) { box.style.display = 'none'; }
 }
 
 async function sendNow() {
@@ -289,7 +376,6 @@ async function sendNow() {
   const status = document.getElementById('send-status');
   btn.disabled = true;
   status.textContent = 'Triggering…';
-  status.style.color = 'var(--gray)';
 
   const { data: rows } = await sb.from('settings').select('key,value');
   const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
@@ -298,55 +384,61 @@ async function sendNow() {
 
   if (!token || !repo) {
     status.textContent = 'GitHub token and repo not set in Settings.';
-    status.style.color = 'var(--red)';
     btn.disabled = false;
     return;
   }
-
   try {
     const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/drip.yml/dispatches`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
       body: JSON.stringify({ ref: 'main' }),
     });
     if (r.status === 204) {
       status.textContent = '✓ Triggered!';
-      status.style.color = 'var(--green)';
       setTimeout(() => checkRunStatus(true), 3000);
     } else {
       const err = await r.json();
       status.textContent = 'Error: ' + (err.message || r.status);
-      status.style.color = 'var(--red)';
     }
-  } catch (e) {
-    status.textContent = 'Failed: ' + e.message;
-    status.style.color = 'var(--red)';
-  }
+  } catch (e) { status.textContent = 'Failed: ' + e.message; }
   btn.disabled = false;
 }
+
+// ── SEQUENCES ────────────────────────────────────────────────────────────────
 
 async function renderSequences() {
   const { data: seqs } = await sb.from('sequences').select('*').order('created_at');
   document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openSeqModal()">+ New Sequence</button>`;
+
+  const priorityBadge = p => p === 'later_first'
+    ? `<span class="priority-badge priority-later">Later Steps First</span>`
+    : `<span class="priority-badge priority-seq">Sequential</span>`;
+
   document.getElementById('content').innerHTML = `
     <div class="panel">
       <div class="panel-header"><h2>Sequences</h2></div>
       ${!seqs||!seqs.length ? '<div class="empty">No sequences yet. Create one to get started.</div>' :
-      `<table><thead><tr><th>Name</th><th>Description</th><th>Active</th><th>Actions</th></tr></thead><tbody>
+      `<table><thead><tr><th>Name</th><th>Description</th><th>Step Priority</th><th>Active</th><th>Actions</th></tr></thead><tbody>
       ${seqs.map(s=>`<tr>
         <td><strong>${s.name}</strong></td>
         <td style="color:var(--gray)">${s.description||'—'}</td>
+        <td>${priorityBadge(s.step_priority||'later_first')}</td>
         <td><label class="toggle"><input type="checkbox" ${s.active?'checked':''} onchange="toggleSeq('${s.id}',this.checked)"><span class="toggle-slider"></span></label></td>
         <td><div class="actions">
           <button class="btn btn-secondary btn-sm" onclick="openStepsModal('${s.id}','${esc(s.name)}')">Steps</button>
-          <button class="btn btn-secondary btn-sm" onclick="openSeqModal('${s.id}','${esc(s.name)}','${esc(s.description||'')}')">Edit</button>
+          <button class="btn btn-secondary btn-sm" onclick="openSeqModal('${s.id}','${esc(s.name)}','${esc(s.description||'')}','${s.step_priority||'later_first'}')">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteSeq('${s.id}')">Delete</button>
         </div></td>
       </tr>`).join('')}</tbody></table>`}
+    </div>
+    <div class="panel" style="background:#fffbeb;border-color:#fde68a">
+      <div style="padding:16px 20px;font-size:13px;color:#92400e">
+        <strong>Step Priority explained:</strong>
+        <ul style="margin-top:8px;padding-left:18px;line-height:1.8">
+          <li><strong>Later Steps First</strong> — contacts already in Step 2, 3, 4… are sent their next email before any new contacts get Step 1. Keeps follow-up sequences moving forward.</li>
+          <li><strong>Sequential</strong> — sends Step 1 to all new contacts first, then moves to later steps. Use this when starting fresh campaigns.</li>
+        </ul>
+      </div>
     </div>`;
 }
 
@@ -360,11 +452,19 @@ async function deleteSeq(id) {
   renderSequences();
 }
 
-function openSeqModal(id, name, desc) {
+function openSeqModal(id, name, desc, priority) {
   showModal(`
     <h2>${id ? 'Edit' : 'New'} Sequence</h2>
     <div class="form-group"><label>Name</label><input id="sq-name" value="${name||''}"></div>
     <div class="form-group"><label>Description</label><textarea id="sq-desc">${desc||''}</textarea></div>
+    <div class="form-group">
+      <label>Step Priority</label>
+      <select id="sq-priority">
+        <option value="later_first" ${(!priority||priority==='later_first')?'selected':''}>Later Steps First — prioritize contacts already in Step 2+ before starting Step 1</option>
+        <option value="sequential" ${priority==='sequential'?'selected':''}>Sequential — send Step 1 to new contacts first, then follow-ups</option>
+      </select>
+      <p class="hint">Controls the order emails are sent when running the sequence. "Later Steps First" is recommended for ongoing outreach.</p>
+    </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveSeq('${id||''}')">Save</button>
@@ -374,9 +474,10 @@ function openSeqModal(id, name, desc) {
 async function saveSeq(id) {
   const name = document.getElementById('sq-name').value.trim();
   const description = document.getElementById('sq-desc').value.trim();
+  const step_priority = document.getElementById('sq-priority').value;
   if (!name) { alert('Name required'); return; }
-  if (id) await sb.from('sequences').update({ name, description }).eq('id', id);
-  else await sb.from('sequences').insert({ name, description, active: true });
+  if (id) await sb.from('sequences').update({ name, description, step_priority }).eq('id', id);
+  else await sb.from('sequences').insert({ name, description, step_priority, active: true });
   closeModal();
   renderSequences();
 }
@@ -405,8 +506,8 @@ function stepCard(s) {
   const batchText = batchLimit
     ? `Batch: ${batchLimit} emails${interval ? `, ${interval} min apart` : ''}`
     : (interval ? `${interval} min between emails` : 'No batch limit');
-  const tagPills = s.tags ? s.tags.split(',').map(t => t.trim()).filter(Boolean).map(t => `<span class="tag-pill">${t}</span>`).join('') : '';
-  const bodyPreview = s.body ? s.body.replace(/<[^>]+>/g, '').trim().substring(0, 80) + (s.body.length > 80 ? '…' : '') : '';
+  const tagPills = s.tags ? s.tags.split(',').map(t=>t.trim()).filter(Boolean).map(t=>`<span class="tag-pill">${t}</span>`).join('') : '';
+  const bodyPreview = s.body ? s.body.replace(/<[^>]+>/g,'').trim().substring(0,80)+(s.body.length>80?'…':'') : '';
   return `<div class="step-card">
     <div class="step-card-header">
       <div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0">
@@ -414,9 +515,9 @@ function stepCard(s) {
         <div style="flex:1;min-width:0">
           <div style="font-size:14px;font-weight:600">${s.subject}</div>
           <div class="step-meta">Wait: ${delay(s)} · ${s.from_email}</div>
-          ${bodyPreview ? `<div class="step-body-preview">"${bodyPreview}"</div>` : ''}
+          ${bodyPreview?`<div class="step-body-preview">"${bodyPreview}"</div>`:''}
           <div class="step-meta" style="margin-top:4px">${batchText}</div>
-          ${tagPills ? `<div style="margin-top:5px">${tagPills}</div>` : ''}
+          ${tagPills?`<div style="margin-top:5px">${tagPills}</div>`:''}
         </div>
       </div>
       <div class="actions" style="flex-shrink:0;margin-left:10px">
@@ -429,20 +530,14 @@ function stepCard(s) {
 
 function openStepForm(seqId, seqName, stepNum, stepId) {
   showModal(`
-    <h2>${stepId ? 'Edit' : 'New'} Step ${stepNum}</h2>
+    <h2>${stepId?'Edit':'New'} Step ${stepNum}</h2>
     <div class="section-title">Email Details</div>
     <div class="form-group"><label>Subject Line</label><input id="st-subj" placeholder="Quick question"></div>
     <div class="form-group"><label>From Email</label><input id="st-from" value="Aaron &lt;aaron@blubalencebookkeeping.com&gt;"></div>
     <div class="section-title">Email Body</div>
     <div class="form-group">
       <label>Body Text <span style="color:var(--gray);font-weight:400">(HTML or plain text)</span></label>
-      <textarea id="st-body" style="min-height:160px;font-family:monospace;font-size:13px" placeholder="Hi {{ .Subscriber.FirstName }},
-
-I noticed you're a realtor in Atlanta and wanted to reach out...
-
-Best,
-Aaron
-Blu Balence Bookkeeping"></textarea>
+      <textarea id="st-body" style="min-height:160px;font-family:monospace;font-size:13px" placeholder="Hi {{ .Subscriber.FirstName }},&#10;&#10;...&#10;&#10;Best,&#10;Aaron"></textarea>
       <p class="hint">Use <code>{{ .Subscriber.FirstName }}</code> and <code>{{ .Subscriber.Email }}</code> for personalization.</p>
     </div>
     <div class="section-title">Wait Before Sending This Step</div>
@@ -451,7 +546,7 @@ Blu Balence Bookkeeping"></textarea>
       <div class="form-group"><label>Hours</label><input id="st-hours" type="number" value="0" min="0" max="23"></div>
       <div class="form-group"><label>Minutes</label><input id="st-mins" type="number" value="0" min="0" max="59"></div>
     </div>
-    <p class="hint">Step 1 always sends immediately on first run. Delay applies from the previous step's send time.</p>
+    <p class="hint">Step 1 sends immediately on first run. Delay applies from the previous step's send time.</p>
     <div class="section-title">Batch Controls</div>
     <div class="form-row-2">
       <div class="form-group">
@@ -492,17 +587,16 @@ Blu Balence Bookkeeping"></textarea>
 
 async function saveStep(seqId, seqName, stepNum, stepId) {
   const payload = {
-    sequence_id: seqId,
-    step_number: stepNum,
+    sequence_id: seqId, step_number: stepNum,
     subject: document.getElementById('st-subj').value.trim(),
     from_email: document.getElementById('st-from').value.trim(),
     template_id: 1,
-    delay_days: parseInt(document.getElementById('st-days').value) || 0,
-    delay_hours: parseInt(document.getElementById('st-hours').value) || 0,
-    delay_minutes: parseInt(document.getElementById('st-mins').value) || 0,
+    delay_days: parseInt(document.getElementById('st-days').value)||0,
+    delay_hours: parseInt(document.getElementById('st-hours').value)||0,
+    delay_minutes: parseInt(document.getElementById('st-mins').value)||0,
     body: document.getElementById('st-body').value,
-    batch_limit: parseInt(document.getElementById('st-batch').value) || 0,
-    batch_interval_minutes: parseInt(document.getElementById('st-interval').value) || 0,
+    batch_limit: parseInt(document.getElementById('st-batch').value)||0,
+    batch_interval_minutes: parseInt(document.getElementById('st-interval').value)||0,
     tags: document.getElementById('st-tags').value.trim(),
   };
   if (!payload.subject || !payload.from_email) { alert('Subject and From email are required'); return; }
@@ -520,12 +614,14 @@ async function deleteStep(stepId, seqId) {
   openStepsModal(seqId, seq?.name || '');
 }
 
+// ── SUBSCRIBERS ──────────────────────────────────────────────────────────────
+
 async function renderSubscribers() {
   const { data: enrs } = await sb.from('enrollments').select('*,sequences(name)').order('enrolled_at', { ascending: false });
   document.getElementById('topbar-actions').innerHTML = `
     <button class="btn btn-secondary" style="margin-right:8px" onclick="openBulkModal()">Bulk CSV</button>
     <button class="btn btn-primary" onclick="openEnrollModal()">+ Enroll</button>`;
-  const badge = s => ({ active:'badge-green', paused:'badge-yellow', completed:'badge-blue', unsubscribed:'badge-red' }[s] || 'badge-gray');
+  const badge = s => ({ active:'badge-green', paused:'badge-yellow', completed:'badge-blue', unsubscribed:'badge-red' }[s]||'badge-gray');
   document.getElementById('content').innerHTML = `
     <div class="panel">
       <div class="panel-header"><h2>Enrollments (${(enrs||[]).length})</h2></div>
@@ -537,7 +633,7 @@ async function renderSubscribers() {
         <td>${e.sequences?.name||'—'}</td>
         <td>Step ${e.current_step}</td>
         <td><span class="badge ${badge(e.status)}">${e.status}</span></td>
-        <td>${e.last_sent_at ? new Date(e.last_sent_at).toLocaleDateString() : 'Not yet'}</td>
+        <td>${e.last_sent_at?new Date(e.last_sent_at).toLocaleDateString():'Not yet'}</td>
         <td><div class="actions">
           ${e.status==='active'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','paused')">Pause</button>`:
             e.status==='paused'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','active')">Resume</button>`:''}
@@ -547,16 +643,8 @@ async function renderSubscribers() {
     </div>`;
 }
 
-async function setStatus(id, status) {
-  await sb.from('enrollments').update({ status }).eq('id', id);
-  renderSubscribers();
-}
-
-async function removeEnr(id) {
-  if (!confirm('Remove this enrollment?')) return;
-  await sb.from('enrollments').delete().eq('id', id);
-  renderSubscribers();
-}
+async function setStatus(id, status) { await sb.from('enrollments').update({ status }).eq('id', id); renderSubscribers(); }
+async function removeEnr(id) { if (!confirm('Remove this enrollment?')) return; await sb.from('enrollments').delete().eq('id', id); renderSubscribers(); }
 
 async function openEnrollModal() {
   const { data: seqs } = await sb.from('sequences').select('id,name').eq('active', true);
@@ -578,8 +666,7 @@ async function enrollOne() {
   if (!email || !sequence_id) { alert('Email and sequence required'); return; }
   const { error } = await sb.from('enrollments').insert({ email, name, sequence_id, current_step: 0, status: 'active' });
   if (error) { alert(error.message); return; }
-  closeModal();
-  renderSubscribers();
+  closeModal(); renderSubscribers();
 }
 
 async function openBulkModal() {
@@ -603,14 +690,15 @@ async function bulkEnroll() {
   if (!seq || !csv) { alert('Sequence and CSV required'); return; }
   const rows = csv.split('\n').map(line => {
     const [email, ...rest] = line.split(',').map(s => s.trim());
-    return email && email.includes('@') ? { email, name: rest.join(' ').trim() || null, sequence_id: seq, current_step: 0, status: 'active' } : null;
+    return email && email.includes('@') ? { email, name: rest.join(' ').trim()||null, sequence_id: seq, current_step: 0, status: 'active' } : null;
   }).filter(Boolean);
   if (!rows.length) { alert('No valid emails found'); return; }
   const { error } = await sb.from('enrollments').upsert(rows, { onConflict: 'email,sequence_id', ignoreDuplicates: true });
   if (error) { alert(error.message); return; }
-  closeModal();
-  renderSubscribers();
+  closeModal(); renderSubscribers();
 }
+
+// ── ANALYTICS ────────────────────────────────────────────────────────────────
 
 async function renderAnalytics() {
   const { data: logs } = await sb.from('send_log')
@@ -632,13 +720,12 @@ async function renderAnalytics() {
     </div>`;
 }
 
-// ── TEST EMAIL ──────────────────────────────────────────────────────────────
+// ── TEST EMAIL ────────────────────────────────────────────────────────────────
 
 async function renderTestEmail() {
   const { data: rows } = await sb.from('settings').select('key,value');
   const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
   const defaultFrom = cfg.from_email || 'Aaron <aaron@blubalencebookkeeping.com>';
-
   document.getElementById('content').innerHTML = `
     <div style="max-width:600px">
       <div class="panel">
@@ -647,21 +734,12 @@ async function renderTestEmail() {
           <span style="font-size:12px;color:var(--gray)">Sends directly via Brevo API — no Listmonk, no sequences</span>
         </div>
         <div style="padding:24px">
-          <div class="form-group">
-            <label>To</label>
-            <input id="te-to" type="email" placeholder="you@example.com">
-          </div>
-          <div class="form-group">
-            <label>From</label>
-            <input id="te-from" value="${defaultFrom}">
-          </div>
-          <div class="form-group">
-            <label>Subject</label>
-            <input id="te-subject" placeholder="Test email from Blu Balence">
-          </div>
+          <div class="form-group"><label>To</label><input id="te-to" type="email" placeholder="you@example.com"></div>
+          <div class="form-group"><label>From</label><input id="te-from" value="${defaultFrom}"></div>
+          <div class="form-group"><label>Subject</label><input id="te-subject" placeholder="Test email from Blu Balence"></div>
           <div class="form-group">
             <label>Body <span style="color:var(--gray);font-weight:400">(HTML or plain text)</span></label>
-            <textarea id="te-body" style="min-height:200px" placeholder="Hi there,&#10;&#10;This is a test email sent directly through Brevo.&#10;&#10;Best,&#10;Aaron"></textarea>
+            <textarea id="te-body" style="min-height:200px" placeholder="Hi there,&#10;&#10;This is a test email.&#10;&#10;Best,&#10;Aaron"></textarea>
           </div>
           <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
             <button class="btn btn-primary" id="te-btn" onclick="sendTestEmail()">&#9654; Send Test Email</button>
@@ -675,138 +753,100 @@ async function renderTestEmail() {
         <div id="te-log"><div class="empty">Loading…</div></div>
       </div>
     </div>`;
-
   await refreshTestLog();
 }
 
 async function refreshTestLog() {
   const el = document.getElementById('te-log');
   if (!el) return;
-  const { data: logs } = await sb.from('test_send_log')
-    .select('*')
-    .order('sent_at', { ascending: false })
-    .limit(20);
-  if (!logs || !logs.length) {
-    el.innerHTML = '<div class="empty">No test emails sent yet.</div>';
-    return;
-  }
+  const { data: logs } = await sb.from('test_send_log').select('*').order('sent_at', { ascending: false }).limit(20);
+  if (!logs||!logs.length) { el.innerHTML = '<div class="empty">No test emails sent yet.</div>'; return; }
   el.innerHTML = `<table><thead><tr><th>Sent At</th><th>To</th><th>Subject</th><th>Status</th><th>Message ID</th></tr></thead><tbody>
-    ${logs.map(l => `<tr>
+    ${logs.map(l=>`<tr>
       <td>${new Date(l.sent_at).toLocaleString()}</td>
       <td>${l.to_email}</td>
       <td>${l.subject}</td>
-      <td><span class="badge ${l.status === 'sent' ? 'badge-green' : 'badge-red'}">${l.status}</span></td>
-      <td style="font-size:11px;color:var(--gray)">${l.message_id || '—'}</td>
-    </tr>`).join('')}
-  </tbody></table>`;
+      <td><span class="badge ${l.status==='sent'?'badge-green':'badge-red'}">${l.status}</span></td>
+      <td style="font-size:11px;color:var(--gray)">${l.message_id||'—'}</td>
+    </tr>`).join('')}</tbody></table>`;
 }
 
 async function sendTestEmail() {
   const btn = document.getElementById('te-btn');
   const statusEl = document.getElementById('te-status');
   const resultEl = document.getElementById('te-result');
-
   const to = document.getElementById('te-to').value.trim();
   const fromRaw = document.getElementById('te-from').value.trim();
   const subject = document.getElementById('te-subject').value.trim();
   const body = document.getElementById('te-body').value.trim();
-
-  if (!to || !subject || !body) {
-    statusEl.textContent = 'To, Subject, and Body are required.';
-    statusEl.style.color = 'var(--red)';
-    return;
-  }
-
-  // Parse "Name <email>" or plain email
+  if (!to||!subject||!body) { statusEl.textContent='To, Subject, and Body are required.'; statusEl.style.color='var(--red)'; return; }
   const fromMatch = fromRaw.match(/^(.+?)\s*<(.+?)>$/);
   const fromName = fromMatch ? fromMatch[1].trim() : '';
   const fromEmail = fromMatch ? fromMatch[2].trim() : fromRaw;
-
-  // Get Brevo API key
   const { data: rows } = await sb.from('settings').select('key,value');
   const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
   const apiKey = cfg.brevo_api_key;
-
-  if (!apiKey) {
-    statusEl.textContent = 'Brevo API key not set. Go to Settings first.';
-    statusEl.style.color = 'var(--red)';
-    return;
-  }
-
-  btn.disabled = true;
-  statusEl.textContent = 'Sending…';
-  statusEl.style.color = 'var(--gray)';
-  resultEl.style.display = 'none';
-
+  if (!apiKey) { statusEl.textContent='Brevo API key not set. Go to Settings first.'; statusEl.style.color='var(--red)'; return; }
+  btn.disabled=true; statusEl.textContent='Sending…'; statusEl.style.color='var(--gray)'; resultEl.style.display='none';
   const isHtml = body.trim().startsWith('<');
-  const payload = {
-    sender: { name: fromName || 'Blu Balence', email: fromEmail },
-    to: [{ email: to }],
-    subject,
-    ...(isHtml ? { htmlContent: body } : { textContent: body }),
-  };
-
   try {
     const res = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
-      headers: {
-        'api-key': apiKey,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify(payload),
+      headers: { 'api-key': apiKey, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ sender:{name:fromName||'Blu Balence',email:fromEmail}, to:[{email:to}], subject, ...(isHtml?{htmlContent:body}:{textContent:body}) }),
     });
-
     const json = await res.json();
-
     if (res.ok && json.messageId) {
-      statusEl.textContent = '';
-      resultEl.className = 'test-result success';
-      resultEl.textContent = `✓ Sent successfully. Message ID: ${json.messageId}`;
-      resultEl.style.display = 'block';
-
-      // Log to test_send_log table (create if needed — won't error if table missing)
-      await sb.from('test_send_log').insert({
-        to_email: to,
-        from_email: fromEmail,
-        subject,
-        status: 'sent',
-        message_id: json.messageId,
-        sent_at: new Date().toISOString(),
-      }).then(() => refreshTestLog()).catch(() => {});
-
+      statusEl.textContent='';
+      resultEl.className='test-result success';
+      resultEl.textContent=`✓ Sent successfully. Message ID: ${json.messageId}`;
+      resultEl.style.display='block';
+      await sb.from('test_send_log').insert({ to_email:to, from_email:fromEmail, subject, status:'sent', message_id:json.messageId, sent_at:new Date().toISOString() }).then(()=>refreshTestLog()).catch(()=>{});
     } else {
-      statusEl.textContent = '';
-      resultEl.className = 'test-result error';
-      resultEl.textContent = `✗ Failed: ${json.message || JSON.stringify(json)}`;
-      resultEl.style.display = 'block';
-
-      await sb.from('test_send_log').insert({
-        to_email: to,
-        from_email: fromEmail,
-        subject,
-        status: 'failed',
-        message_id: null,
-        sent_at: new Date().toISOString(),
-      }).then(() => refreshTestLog()).catch(() => {});
+      resultEl.className='test-result error';
+      resultEl.textContent=`✗ Failed: ${json.message||JSON.stringify(json)}`;
+      resultEl.style.display='block';
+      await sb.from('test_send_log').insert({ to_email:to, from_email:fromEmail, subject, status:'failed', message_id:null, sent_at:new Date().toISOString() }).then(()=>refreshTestLog()).catch(()=>{});
     }
-  } catch (e) {
-    statusEl.textContent = '';
-    resultEl.className = 'test-result error';
-    resultEl.textContent = `✗ Request failed: ${e.message}`;
-    resultEl.style.display = 'block';
-  }
-
-  btn.disabled = false;
+  } catch(e) { resultEl.className='test-result error'; resultEl.textContent=`✗ Request failed: ${e.message}`; resultEl.style.display='block'; }
+  btn.disabled=false;
 }
 
-// ── SETTINGS ────────────────────────────────────────────────────────────────
+// ── SETTINGS ─────────────────────────────────────────────────────────────────
 
 async function renderSettings() {
   const { data: rows } = await sb.from('settings').select('key,value');
   const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
   document.getElementById('content').innerHTML = `
     <div style="max-width:560px">
+
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><h2>Daily Send Schedule</h2></div>
+        <div style="padding:20px">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Send Time (24hr)</label>
+              <input id="s-time" type="time" value="${cfg.send_time||'09:00'}">
+              <p class="hint">e.g. 09:00 = 9:00 AM. The GitHub Action must be scheduled to match this time.</p>
+            </div>
+            <div class="form-group">
+              <label>Timezone</label>
+              <select id="s-tz">
+                <option value="America/New_York" ${cfg.send_timezone==='America/New_York'||!cfg.send_timezone?'selected':''}>Eastern (ET)</option>
+                <option value="America/Chicago" ${cfg.send_timezone==='America/Chicago'?'selected':''}>Central (CT)</option>
+                <option value="America/Denver" ${cfg.send_timezone==='America/Denver'?'selected':''}>Mountain (MT)</option>
+                <option value="America/Los_Angeles" ${cfg.send_timezone==='America/Los_Angeles'?'selected':''}>Pacific (PT)</option>
+                <option value="America/Anchorage" ${cfg.send_timezone==='America/Anchorage'?'selected':''}>Alaska (AKT)</option>
+                <option value="Pacific/Honolulu" ${cfg.send_timezone==='Pacific/Honolulu'?'selected':''}>Hawaii (HT)</option>
+              </select>
+            </div>
+          </div>
+          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 14px;font-size:13px;color:#1e40af">
+            <strong>To make this automatic:</strong> In your GitHub repo, edit <code>.github/workflows/drip.yml</code> and set the cron schedule to match. Example for 9:00 AM ET: <code>cron: '0 14 * * *'</code> (UTC offset). The "Send Now" button on the dashboard always works manually.
+          </div>
+        </div>
+      </div>
+
       <div class="panel" style="margin-bottom:20px">
         <div class="panel-header"><h2>Brevo Connection</h2></div>
         <div style="padding:20px">
@@ -821,6 +861,7 @@ async function renderSettings() {
           </div>
         </div>
       </div>
+
       <div class="panel" style="margin-bottom:20px">
         <div class="panel-header"><h2>GitHub Actions</h2></div>
         <div style="padding:20px">
@@ -835,6 +876,7 @@ async function renderSettings() {
           </div>
         </div>
       </div>
+
       <div class="panel" style="margin-bottom:20px">
         <div class="panel-header"><h2>Send Rate (Global Defaults)</h2></div>
         <div style="padding:20px">
@@ -846,6 +888,7 @@ async function renderSettings() {
           <p class="hint">Brevo free plan: 300/day. Each step can override batch size and interval.</p>
         </div>
       </div>
+
       <div style="display:flex;gap:10px">
         <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
         <button class="btn btn-secondary" onclick="resetConn()">Change Supabase Connection</button>
@@ -855,6 +898,8 @@ async function renderSettings() {
 
 async function saveSettings() {
   const kvs = [
+    ['send_time', document.getElementById('s-time').value],
+    ['send_timezone', document.getElementById('s-tz').value],
     ['brevo_api_key', document.getElementById('s-brevo').value.trim()],
     ['from_email', document.getElementById('s-from').value.trim()],
     ['github_repo', document.getElementById('s-repo').value.trim()],
@@ -869,17 +914,13 @@ async function saveSettings() {
   alert('Settings saved!');
 }
 
-function resetConn() {
-  localStorage.removeItem('sb_url');
-  localStorage.removeItem('sb_key');
-  location.reload();
-}
+function resetConn() { localStorage.removeItem('sb_url'); localStorage.removeItem('sb_key'); location.reload(); }
 
 function showModal(html, wide) {
   const o = document.createElement('div');
   o.className = 'modal-overlay';
   o.innerHTML = `<div class="modal" style="${wide?'width:720px':''}">${html}</div>`;
-  o.addEventListener('click', e => { if (e.target === o) closeModal(); });
+  o.addEventListener('click', e => { if (e.target===o) closeModal(); });
   document.getElementById('modals').innerHTML = '';
   document.getElementById('modals').appendChild(o);
 }
