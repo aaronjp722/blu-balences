@@ -1,13 +1,20 @@
 """
-Brevo drip automation — reads config from Supabase, sends transactional emails via Brevo.
+Brevo drip automation — reads config from Supabase, sends via Brevo.
 
-Setup:
-  export SUPABASE_URL=https://xxxx.supabase.co
-  export SUPABASE_SERVICE_KEY=your-service-role-key   # NOT the anon key
-  python listmonk_drip.py
+New in this version:
+  - Skips globally unsubscribed emails (unsubscribes table)
+  - Skips enrollments with status='unsubscribed'
+  - Step priority per sequence: later_first (default) or sequential
+  - Daily send limit respected across all sequences
+  - Unsubscribe footer link appended to every email automatically
 
-Cron / GitHub Actions (daily 9am UTC):
-  0 14 * * *   (9am ET)
+Secrets required in GitHub Actions:
+  SUPABASE_URL          — https://xxxx.supabase.co
+  SUPABASE_SERVICE_KEY  — service role key (not anon)
+
+Settings stored in Supabase settings table:
+  brevo_api_key, from_email, from_name,
+  emails_per_minute, daily_limit, site_url
 """
 
 import datetime as dt
@@ -22,6 +29,8 @@ import requests
 
 log = logging.getLogger("drip")
 
+
+# ── Supabase helpers ──────────────────────────────────────────────────────────
 
 def _supa_headers(key: str) -> dict:
     return {
@@ -58,16 +67,52 @@ def parse_setting(v):
     return v
 
 
+# ── Email sending ─────────────────────────────────────────────────────────────
+
+def build_unsubscribe_footer(site_url: str, to_email: str) -> str:
+    base = site_url.rstrip("/") if site_url else "https://aaronjp722.github.io/blu-balences"
+    link = f"{base}/unsubscribe.html?email={to_email}"
+    return (
+        "\n\n---\n"
+        f"To unsubscribe from future emails, click here: {link}\n"
+        "Blu Balence | 6545 Market Avenue N. STE 100, North Canton, OH 44721"
+    )
+
+
 def send_email(api_key: str, to_email: str, to_name: str,
                from_email: str, from_name: str,
-               subject: str, body: str, tags: list) -> str:
-    display_name = to_name or to_email.split("@")[0]
-    personalized = body.replace("{{name}}", display_name).replace("{{email}}", to_email)
+               subject: str, body: str, tags: list,
+               site_url: str = "") -> str:
 
-    if "<" not in personalized:
-        html_body = "<html><body>" + personalized.replace("\n", "<br>") + "</body></html>"
+    display_name = to_name or to_email.split("@")[0]
+    personalized = (
+        body
+        .replace("{{name}}", display_name)
+        .replace("{{email}}", to_email)
+    )
+
+    footer = build_unsubscribe_footer(site_url, to_email)
+
+    if "<" in personalized and "<br" in personalized.lower():
+        # HTML email — append footer as HTML
+        footer_html = (
+            "<br><br><hr style='border:none;border-top:1px solid #e5e7eb;margin:24px 0'>"
+            f"<p style='font-size:12px;color:#6b7280'>To unsubscribe, "
+            f"<a href='{build_unsubscribe_footer(site_url, to_email).split(\":\", 2)[-1].strip().split()[0]}' "
+            f"style='color:#6b7280'>click here</a>.<br>"
+            "Blu Balence | 6545 Market Avenue N. STE 100, North Canton, OH 44721</p>"
+        )
+        # Simpler: just inject the text footer converted to HTML
+        html_body = personalized + "<br><br><hr><p style='font-size:11px;color:#9ca3af'>" + \
+                    footer.replace("\n", "<br>").replace("---", "") + "</p>"
     else:
-        html_body = personalized
+        # Plain text — convert to HTML with footer
+        full_text = personalized + footer
+        html_body = (
+            "<html><body style='font-family:Arial,sans-serif;font-size:15px;color:#111;max-width:600px;margin:0 auto'>"
+            + full_text.replace("\n", "<br>")
+            + "</body></html>"
+        )
 
     payload = {
         "sender": {"email": from_email, "name": from_name or from_email},
@@ -85,10 +130,12 @@ def send_email(api_key: str, to_email: str, to_name: str,
         timeout=30,
     )
     if not r.ok:
-        log.error("Brevo %d error: %s", r.status_code, r.text)
+        log.error("Brevo %d: %s", r.status_code, r.text)
     r.raise_for_status()
     return r.json().get("messageId", "")
 
+
+# ── Main ──────────────────────────────────────────────────────────────────────
 
 def main() -> int:
     logging.basicConfig(
@@ -107,6 +154,7 @@ def main() -> int:
     def post(table, payload): return supa_post(SUPA_URL, SUPA_KEY, table, payload)
     def patch(table, qs, payload): return supa_patch(SUPA_URL, SUPA_KEY, table, qs, payload)
 
+    # ── Load settings ──
     raw_cfg = get("settings", "?select=key,value")
     cfg = {r["key"]: parse_setting(r["value"]) for r in raw_cfg}
 
@@ -114,8 +162,6 @@ def main() -> int:
     if not brevo_api_key:
         log.error("brevo_api_key not set in settings table")
         return 1
-
-    log.info("Brevo key loaded: length=%d, prefix=%s", len(brevo_api_key), brevo_api_key[:12])
 
     from_email = cfg.get("from_email", "")
     from_name  = cfg.get("from_name", "")
@@ -127,24 +173,64 @@ def main() -> int:
     if m:
         from_name  = from_name or m.group(1).strip()
         from_email = m.group(2).strip()
-    log.info("Sending from: %s <%s>", from_name, from_email)
 
-    global_emails_per_minute = float(cfg.get("emails_per_minute", "2"))
-    global_send_interval = 60.0 / global_emails_per_minute
+    site_url              = cfg.get("site_url", "https://aaronjp722.github.io/blu-balences")
+    global_epm            = float(cfg.get("emails_per_minute", "2"))
+    global_send_interval  = 60.0 / global_epm
+    daily_limit           = int(cfg.get("daily_limit", "50"))
 
-    sequences = get("sequences", "?active=eq.true&select=id,name")
+    log.info("From: %s <%s>", from_name, from_email)
+    log.info("Rate: %.1f emails/min | Daily limit: %d", global_epm, daily_limit)
+
+    # ── Count emails already sent today ──
+    today_start = dt.datetime.now(dt.timezone.utc).replace(
+        hour=0, minute=0, second=0, microsecond=0
+    ).isoformat()
+    today_sent_rows = get("send_log", f"?sent_at=gte.{today_start}&select=id")
+    sent_today = len(today_sent_rows)
+    log.info("Already sent today: %d / %d", sent_today, daily_limit)
+
+    if sent_today >= daily_limit:
+        log.info("Daily limit reached (%d). Exiting.", daily_limit)
+        return 0
+
+    # ── Load globally unsubscribed emails ──
+    try:
+        unsub_rows = get("unsubscribes", "?select=email")
+        global_unsubscribed = {r["email"].strip().lower() for r in unsub_rows}
+        log.info("Global unsubscribe list: %d email(s)", len(global_unsubscribed))
+    except Exception:
+        log.warning("Could not load unsubscribes table — continuing without it")
+        global_unsubscribed = set()
+
+    # ── Process sequences ──
+    sequences = get("sequences", "?active=eq.true&select=id,name,step_priority")
     log.info("%d active sequence(s)", len(sequences))
 
     for seq in sequences:
+        if sent_today >= daily_limit:
+            log.info("Daily limit reached mid-run. Stopping.")
+            break
+
         steps = get("steps", f"?sequence_id=eq.{seq['id']}&order=step_number.asc")
         total_steps = len(steps)
         if not total_steps:
-            log.info("  Sequence '%s' has no steps, skipping", seq["name"])
+            log.info("Sequence '%s': no steps, skipping", seq["name"])
             continue
 
-        log.info("Sequence '%s' — %d steps", seq["name"], total_steps)
+        priority = seq.get("step_priority") or "later_first"
+        if priority == "later_first":
+            steps_to_process = sorted(steps, key=lambda s: s["step_number"], reverse=True)
+            log.info("Sequence '%s' — %d steps — priority: LATER FIRST", seq["name"], total_steps)
+        else:
+            steps_to_process = steps  # ascending: step 1 first
+            log.info("Sequence '%s' — %d steps — priority: SEQUENTIAL", seq["name"], total_steps)
 
-        for step in steps:
+        for step in steps_to_process:
+            if sent_today >= daily_limit:
+                log.info("Daily limit reached. Stopping.")
+                break
+
             snum = step["step_number"]
             delay_mins = (
                 step["delay_days"] * 1440
@@ -152,13 +238,14 @@ def main() -> int:
                 + step["delay_minutes"]
             )
 
-            batch_limit = int(step.get("batch_limit") or 0)
+            batch_limit            = int(step.get("batch_limit") or 0)
             batch_interval_minutes = int(step.get("batch_interval_minutes") or 0)
             send_interval = (batch_interval_minutes * 60) if batch_interval_minutes > 0 else global_send_interval
 
             step_body = step.get("body") or ""
             step_tags = [t.strip() for t in (step.get("tags") or "").split(",") if t.strip()]
 
+            # Find due enrollments
             if snum == 1:
                 due = get("enrollments",
                     f"?sequence_id=eq.{seq['id']}&current_step=eq.0"
@@ -175,36 +262,49 @@ def main() -> int:
                 log.info("  Step %d: nobody due", snum)
                 continue
 
+            # Filter out globally unsubscribed contacts
+            before = len(due)
+            due = [e for e in due if e["email"].strip().lower() not in global_unsubscribed]
+            skipped_unsub = before - len(due)
+            if skipped_unsub:
+                log.info("  Step %d: skipped %d globally unsubscribed", snum, skipped_unsub)
+
+            if not due:
+                log.info("  Step %d: all due are unsubscribed", snum)
+                continue
+
+            # Filter out already-sent this step
             already_sent = get("send_log", f"?step_id=eq.{step['id']}&select=enrollment_id")
             already_sent_ids = {r["enrollment_id"] for r in already_sent}
             if already_sent_ids:
-                before = len(due)
+                before2 = len(due)
                 due = [e for e in due if e["id"] not in already_sent_ids]
-                skipped = before - len(due)
-                if skipped:
-                    log.info("  Step %d: skipped %d already-sent enrollment(s)", snum, skipped)
+                if before2 - len(due):
+                    log.info("  Step %d: skipped %d already-sent", snum, before2 - len(due))
 
             if not due:
-                log.info("  Step %d: all due already sent, skipping", snum)
+                log.info("  Step %d: all due already sent", snum)
                 continue
 
-            if batch_limit > 0 and len(due) > batch_limit:
-                log.info("  Step %d: %d due, capped to batch limit of %d", snum, len(due), batch_limit)
-                due = due[:batch_limit]
-            else:
-                log.info("  Step %d: %d due (delay was %d min)", snum, len(due), delay_mins)
+            # Respect daily limit when capping batch
+            remaining_today = daily_limit - sent_today
+            effective_cap = remaining_today
+            if batch_limit > 0:
+                effective_cap = min(batch_limit, remaining_today)
 
-            if batch_interval_minutes > 0:
-                log.info("  Step %d: interval %d min between emails", snum, batch_interval_minutes)
+            if len(due) > effective_cap:
+                log.info("  Step %d: %d due, capped to %d", snum, len(due), effective_cap)
+                due = due[:effective_cap]
             else:
-                log.info("  Step %d: using global rate %.1f emails/min", snum, global_emails_per_minute)
-
-            if step_tags:
-                log.info("  Step %d: tags %s", snum, step_tags)
+                log.info("  Step %d: %d due (delay %d min)", snum, len(due), delay_mins)
 
             is_last = snum >= total_steps
 
             for i, enr in enumerate(due):
+                if sent_today >= daily_limit:
+                    log.info("  Daily limit hit mid-step. Stopping.")
+                    break
+
                 try:
                     msg_id = send_email(
                         api_key=brevo_api_key,
@@ -215,8 +315,11 @@ def main() -> int:
                         subject=step["subject"],
                         body=step_body,
                         tags=step_tags,
+                        site_url=site_url,
                     )
-                    log.info("  [%d/%d] Sent → %s (msgId: %s)", i + 1, len(due), enr["email"], msg_id)
+                    sent_today += 1
+                    log.info("  [%d/%d] Sent → %s (msgId: %s) [today: %d/%d]",
+                             i + 1, len(due), enr["email"], msg_id, sent_today, daily_limit)
 
                     now = dt.datetime.now(dt.timezone.utc).isoformat()
                     post("send_log", {
@@ -225,6 +328,7 @@ def main() -> int:
                         "step_number": snum,
                         "brevo_message_id": msg_id,
                         "status": "sent",
+                        "sent_at": now,
                     })
                     patch("enrollments", f"?id=eq.{enr['id']}", {
                         "current_step": snum,
@@ -236,9 +340,9 @@ def main() -> int:
                     log.exception("  [%d/%d] Failed for %s", i + 1, len(due), enr["email"])
 
                 if i < len(due) - 1:
-                    log.info("  Waiting %.0f seconds before next email…", send_interval)
                     time.sleep(send_interval)
 
+    log.info("Done. Total sent this run: %d", sent_today)
     return 0
 
 
