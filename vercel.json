@@ -22,6 +22,7 @@
     { "source": "/applications-template", "destination": "/applications-template.html" },
     { "source": "/login", "destination": "/Login.html" },
     { "source": "/email-dashboard", "destination": "/email-dashboard.html" },
+    { "source": "/about", "destination": "/about.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
