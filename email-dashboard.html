@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--blue:#1a56db;--blue-dark:#1141a8;--blue-light:#e8f0fe;--gray:#6b7280;--gray-light:#f3f4f6;--border:#e5e7eb;--text:#111827;--green:#10b981;--red:#ef4444;--yellow:#f59e0b}
+:root{--blue:#1a56db;--blue-dark:#1141a8;--blue-light:#e8f0fe;--gray:#6b7280;--gray-light:#f3f4f6;--border:#e5e7eb;--text:#111827;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--purple:#8b5cf6}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--gray-light);color:var(--text);height:100vh;overflow:hidden}
 #config-screen{position:fixed;inset:0;background:var(--gray-light);display:flex;align-items:center;justify-content:center;z-index:200}
 #config-screen .box{background:#fff;border-radius:12px;padding:32px;width:440px;box-shadow:0 4px 24px rgba(0,0,0,.1)}
@@ -62,6 +62,7 @@ tr:hover td{background:#fafafa}
 .badge-yellow{background:#fef3c7;color:#92400e}
 .badge-red{background:#fee2e2;color:#991b1b}
 .badge-blue{background:var(--blue-light);color:var(--blue-dark)}
+.badge-purple{background:#ede9fe;color:#5b21b6}
 .toggle{position:relative;width:40px;height:22px;display:inline-block}
 .toggle input{opacity:0;width:0;height:0}
 .toggle-slider{position:absolute;inset:0;background:#d1d5db;border-radius:22px;cursor:pointer;transition:background .2s}
@@ -69,7 +70,7 @@ tr:hover td{background:#fafafa}
 .toggle-slider:before{position:absolute;content:"";height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:transform .2s}
 .toggle input:checked+.toggle-slider:before{transform:translateX(18px)}
 .empty{text-align:center;padding:40px;color:var(--gray);font-size:14px}
-.actions{display:flex;gap:6px}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
 .step-card{background:var(--gray-light);border-radius:8px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border)}
 .step-card-header{display:flex;align-items:center;justify-content:space-between}
 .step-num{background:var(--blue);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
@@ -88,6 +89,29 @@ textarea{resize:vertical;min-height:80px}
 .priority-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600}
 .priority-later{background:#fef3c7;color:#92400e}
 .priority-seq{background:#e0e7ff;color:#3730a3}
+/* NEW */
+.tab-bar{display:flex;gap:2px;background:var(--gray-light);border-radius:8px;padding:3px;margin-bottom:20px;width:fit-content;border:1px solid var(--border)}
+.tab-btn{padding:7px 18px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--gray);transition:all .15s;font-family:inherit}
+.tab-btn.active{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1);font-weight:600}
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:14px 16px;background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:16px}
+.fg{display:flex;align-items:center;gap:6px}
+.fg label{font-size:12px;font-weight:600;color:var(--gray);white-space:nowrap}
+.fg select,.fg input[type=text]{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff;font-family:inherit;outline:none}
+.fg select:focus,.fg input:focus{border-color:var(--blue)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;text-align:center}
+.stat-card .sv{font-size:28px;font-weight:800;margin-bottom:3px;font-variant-numeric:tabular-nums;line-height:1}
+.stat-card .sl{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.05em}
+.stat-card .ss{font-size:11px;color:var(--gray);margin-top:3px}
+.days-grid{display:flex;gap:6px;flex-wrap:wrap}
+.day-chip{display:inline-flex;align-items:center;justify-content:center;width:48px;height:36px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;user-select:none;transition:all .15s;background:#fff;color:var(--gray)}
+.day-chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.account-card{background:var(--gray-light);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.account-info{flex:1;min-width:0}
+.account-name{font-size:14px;font-weight:600}
+.account-meta{font-size:12px;color:var(--gray);margin-top:2px}
+.info-banner{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;font-size:13px;color:#1e40af;margin-bottom:16px}
+.warn-banner{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;font-size:13px;color:#92400e;margin-bottom:16px}
 </style>
 </head>
 <body>
@@ -145,6 +169,8 @@ textarea{resize:vertical;min-height:80px}
 <script>
 let sb;
 let countdownInterval = null;
+let currentSubTab = 'contacts';
+let aF = { days: '30', seqId: '', status: '', search: '' }; // analytics filters
 
 function saveConfig() {
   const url = document.getElementById('cfg-url').value.trim();
@@ -162,6 +188,8 @@ function boot(url, key) {
   navigate('dashboard');
 }
 
+function cfgVal(v) { return typeof v === 'string' ? v.replace(/^"|"$/g, '') : (v || ''); }
+
 async function navigate(tab) {
   if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
   document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
@@ -171,76 +199,52 @@ async function navigate(tab) {
     { dashboard:'Dashboard', sequences:'Sequences', subscribers:'Subscribers', analytics:'Analytics', testemail:'Test Email', settings:'Settings' }[tab];
   document.getElementById('topbar-actions').innerHTML = '';
   document.getElementById('content').innerHTML = '<div style="padding:40px;text-align:center;color:#6b7280">Loading…</div>';
-  if (tab === 'dashboard') await renderDashboard();
-  else if (tab === 'sequences') await renderSequences();
-  else if (tab === 'subscribers') await renderSubscribers();
-  else if (tab === 'analytics') await renderAnalytics();
-  else if (tab === 'testemail') await renderTestEmail();
-  else if (tab === 'settings') await renderSettings();
+  if (tab==='dashboard') await renderDashboard();
+  else if (tab==='sequences') await renderSequences();
+  else if (tab==='subscribers') await renderSubscribers();
+  else if (tab==='analytics') await renderAnalytics();
+  else if (tab==='testemail') await renderTestEmail();
+  else if (tab==='settings') await renderSettings();
 }
 
-function cfgVal(v) { return typeof v === 'string' ? v.replace(/^"|"$/g, '') : (v || ''); }
-
-// ── COUNTDOWN HELPERS ────────────────────────────────────────────────────────
-
+// ── COUNTDOWN ────────────────────────────────────────────────────────────────
 function getNextSendMs(timeStr, tz) {
   if (!timeStr) return null;
   try {
     const [hh, mm] = timeStr.split(':').map(Number);
     const now = new Date();
-    // Build today's target in the configured timezone
-    const todayStr = now.toLocaleDateString('en-CA', { timeZone: tz }); // YYYY-MM-DD
-    const targetStr = `${todayStr}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
-    // Parse that as local time in the target tz
-    const targetLocal = new Date(new Date(targetStr).toLocaleString('en-US', { timeZone: tz }));
-    const targetUtc = new Date(new Date(targetStr).getTime() + (new Date(targetStr) - targetLocal));
-    let next = new Date(targetStr); // approximate — good enough for display
-    // If already past, add 1 day
-    if (next <= now) next = new Date(next.getTime() + 86400000);
-    return next.getTime() - now.getTime();
+    const todayStr = now.toLocaleDateString('en-CA', { timeZone: tz });
+    const target = new Date(`${todayStr}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`);
+    if (target <= now) target.setDate(target.getDate() + 1);
+    return target.getTime() - now.getTime();
   } catch { return null; }
 }
-
 function formatCountdown(ms) {
   if (ms === null) return '--:--:--';
-  const total = Math.max(0, Math.floor(ms / 1000));
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = total % 60;
-  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const t = Math.max(0, Math.floor(ms / 1000));
+  return `${String(Math.floor(t/3600)).padStart(2,'0')}:${String(Math.floor((t%3600)/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
 }
-
 function startCountdown(timeStr, tz) {
   if (countdownInterval) clearInterval(countdownInterval);
-  function tick() {
-    const el = document.getElementById('countdown-timer');
-    if (!el) { clearInterval(countdownInterval); return; }
-    const ms = getNextSendMs(timeStr, tz);
-    el.textContent = formatCountdown(ms);
-  }
-  tick();
-  countdownInterval = setInterval(tick, 1000);
+  const tick = () => { const el = document.getElementById('countdown-timer'); if (!el) { clearInterval(countdownInterval); return; } el.textContent = formatCountdown(getNextSendMs(timeStr, tz)); };
+  tick(); countdownInterval = setInterval(tick, 1000);
 }
+function formatTime12(t) { if (!t) return ''; const [h,m]=t.split(':').map(Number); return `${h%12||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`; }
+function tzLabel(tz) { return ({  'America/New_York':'ET','America/Chicago':'CT','America/Denver':'MT','America/Los_Angeles':'PT','America/Anchorage':'AKT','Pacific/Honolulu':'HT' })[tz]||tz; }
 
 // ── DASHBOARD ────────────────────────────────────────────────────────────────
-
 async function renderDashboard() {
-  const [{ data: seqs }, { data: enrs }, { data: logs }, { data: rows }] = await Promise.all([
+  const [{ data: seqs },{ data: enrs },{ data: logs },{ data: rows }] = await Promise.all([
     sb.from('sequences').select('id,active'),
     sb.from('enrollments').select('status'),
-    sb.from('send_log').select('id,sent_at').order('sent_at', { ascending: false }).limit(200),
+    sb.from('send_log').select('id,sent_at').order('sent_at',{ascending:false}).limit(200),
     sb.from('settings').select('key,value'),
   ]);
-  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
-  const sendTime = cfg.send_time || '';
-  const sendTz = cfg.send_timezone || 'America/New_York';
+  const cfg = Object.fromEntries((rows||[]).map(r=>[r.key,cfgVal(r.value)]));
+  const sendTime = cfg.send_time||''; const sendTz = cfg.send_timezone||'America/New_York';
   const today = new Date().toDateString();
-  const sentToday = (logs || []).filter(l => new Date(l.sent_at).toDateString() === today).length;
-
-  const scheduleDisplay = sendTime
-    ? `Daily at ${formatTime12(sendTime)} (${tzLabel(sendTz)})`
-    : 'Not scheduled — set a time in Settings';
-
+  const sentToday = (logs||[]).filter(l=>new Date(l.sent_at).toDateString()===today).length;
+  const scheduleDisplay = sendTime ? `Daily at ${formatTime12(sendTime)} (${tzLabel(sendTz)})` : 'Not scheduled — set a time in Settings';
   document.getElementById('content').innerHTML = `
     <div class="cards">
       <div class="card"><div class="label">Active Sequences</div><div class="value" style="color:var(--blue)">${(seqs||[]).filter(s=>s.active).length}</div><div class="sub">${(seqs||[]).length} total</div></div>
@@ -248,12 +252,8 @@ async function renderDashboard() {
       <div class="card"><div class="label">Sent Today</div><div class="value" style="color:var(--green)">${sentToday}</div><div class="sub">emails</div></div>
       <div class="card"><div class="label">Total Sent</div><div class="value">${(logs||[]).length}</div><div class="sub">all time</div></div>
     </div>
-
     <div class="panel" style="margin-bottom:20px">
-      <div class="panel-header">
-        <h2>Scheduled Send</h2>
-        <button class="btn btn-secondary btn-sm" onclick="navigate('settings')">Change Schedule</button>
-      </div>
+      <div class="panel-header"><h2>Scheduled Send</h2><button class="btn btn-secondary btn-sm" onclick="navigate('settings')">Change Schedule</button></div>
       <div style="padding:20px">
         <div class="countdown-box">
           <div>
@@ -269,201 +269,117 @@ async function renderDashboard() {
         <div id="run-status-box" style="margin-top:14px;display:none;background:var(--gray-light);border-radius:8px;padding:14px 16px;font-size:13px">
           <div style="display:flex;align-items:center;gap:10px">
             <span id="run-status-dot" style="width:10px;height:10px;border-radius:50%;flex-shrink:0;background:#d1d5db"></span>
-            <div>
-              <div id="run-status-text" style="font-weight:600">Checking…</div>
-              <div id="run-status-time" style="color:var(--gray);margin-top:2px"></div>
-            </div>
+            <div><div id="run-status-text" style="font-weight:600">Checking…</div><div id="run-status-time" style="color:var(--gray);margin-top:2px"></div></div>
             <a id="run-status-link" href="#" target="_blank" style="margin-left:auto;font-size:12px;color:var(--blue)">View on GitHub →</a>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="panel">
-      <div class="panel-header">
-        <h2>Recent Activity</h2>
-        <button class="btn btn-secondary btn-sm" onclick="refreshLog()">Refresh</button>
-      </div>
-      <div id="recent-log"><div class="empty">Loading…</div></div>
-    </div>`;
-
+    <div class="panel"><div class="panel-header"><h2>Recent Activity</h2><button class="btn btn-secondary btn-sm" onclick="refreshLog()">Refresh</button></div><div id="recent-log"><div class="empty">Loading…</div></div></div>`;
   if (sendTime) startCountdown(sendTime, sendTz);
-  await refreshLog();
-  checkRunStatus();
-}
-
-function formatTime12(t) {
-  if (!t) return '';
-  const [h, m] = t.split(':').map(Number);
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  const h12 = h % 12 || 12;
-  return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
-}
-
-function tzLabel(tz) {
-  const map = {
-    'America/New_York': 'ET', 'America/Chicago': 'CT',
-    'America/Denver': 'MT', 'America/Los_Angeles': 'PT',
-    'America/Anchorage': 'AKT', 'Pacific/Honolulu': 'HT'
-  };
-  return map[tz] || tz;
+  await refreshLog(); checkRunStatus();
 }
 
 async function refreshLog() {
-  const { data: recent } = await sb.from('send_log')
-    .select('sent_at,step_number,brevo_message_id,enrollments(email,sequences(name))')
-    .order('sent_at', { ascending: false }).limit(20);
-  document.getElementById('recent-log').innerHTML = !recent || !recent.length
-    ? '<div class="empty">No sends yet. Create a sequence and enroll subscribers.</div>'
-    : `<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Message ID</th></tr></thead><tbody>
-      ${recent.map(l=>`<tr>
-        <td>${new Date(l.sent_at).toLocaleString()}</td>
-        <td>${l.enrollments?.email||'—'}</td>
-        <td>${l.enrollments?.sequences?.name||'—'}</td>
-        <td>Step ${l.step_number}</td>
-        <td style="font-size:11px;color:var(--gray)">${l.brevo_message_id||'—'}</td>
-      </tr>`).join('')}</tbody></table>`;
+  const { data: recent } = await sb.from('send_log').select('sent_at,step_number,brevo_message_id,enrollments(email,sequences(name))').order('sent_at',{ascending:false}).limit(20);
+  document.getElementById('recent-log').innerHTML = !recent||!recent.length
+    ? '<div class="empty">No sends yet.</div>'
+    : `<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Message ID</th></tr></thead><tbody>${recent.map(l=>`<tr><td>${new Date(l.sent_at).toLocaleString()}</td><td>${l.enrollments?.email||'—'}</td><td>${l.enrollments?.sequences?.name||'—'}</td><td>Step ${l.step_number}</td><td style="font-size:11px;color:var(--gray)">${l.brevo_message_id||'—'}</td></tr>`).join('')}</tbody></table>`;
 }
 
 async function checkRunStatus(poll) {
   const { data: rows } = await sb.from('settings').select('key,value');
-  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
-  const token = cfg.github_token;
-  const repo = cfg.github_repo;
-  if (!token || !repo) return;
-
-  const box = document.getElementById('run-status-box');
-  const dot = document.getElementById('run-status-dot');
-  const text = document.getElementById('run-status-text');
-  const time = document.getElementById('run-status-time');
-  const link = document.getElementById('run-status-link');
-  if (!box) return;
-
+  const cfg = Object.fromEntries((rows||[]).map(r=>[r.key,cfgVal(r.value)]));
+  if (!cfg.github_token||!cfg.github_repo) return;
+  const box=document.getElementById('run-status-box'); if (!box) return;
   try {
-    const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/drip.yml/runs?per_page=1`, {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
-    });
-    const data = await r.json();
-    const run = data.workflow_runs?.[0];
-    if (!run) { box.style.display = 'none'; return; }
-    box.style.display = 'block';
-    link.href = run.html_url;
-    const started = new Date(run.created_at).toLocaleString();
-    if (run.status === 'in_progress' || run.status === 'queued') {
-      dot.style.background = '#f59e0b';
-      text.textContent = run.status === 'queued' ? 'Queued — starting soon…' : 'Running — emails sending now…';
-      time.textContent = `Started ${started}`;
-      if (poll !== false) setTimeout(() => checkRunStatus(true), 10000);
-    } else if (run.conclusion === 'success') {
-      dot.style.background = '#10b981';
-      text.textContent = 'Completed successfully';
-      time.textContent = `Finished ${new Date(run.updated_at).toLocaleString()}`;
-      if (poll) refreshLog();
-    } else if (run.conclusion === 'failure') {
-      dot.style.background = '#ef4444';
-      text.textContent = 'Run failed — check GitHub Actions for details';
-      time.textContent = `Failed ${new Date(run.updated_at).toLocaleString()}`;
-    } else {
-      dot.style.background = '#d1d5db';
-      text.textContent = `Last run: ${run.conclusion || run.status}`;
-      time.textContent = started;
-    }
-  } catch(e) { box.style.display = 'none'; }
+    const r = await fetch(`https://api.github.com/repos/${cfg.github_repo}/actions/workflows/drip.yml/runs?per_page=1`,{headers:{'Authorization':`Bearer ${cfg.github_token}`,'Accept':'application/vnd.github+json'}});
+    const data = await r.json(); const run = data.workflow_runs?.[0]; if (!run){box.style.display='none';return;}
+    box.style.display='block'; document.getElementById('run-status-link').href=run.html_url;
+    const dot=document.getElementById('run-status-dot'),text=document.getElementById('run-status-text'),time=document.getElementById('run-status-time');
+    if (run.status==='in_progress'||run.status==='queued'){dot.style.background='#f59e0b';text.textContent=run.status==='queued'?'Queued…':'Running…';time.textContent=`Started ${new Date(run.created_at).toLocaleString()}`;if(poll!==false)setTimeout(()=>checkRunStatus(true),10000);}
+    else if (run.conclusion==='success'){dot.style.background='#10b981';text.textContent='Completed successfully';time.textContent=`Finished ${new Date(run.updated_at).toLocaleString()}`;if(poll)refreshLog();}
+    else if (run.conclusion==='failure'){dot.style.background='#ef4444';text.textContent='Run failed — check GitHub Actions';time.textContent=`Failed ${new Date(run.updated_at).toLocaleString()}`;}
+    else{dot.style.background='#d1d5db';text.textContent=`Last run: ${run.conclusion||run.status}`;time.textContent=new Date(run.created_at).toLocaleString();}
+  } catch(e){box.style.display='none';}
 }
 
 async function sendNow() {
-  const btn = document.getElementById('send-btn');
-  const status = document.getElementById('send-status');
-  btn.disabled = true;
-  status.textContent = 'Triggering…';
-
+  const btn=document.getElementById('send-btn'),status=document.getElementById('send-status');
+  btn.disabled=true; status.textContent='Triggering…';
   const { data: rows } = await sb.from('settings').select('key,value');
-  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
-  const token = cfg.github_token;
-  const repo = cfg.github_repo;
-
-  if (!token || !repo) {
-    status.textContent = 'GitHub token and repo not set in Settings.';
-    btn.disabled = false;
-    return;
-  }
+  const cfg = Object.fromEntries((rows||[]).map(r=>[r.key,cfgVal(r.value)]));
+  if (!cfg.github_token||!cfg.github_repo){status.textContent='GitHub token/repo not set.';btn.disabled=false;return;}
   try {
-    const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/drip.yml/dispatches`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ref: 'main' }),
-    });
-    if (r.status === 204) {
-      status.textContent = '✓ Triggered!';
-      setTimeout(() => checkRunStatus(true), 3000);
-    } else {
-      const err = await r.json();
-      status.textContent = 'Error: ' + (err.message || r.status);
-    }
-  } catch (e) { status.textContent = 'Failed: ' + e.message; }
-  btn.disabled = false;
+    const r = await fetch(`https://api.github.com/repos/${cfg.github_repo}/actions/workflows/drip.yml/dispatches`,{method:'POST',headers:{'Authorization':`Bearer ${cfg.github_token}`,'Accept':'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify({ref:'main'})});
+    if (r.status===204){status.textContent='✓ Triggered!';setTimeout(()=>checkRunStatus(true),3000);}
+    else{const err=await r.json();status.textContent='Error: '+(err.message||r.status);}
+  } catch(e){status.textContent='Failed: '+e.message;}
+  btn.disabled=false;
 }
 
 // ── SEQUENCES ────────────────────────────────────────────────────────────────
-
 async function renderSequences() {
-  const { data: seqs } = await sb.from('sequences').select('*').order('created_at');
+  const { data: seqs } = await sb.from('sequences').select('*,sending_accounts(name),lists(name)').order('created_at');
   document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openSeqModal()">+ New Sequence</button>`;
-
-  const priorityBadge = p => p === 'later_first'
-    ? `<span class="priority-badge priority-later">Later Steps First</span>`
-    : `<span class="priority-badge priority-seq">Sequential</span>`;
-
+  const pb = p => p==='later_first' ? `<span class="priority-badge priority-later">Later First</span>` : `<span class="priority-badge priority-seq">Sequential</span>`;
   document.getElementById('content').innerHTML = `
     <div class="panel">
       <div class="panel-header"><h2>Sequences</h2></div>
-      ${!seqs||!seqs.length ? '<div class="empty">No sequences yet. Create one to get started.</div>' :
-      `<table><thead><tr><th>Name</th><th>Description</th><th>Step Priority</th><th>Active</th><th>Actions</th></tr></thead><tbody>
+      ${!seqs||!seqs.length ? '<div class="empty">No sequences yet.</div>' :
+      `<table><thead><tr><th>Name</th><th>Priority</th><th>Inbox</th><th>List</th><th>Active</th><th>Actions</th></tr></thead><tbody>
       ${seqs.map(s=>`<tr>
-        <td><strong>${s.name}</strong></td>
-        <td style="color:var(--gray)">${s.description||'—'}</td>
-        <td>${priorityBadge(s.step_priority||'later_first')}</td>
+        <td><strong>${s.name}</strong>${s.description?`<div style="font-size:12px;color:var(--gray)">${s.description}</div>`:''}</td>
+        <td>${pb(s.step_priority||'later_first')}</td>
+        <td style="font-size:13px">${s.sending_accounts?.name||'<span style="color:var(--gray)">Default</span>'}</td>
+        <td style="font-size:13px">${s.lists?.name||'<span style="color:var(--gray)">—</span>'}</td>
         <td><label class="toggle"><input type="checkbox" ${s.active?'checked':''} onchange="toggleSeq('${s.id}',this.checked)"><span class="toggle-slider"></span></label></td>
         <td><div class="actions">
           <button class="btn btn-secondary btn-sm" onclick="openStepsModal('${s.id}','${esc(s.name)}')">Steps</button>
-          <button class="btn btn-secondary btn-sm" onclick="openSeqModal('${s.id}','${esc(s.name)}','${esc(s.description||'')}','${s.step_priority||'later_first'}')">Edit</button>
+          <button class="btn btn-secondary btn-sm" onclick="openSeqModal('${s.id}')">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteSeq('${s.id}')">Delete</button>
         </div></td>
       </tr>`).join('')}</tbody></table>`}
-    </div>
-    <div class="panel" style="background:#fffbeb;border-color:#fde68a">
-      <div style="padding:16px 20px;font-size:13px;color:#92400e">
-        <strong>Step Priority explained:</strong>
-        <ul style="margin-top:8px;padding-left:18px;line-height:1.8">
-          <li><strong>Later Steps First</strong> — contacts already in Step 2, 3, 4… are sent their next email before any new contacts get Step 1. Keeps follow-up sequences moving forward.</li>
-          <li><strong>Sequential</strong> — sends Step 1 to all new contacts first, then moves to later steps. Use this when starting fresh campaigns.</li>
-        </ul>
-      </div>
     </div>`;
 }
 
-async function toggleSeq(id, active) {
-  await sb.from('sequences').update({ active }).eq('id', id);
-}
+async function toggleSeq(id,active){await sb.from('sequences').update({active}).eq('id',id);}
+async function deleteSeq(id){if(!confirm('Delete sequence and all enrollments?'))return;await sb.from('sequences').delete().eq('id',id);renderSequences();}
 
-async function deleteSeq(id) {
-  if (!confirm('Delete this sequence and all enrollments?')) return;
-  await sb.from('sequences').delete().eq('id', id);
-  renderSequences();
-}
-
-function openSeqModal(id, name, desc, priority) {
+async function openSeqModal(id) {
+  const [{ data: accounts },{ data: lists }] = await Promise.all([
+    sb.from('sending_accounts').select('id,name,from_email').eq('active',true),
+    sb.from('lists').select('id,name').order('name'),
+  ]);
+  let seq = null;
+  if (id) ({ data: seq } = await sb.from('sequences').select('*').eq('id',id).single());
   showModal(`
-    <h2>${id ? 'Edit' : 'New'} Sequence</h2>
-    <div class="form-group"><label>Name</label><input id="sq-name" value="${name||''}"></div>
-    <div class="form-group"><label>Description</label><textarea id="sq-desc">${desc||''}</textarea></div>
+    <h2>${id?'Edit':'New'} Sequence</h2>
+    <div class="form-group"><label>Name</label><input id="sq-name" value="${esc(seq?.name||'')}"></div>
+    <div class="form-group"><label>Description</label><textarea id="sq-desc">${esc(seq?.description||'')}</textarea></div>
     <div class="form-group">
       <label>Step Priority</label>
       <select id="sq-priority">
-        <option value="later_first" ${(!priority||priority==='later_first')?'selected':''}>Later Steps First — prioritize contacts already in Step 2+ before starting Step 1</option>
-        <option value="sequential" ${priority==='sequential'?'selected':''}>Sequential — send Step 1 to new contacts first, then follow-ups</option>
+        <option value="later_first" ${(!seq?.step_priority||seq?.step_priority==='later_first')?'selected':''}>Later Steps First — contacts in Step 2+ go before new Step 1</option>
+        <option value="sequential" ${seq?.step_priority==='sequential'?'selected':''}>Sequential — Step 1 to new contacts first</option>
       </select>
-      <p class="hint">Controls the order emails are sent when running the sequence. "Later Steps First" is recommended for ongoing outreach.</p>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group">
+        <label>Sending Inbox <span style="color:var(--gray);font-weight:400">(optional)</span></label>
+        <select id="sq-account">
+          <option value="">Default (from Settings)</option>
+          ${(accounts||[]).map(a=>`<option value="${a.id}" ${seq?.sending_account_id===a.id?'selected':''}>${a.name} — ${a.from_email}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Target List <span style="color:var(--gray);font-weight:400">(optional)</span></label>
+        <select id="sq-list">
+          <option value="">None</option>
+          ${(lists||[]).map(l=>`<option value="${l.id}" ${seq?.list_id===l.id?'selected':''}>${l.name}</option>`).join('')}
+        </select>
+        <p class="hint">Use "Enroll List" in Subscribers to add members.</p>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
@@ -472,277 +388,341 @@ function openSeqModal(id, name, desc, priority) {
 }
 
 async function saveSeq(id) {
-  const name = document.getElementById('sq-name').value.trim();
-  const description = document.getElementById('sq-desc').value.trim();
-  const step_priority = document.getElementById('sq-priority').value;
-  if (!name) { alert('Name required'); return; }
-  if (id) await sb.from('sequences').update({ name, description, step_priority }).eq('id', id);
-  else await sb.from('sequences').insert({ name, description, step_priority, active: true });
-  closeModal();
-  renderSequences();
+  const name=document.getElementById('sq-name').value.trim();
+  const description=document.getElementById('sq-desc').value.trim();
+  const step_priority=document.getElementById('sq-priority').value;
+  const sending_account_id=document.getElementById('sq-account').value||null;
+  const list_id=document.getElementById('sq-list').value||null;
+  if (!name){alert('Name required');return;}
+  const payload={name,description,step_priority,sending_account_id,list_id};
+  if (id) await sb.from('sequences').update(payload).eq('id',id);
+  else await sb.from('sequences').insert({...payload,active:true});
+  closeModal(); renderSequences();
 }
 
-async function openStepsModal(seqId, seqName) {
-  const { data: steps } = await sb.from('steps').select('*').eq('sequence_id', seqId).order('step_number');
-  const nextNum = steps && steps.length ? steps[steps.length - 1].step_number + 1 : 1;
-  showModal(`
-    <h2>Steps — ${seqName}</h2>
-    <div id="steps-list">
-      ${!steps||!steps.length ? '<div class="empty">No steps. Add one below.</div>' : steps.map(s => stepCard(s)).join('')}
-    </div>
-    <button class="btn btn-ghost" style="margin-top:12px;width:100%" onclick="openStepForm('${seqId}','${esc(seqName)}',${nextNum},null)">+ Add Step</button>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Done</button></div>
-  `, true);
+async function openStepsModal(seqId,seqName) {
+  const { data: steps } = await sb.from('steps').select('*').eq('sequence_id',seqId).order('step_number');
+  const nextNum=steps&&steps.length?steps[steps.length-1].step_number+1:1;
+  showModal(`<h2>Steps — ${seqName}</h2><div id="steps-list">${!steps||!steps.length?'<div class="empty">No steps yet.</div>':steps.map(s=>stepCard(s)).join('')}</div><button class="btn btn-ghost" style="margin-top:12px;width:100%" onclick="openStepForm('${seqId}','${esc(seqName)}',${nextNum},null)">+ Add Step</button><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Done</button></div>`,true);
 }
 
-function delay(s) {
-  const parts = [s.delay_days>0?`${s.delay_days}d`:'', s.delay_hours>0?`${s.delay_hours}h`:'', s.delay_minutes>0?`${s.delay_minutes}m`:''].filter(Boolean);
-  return parts.length ? parts.join(' ') : 'Immediately';
-}
+function delay(s){const p=[s.delay_days>0?`${s.delay_days}d`:'',s.delay_hours>0?`${s.delay_hours}h`:'',s.delay_minutes>0?`${s.delay_minutes}m`:''].filter(Boolean);return p.length?p.join(' '):'Immediately';}
 
 function stepCard(s) {
-  const batchLimit = s.batch_limit > 0 ? s.batch_limit : null;
-  const interval = s.batch_interval_minutes > 0 ? s.batch_interval_minutes : null;
-  const batchText = batchLimit
-    ? `Batch: ${batchLimit} emails${interval ? `, ${interval} min apart` : ''}`
-    : (interval ? `${interval} min between emails` : 'No batch limit');
-  const tagPills = s.tags ? s.tags.split(',').map(t=>t.trim()).filter(Boolean).map(t=>`<span class="tag-pill">${t}</span>`).join('') : '';
-  const bodyPreview = s.body ? s.body.replace(/<[^>]+>/g,'').trim().substring(0,80)+(s.body.length>80?'…':'') : '';
-  return `<div class="step-card">
-    <div class="step-card-header">
-      <div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0">
-        <div class="step-num" style="margin-top:2px">${s.step_number}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:14px;font-weight:600">${s.subject}</div>
-          <div class="step-meta">Wait: ${delay(s)} · ${s.from_email}</div>
-          ${bodyPreview?`<div class="step-body-preview">"${bodyPreview}"</div>`:''}
-          <div class="step-meta" style="margin-top:4px">${batchText}</div>
-          ${tagPills?`<div style="margin-top:5px">${tagPills}</div>`:''}
-        </div>
-      </div>
-      <div class="actions" style="flex-shrink:0;margin-left:10px">
-        <button class="btn btn-secondary btn-sm" onclick="openStepForm('${s.sequence_id}','_',${s.step_number},'${s.id}')">Edit</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteStep('${s.id}','${s.sequence_id}')">×</button>
-      </div>
-    </div>
-  </div>`;
+  const bl=s.batch_limit>0?s.batch_limit:null,iv=s.batch_interval_minutes>0?s.batch_interval_minutes:null;
+  const bt=bl?`Batch: ${bl}${iv?`, ${iv} min apart`:''}`:iv?`${iv} min between`:'No batch limit';
+  const tp=s.tags?s.tags.split(',').map(t=>t.trim()).filter(Boolean).map(t=>`<span class="tag-pill">${t}</span>`).join(''):'';
+  const bp=s.body?s.body.replace(/<[^>]+>/g,'').trim().substring(0,80)+(s.body.length>80?'…':''):'';
+  return `<div class="step-card"><div class="step-card-header"><div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0"><div class="step-num" style="margin-top:2px">${s.step_number}</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">${s.subject}</div><div class="step-meta">Wait: ${delay(s)} · ${s.from_email}</div>${bp?`<div class="step-body-preview">"${bp}"</div>`:''}<div class="step-meta" style="margin-top:4px">${bt}</div>${tp?`<div style="margin-top:5px">${tp}</div>`:''}</div></div><div class="actions" style="flex-shrink:0;margin-left:10px"><button class="btn btn-secondary btn-sm" onclick="openStepForm('${s.sequence_id}','_',${s.step_number},'${s.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteStep('${s.id}','${s.sequence_id}')">×</button></div></div></div>`;
 }
 
-function openStepForm(seqId, seqName, stepNum, stepId) {
-  showModal(`
-    <h2>${stepId?'Edit':'New'} Step ${stepNum}</h2>
+function openStepForm(seqId,seqName,stepNum,stepId) {
+  showModal(`<h2>${stepId?'Edit':'New'} Step ${stepNum}</h2>
     <div class="section-title">Email Details</div>
     <div class="form-group"><label>Subject Line</label><input id="st-subj" placeholder="Quick question"></div>
     <div class="form-group"><label>From Email</label><input id="st-from" value="Aaron &lt;aaron@blubalencebookkeeping.com&gt;"></div>
     <div class="section-title">Email Body</div>
-    <div class="form-group">
-      <label>Body Text <span style="color:var(--gray);font-weight:400">(HTML or plain text)</span></label>
-      <textarea id="st-body" style="min-height:160px;font-family:monospace;font-size:13px" placeholder="Hi {{ .Subscriber.FirstName }},&#10;&#10;...&#10;&#10;Best,&#10;Aaron"></textarea>
-      <p class="hint">Use <code>{{ .Subscriber.FirstName }}</code> and <code>{{ .Subscriber.Email }}</code> for personalization.</p>
-    </div>
-    <div class="section-title">Wait Before Sending This Step</div>
-    <div class="form-row">
-      <div class="form-group"><label>Days</label><input id="st-days" type="number" value="0" min="0"></div>
-      <div class="form-group"><label>Hours</label><input id="st-hours" type="number" value="0" min="0" max="23"></div>
-      <div class="form-group"><label>Minutes</label><input id="st-mins" type="number" value="0" min="0" max="59"></div>
-    </div>
-    <p class="hint">Step 1 sends immediately on first run. Delay applies from the previous step's send time.</p>
+    <div class="form-group"><label>Body <span style="color:var(--gray);font-weight:400">(HTML or plain text)</span></label><textarea id="st-body" style="min-height:160px;font-family:monospace;font-size:13px"></textarea><p class="hint">Use {{name}} and {{email}} for personalization.</p></div>
+    <div class="section-title">Wait Before This Step</div>
+    <div class="form-row"><div class="form-group"><label>Days</label><input id="st-days" type="number" value="0" min="0"></div><div class="form-group"><label>Hours</label><input id="st-hours" type="number" value="0" min="0" max="23"></div><div class="form-group"><label>Minutes</label><input id="st-mins" type="number" value="0" min="0" max="59"></div></div>
     <div class="section-title">Batch Controls</div>
-    <div class="form-row-2">
-      <div class="form-group">
-        <label>Batch Limit <span style="color:var(--gray);font-weight:400">(max per run)</span></label>
-        <input id="st-batch" type="number" value="0" min="0" placeholder="0 = unlimited">
-      </div>
-      <div class="form-group">
-        <label>Minutes Between Emails</label>
-        <input id="st-interval" type="number" value="0" min="0" placeholder="0 = use global rate">
-      </div>
-    </div>
-    <p class="hint">Example: Batch 5 + 10 min = send 5 emails, one every 10 minutes.</p>
+    <div class="form-row-2"><div class="form-group"><label>Batch Limit</label><input id="st-batch" type="number" value="0" min="0" placeholder="0=unlimited"></div><div class="form-group"><label>Minutes Between Emails</label><input id="st-interval" type="number" value="0" min="0" placeholder="0=global rate"></div></div>
     <div class="section-title">Tags</div>
-    <div class="form-group">
-      <label>Tags <span style="color:var(--gray);font-weight:400">(comma-separated)</span></label>
-      <input id="st-tags" placeholder="atlanta-realtors, cold-outreach, step-1">
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="openStepsModal('${seqId}','${esc(seqName)}')">Back</button>
-      <button class="btn btn-primary" onclick="saveStep('${seqId}','${esc(seqName)}',${stepNum},'${stepId||''}')">Save Step</button>
-    </div>`, true);
-
-  if (stepId) {
-    sb.from('steps').select('*').eq('id', stepId).single().then(({ data: s }) => {
-      if (!s) return;
-      document.getElementById('st-subj').value = s.subject || '';
-      document.getElementById('st-from').value = s.from_email || '';
-      document.getElementById('st-days').value = s.delay_days || 0;
-      document.getElementById('st-hours').value = s.delay_hours || 0;
-      document.getElementById('st-mins').value = s.delay_minutes || 0;
-      document.getElementById('st-body').value = s.body || '';
-      document.getElementById('st-batch').value = s.batch_limit || 0;
-      document.getElementById('st-interval').value = s.batch_interval_minutes || 0;
-      document.getElementById('st-tags').value = s.tags || '';
-    });
-  }
+    <div class="form-group"><input id="st-tags" placeholder="tag1, tag2"></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="openStepsModal('${seqId}','${esc(seqName)}')">Back</button><button class="btn btn-primary" onclick="saveStep('${seqId}','${esc(seqName)}',${stepNum},'${stepId||''}')">Save Step</button></div>`,true);
+  if (stepId) sb.from('steps').select('*').eq('id',stepId).single().then(({data:s})=>{if(!s)return;document.getElementById('st-subj').value=s.subject||'';document.getElementById('st-from').value=s.from_email||'';document.getElementById('st-days').value=s.delay_days||0;document.getElementById('st-hours').value=s.delay_hours||0;document.getElementById('st-mins').value=s.delay_minutes||0;document.getElementById('st-body').value=s.body||'';document.getElementById('st-batch').value=s.batch_limit||0;document.getElementById('st-interval').value=s.batch_interval_minutes||0;document.getElementById('st-tags').value=s.tags||'';});
 }
 
-async function saveStep(seqId, seqName, stepNum, stepId) {
-  const payload = {
-    sequence_id: seqId, step_number: stepNum,
-    subject: document.getElementById('st-subj').value.trim(),
-    from_email: document.getElementById('st-from').value.trim(),
-    template_id: 1,
-    delay_days: parseInt(document.getElementById('st-days').value)||0,
-    delay_hours: parseInt(document.getElementById('st-hours').value)||0,
-    delay_minutes: parseInt(document.getElementById('st-mins').value)||0,
-    body: document.getElementById('st-body').value,
-    batch_limit: parseInt(document.getElementById('st-batch').value)||0,
-    batch_interval_minutes: parseInt(document.getElementById('st-interval').value)||0,
-    tags: document.getElementById('st-tags').value.trim(),
-  };
-  if (!payload.subject || !payload.from_email) { alert('Subject and From email are required'); return; }
+async function saveStep(seqId,seqName,stepNum,stepId) {
+  const payload={sequence_id:seqId,step_number:stepNum,subject:document.getElementById('st-subj').value.trim(),from_email:document.getElementById('st-from').value.trim(),template_id:1,delay_days:parseInt(document.getElementById('st-days').value)||0,delay_hours:parseInt(document.getElementById('st-hours').value)||0,delay_minutes:parseInt(document.getElementById('st-mins').value)||0,body:document.getElementById('st-body').value,batch_limit:parseInt(document.getElementById('st-batch').value)||0,batch_interval_minutes:parseInt(document.getElementById('st-interval').value)||0,tags:document.getElementById('st-tags').value.trim()};
+  if (!payload.subject||!payload.from_email){alert('Subject and From required');return;}
   let error;
-  if (stepId) ({ error } = await sb.from('steps').update(payload).eq('id', stepId));
-  else ({ error } = await sb.from('steps').insert(payload));
-  if (error) { alert('Save failed: ' + error.message); return; }
-  openStepsModal(seqId, seqName);
+  if (stepId)({error}=await sb.from('steps').update(payload).eq('id',stepId));
+  else({error}=await sb.from('steps').insert(payload));
+  if (error){alert('Save failed: '+error.message);return;}
+  openStepsModal(seqId,seqName);
 }
 
-async function deleteStep(stepId, seqId) {
-  if (!confirm('Delete this step?')) return;
-  await sb.from('steps').delete().eq('id', stepId);
-  const { data: seq } = await sb.from('sequences').select('name').eq('id', seqId).single();
-  openStepsModal(seqId, seq?.name || '');
-}
+async function deleteStep(stepId,seqId){if(!confirm('Delete step?'))return;await sb.from('steps').delete().eq('id',stepId);const{data:seq}=await sb.from('sequences').select('name').eq('id',seqId).single();openStepsModal(seqId,seq?.name||'');}
 
-// ── SUBSCRIBERS ──────────────────────────────────────────────────────────────
-
+// ── SUBSCRIBERS (3 tabs) ─────────────────────────────────────────────────────
 async function renderSubscribers() {
-  const { data: enrs } = await sb.from('enrollments').select('*,sequences(name)').order('enrolled_at', { ascending: false });
   document.getElementById('topbar-actions').innerHTML = `
     <button class="btn btn-secondary" style="margin-right:8px" onclick="openBulkModal()">Bulk CSV</button>
-    <button class="btn btn-primary" onclick="openEnrollModal()">+ Enroll</button>`;
-  const badge = s => ({ active:'badge-green', paused:'badge-yellow', completed:'badge-blue', unsubscribed:'badge-red' }[s]||'badge-gray');
+    <button class="btn btn-primary" onclick="subAddBtn()">+ Add</button>`;
   document.getElementById('content').innerHTML = `
+    <div class="tab-bar">
+      <button class="tab-btn ${currentSubTab==='contacts'?'active':''}" onclick="switchSubTab('contacts')">Contacts</button>
+      <button class="tab-btn ${currentSubTab==='lists'?'active':''}" onclick="switchSubTab('lists')">Lists</button>
+      <button class="tab-btn ${currentSubTab==='enrollments'?'active':''}" onclick="switchSubTab('enrollments')">Enrollments</button>
+    </div>
+    <div id="sub-content"><div style="padding:40px;text-align:center;color:#6b7280">Loading…</div></div>`;
+  await loadSubTab(currentSubTab);
+}
+
+function subAddBtn(){if(currentSubTab==='contacts')openContactModal();else if(currentSubTab==='lists')openListModal();else openEnrollModal();}
+function switchSubTab(t){currentSubTab=t;renderSubscribers();}
+async function loadSubTab(t){if(t==='contacts')await renderContactsTab();else if(t==='lists')await renderListsTab();else await renderEnrollmentsTab();}
+
+// CONTACTS TAB
+async function renderContactsTab() {
+  const [{ data: contacts },{ data: unsubs }] = await Promise.all([
+    sb.from('contacts').select('*').order('created_at',{ascending:false}),
+    sb.from('unsubscribes').select('email'),
+  ]);
+  const bl = new Set((unsubs||[]).map(r=>r.email.toLowerCase()));
+  const el = document.getElementById('sub-content');
+  el.innerHTML = `
+    <div class="panel">
+      <div class="panel-header"><h2>Contacts (${(contacts||[]).length})</h2><button class="btn btn-secondary btn-sm" onclick="openBulkContactsModal()">Import CSV</button></div>
+      ${!contacts||!contacts.length ? '<div class="empty">No contacts yet. Add contacts manually or import via CSV.</div>' :
+      `<table><thead><tr><th>Email</th><th>Name</th><th>Company</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+      ${(contacts||[]).map(c=>{const isbl=bl.has(c.email.toLowerCase())||c.status==='blacklisted';return`<tr>
+        <td>${c.email}</td>
+        <td>${[c.first_name,c.last_name].filter(Boolean).join(' ')||'—'}</td>
+        <td>${c.company||'—'}</td>
+        <td><span class="badge ${isbl?'badge-red':'badge-green'}">${isbl?'Blacklisted':'Active'}</span></td>
+        <td><div class="actions">
+          <button class="btn btn-secondary btn-sm" onclick="openContactModal('${c.id}')">Edit</button>
+          <button class="btn btn-secondary btn-sm" onclick="addToListPrompt('${c.email}','${esc([c.first_name,c.last_name].filter(Boolean).join(' '))}')">+ List</button>
+          ${isbl?`<button class="btn btn-secondary btn-sm" onclick="unBlacklist('${c.email}')">Unblock</button>`:`<button class="btn btn-danger btn-sm" onclick="blacklistContact('${c.email}')">Blacklist</button>`}
+        </div></td>
+      </tr>`}).join('')}
+      </tbody></table>`}
+    </div>`;
+}
+
+function openContactModal(id) {
+  showModal(`<h2>${id?'Edit':'Add'} Contact</h2>
+    <div class="form-row-2"><div class="form-group"><label>First Name</label><input id="ct-fn"></div><div class="form-group"><label>Last Name</label><input id="ct-ln"></div></div>
+    <div class="form-group"><label>Email</label><input id="ct-email" type="email" ${id?'readonly style="opacity:.7"':''}></div>
+    <div class="form-group"><label>Company</label><input id="ct-co"></div>
+    <div class="form-group"><label>Phone</label><input id="ct-ph"></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveContact('${id||''}')">Save</button></div>`);
+  if (id) sb.from('contacts').select('*').eq('id',id).single().then(({data:c})=>{if(!c)return;document.getElementById('ct-fn').value=c.first_name||'';document.getElementById('ct-ln').value=c.last_name||'';document.getElementById('ct-email').value=c.email||'';document.getElementById('ct-co').value=c.company||'';document.getElementById('ct-ph').value=c.phone||'';});
+}
+
+async function saveContact(id) {
+  const payload={first_name:document.getElementById('ct-fn').value.trim(),last_name:document.getElementById('ct-ln').value.trim(),email:document.getElementById('ct-email').value.trim().toLowerCase(),company:document.getElementById('ct-co').value.trim(),phone:document.getElementById('ct-ph').value.trim()};
+  if (!payload.email){alert('Email required');return;}
+  let error;
+  if (id)({error}=await sb.from('contacts').update(payload).eq('id',id));
+  else({error}=await sb.from('contacts').insert(payload));
+  if (error){alert(error.message);return;}
+  closeModal();renderContactsTab();
+}
+
+async function blacklistContact(email){if(!confirm(`Blacklist ${email}?`))return;await sb.from('unsubscribes').upsert({email,unsubscribed_at:new Date().toISOString()},{onConflict:'email'});await sb.from('enrollments').update({status:'unsubscribed'}).eq('email',email);renderContactsTab();}
+async function unBlacklist(email){if(!confirm(`Remove ${email} from blacklist?`))return;await sb.from('unsubscribes').delete().eq('email',email);renderContactsTab();}
+
+async function addToListPrompt(email,name) {
+  const { data: lists } = await sb.from('lists').select('id,name').order('name');
+  showModal(`<h2>Add to List</h2>
+    <p style="font-size:14px;color:var(--gray);margin-bottom:16px">Adding: <strong>${email}</strong></p>
+    <div class="form-group"><label>Select List</label><select id="atl-list"><option value="">Select…</option>${(lists||[]).map(l=>`<option value="${l.id}">${l.name}</option>`).join('')}</select></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doAddToList('${email}','${esc(name)}')">Add</button></div>`);
+}
+
+async function doAddToList(email,name){const listId=document.getElementById('atl-list').value;if(!listId){alert('Select a list');return;}const{error}=await sb.from('list_contacts').upsert({list_id:listId,email,name:name||null},{onConflict:'list_id,email',ignoreDuplicates:true});if(error){alert(error.message);return;}closeModal();}
+
+async function openBulkContactsModal() {
+  showModal(`<h2>Import Contacts via CSV</h2>
+    <div class="form-group"><label>One per line: <code>email, First Last, Company</code></label><textarea id="bct-csv" style="min-height:160px" placeholder="john@example.com, John Smith, Acme Realty&#10;jane@example.com, Jane Doe"></textarea></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doBulkContacts()">Import</button></div>`);
+}
+
+async function doBulkContacts(){const csv=document.getElementById('bct-csv').value.trim();if(!csv)return;const rows=csv.split('\n').map(line=>{const[email,...rest]=line.split(',').map(s=>s.trim());if(!email||!email.includes('@'))return null;const[first,...lrest]=((rest[0]||'').split(' '));return{email:email.toLowerCase(),first_name:first||null,last_name:lrest.join(' ')||null,company:rest[1]||null};}).filter(Boolean);if(!rows.length){alert('No valid emails');return;}const{error}=await sb.from('contacts').upsert(rows,{onConflict:'email',ignoreDuplicates:true});if(error){alert(error.message);return;}closeModal();renderContactsTab();}
+
+// LISTS TAB
+async function renderListsTab() {
+  const { data: lists } = await sb.from('lists').select('id,name,description,created_at').order('created_at');
+  const el = document.getElementById('sub-content');
+  el.innerHTML = `
+    <div class="panel">
+      <div class="panel-header"><h2>Lists</h2><button class="btn btn-primary btn-sm" onclick="openListModal()">+ New List</button></div>
+      ${!lists||!lists.length ? '<div class="empty">No lists yet. Create a list to organize contacts.</div>' :
+      `<table><thead><tr><th>Name</th><th>Description</th><th>Members</th><th>Actions</th></tr></thead><tbody>
+      ${lists.map(l=>`<tr>
+        <td><strong>${l.name}</strong></td>
+        <td style="color:var(--gray)">${l.description||'—'}</td>
+        <td id="lc-${l.id}">—</td>
+        <td><div class="actions">
+          <button class="btn btn-secondary btn-sm" onclick="viewListMembers('${l.id}','${esc(l.name)}')">Members</button>
+          <button class="btn btn-ghost btn-sm" onclick="enrollListToSeq('${l.id}','${esc(l.name)}')">Enroll to Sequence</button>
+          <button class="btn btn-secondary btn-sm" onclick="openListModal('${l.id}','${esc(l.name)}','${esc(l.description||'')}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteList('${l.id}')">Delete</button>
+        </div></td>
+      </tr>`).join('')}
+      </tbody></table>`}
+    </div>`;
+  (lists||[]).forEach(async l=>{const{count}=await sb.from('list_contacts').select('id',{count:'exact',head:true}).eq('list_id',l.id);const e=document.getElementById(`lc-${l.id}`);if(e)e.textContent=count||0;});
+}
+
+function openListModal(id,name,desc){showModal(`<h2>${id?'Edit':'New'} List</h2><div class="form-group"><label>Name</label><input id="ls-name" value="${name||''}"></div><div class="form-group"><label>Description</label><textarea id="ls-desc">${desc||''}</textarea></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveList('${id||''}')">Save</button></div>`);}
+
+async function saveList(id){const name=document.getElementById('ls-name').value.trim(),description=document.getElementById('ls-desc').value.trim();if(!name){alert('Name required');return;}let error;if(id)({error}=await sb.from('lists').update({name,description}).eq('id',id));else({error}=await sb.from('lists').insert({name,description}));if(error){alert(error.message);return;}closeModal();renderListsTab();}
+async function deleteList(id){if(!confirm('Delete list? Members are not deleted.'))return;await sb.from('lists').delete().eq('id',id);renderListsTab();}
+
+async function viewListMembers(listId,listName) {
+  const { data: members } = await sb.from('list_contacts').select('id,email,name,company,added_at').eq('list_id',listId).order('added_at',{ascending:false});
+  showModal(`<h2>${listName} (${(members||[]).length} members)</h2>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="btn btn-primary btn-sm" onclick="bulkAddToListModal('${listId}','${esc(listName)}')">+ Bulk CSV</button>
+    </div>
+    ${!members||!members.length?'<div class="empty">No members.</div>':`<table><thead><tr><th>Email</th><th>Name</th><th>Company</th><th></th></tr></thead><tbody>${members.map(m=>`<tr><td>${m.email}</td><td>${m.name||'—'}</td><td>${m.company||'—'}</td><td><button class="btn btn-danger btn-sm" onclick="removeListMember('${m.id}','${listId}','${esc(listName)}')">Remove</button></td></tr>`).join('')}</tbody></table>`}
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Close</button></div>`,true);
+}
+
+async function removeListMember(id,listId,listName){await sb.from('list_contacts').delete().eq('id',id);viewListMembers(listId,listName);}
+
+async function bulkAddToListModal(listId,listName){showModal(`<h2>Bulk Add to "${listName}"</h2><div class="form-group"><label>One per line: <code>email, Name, Company</code></label><textarea id="batl-csv" style="min-height:160px" placeholder="john@example.com, John Smith&#10;jane@example.com"></textarea></div><div class="modal-footer"><button class="btn btn-secondary" onclick="viewListMembers('${listId}','${esc(listName)}')">Back</button><button class="btn btn-primary" onclick="doBulkAddToList('${listId}','${esc(listName)}')">Add All</button></div>`);}
+
+async function doBulkAddToList(listId,listName){const csv=document.getElementById('batl-csv').value.trim();if(!csv)return;const rows=csv.split('\n').map(line=>{const[email,...rest]=line.split(',').map(s=>s.trim());return email&&email.includes('@')?{list_id:listId,email,name:rest[0]||null,company:rest[1]||null}:null;}).filter(Boolean);if(!rows.length){alert('No valid emails');return;}const{error}=await sb.from('list_contacts').upsert(rows,{onConflict:'list_id,email',ignoreDuplicates:true});if(error){alert(error.message);return;}viewListMembers(listId,listName);}
+
+async function enrollListToSeq(listId,listName) {
+  const { data: seqs } = await sb.from('sequences').select('id,name').eq('active',true);
+  showModal(`<h2>Enroll "${listName}" to Sequence</h2>
+    <p style="font-size:14px;color:var(--gray);margin-bottom:16px">All contacts in this list will be enrolled in the selected sequence.</p>
+    <div class="form-group"><label>Sequence</label><select id="els-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doEnrollList('${listId}')">Enroll All</button></div>`);
+}
+
+async function doEnrollList(listId){const seqId=document.getElementById('els-seq').value;if(!seqId){alert('Select a sequence');return;}const{data:members}=await sb.from('list_contacts').select('email,name').eq('list_id',listId);if(!members||!members.length){alert('No members in list');return;}const rows=members.map(m=>({email:m.email,name:m.name||null,sequence_id:seqId,current_step:0,status:'active'}));const{error}=await sb.from('enrollments').upsert(rows,{onConflict:'email,sequence_id',ignoreDuplicates:true});if(error){alert(error.message);return;}alert(`Enrolled ${members.length} contact(s)!`);closeModal();}
+
+// ENROLLMENTS TAB
+async function renderEnrollmentsTab() {
+  const { data: enrs } = await sb.from('enrollments').select('*,sequences(name)').order('enrolled_at',{ascending:false});
+  const badge = s=>({active:'badge-green',paused:'badge-yellow',completed:'badge-blue',unsubscribed:'badge-red'}[s]||'badge-gray');
+  document.getElementById('sub-content').innerHTML = `
     <div class="panel">
       <div class="panel-header"><h2>Enrollments (${(enrs||[]).length})</h2></div>
-      ${!enrs||!enrs.length ? '<div class="empty">No enrollments yet.</div>' :
+      ${!enrs||!enrs.length?'<div class="empty">No enrollments yet.</div>':
       `<table><thead><tr><th>Email</th><th>Name</th><th>Sequence</th><th>Step</th><th>Status</th><th>Last Sent</th><th>Actions</th></tr></thead><tbody>
       ${enrs.map(e=>`<tr>
-        <td>${e.email}</td>
-        <td>${e.name||'—'}</td>
-        <td>${e.sequences?.name||'—'}</td>
+        <td>${e.email}</td><td>${e.name||'—'}</td><td>${e.sequences?.name||'—'}</td>
         <td>Step ${e.current_step}</td>
         <td><span class="badge ${badge(e.status)}">${e.status}</span></td>
         <td>${e.last_sent_at?new Date(e.last_sent_at).toLocaleDateString():'Not yet'}</td>
         <td><div class="actions">
-          ${e.status==='active'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','paused')">Pause</button>`:
-            e.status==='paused'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','active')">Resume</button>`:''}
+          ${e.status==='active'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','paused')">Pause</button>`:e.status==='paused'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','active')">Resume</button>`:''}
           <button class="btn btn-danger btn-sm" onclick="removeEnr('${e.id}')">Remove</button>
         </div></td>
-      </tr>`).join('')}</tbody></table>`}
+      </tr>`).join('')}
+      </tbody></table>`}
     </div>`;
 }
 
-async function setStatus(id, status) { await sb.from('enrollments').update({ status }).eq('id', id); renderSubscribers(); }
-async function removeEnr(id) { if (!confirm('Remove this enrollment?')) return; await sb.from('enrollments').delete().eq('id', id); renderSubscribers(); }
+async function setStatus(id,status){await sb.from('enrollments').update({status}).eq('id',id);renderEnrollmentsTab();}
+async function removeEnr(id){if(!confirm('Remove enrollment?'))return;await sb.from('enrollments').delete().eq('id',id);renderEnrollmentsTab();}
 
-async function openEnrollModal() {
-  const { data: seqs } = await sb.from('sequences').select('id,name').eq('active', true);
-  showModal(`
-    <h2>Enroll Subscriber</h2>
-    <div class="form-group"><label>Email</label><input id="en-email" type="email" placeholder="prospect@example.com"></div>
-    <div class="form-group"><label>Name</label><input id="en-name" placeholder="First Last"></div>
-    <div class="form-group"><label>Sequence</label><select id="en-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="enrollOne()">Enroll</button>
-    </div>`);
-}
-
-async function enrollOne() {
-  const email = document.getElementById('en-email').value.trim();
-  const name = document.getElementById('en-name').value.trim();
-  const sequence_id = document.getElementById('en-seq').value;
-  if (!email || !sequence_id) { alert('Email and sequence required'); return; }
-  const { error } = await sb.from('enrollments').insert({ email, name, sequence_id, current_step: 0, status: 'active' });
-  if (error) { alert(error.message); return; }
-  closeModal(); renderSubscribers();
-}
-
-async function openBulkModal() {
-  const { data: seqs } = await sb.from('sequences').select('id,name').eq('active', true);
-  showModal(`
-    <h2>Bulk Enroll via CSV</h2>
-    <div class="form-group"><label>Sequence</label><select id="bl-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
-    <div class="form-group">
-      <label>Paste CSV — one per line: <code>email, First Last</code></label>
-      <textarea id="bl-csv" style="min-height:160px" placeholder="john@example.com, John Smith&#10;jane@example.com, Jane Doe"></textarea>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="bulkEnroll()">Enroll All</button>
-    </div>`);
-}
-
-async function bulkEnroll() {
-  const seq = document.getElementById('bl-seq').value;
-  const csv = document.getElementById('bl-csv').value.trim();
-  if (!seq || !csv) { alert('Sequence and CSV required'); return; }
-  const rows = csv.split('\n').map(line => {
-    const [email, ...rest] = line.split(',').map(s => s.trim());
-    return email && email.includes('@') ? { email, name: rest.join(' ').trim()||null, sequence_id: seq, current_step: 0, status: 'active' } : null;
-  }).filter(Boolean);
-  if (!rows.length) { alert('No valid emails found'); return; }
-  const { error } = await sb.from('enrollments').upsert(rows, { onConflict: 'email,sequence_id', ignoreDuplicates: true });
-  if (error) { alert(error.message); return; }
-  closeModal(); renderSubscribers();
-}
+async function openEnrollModal(){const{data:seqs}=await sb.from('sequences').select('id,name').eq('active',true);showModal(`<h2>Enroll Subscriber</h2><div class="form-group"><label>Email</label><input id="en-email" type="email"></div><div class="form-group"><label>Name</label><input id="en-name"></div><div class="form-group"><label>Sequence</label><select id="en-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="enrollOne()">Enroll</button></div>`);}
+async function enrollOne(){const email=document.getElementById('en-email').value.trim(),name=document.getElementById('en-name').value.trim(),sequence_id=document.getElementById('en-seq').value;if(!email||!sequence_id){alert('Email and sequence required');return;}const{error}=await sb.from('enrollments').insert({email,name,sequence_id,current_step:0,status:'active'});if(error){alert(error.message);return;}closeModal();renderEnrollmentsTab();}
+async function openBulkModal(){const{data:seqs}=await sb.from('sequences').select('id,name').eq('active',true);showModal(`<h2>Bulk Enroll via CSV</h2><div class="form-group"><label>Sequence</label><select id="bl-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div><div class="form-group"><label>One per line: <code>email, Name</code></label><textarea id="bl-csv" style="min-height:160px"></textarea></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="bulkEnroll()">Enroll All</button></div>`);}
+async function bulkEnroll(){const seq=document.getElementById('bl-seq').value,csv=document.getElementById('bl-csv').value.trim();if(!seq||!csv){alert('Sequence and CSV required');return;}const rows=csv.split('\n').map(line=>{const[email,...rest]=line.split(',').map(s=>s.trim());return email&&email.includes('@')?{email,name:rest.join(' ').trim()||null,sequence_id:seq,current_step:0,status:'active'}:null;}).filter(Boolean);if(!rows.length){alert('No valid emails');return;}const{error}=await sb.from('enrollments').upsert(rows,{onConflict:'email,sequence_id',ignoreDuplicates:true});if(error){alert(error.message);return;}closeModal();renderEnrollmentsTab();}
 
 // ── ANALYTICS ────────────────────────────────────────────────────────────────
-
 async function renderAnalytics() {
-  const { data: logs } = await sb.from('send_log')
-    .select('sent_at,step_number,brevo_message_id,status,enrollments(email,sequences(name))')
-    .order('sent_at', { ascending: false }).limit(500);
+  let logQ = sb.from('send_log').select('id,sent_at,step_number,brevo_message_id,enrollments(email,sequences(id,name))').order('sent_at',{ascending:false}).limit(2000);
+  if (aF.days!=='all') logQ=logQ.gte('sent_at',new Date(Date.now()-parseInt(aF.days)*86400000).toISOString());
+  const [{ data: logs },{ data: seqs },{ data: events }] = await Promise.all([
+    logQ,
+    sb.from('sequences').select('id,name'),
+    sb.from('email_events').select('event_type,email,message_id').limit(10000),
+  ]);
+
+  let filtered = (logs||[]);
+  if (aF.seqId) filtered=filtered.filter(l=>l.enrollments?.sequences?.id===aF.seqId);
+  if (aF.search){const s=aF.search.toLowerCase();filtered=filtered.filter(l=>(l.enrollments?.email||'').toLowerCase().includes(s));}
+
+  const evtMap={};
+  (events||[]).forEach(e=>{if(!e.message_id)return;if(!evtMap[e.message_id])evtMap[e.message_id]=[];evtMap[e.message_id].push(e.event_type);});
+
+  let opened=0,clicked=0,bounced=0,spam=0;
+  if (aF.status&&aF.status!=='all') filtered=filtered.filter(l=>(evtMap[l.brevo_message_id]||[]).includes(aF.status));
+  filtered.forEach(l=>{const ev=evtMap[l.brevo_message_id]||[];if(ev.includes('opened'))opened++;if(ev.includes('clicked'))clicked++;if(ev.includes('bounced'))bounced++;if(ev.includes('spam'))spam++;});
+
+  const total=filtered.length;
+  const pct=n=>total?(n/total*100).toFixed(1)+'%':'—';
+  const hasEv=(events||[]).length>0;
+
+  // per-sequence breakdown
+  const bySeq={};
+  filtered.forEach(l=>{const k=l.enrollments?.sequences?.name||'(none)';if(!bySeq[k])bySeq[k]={sent:0,opened:0,clicked:0,bounced:0,spam:0};bySeq[k].sent++;const ev=evtMap[l.brevo_message_id]||[];if(ev.includes('opened'))bySeq[k].opened++;if(ev.includes('clicked'))bySeq[k].clicked++;if(ev.includes('bounced'))bySeq[k].bounced++;if(ev.includes('spam'))bySeq[k].spam++;});
+
+  // per-receiving-domain
+  const byDom={};
+  filtered.forEach(l=>{const e=l.enrollments?.email||'';const d=e.split('@')[1]||'unknown';if(!byDom[d])byDom[d]={sent:0,opened:0};byDom[d].sent++;if((evtMap[l.brevo_message_id]||[]).includes('opened'))byDom[d].opened++;});
+  const topDoms=Object.entries(byDom).sort((a,b)=>b[1].sent-a[1].sent).slice(0,10);
+
   document.getElementById('content').innerHTML = `
+    ${!hasEv?`<div class="info-banner"><strong>Webhook tracking not set up.</strong> Open rate, click rate, and spam rate require Brevo webhooks → a Supabase Edge Function that inserts into the <code>email_events</code> table. Without it, send counts are still tracked.</div>`:''}
+
+    <div class="filter-bar">
+      <div class="fg"><label>Range</label><select onchange="aF.days=this.value;renderAnalytics()">
+        <option value="7" ${aF.days==='7'?'selected':''}>Last 7 days</option>
+        <option value="30" ${aF.days==='30'?'selected':''}>Last 30 days</option>
+        <option value="90" ${aF.days==='90'?'selected':''}>Last 90 days</option>
+        <option value="all" ${aF.days==='all'?'selected':''}>All time</option>
+      </select></div>
+      <div class="fg"><label>Sequence</label><select onchange="aF.seqId=this.value;renderAnalytics()">
+        <option value="">All</option>${(seqs||[]).map(s=>`<option value="${s.id}" ${aF.seqId===s.id?'selected':''}>${s.name}</option>`).join('')}
+      </select></div>
+      <div class="fg"><label>Status</label><select onchange="aF.status=this.value;renderAnalytics()">
+        <option value="">All</option>
+        <option value="opened" ${aF.status==='opened'?'selected':''}>Opened</option>
+        <option value="clicked" ${aF.status==='clicked'?'selected':''}>Clicked</option>
+        <option value="bounced" ${aF.status==='bounced'?'selected':''}>Bounced</option>
+        <option value="spam" ${aF.status==='spam'?'selected':''}>Spam</option>
+      </select></div>
+      <div class="fg"><label>Search</label><input type="text" placeholder="Filter by email…" value="${aF.search}" oninput="aF.search=this.value;renderAnalytics()" style="width:180px"></div>
+      <button class="btn btn-secondary btn-sm" onclick="aF={days:'30',seqId:'',status:'',search:''};renderAnalytics()">Reset</button>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="sv" style="color:var(--blue)">${total.toLocaleString()}</div><div class="sl">Sent</div></div>
+      <div class="stat-card"><div class="sv" style="color:${hasEv?'var(--green)':'var(--gray)'}">${hasEv?pct(opened):'—'}</div><div class="sl">Open Rate</div><div class="ss">${hasEv?opened+' opened':'Webhooks needed'}</div></div>
+      <div class="stat-card"><div class="sv" style="color:${hasEv?'var(--purple)':'var(--gray)'}">${hasEv?pct(clicked):'—'}</div><div class="sl">Click Rate</div><div class="ss">${hasEv?clicked+' clicked':'Webhooks needed'}</div></div>
+      <div class="stat-card"><div class="sv" style="color:${hasEv?'var(--yellow)':'var(--gray)'}">${hasEv?pct(bounced):'—'}</div><div class="sl">Bounce Rate</div><div class="ss">${hasEv?bounced+' bounced':'Webhooks needed'}</div></div>
+      <div class="stat-card"><div class="sv" style="color:${hasEv?'var(--red)':'var(--gray)'}">${hasEv?pct(spam):'—'}</div><div class="sl">Spam Rate</div><div class="ss">${hasEv?spam+' reported':'Webhooks needed'}</div></div>
+    </div>
+
     <div class="panel">
-      <div class="panel-header"><h2>Send Log</h2></div>
-      ${!logs||!logs.length ? '<div class="empty">No sends logged yet.</div>' :
-      `<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Message ID</th><th>Status</th></tr></thead><tbody>
-      ${logs.map(l=>`<tr>
-        <td>${new Date(l.sent_at).toLocaleString()}</td>
-        <td>${l.enrollments?.email||'—'}</td>
-        <td>${l.enrollments?.sequences?.name||'—'}</td>
-        <td>Step ${l.step_number}</td>
-        <td style="font-size:11px;color:var(--gray)">${l.brevo_message_id||'—'}</td>
-        <td><span class="badge badge-green">${l.status}</span></td>
-      </tr>`).join('')}</tbody></table>`}
+      <div class="panel-header"><h2>By Sequence</h2></div>
+      ${Object.keys(bySeq).length===0?'<div class="empty">No data</div>':`<table><thead><tr><th>Sequence</th><th>Sent</th><th>Open%</th><th>Click%</th><th>Bounce%</th><th>Spam%</th></tr></thead><tbody>
+      ${Object.entries(bySeq).sort((a,b)=>b[1].sent-a[1].sent).map(([name,d])=>{const p=n=>d.sent?((n/d.sent)*100).toFixed(1)+'%':'—';return`<tr><td><strong>${name}</strong></td><td>${d.sent}</td><td>${hasEv?p(d.opened):'—'}</td><td>${hasEv?p(d.clicked):'—'}</td><td>${hasEv?p(d.bounced):'—'}</td><td>${hasEv?p(d.spam):'—'}</td></tr>`;}).join('')}
+      </tbody></table>`}
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><h2>By Receiving Domain (top 10)</h2></div>
+      ${topDoms.length===0?'<div class="empty">No data</div>':`<table><thead><tr><th>Domain</th><th>Sent</th><th>Open Rate</th></tr></thead><tbody>
+      ${topDoms.map(([dom,d])=>`<tr><td>@${dom}</td><td>${d.sent}</td><td>${hasEv&&d.sent?((d.opened/d.sent)*100).toFixed(1)+'%':'—'}</td></tr>`).join('')}
+      </tbody></table>`}
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><h2>Send Log (${filtered.length})</h2><button class="btn btn-secondary btn-sm" onclick="renderAnalytics()">Refresh</button></div>
+      ${filtered.length===0?'<div class="empty">No sends match filters.</div>':`<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Events</th><th>Message ID</th></tr></thead><tbody>
+      ${filtered.slice(0,300).map(l=>{const ev=[...new Set(evtMap[l.brevo_message_id]||[])];const evBadges=ev.map(t=>`<span class="badge ${{opened:'badge-green',clicked:'badge-purple',bounced:'badge-yellow',spam:'badge-red'}[t]||'badge-gray'}">${t}</span>`).join(' ');return`<tr><td>${new Date(l.sent_at).toLocaleString()}</td><td>${l.enrollments?.email||'—'}</td><td>${l.enrollments?.sequences?.name||'—'}</td><td>Step ${l.step_number}</td><td>${evBadges||'<span class="badge badge-gray">sent</span>'}</td><td style="font-size:11px;color:var(--gray)">${l.brevo_message_id||'—'}</td></tr>`;}).join('')}
+      </tbody></table>`}
     </div>`;
 }
 
 // ── TEST EMAIL ────────────────────────────────────────────────────────────────
-
 async function renderTestEmail() {
   const { data: rows } = await sb.from('settings').select('key,value');
-  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
-  const defaultFrom = cfg.from_email || 'Aaron <aaron@blubalencebookkeeping.com>';
+  const cfg = Object.fromEntries((rows||[]).map(r=>[r.key,cfgVal(r.value)]));
   document.getElementById('content').innerHTML = `
     <div style="max-width:600px">
       <div class="panel">
-        <div class="panel-header">
-          <h2>Send a Test Email</h2>
-          <span style="font-size:12px;color:var(--gray)">Sends directly via Brevo API — no Listmonk, no sequences</span>
-        </div>
+        <div class="panel-header"><h2>Send a Test Email</h2><span style="font-size:12px;color:var(--gray)">Sends directly via Brevo — no sequences</span></div>
         <div style="padding:24px">
           <div class="form-group"><label>To</label><input id="te-to" type="email" placeholder="you@example.com"></div>
-          <div class="form-group"><label>From</label><input id="te-from" value="${defaultFrom}"></div>
-          <div class="form-group"><label>Subject</label><input id="te-subject" placeholder="Test email from Blu Balence"></div>
-          <div class="form-group">
-            <label>Body <span style="color:var(--gray);font-weight:400">(HTML or plain text)</span></label>
-            <textarea id="te-body" style="min-height:200px" placeholder="Hi there,&#10;&#10;This is a test email.&#10;&#10;Best,&#10;Aaron"></textarea>
-          </div>
+          <div class="form-group"><label>From</label><input id="te-from" value="${cfg.from_email||'Aaron <aaron@blubalencebookkeeping.com>'}"></div>
+          <div class="form-group"><label>Subject</label><input id="te-subject" placeholder="Test from Blu Balence"></div>
+          <div class="form-group"><label>Body</label><textarea id="te-body" style="min-height:200px" placeholder="Hi there,&#10;&#10;This is a test.&#10;&#10;Best, Aaron"></textarea></div>
           <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-            <button class="btn btn-primary" id="te-btn" onclick="sendTestEmail()">&#9654; Send Test Email</button>
+            <button class="btn btn-primary" id="te-btn" onclick="sendTestEmail()">&#9654; Send Test</button>
             <span id="te-status" style="font-size:14px;color:var(--gray)"></span>
           </div>
           <div id="te-result" class="test-result"></div>
@@ -757,123 +737,90 @@ async function renderTestEmail() {
 }
 
 async function refreshTestLog() {
-  const el = document.getElementById('te-log');
-  if (!el) return;
-  const { data: logs } = await sb.from('test_send_log').select('*').order('sent_at', { ascending: false }).limit(20);
-  if (!logs||!logs.length) { el.innerHTML = '<div class="empty">No test emails sent yet.</div>'; return; }
-  el.innerHTML = `<table><thead><tr><th>Sent At</th><th>To</th><th>Subject</th><th>Status</th><th>Message ID</th></tr></thead><tbody>
-    ${logs.map(l=>`<tr>
-      <td>${new Date(l.sent_at).toLocaleString()}</td>
-      <td>${l.to_email}</td>
-      <td>${l.subject}</td>
-      <td><span class="badge ${l.status==='sent'?'badge-green':'badge-red'}">${l.status}</span></td>
-      <td style="font-size:11px;color:var(--gray)">${l.message_id||'—'}</td>
-    </tr>`).join('')}</tbody></table>`;
+  const el = document.getElementById('te-log'); if (!el) return;
+  const { data: logs } = await sb.from('test_send_log').select('*').order('sent_at',{ascending:false}).limit(20);
+  if (!logs||!logs.length){el.innerHTML='<div class="empty">No test emails yet.</div>';return;}
+  el.innerHTML=`<table><thead><tr><th>Sent At</th><th>To</th><th>Subject</th><th>Status</th><th>Message ID</th></tr></thead><tbody>${logs.map(l=>`<tr><td>${new Date(l.sent_at).toLocaleString()}</td><td>${l.to_email}</td><td>${l.subject}</td><td><span class="badge ${l.status==='sent'?'badge-green':'badge-red'}">${l.status}</span></td><td style="font-size:11px;color:var(--gray)">${l.message_id||'—'}</td></tr>`).join('')}</tbody></table>`;
 }
 
 async function sendTestEmail() {
-  const btn = document.getElementById('te-btn');
-  const statusEl = document.getElementById('te-status');
-  const resultEl = document.getElementById('te-result');
-  const to = document.getElementById('te-to').value.trim();
-  const fromRaw = document.getElementById('te-from').value.trim();
-  const subject = document.getElementById('te-subject').value.trim();
-  const body = document.getElementById('te-body').value.trim();
-  if (!to||!subject||!body) { statusEl.textContent='To, Subject, and Body are required.'; statusEl.style.color='var(--red)'; return; }
-  const fromMatch = fromRaw.match(/^(.+?)\s*<(.+?)>$/);
-  const fromName = fromMatch ? fromMatch[1].trim() : '';
-  const fromEmail = fromMatch ? fromMatch[2].trim() : fromRaw;
+  const btn=document.getElementById('te-btn'),statusEl=document.getElementById('te-status'),resultEl=document.getElementById('te-result');
+  const to=document.getElementById('te-to').value.trim(),fromRaw=document.getElementById('te-from').value.trim(),subject=document.getElementById('te-subject').value.trim(),body=document.getElementById('te-body').value.trim();
+  if (!to||!subject||!body){statusEl.textContent='To, Subject, and Body required.';statusEl.style.color='var(--red)';return;}
+  const fm=fromRaw.match(/^(.+?)\s*<(.+?)>$/);
+  const fromName=fm?fm[1].trim():'';const fromEmail=fm?fm[2].trim():fromRaw;
   const { data: rows } = await sb.from('settings').select('key,value');
-  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
-  const apiKey = cfg.brevo_api_key;
-  if (!apiKey) { statusEl.textContent='Brevo API key not set. Go to Settings first.'; statusEl.style.color='var(--red)'; return; }
-  btn.disabled=true; statusEl.textContent='Sending…'; statusEl.style.color='var(--gray)'; resultEl.style.display='none';
-  const isHtml = body.trim().startsWith('<');
+  const cfg=Object.fromEntries((rows||[]).map(r=>[r.key,cfgVal(r.value)]));
+  const apiKey=cfg.brevo_api_key;
+  if (!apiKey){statusEl.textContent='Brevo API key not set in Settings.';statusEl.style.color='var(--red)';return;}
+  btn.disabled=true;statusEl.textContent='Sending…';statusEl.style.color='var(--gray)';resultEl.style.display='none';
+  const isHtml=body.trim().startsWith('<');
   try {
-    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: { 'api-key': apiKey, 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ sender:{name:fromName||'Blu Balence',email:fromEmail}, to:[{email:to}], subject, ...(isHtml?{htmlContent:body}:{textContent:body}) }),
-    });
-    const json = await res.json();
-    if (res.ok && json.messageId) {
-      statusEl.textContent='';
-      resultEl.className='test-result success';
-      resultEl.textContent=`✓ Sent successfully. Message ID: ${json.messageId}`;
-      resultEl.style.display='block';
-      await sb.from('test_send_log').insert({ to_email:to, from_email:fromEmail, subject, status:'sent', message_id:json.messageId, sent_at:new Date().toISOString() }).then(()=>refreshTestLog()).catch(()=>{});
-    } else {
-      resultEl.className='test-result error';
-      resultEl.textContent=`✗ Failed: ${json.message||JSON.stringify(json)}`;
-      resultEl.style.display='block';
-      await sb.from('test_send_log').insert({ to_email:to, from_email:fromEmail, subject, status:'failed', message_id:null, sent_at:new Date().toISOString() }).then(()=>refreshTestLog()).catch(()=>{});
-    }
-  } catch(e) { resultEl.className='test-result error'; resultEl.textContent=`✗ Request failed: ${e.message}`; resultEl.style.display='block'; }
+    const res=await fetch('https://api.brevo.com/v3/smtp/email',{method:'POST',headers:{'api-key':apiKey,'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({sender:{name:fromName||'Blu Balence',email:fromEmail},to:[{email:to}],subject,...(isHtml?{htmlContent:body}:{textContent:body})})});
+    const json=await res.json();
+    if (res.ok&&json.messageId){statusEl.textContent='';resultEl.className='test-result success';resultEl.textContent=`✓ Sent! Message ID: ${json.messageId}`;resultEl.style.display='block';await sb.from('test_send_log').insert({to_email:to,from_email:fromEmail,subject,status:'sent',message_id:json.messageId,sent_at:new Date().toISOString()});refreshTestLog();}
+    else{resultEl.className='test-result error';resultEl.textContent=`✗ Failed: ${json.message||JSON.stringify(json)}`;resultEl.style.display='block';await sb.from('test_send_log').insert({to_email:to,from_email:fromEmail,subject,status:'failed',message_id:null,sent_at:new Date().toISOString()});refreshTestLog();}
+  } catch(e){resultEl.className='test-result error';resultEl.textContent=`✗ Request failed: ${e.message}`;resultEl.style.display='block';}
   btn.disabled=false;
 }
 
 // ── SETTINGS ─────────────────────────────────────────────────────────────────
-
 async function renderSettings() {
   const { data: rows } = await sb.from('settings').select('key,value');
-  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
+  const cfg = Object.fromEntries((rows||[]).map(r=>[r.key,cfgVal(r.value)]));
+  const activeDays = (cfg.send_days||'mon,tue,wed,thu,fri').split(',').map(d=>d.trim());
+  const days=[{v:'mon',l:'Mon'},{v:'tue',l:'Tue'},{v:'wed',l:'Wed'},{v:'thu',l:'Thu'},{v:'fri',l:'Fri'},{v:'sat',l:'Sat'},{v:'sun',l:'Sun'}];
+
   document.getElementById('content').innerHTML = `
-    <div style="max-width:560px">
+    <div style="max-width:680px">
 
       <div class="panel" style="margin-bottom:20px">
         <div class="panel-header"><h2>Daily Send Schedule</h2></div>
         <div style="padding:20px">
           <div class="form-row-2">
-            <div class="form-group">
-              <label>Send Time (24hr)</label>
-              <input id="s-time" type="time" value="${cfg.send_time||'09:00'}">
-              <p class="hint">e.g. 09:00 = 9:00 AM. The GitHub Action must be scheduled to match this time.</p>
-            </div>
-            <div class="form-group">
-              <label>Timezone</label>
-              <select id="s-tz">
-                <option value="America/New_York" ${cfg.send_timezone==='America/New_York'||!cfg.send_timezone?'selected':''}>Eastern (ET)</option>
-                <option value="America/Chicago" ${cfg.send_timezone==='America/Chicago'?'selected':''}>Central (CT)</option>
-                <option value="America/Denver" ${cfg.send_timezone==='America/Denver'?'selected':''}>Mountain (MT)</option>
-                <option value="America/Los_Angeles" ${cfg.send_timezone==='America/Los_Angeles'?'selected':''}>Pacific (PT)</option>
-                <option value="America/Anchorage" ${cfg.send_timezone==='America/Anchorage'?'selected':''}>Alaska (AKT)</option>
-                <option value="Pacific/Honolulu" ${cfg.send_timezone==='Pacific/Honolulu'?'selected':''}>Hawaii (HT)</option>
-              </select>
-            </div>
+            <div class="form-group"><label>Send Time (24hr)</label><input id="s-time" type="time" value="${cfg.send_time||'09:00'}"><p class="hint">Match your drip.yml cron schedule.</p></div>
+            <div class="form-group"><label>Timezone</label><select id="s-tz">
+              <option value="America/New_York" ${(cfg.send_timezone||'America/New_York')==='America/New_York'?'selected':''}>Eastern (ET)</option>
+              <option value="America/Chicago" ${cfg.send_timezone==='America/Chicago'?'selected':''}>Central (CT)</option>
+              <option value="America/Denver" ${cfg.send_timezone==='America/Denver'?'selected':''}>Mountain (MT)</option>
+              <option value="America/Los_Angeles" ${cfg.send_timezone==='America/Los_Angeles'?'selected':''}>Pacific (PT)</option>
+            </select></div>
           </div>
-          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 14px;font-size:13px;color:#1e40af">
-            <strong>To make this automatic:</strong> In your GitHub repo, edit <code>.github/workflows/drip.yml</code> and set the cron schedule to match. Example for 9:00 AM ET: <code>cron: '0 14 * * *'</code> (UTC offset). The "Send Now" button on the dashboard always works manually.
+          <div class="form-group">
+            <label>Send Days</label>
+            <div class="days-grid" id="days-grid">
+              ${days.map(d=>`<button type="button" class="day-chip ${activeDays.includes(d.v)?'on':''}" data-day="${d.v}" onclick="this.classList.toggle('on')">${d.l}</button>`).join('')}
+            </div>
+            <p class="hint">The drip script checks this before sending. Default Mon–Fri.</p>
           </div>
         </div>
       </div>
 
       <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><h2>Brevo Connection</h2></div>
+        <div class="panel-header"><h2>Brevo Connection (Default)</h2></div>
         <div style="padding:20px">
-          <div class="form-group">
-            <label>Brevo API Key</label>
-            <input id="s-brevo" type="password" value="${cfg.brevo_api_key||''}" placeholder="xkeysib-...">
-            <p class="hint">Brevo dashboard → API Keys → Generate. NOT the SMTP key — the API key.</p>
-          </div>
-          <div class="form-group">
-            <label>From Email (default)</label>
-            <input id="s-from" value="${cfg.from_email||'Aaron <aaron@blubalencebookkeeping.com>'}">
-          </div>
+          <div class="form-group"><label>Brevo API Key</label><input id="s-brevo" type="password" value="${cfg.brevo_api_key||''}" placeholder="xkeysib-..."></div>
+          <div class="form-group"><label>From Email</label><input id="s-from" value="${cfg.from_email||'Aaron <aaron@blubalencebookkeeping.com>'}"></div>
         </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><h2>Sending Accounts (Inboxes)</h2><button class="btn btn-primary btn-sm" onclick="openAccountModal()">+ Add Inbox</button></div>
+        <div style="padding:16px 20px"><div id="accounts-list"><div style="color:var(--gray);font-size:14px;padding:8px 0">Loading…</div></div></div>
+        <div style="padding:12px 16px;background:#fffbeb;border-top:1px solid var(--border);font-size:13px;color:#92400e">Add multiple sending accounts (different domains/inboxes). Assign one to a sequence for per-inbox volume control.</div>
+      </div>
+
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><h2>Per-Domain Receiving Limits</h2><button class="btn btn-secondary btn-sm" onclick="openDomainLimitModal()">+ Add Limit</button></div>
+        <div id="domain-limits-list"><div style="padding:20px;color:var(--gray);font-size:14px">Loading…</div></div>
+        <div style="padding:12px 16px;background:#fffbeb;border-top:1px solid var(--border);font-size:13px;color:#92400e">Limit daily sends to a receiving domain. Example: gmail.com = 20/day prevents Gmail spam filters.</div>
       </div>
 
       <div class="panel" style="margin-bottom:20px">
         <div class="panel-header"><h2>GitHub Actions</h2></div>
         <div style="padding:20px">
-          <div class="form-group">
-            <label>GitHub Repo <span style="color:var(--gray);font-weight:400">(owner/repo)</span></label>
-            <input id="s-repo" value="${cfg.github_repo||'aaronjp722/blu-balences'}">
-          </div>
-          <div class="form-group">
-            <label>GitHub Token <span style="color:var(--gray);font-weight:400">(needs workflow scope)</span></label>
-            <input id="s-ghtoken" type="password" value="${cfg.github_token||''}" placeholder="ghp_...">
-            <p class="hint">GitHub → Settings → Developer settings → Personal access tokens → Generate (check workflow scope).</p>
-          </div>
+          <div class="form-group"><label>GitHub Repo</label><input id="s-repo" value="${cfg.github_repo||'aaronjp722/blu-balences'}"></div>
+          <div class="form-group"><label>GitHub Token</label><input id="s-ghtoken" type="password" value="${cfg.github_token||''}" placeholder="ghp_..."><p class="hint">Needs workflow scope.</p></div>
         </div>
       </div>
 
@@ -882,10 +829,9 @@ async function renderSettings() {
         <div style="padding:20px">
           <div class="form-row">
             <div class="form-group"><label>Emails / Min</label><input id="s-rate" type="number" min="1" max="60" value="${cfg.emails_per_minute||'2'}"></div>
-            <div class="form-group"><label>Batch Size</label><input id="s-batch" type="number" min="1" value="${cfg.batch_size||'50'}"></div>
+            <div class="form-group"><label>Batch Size</label><input id="s-batch" type="number" value="${cfg.batch_size||'50'}"></div>
             <div class="form-group"><label>Daily Limit</label><input id="s-daily" type="number" value="${cfg.daily_limit||'300'}"></div>
           </div>
-          <p class="hint">Brevo free plan: 300/day. Each step can override batch size and interval.</p>
         </div>
       </div>
 
@@ -894,12 +840,17 @@ async function renderSettings() {
         <button class="btn btn-secondary" onclick="resetConn()">Change Supabase Connection</button>
       </div>
     </div>`;
+
+  loadAccounts();
+  loadDomainLimits();
 }
 
 async function saveSettings() {
+  const sendDays = [...document.querySelectorAll('.day-chip.on')].map(b=>b.dataset.day).join(',');
   const kvs = [
     ['send_time', document.getElementById('s-time').value],
     ['send_timezone', document.getElementById('s-tz').value],
+    ['send_days', sendDays],
     ['brevo_api_key', document.getElementById('s-brevo').value.trim()],
     ['from_email', document.getElementById('s-from').value.trim()],
     ['github_repo', document.getElementById('s-repo').value.trim()],
@@ -908,30 +859,67 @@ async function saveSettings() {
     ['batch_size', document.getElementById('s-batch').value],
     ['daily_limit', document.getElementById('s-daily').value],
   ];
-  for (const [key, value] of kvs) {
-    await sb.from('settings').upsert({ key, value }, { onConflict: 'key' });
-  }
+  for (const [key,value] of kvs) await sb.from('settings').upsert({key,value},{onConflict:'key'});
   alert('Settings saved!');
 }
 
-function resetConn() { localStorage.removeItem('sb_url'); localStorage.removeItem('sb_key'); location.reload(); }
-
-function showModal(html, wide) {
-  const o = document.createElement('div');
-  o.className = 'modal-overlay';
-  o.innerHTML = `<div class="modal" style="${wide?'width:720px':''}">${html}</div>`;
-  o.addEventListener('click', e => { if (e.target===o) closeModal(); });
-  document.getElementById('modals').innerHTML = '';
-  document.getElementById('modals').appendChild(o);
+// SENDING ACCOUNTS
+async function loadAccounts() {
+  const el=document.getElementById('accounts-list'); if (!el) return;
+  const { data: accs } = await sb.from('sending_accounts').select('*').order('created_at');
+  if (!accs||!accs.length){el.innerHTML='<div style="color:var(--gray);font-size:14px;padding:8px 0">No extra accounts. Default is the Brevo key above.</div>';return;}
+  el.innerHTML=accs.map(a=>`<div class="account-card"><div class="account-info"><div class="account-name">${a.name}</div><div class="account-meta">${a.from_name?a.from_name+' ':''}&lt;${a.from_email}&gt; · Daily limit: ${a.daily_limit}</div></div><div style="display:flex;align-items:center;gap:8px"><span class="badge ${a.active?'badge-green':'badge-gray'}">${a.active?'Active':'Paused'}</span><button class="btn btn-secondary btn-sm" onclick="openAccountModal('${a.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteAccount('${a.id}')">Delete</button></div></div>`).join('');
 }
-function closeModal() { document.getElementById('modals').innerHTML = ''; }
-function esc(s) { return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
 
-(function() {
-  const url = localStorage.getItem('sb_url');
-  const key = localStorage.getItem('sb_key');
-  if (url && key) boot(url, key);
-})();
+function openAccountModal(id) {
+  showModal(`<h2>${id?'Edit':'Add'} Sending Account</h2>
+    <div class="form-group"><label>Account Name</label><input id="ac-name" placeholder="Primary, Gmail Backup, etc."></div>
+    <div class="form-row-2">
+      <div class="form-group"><label>From Email</label><input id="ac-email" placeholder="aaron@domain.com"></div>
+      <div class="form-group"><label>From Name</label><input id="ac-fname" placeholder="Aaron Parker"></div>
+    </div>
+    <div class="form-group"><label>Brevo API Key</label><input id="ac-key" type="password" placeholder="xkeysib-..."></div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Daily Send Limit</label><input id="ac-daily" type="number" value="300" min="1"></div>
+      <div class="form-group"><label style="display:flex;align-items:center;gap:8px;margin-bottom:10px">Active <label class="toggle" style="margin:0"><input type="checkbox" id="ac-active" checked><span class="toggle-slider"></span></label></label></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveAccount('${id||''}')">Save</button></div>`);
+  if (id) sb.from('sending_accounts').select('*').eq('id',id).single().then(({data:a})=>{if(!a)return;document.getElementById('ac-name').value=a.name||'';document.getElementById('ac-email').value=a.from_email||'';document.getElementById('ac-fname').value=a.from_name||'';document.getElementById('ac-key').value=a.brevo_api_key||'';document.getElementById('ac-daily').value=a.daily_limit||300;document.getElementById('ac-active').checked=a.active!==false;});
+}
+
+async function saveAccount(id) {
+  const payload={name:document.getElementById('ac-name').value.trim(),from_email:document.getElementById('ac-email').value.trim(),from_name:document.getElementById('ac-fname').value.trim(),brevo_api_key:document.getElementById('ac-key').value.trim(),daily_limit:parseInt(document.getElementById('ac-daily').value)||300,active:document.getElementById('ac-active').checked};
+  if (!payload.name||!payload.from_email||!payload.brevo_api_key){alert('Name, From Email, and API Key required');return;}
+  let error;
+  if (id)({error}=await sb.from('sending_accounts').update(payload).eq('id',id));
+  else({error}=await sb.from('sending_accounts').insert(payload));
+  if (error){alert(error.message);return;}
+  closeModal();loadAccounts();
+}
+
+async function deleteAccount(id){if(!confirm('Delete this account?'))return;await sb.from('sending_accounts').delete().eq('id',id);loadAccounts();}
+
+// DOMAIN LIMITS
+async function loadDomainLimits() {
+  const el=document.getElementById('domain-limits-list'); if (!el) return;
+  const { data: limits } = await sb.from('domain_limits').select('*').order('domain');
+  if (!limits||!limits.length){el.innerHTML='<div style="padding:20px;color:var(--gray);font-size:14px">No domain limits set.</div>';return;}
+  el.innerHTML=`<table><thead><tr><th>Domain</th><th>Daily Limit</th><th>Status</th><th>Actions</th></tr></thead><tbody>${limits.map(l=>`<tr><td>@${l.domain}</td><td>${l.daily_limit}/day</td><td><span class="badge ${l.active?'badge-green':'badge-gray'}">${l.active?'Active':'Off'}</span></td><td><div class="actions"><button class="btn btn-secondary btn-sm" onclick="openDomainLimitModal('${l.id}','${l.domain}','${l.daily_limit}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteDomainLimit('${l.id}')">Delete</button></div></td></tr>`).join('')}</tbody></table>`;
+}
+
+function openDomainLimitModal(id,domain,limit){showModal(`<h2>${id?'Edit':'Add'} Domain Limit</h2><div class="form-group"><label>Domain</label><input id="dl-dom" value="${domain||''}" placeholder="gmail.com"><p class="hint">Just the domain — no @ symbol. e.g. gmail.com, yahoo.com</p></div><div class="form-group"><label>Daily Limit</label><input id="dl-lim" type="number" value="${limit||20}" min="1"><p class="hint">Max emails/day to this domain. Recommended: 20 for Gmail, 10 for Yahoo.</p></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveDomainLimit('${id||''}')">Save</button></div>`);}
+
+async function saveDomainLimit(id){const domain=document.getElementById('dl-dom').value.trim().toLowerCase().replace('@',''),daily_limit=parseInt(document.getElementById('dl-lim').value);if(!domain){alert('Domain required');return;}let error;if(id)({error}=await sb.from('domain_limits').update({domain,daily_limit}).eq('id',id));else({error}=await sb.from('domain_limits').insert({domain,daily_limit,active:true}));if(error){alert(error.message);return;}closeModal();loadDomainLimits();}
+async function deleteDomainLimit(id){if(!confirm('Remove limit?'))return;await sb.from('domain_limits').delete().eq('id',id);loadDomainLimits();}
+
+function resetConn(){localStorage.removeItem('sb_url');localStorage.removeItem('sb_key');location.reload();}
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function showModal(html,wide){const o=document.createElement('div');o.className='modal-overlay';o.innerHTML=`<div class="modal" style="${wide?'width:720px':''}">${html}</div>`;o.addEventListener('click',e=>{if(e.target===o)closeModal();});document.getElementById('modals').innerHTML='';document.getElementById('modals').appendChild(o);}
+function closeModal(){document.getElementById('modals').innerHTML='';}
+function esc(s){return(s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
+
+(function(){const url=localStorage.getItem('sb_url'),key=localStorage.getItem('sb_key');if(url&&key)boot(url,key);})();
 </script>
 </body>
 </html>
