@@ -147,17 +147,59 @@ function saveConfig() {
   boot(url, key);
 }
 
+  function initAutoSend() {
+  if (window._autoSendTimer) clearInterval(window._autoSendTimer);
+  window._autoSendTimer = setInterval(async () => {
+    try {
+      const { data: rows } = await sb.from('settings').select('key,value');
+      const cfg = Object.fromEntries((rows||[]).map(r=>[r.key,cfgVal(r.value)]));
+      const sendTime = cfg.send_time;
+      const sendTz   = cfg.send_timezone || 'America/New_York';
+      const sendDays = (cfg.send_days || 'mon,tue,wed,thu,fri').split(',').map(d=>d.trim());
+      if (!sendTime || !cfg.github_token || !cfg.github_repo) return;
+
+      const now    = new Date();
+      const tzDate = new Date(now.toLocaleString('en-US', { timeZone: sendTz }));
+      const hh     = String(tzDate.getHours()).padStart(2,'0');
+      const mm     = String(tzDate.getMinutes()).padStart(2,'0');
+      const currentTime = `${hh}:${mm}`;
+      const dayMap = {0:'sun',1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat'};
+      const currentDay  = dayMap[tzDate.getDay()];
+
+      if (currentTime !== sendTime) return;
+      if (!sendDays.includes(currentDay)) return;
+
+      const fireKey = `auto_sent_${now.toDateString()}_${sendTime}`;
+      if (sessionStorage.getItem(fireKey)) return;
+      sessionStorage.setItem(fireKey, '1');
+
+      const r = await fetch(`https://api.github.com/repos/${cfg.github_repo}/actions/workflows/drip.yml/dispatches`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${cfg.github_token}`,
+          'Accept': 'application/vnd.github+json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ref: 'main' }),
+      });
+      if (r.status === 204) {
+        console.log('[Auto-send] Triggered at', currentTime);
+      } else {
+        const err = await r.json().catch(()=>({}));
+        console.warn('[Auto-send] Failed:', r.status, err.message||'');
+      }
+    } catch(e) {
+      console.error('[Auto-send] Error:', e.message);
+    }
+  }, 30000);
+}
+
 function boot(url, key) {
-  try {
-    sb = supabase.createClient(url, key);
-  } catch(e) {
-    const err = document.getElementById('cfg-error');
-    if (err) { err.textContent = 'Failed to connect: ' + e.message; err.style.display = 'block'; }
-    return;
-  }
+  sb = supabase.createClient(url, key);
   document.getElementById('config-screen').style.display = 'none';
   document.getElementById('app').classList.add('show');
   navigate('dashboard');
+  initAutoSend();
 }
 
 async function navigate(tab) {
@@ -783,80 +825,107 @@ async function renderAnalytics() {
 
 async function renderSettings() {
   const { data: rows } = await sb.from('settings').select('key,value');
-  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
+  const cfg = Object.fromEntries((rows||[]).map(r=>[r.key,cfgVal(r.value)]));
+  const activeDays = (cfg.send_days||'mon,tue,wed,thu,fri').split(',').map(d=>d.trim());
+  const days=[{v:'mon',l:'Mon'},{v:'tue',l:'Tue'},{v:'wed',l:'Wed'},{v:'thu',l:'Thu'},{v:'fri',l:'Fri'},{v:'sat',l:'Sat'},{v:'sun',l:'Sun'}];
   document.getElementById('content').innerHTML = `
-    <div style="max-width:560px">
+    <div style="max-width:680px">
+
       <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><h2>Brevo Connection</h2></div>
+        <div class="panel-header"><h2>Daily Send Schedule</h2></div>
         <div style="padding:20px">
-          <div class="form-group">
-            <label>Brevo API Key</label>
-            <input id="s-brevo" type="password" value="${cfg.brevo_api_key||''}" placeholder="xkeysib-...">
-            <p class="hint">Brevo dashboard → API Keys → Generate. NOT the SMTP key — the API key.</p>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Send Time (24hr)</label>
+              <input id="s-time" type="time" value="${cfg.send_time||'09:00'}">
+              <p class="hint">Keep this browser tab open — it auto-fires at this time via GitHub Actions.</p>
+            </div>
+            <div class="form-group">
+              <label>Timezone</label>
+              <select id="s-tz">
+                <option value="America/New_York"    ${(cfg.send_timezone||'America/New_York')==='America/New_York'   ?'selected':''}>Eastern (ET)</option>
+                <option value="America/Chicago"     ${cfg.send_timezone==='America/Chicago'    ?'selected':''}>Central (CT)</option>
+                <option value="America/Denver"      ${cfg.send_timezone==='America/Denver'     ?'selected':''}>Mountain (MT)</option>
+                <option value="America/Los_Angeles" ${cfg.send_timezone==='America/Los_Angeles'?'selected':''}>Pacific (PT)</option>
+              </select>
+            </div>
           </div>
           <div class="form-group">
-            <label>From Email (default)</label>
-            <input id="s-from" value="${cfg.from_email||'Aaron <aaron@blubalencebookkeeping.com>'}">
+            <label>Send Days</label>
+            <div class="days-grid" id="days-grid">
+              ${days.map(d=>`<button type="button" class="day-chip ${activeDays.includes(d.v)?'on':''}" data-day="${d.v}" onclick="this.classList.toggle('on')">${d.l}</button>`).join('')}
+            </div>
+            <p class="hint">Click to toggle. Blue = enabled. Default Mon–Fri.</p>
           </div>
         </div>
       </div>
+
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><h2>Brevo Connection (Default)</h2></div>
+        <div style="padding:20px">
+          <div class="form-group"><label>Brevo API Key</label><input id="s-brevo" type="password" value="${cfg.brevo_api_key||''}" placeholder="xkeysib-..."></div>
+          <div class="form-group"><label>From Email</label><input id="s-from" value="${cfg.from_email||'Aaron <aaron@blubalencebookkeeping.com>'}"></div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><h2>Sending Accounts (Inboxes)</h2><button class="btn btn-primary btn-sm" onclick="openAccountModal()">+ Add Inbox</button></div>
+        <div style="padding:16px 20px"><div id="accounts-list"><div style="color:var(--gray);font-size:14px;padding:8px 0">Loading…</div></div></div>
+        <div style="padding:12px 16px;background:#fffbeb;border-top:1px solid var(--border);font-size:13px;color:#92400e">Add multiple sending accounts. Assign one to a sequence for per-inbox volume control.</div>
+      </div>
+
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><h2>Per-Domain Receiving Limits</h2><button class="btn btn-secondary btn-sm" onclick="openDomainLimitModal()">+ Add Limit</button></div>
+        <div id="domain-limits-list"><div style="padding:20px;color:var(--gray);font-size:14px">Loading…</div></div>
+        <div style="padding:12px 16px;background:#fffbeb;border-top:1px solid var(--border);font-size:13px;color:#92400e">Limit daily sends to a receiving domain. Example: gmail.com = 20/day.</div>
+      </div>
+
       <div class="panel" style="margin-bottom:20px">
         <div class="panel-header"><h2>GitHub Actions</h2></div>
         <div style="padding:20px">
-          <div class="form-group">
-            <label>GitHub Repo <span style="color:var(--gray);font-weight:400">(owner/repo)</span></label>
-            <input id="s-repo" value="${cfg.github_repo||'aaronjp722/blu-balences'}">
-          </div>
-          <div class="form-group">
-            <label>GitHub Token <span style="color:var(--gray);font-weight:400">(needs workflow scope)</span></label>
-            <input id="s-ghtoken" type="password" value="${cfg.github_token||''}" placeholder="ghp_...">
-            <p class="hint">GitHub → Settings → Developer settings → Personal access tokens → Generate (check workflow scope).</p>
-          </div>
+          <div class="form-group"><label>GitHub Repo</label><input id="s-repo" value="${cfg.github_repo||'aaronjp722/blu-balences'}"></div>
+          <div class="form-group"><label>GitHub Token</label><input id="s-ghtoken" type="password" value="${cfg.github_token||''}" placeholder="ghp_..."><p class="hint">Needs workflow scope.</p></div>
         </div>
       </div>
-      <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><h2>Brevo Webhook</h2></div>
-        <div style="padding:20px">
-          <p style="font-size:14px;margin-bottom:12px">Point your Brevo transactional webhook to your Supabase Edge Function:</p>
-          <div class="form-group">
-            <label>Webhook URL</label>
-            <input readonly value="${(cfg.supabase_url||localStorage.getItem('sb_url')||'https://xxxx.supabase.co').replace(/\/$/,'')}/functions/v1/brevo-webhook" onclick="this.select()">
-          </div>
-          <p class="hint">In Brevo: Settings → Webhooks → Add webhook → select all Transactional events → paste URL above → No authentication.</p>
-        </div>
-      </div>
+
       <div class="panel" style="margin-bottom:20px">
         <div class="panel-header"><h2>Send Rate (Global Defaults)</h2></div>
         <div style="padding:20px">
           <div class="form-row">
             <div class="form-group"><label>Emails / Min</label><input id="s-rate" type="number" min="1" max="60" value="${cfg.emails_per_minute||'2'}"></div>
-            <div class="form-group"><label>Batch Size</label><input id="s-batch" type="number" min="1" value="${cfg.batch_size||'50'}"></div>
+            <div class="form-group"><label>Batch Size</label><input id="s-batch" type="number" value="${cfg.batch_size||'50'}"></div>
             <div class="form-group"><label>Daily Limit</label><input id="s-daily" type="number" value="${cfg.daily_limit||'300'}"></div>
           </div>
-          <p class="hint">Brevo free plan: 300/day. Each step can override batch size and interval.</p>
+          <p class="hint">Brevo free plan: 300/day.</p>
         </div>
       </div>
+
       <div style="display:flex;gap:10px">
         <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
         <button class="btn btn-secondary" onclick="resetConn()">Change Supabase Connection</button>
       </div>
     </div>`;
+  loadAccounts();
+  loadDomainLimits();
 }
 
 async function saveSettings() {
+  const sendDays = [...document.querySelectorAll('.day-chip.on')].map(b=>b.dataset.day).join(',');
   const kvs = [
-    ['brevo_api_key',      document.getElementById('s-brevo').value.trim()],
-    ['from_email',         document.getElementById('s-from').value.trim()],
-    ['github_repo',        document.getElementById('s-repo').value.trim()],
-    ['github_token',       document.getElementById('s-ghtoken').value.trim()],
-    ['emails_per_minute',  document.getElementById('s-rate').value],
-    ['batch_size',         document.getElementById('s-batch').value],
-    ['daily_limit',        document.getElementById('s-daily').value],
+    ['send_time',         document.getElementById('s-time').value],
+    ['send_timezone',     document.getElementById('s-tz').value],
+    ['send_days',         sendDays],
+    ['brevo_api_key',     document.getElementById('s-brevo').value.trim()],
+    ['from_email',        document.getElementById('s-from').value.trim()],
+    ['github_repo',       document.getElementById('s-repo').value.trim()],
+    ['github_token',      document.getElementById('s-ghtoken').value.trim()],
+    ['emails_per_minute', document.getElementById('s-rate').value],
+    ['batch_size',        document.getElementById('s-batch').value],
+    ['daily_limit',       document.getElementById('s-daily').value],
   ];
-  for (const [key, value] of kvs) {
-    await sb.from('settings').upsert({ key, value }, { onConflict: 'key' });
-  }
+  for (const [key,value] of kvs) await sb.from('settings').upsert({key,value},{onConflict:'key'});
   alert('Settings saved!');
+  initAutoSend();
 }
 
 function resetConn() {
