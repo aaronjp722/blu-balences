@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us | Blu Balence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0a1628; --navy2: #0f1f3d; --navy3: #162444;
+      --blue: #2563eb; --blue-light: #3b82f6; --blue-glow: rgba(37,99,235,0.2);
+      --green: #16a34a; --text: #e2e8f0; --text-sub: #94a3b8; --text-dim: #64748b;
+      --border: rgba(255,255,255,0.08); --white: #ffffff;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--navy); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(10,22,40,0.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 32px; }
+    .nav-inner { max-width: 1140px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 68px; }
+    .logo { font-size: 20px; font-weight: 800; color: var(--white); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { color: var(--blue-light); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { color: var(--text-sub); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a.active { color: var(--white); }
+    .nav-cta { background: var(--blue); color: var(--white) !important; padding: 10px 22px; border-radius: 8px; font-weight: 600 !important; font-size: 14px !important; text-decoration: none; transition: background 0.2s; }
+    .nav-cta:hover { background: var(--blue-light) !important; }
+
+    .about-hero { padding: 96px 32px 80px; max-width: 1140px; margin: 0 auto; text-align: center; }
+    .section-label { font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--blue-light); margin-bottom: 16px; }
+    .about-hero h1 { font-size: clamp(36px, 5vw, 56px); font-weight: 900; letter-spacing: -2px; color: var(--white); line-height: 1.1; margin-bottom: 22px; }
+    .about-hero h1 em { font-style: normal; color: var(--blue-light); }
+    .about-hero p { font-size: 18px; color: var(--text-sub); max-width: 600px; margin: 0 auto 48px; line-height: 1.75; }
+
+    .stats-row { display: flex; justify-content: center; gap: 0; max-width: 700px; margin: 0 auto 80px; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--navy2); }
+    .stat-item { flex: 1; padding: 28px 20px; text-align: center; border-right: 1px solid var(--border); }
+    .stat-item:last-child { border-right: none; }
+    .stat-number { font-size: 30px; font-weight: 900; color: var(--white); letter-spacing: -1px; }
+    .stat-number span { color: var(--blue-light); }
+    .stat-label { font-size: 12px; font-weight: 500; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+    .divider { height: 1px; background: var(--border); max-width: 1140px; margin: 0 auto; }
+
+    .mission-section { padding: 88px 32px; }
+    .mission-inner { max-width: 1140px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .mission-inner h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 900; letter-spacing: -1.5px; color: var(--white); line-height: 1.1; margin-bottom: 20px; }
+    .mission-inner h2 em { font-style: normal; color: var(--blue-light); }
+    .mission-inner p { font-size: 16px; color: var(--text-sub); line-height: 1.8; margin-bottom: 16px; }
+    .values-list { display: flex; flex-direction: column; gap: 16px; }
+    .value-item { display: flex; align-items: flex-start; gap: 14px; }
+    .value-icon { width: 36px; height: 36px; background: rgba(37,99,235,0.12); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+    .value-text h4 { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+    .value-text p { font-size: 13px; color: var(--text-sub); line-height: 1.6; margin: 0; }
+
+    .team-section { padding: 88px 32px; background: var(--navy2); }
+    .team-inner { max-width: 1140px; margin: 0 auto; }
+    .team-header { text-align: center; margin-bottom: 56px; }
+    .team-header h2 { font-size: clamp(28px, 4vw, 42px); font-weight: 900; letter-spacing: -1.5px; color: var(--white); line-height: 1.1; margin-bottom: 14px; }
+    .team-header h2 em { font-style: normal; color: var(--blue-light); }
+    .team-header p { font-size: 17px; color: var(--text-sub); max-width: 520px; margin: 0 auto; line-height: 1.75; }
+    .team-grid { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+
+    .team-card { background: var(--navy3); width: 320px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.55); overflow: hidden; text-align: center; padding-bottom: 28px; transition: 0.3s ease; border: 1px solid var(--border); }
+    .team-card:hover { transform: translateY(-6px); box-shadow: 0 18px 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(59,130,246,0.15); }
+    .team-photo { width: 100%; height: 360px; object-fit: cover; object-position: center top; border-bottom: 4px solid var(--blue); display: block; }
+    .team-name { font-size: 21px; font-weight: 700; margin-top: 22px; color: var(--white); letter-spacing: -0.3px; }
+    .team-role { font-size: 13px; font-weight: 600; color: var(--blue-light); margin-bottom: 14px; letter-spacing: 1px; text-transform: uppercase; }
+    .team-bio { padding: 0 22px; font-size: 14px; color: var(--text-sub); line-height: 1.7; }
+
+    .contact-section { padding: 88px 32px; }
+    .contact-inner { max-width: 1140px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+    .contact-left h2 { font-size: clamp(26px, 3.5vw, 38px); font-weight: 900; letter-spacing: -1.5px; color: var(--white); margin-bottom: 14px; }
+    .contact-left h2 em { font-style: normal; color: var(--blue-light); }
+    .contact-left p { font-size: 16px; color: var(--text-sub); line-height: 1.8; margin-bottom: 32px; }
+    .contact-details { display: flex; flex-direction: column; gap: 20px; }
+    .contact-item { display: flex; align-items: flex-start; gap: 14px; }
+    .contact-icon { width: 42px; height: 42px; background: rgba(37,99,235,0.1); border: 1px solid rgba(59,130,246,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .contact-item-text h4 { font-size: 13px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .contact-item-text p { font-size: 15px; color: var(--white); font-weight: 500; line-height: 1.5; }
+    .contact-map { background: var(--navy2); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; height: 320px; display: flex; align-items: center; justify-content: center; }
+    .map-placeholder { text-align: center; }
+    .map-placeholder .map-pin { font-size: 36px; margin-bottom: 12px; }
+    .map-placeholder h4 { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+    .map-placeholder p { font-size: 13px; color: var(--text-sub); line-height: 1.6; }
+    .map-link { display: inline-block; margin-top: 14px; background: var(--blue); color: var(--white); padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; transition: background 0.2s; }
+    .map-link:hover { background: var(--blue-light); }
+
+    footer { background: var(--navy2); border-top: 1px solid var(--border); padding: 40px 32px; }
+    .footer-inner { max-width: 1140px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    .footer-logo { font-size: 18px; font-weight: 800; color: var(--white); text-decoration: none; }
+    .footer-logo span { color: var(--blue-light); }
+    .footer-copy { font-size: 13px; color: var(--text-dim); }
+
+    @media (max-width: 900px) {
+      .mission-inner { grid-template-columns: 1fr; gap: 48px; }
+      .contact-inner { grid-template-columns: 1fr; gap: 48px; }
+    }
+    @media (max-width: 768px) {
+      .stats-row { flex-direction: column; border-radius: 12px; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat-item:last-child { border-bottom: none; }
+      .team-card { width: 90%; max-width: 360px; }
+      .footer-inner { flex-direction: column; gap: 12px; text-align: center; }
+      nav { padding: 0 16px; }
+      .nav-links { gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="index.html" class="logo">Blu<span>Balence</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html" class="active">About</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="index.html#book" class="nav-cta">Get Started</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="about-hero">
+    <div class="section-label">About Blu Balence</div>
+    <h1>Bookkeeping built on<br><em>trust and clarity</em></h1>
+    <p>We help small business owners stop guessing and start growing — with clean books, clear reports, and a team that actually cares about your numbers.</p>
+  </div>
+
+  <div style="padding: 0 32px 80px;">
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-number">100<span>%</span></div>
+        <div class="stat-label">Remote Friendly</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number"><span>$</span>0</div>
+        <div class="stat-label">Hidden Fees</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">24<span>hr</span></div>
+        <div class="stat-label">Response Time</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <section class="mission-section">
+    <div class="mission-inner">
+      <div>
+        <div class="section-label">Our Mission</div>
+        <h2>We make the numbers<br><em>work for you</em></h2>
+        <p>Blu Balence was founded with one goal: give small business owners the financial clarity they deserve without the complexity or cost of a large accounting firm.</p>
+        <p>We believe every business — no matter the size — deserves accurate books, timely reports, and a bookkeeper who speaks plain English.</p>
+      </div>
+      <div class="values-list">
+        <div class="value-item">
+          <div class="value-icon">📊</div>
+          <div class="value-text">
+            <h4>Accuracy First</h4>
+            <p>Every transaction categorized correctly, every report reconciled and on time.</p>
+          </div>
+        </div>
+        <div class="value-item">
+          <div class="value-icon">🤝</div>
+          <div class="value-text">
+            <h4>Relationship Driven</h4>
+            <p>We're not a faceless service — you'll always know who is handling your books.</p>
+          </div>
+        </div>
+        <div class="value-item">
+          <div class="value-icon">🔒</div>
+          <div class="value-text">
+            <h4>Secure &amp; Confidential</h4>
+            <p>Your financial data is handled with the highest level of care and discretion.</p>
+          </div>
+        </div>
+        <div class="value-item">
+          <div class="value-icon">⚡</div>
+          <div class="value-text">
+            <h4>Responsive Support</h4>
+            <p>Questions answered fast — no waiting weeks for a response from your bookkeeper.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="team-section">
+    <div class="team-inner">
+      <div class="team-header">
+        <div class="section-label">The People Behind Blu Balence</div>
+        <h2>Meet the <em>team</em></h2>
+        <p>Real people who take your finances seriously and show up every time.</p>
+      </div>
+      <div class="team-grid">
+        <div class="team-card">
+          <img src="https://i.imgur.com/BOi0msf.png" class="team-photo" alt="Aaron Parker">
+          <div class="team-name">Aaron Parker</div>
+          <div class="team-role">Founder &amp; Principal</div>
+          <p class="team-bio">
+            Aaron is a Maryland native currently based in Northern Virginia,
+            overseeing operations across Maryland and Montana. He manages all
+            strategic direction, bookkeeping performance,
+            and client relationships — ensuring every client
+            receives consistent, reliable, and accurate financial service.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="contact-section">
+    <div class="contact-inner">
+      <div class="contact-left">
+        <div class="section-label">Find Us</div>
+        <h2>We're based in<br><em>North Canton, OH</em></h2>
+        <p>Serving clients remotely across the country while staying rooted in Northeast Ohio. Reach out anytime — we're always happy to connect.</p>
+        <div class="contact-details">
+          <div class="contact-item">
+            <div class="contact-icon">📍</div>
+            <div class="contact-item-text">
+              <h4>Office Address</h4>
+              <p>6545 Market Avenue N. STE 100<br>North Canton, OH 44721</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">💼</div>
+            <div class="contact-item-text">
+              <h4>Business Type</h4>
+              <p>Bookkeeping &amp; Financial Services</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">🌐</div>
+            <div class="contact-item-text">
+              <h4>Service Area</h4>
+              <p>Nationwide — fully remote-capable</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="contact-map">
+        <div class="map-placeholder">
+          <div class="map-pin">📍</div>
+          <h4>6545 Market Avenue N. STE 100</h4>
+          <p>North Canton, OH 44721</p>
+          <a class="map-link" href="https://maps.google.com/?q=6545+Market+Avenue+N+STE+100+North+Canton+OH+44721" target="_blank" rel="noopener">Open in Google Maps</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <a href="index.html" class="footer-logo">Blu<span>Balence</span></a>
+      <div class="footer-copy">© 2025 Blu Balence. All rights reserved. &nbsp;|&nbsp; 6545 Market Ave N. STE 100, North Canton, OH 44721</div>
+    </div>
+  </footer>
+
+</body>
+</html>
