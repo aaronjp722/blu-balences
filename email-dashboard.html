@@ -79,6 +79,9 @@ textarea{resize:vertical;min-height:80px}
 .section-title{font-size:13px;font-weight:600;margin:16px 0 8px;color:var(--gray);text-transform:uppercase;letter-spacing:.04em}
 .hint{font-size:12px;color:var(--gray);margin-top:4px}
 .tag-pill{display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:500;background:var(--blue-light);color:var(--blue-dark);margin-right:4px;margin-top:3px}
+.test-result{padding:14px 16px;border-radius:8px;font-size:14px;margin-top:16px;display:none}
+.test-result.success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
+.test-result.error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
 </style>
 </head>
 <body>
@@ -112,6 +115,10 @@ textarea{resize:vertical;min-height:80px}
       <a onclick="navigate('analytics')" id="nav-analytics">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         Analytics
+      </a>
+      <a onclick="navigate('testemail')" id="nav-testemail">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        Test Email
       </a>
       <a onclick="navigate('settings')" id="nav-settings">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -153,17 +160,17 @@ async function navigate(tab) {
   const el = document.getElementById('nav-' + tab);
   if (el) el.classList.add('active');
   document.getElementById('page-title').textContent =
-    { dashboard: 'Dashboard', sequences: 'Sequences', subscribers: 'Subscribers', analytics: 'Analytics', settings: 'Settings' }[tab];
+    { dashboard: 'Dashboard', sequences: 'Sequences', subscribers: 'Subscribers', analytics: 'Analytics', testemail: 'Test Email', settings: 'Settings' }[tab];
   document.getElementById('topbar-actions').innerHTML = '';
   document.getElementById('content').innerHTML = '<div style="padding:40px;text-align:center;color:#6b7280">Loading…</div>';
   if (tab === 'dashboard') await renderDashboard();
   else if (tab === 'sequences') await renderSequences();
   else if (tab === 'subscribers') await renderSubscribers();
   else if (tab === 'analytics') await renderAnalytics();
+  else if (tab === 'testemail') await renderTestEmail();
   else if (tab === 'settings') await renderSettings();
 }
 
-// strip JSON quotes from settings values
 function cfgVal(v) { return typeof v === 'string' ? v.replace(/^"|"$/g, '') : (v || ''); }
 
 async function renderDashboard() {
@@ -251,7 +258,6 @@ async function checkRunStatus(poll) {
 
     box.style.display = 'block';
     link.href = run.html_url;
-
     const started = new Date(run.created_at).toLocaleString();
 
     if (run.status === 'in_progress' || run.status === 'queued') {
@@ -625,6 +631,176 @@ async function renderAnalytics() {
       </tr>`).join('')}</tbody></table>`}
     </div>`;
 }
+
+// ── TEST EMAIL ──────────────────────────────────────────────────────────────
+
+async function renderTestEmail() {
+  const { data: rows } = await sb.from('settings').select('key,value');
+  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
+  const defaultFrom = cfg.from_email || 'Aaron <aaron@blubalencebookkeeping.com>';
+
+  document.getElementById('content').innerHTML = `
+    <div style="max-width:600px">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Send a Test Email</h2>
+          <span style="font-size:12px;color:var(--gray)">Sends directly via Brevo API — no Listmonk, no sequences</span>
+        </div>
+        <div style="padding:24px">
+          <div class="form-group">
+            <label>To</label>
+            <input id="te-to" type="email" placeholder="you@example.com">
+          </div>
+          <div class="form-group">
+            <label>From</label>
+            <input id="te-from" value="${defaultFrom}">
+          </div>
+          <div class="form-group">
+            <label>Subject</label>
+            <input id="te-subject" placeholder="Test email from Blu Balence">
+          </div>
+          <div class="form-group">
+            <label>Body <span style="color:var(--gray);font-weight:400">(HTML or plain text)</span></label>
+            <textarea id="te-body" style="min-height:200px" placeholder="Hi there,&#10;&#10;This is a test email sent directly through Brevo.&#10;&#10;Best,&#10;Aaron"></textarea>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <button class="btn btn-primary" id="te-btn" onclick="sendTestEmail()">&#9654; Send Test Email</button>
+            <span id="te-status" style="font-size:14px;color:var(--gray)"></span>
+          </div>
+          <div id="te-result" class="test-result"></div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:20px">
+        <div class="panel-header"><h2>Recent Test Sends</h2></div>
+        <div id="te-log"><div class="empty">Loading…</div></div>
+      </div>
+    </div>`;
+
+  await refreshTestLog();
+}
+
+async function refreshTestLog() {
+  const el = document.getElementById('te-log');
+  if (!el) return;
+  const { data: logs } = await sb.from('test_send_log')
+    .select('*')
+    .order('sent_at', { ascending: false })
+    .limit(20);
+  if (!logs || !logs.length) {
+    el.innerHTML = '<div class="empty">No test emails sent yet.</div>';
+    return;
+  }
+  el.innerHTML = `<table><thead><tr><th>Sent At</th><th>To</th><th>Subject</th><th>Status</th><th>Message ID</th></tr></thead><tbody>
+    ${logs.map(l => `<tr>
+      <td>${new Date(l.sent_at).toLocaleString()}</td>
+      <td>${l.to_email}</td>
+      <td>${l.subject}</td>
+      <td><span class="badge ${l.status === 'sent' ? 'badge-green' : 'badge-red'}">${l.status}</span></td>
+      <td style="font-size:11px;color:var(--gray)">${l.message_id || '—'}</td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+async function sendTestEmail() {
+  const btn = document.getElementById('te-btn');
+  const statusEl = document.getElementById('te-status');
+  const resultEl = document.getElementById('te-result');
+
+  const to = document.getElementById('te-to').value.trim();
+  const fromRaw = document.getElementById('te-from').value.trim();
+  const subject = document.getElementById('te-subject').value.trim();
+  const body = document.getElementById('te-body').value.trim();
+
+  if (!to || !subject || !body) {
+    statusEl.textContent = 'To, Subject, and Body are required.';
+    statusEl.style.color = 'var(--red)';
+    return;
+  }
+
+  // Parse "Name <email>" or plain email
+  const fromMatch = fromRaw.match(/^(.+?)\s*<(.+?)>$/);
+  const fromName = fromMatch ? fromMatch[1].trim() : '';
+  const fromEmail = fromMatch ? fromMatch[2].trim() : fromRaw;
+
+  // Get Brevo API key
+  const { data: rows } = await sb.from('settings').select('key,value');
+  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
+  const apiKey = cfg.brevo_api_key;
+
+  if (!apiKey) {
+    statusEl.textContent = 'Brevo API key not set. Go to Settings first.';
+    statusEl.style.color = 'var(--red)';
+    return;
+  }
+
+  btn.disabled = true;
+  statusEl.textContent = 'Sending…';
+  statusEl.style.color = 'var(--gray)';
+  resultEl.style.display = 'none';
+
+  const isHtml = body.trim().startsWith('<');
+  const payload = {
+    sender: { name: fromName || 'Blu Balence', email: fromEmail },
+    to: [{ email: to }],
+    subject,
+    ...(isHtml ? { htmlContent: body } : { textContent: body }),
+  };
+
+  try {
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'api-key': apiKey,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const json = await res.json();
+
+    if (res.ok && json.messageId) {
+      statusEl.textContent = '';
+      resultEl.className = 'test-result success';
+      resultEl.textContent = `✓ Sent successfully. Message ID: ${json.messageId}`;
+      resultEl.style.display = 'block';
+
+      // Log to test_send_log table (create if needed — won't error if table missing)
+      await sb.from('test_send_log').insert({
+        to_email: to,
+        from_email: fromEmail,
+        subject,
+        status: 'sent',
+        message_id: json.messageId,
+        sent_at: new Date().toISOString(),
+      }).then(() => refreshTestLog()).catch(() => {});
+
+    } else {
+      statusEl.textContent = '';
+      resultEl.className = 'test-result error';
+      resultEl.textContent = `✗ Failed: ${json.message || JSON.stringify(json)}`;
+      resultEl.style.display = 'block';
+
+      await sb.from('test_send_log').insert({
+        to_email: to,
+        from_email: fromEmail,
+        subject,
+        status: 'failed',
+        message_id: null,
+        sent_at: new Date().toISOString(),
+      }).then(() => refreshTestLog()).catch(() => {});
+    }
+  } catch (e) {
+    statusEl.textContent = '';
+    resultEl.className = 'test-result error';
+    resultEl.textContent = `✗ Request failed: ${e.message}`;
+    resultEl.style.display = 'block';
+  }
+
+  btn.disabled = false;
+}
+
+// ── SETTINGS ────────────────────────────────────────────────────────────────
 
 async function renderSettings() {
   const { data: rows } = await sb.from('settings').select('key,value');
