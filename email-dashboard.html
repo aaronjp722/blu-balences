@@ -94,6 +94,28 @@ textarea{resize:vertical;min-height:80px}
 .days-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .day-chip{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--gray);transition:all .15s}
 .day-chip.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+/* ── NEW STYLES ── */
+.countdown-box{background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;border-radius:10px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.countdown-time{font-size:42px;font-weight:700;letter-spacing:.05em;font-family:monospace;font-variant-numeric:tabular-nums}
+.countdown-label{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.countdown-detail{font-size:13px;opacity:.85;margin-top:6px}
+.countdown-right{text-align:right;font-size:13px;opacity:.85;line-height:1.6}
+.reply-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px;cursor:pointer;transition:box-shadow .15s;display:flex;align-items:flex-start;gap:14px}
+.reply-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.09)}
+.reply-card.unread{border-left:3px solid var(--blue)}
+.reply-meta{flex:1;min-width:0}
+.reply-from{font-weight:600;font-size:14px}
+.reply-subj{font-size:13px;color:var(--gray);margin-top:2px}
+.reply-preview{font-size:13px;color:#374151;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reply-time{font-size:11px;color:var(--gray);flex-shrink:0;white-space:nowrap}
+.reply-thread{background:var(--gray-light);border-radius:8px;padding:14px;margin-bottom:16px;font-size:14px;line-height:1.6;white-space:pre-wrap;max-height:260px;overflow-y:auto}
+.inbox-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
+.inbox-info{flex:1;min-width:0}
+.inbox-name{font-weight:600;font-size:15px}
+.inbox-email{font-size:13px;color:var(--gray);margin-top:2px}
+.inbox-hint{font-size:11px;color:var(--gray);margin-top:2px}
+.seq-sched{display:inline-block;font-size:11px;padding:2px 7px;border-radius:4px;background:var(--blue-light);color:var(--blue-dark);margin-top:4px}
+.unread-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-left:6px;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -128,6 +150,17 @@ textarea{resize:vertical;min-height:80px}
       <a onclick="navigate('analytics')" id="nav-analytics">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         Analytics
+      </a>
+      <a onclick="navigate('inboxes')" id="nav-inboxes">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+        Inboxes
+      </a>
+      <a onclick="navigate('replies')" id="nav-replies" style="justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+          Replies
+        </div>
+        <span id="nav-replies-badge" style="display:none;background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700"></span>
       </a>
       <a onclick="navigate('settings')" id="nav-settings">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -169,6 +202,7 @@ function boot(url, key) {
   document.getElementById('app').classList.add('show');
   navigate('dashboard');
   initAutoSend();
+  refreshUnreadBadge();
 }
 
 async function navigate(tab) {
@@ -176,7 +210,7 @@ async function navigate(tab) {
   const el = document.getElementById('nav-' + tab);
   if (el) el.classList.add('active');
   document.getElementById('page-title').textContent =
-    { dashboard: 'Dashboard', sequences: 'Sequences', subscribers: 'Subscribers', analytics: 'Analytics', settings: 'Settings' }[tab];
+    { dashboard:'Dashboard', sequences:'Sequences', subscribers:'Subscribers', analytics:'Analytics', settings:'Settings', inboxes:'Inboxes', replies:'Replies' }[tab] || tab;
   document.getElementById('topbar-actions').innerHTML = '';
   document.getElementById('content').innerHTML = '<div style="padding:40px;text-align:center;color:#6b7280">Loading…</div>';
   if (tab === 'dashboard') await renderDashboard();
@@ -184,17 +218,76 @@ async function navigate(tab) {
   else if (tab === 'subscribers') await renderSubscribers();
   else if (tab === 'analytics') await renderAnalytics();
   else if (tab === 'settings') await renderSettings();
+  else if (tab === 'inboxes') await renderInboxes();
+  else if (tab === 'replies') await renderReplies();
 }
 
 function cfgVal(v) { return typeof v === 'string' ? v.replace(/^"|"$/g, '') : (v || ''); }
 
+/* ─── COUNTDOWN ─── */
+function computeNextSendMs(sendTime, sendDays, tz) {
+  if (!sendTime || !sendDays || !sendDays.length) return null;
+  const [sendH, sendM] = sendTime.split(':').map(Number);
+  const now = new Date();
+  for (let d = 0; d <= 7; d++) {
+    const probe = new Date(now.getTime() + d * 86400000);
+    const str = probe.toLocaleString('en-US', {
+      timeZone: tz, hour12: false,
+      year:'numeric', month:'2-digit', day:'2-digit',
+      weekday:'short', hour:'2-digit', minute:'2-digit', second:'2-digit'
+    });
+    const m = str.match(/(\w+),\s+(\d+)\/(\d+)\/(\d+),\s+(\d+):(\d+):(\d+)/);
+    if (!m) continue;
+    const [, wday, mo, da, yr, h, min, sec] = m;
+    const dayKey = {Sun:'sun',Mon:'mon',Tue:'tue',Wed:'wed',Thu:'thu',Fri:'fri',Sat:'sat'}[wday] || '';
+    if (!sendDays.includes(dayKey)) continue;
+    const curMin = parseInt(h) * 60 + parseInt(min);
+    const sendMin = sendH * 60 + sendM;
+    if (d === 0 && curMin >= sendMin) continue;
+    const tzNowMs = new Date(`${yr}-${mo}-${da}T${h}:${min}:${sec}Z`).getTime();
+    const offset = probe.getTime() - tzNowMs;
+    const tzSendMs = new Date(`${yr}-${mo}-${da}T${String(sendH).padStart(2,'0')}:${String(sendM).padStart(2,'0')}:00Z`).getTime();
+    const utcSend = tzSendMs + offset;
+    if (utcSend > now.getTime()) return utcSend - now.getTime();
+  }
+  return null;
+}
+
+function startCountdown(sendTime, sendDays, tz) {
+  if (window._countdownTimer) clearInterval(window._countdownTimer);
+  function tick() {
+    const el = document.getElementById('cd-time');
+    const dtEl = document.getElementById('cd-next');
+    if (!el) { clearInterval(window._countdownTimer); return; }
+    const ms = computeNextSendMs(sendTime, sendDays, tz);
+    if (ms === null) { el.textContent = '—'; if (dtEl) dtEl.textContent = 'No schedule'; return; }
+    const s = Math.floor(ms / 1000);
+    const h = Math.floor(s / 3600), min = Math.floor((s % 3600) / 60), sec = s % 60;
+    el.textContent = `${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    if (dtEl) {
+      const next = new Date(Date.now() + ms);
+      dtEl.textContent = next.toLocaleString('en-US', { timeZone: tz, weekday:'short', month:'short', day:'numeric', hour:'numeric', minute:'2-digit', timeZoneName:'short' });
+    }
+  }
+  tick();
+  window._countdownTimer = setInterval(tick, 1000);
+}
+
+/* ─── DASHBOARD ─── */
 async function renderDashboard() {
-  const [{ data: seqs }, { data: enrs }, { data: logs }, { data: evts }] = await Promise.all([
+  const [{ data: seqs }, { data: enrs }, { data: logs }, { data: evts }, { data: settRows }, { data: seqSchedules }] = await Promise.all([
     sb.from('sequences').select('id,active'),
     sb.from('enrollments').select('status'),
     sb.from('send_log').select('id,sent_at').order('sent_at', { ascending: false }).limit(200),
     sb.from('email_events').select('event_type').limit(1000),
+    sb.from('settings').select('key,value'),
+    sb.from('sequences').select('id,name,send_time,send_days,active').eq('active', true),
   ]);
+  const cfg = Object.fromEntries((settRows||[]).map(r => [r.key, cfgVal(r.value)]));
+  const sendTime = cfg.send_time || '';
+  const sendDays = (cfg.send_days || 'mon,tue,wed,thu,fri').split(',').map(d => d.trim());
+  const tz = cfg.send_timezone || 'America/New_York';
+
   const today = new Date().toDateString();
   const sentToday = (logs || []).filter(l => new Date(l.sent_at).toDateString() === today).length;
   const evCounts = {};
@@ -205,7 +298,31 @@ async function renderDashboard() {
   const openRate = totalSent > 0 ? Math.round((opens / totalSent) * 100) : 0;
   const clickRate = totalSent > 0 ? Math.round((clicks / totalSent) * 100) : 0;
 
+  const seqScheds = (seqSchedules || []).filter(s => s.send_time);
+  const scheduleRows = seqScheds.map(s => {
+    const t = s.send_time;
+    const days = s.send_days || cfg.send_days || 'mon-fri';
+    const ms = computeNextSendMs(t, days.split(',').map(d=>d.trim()), tz);
+    const nextStr = ms ? new Date(Date.now() + ms).toLocaleString('en-US', { timeZone: tz, weekday:'short', month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '—';
+    return `<tr><td><strong>${s.name}</strong></td><td>${t}</td><td>${days}</td><td>${nextStr}</td></tr>`;
+  }).join('');
+
   document.getElementById('content').innerHTML = `
+    ${sendTime ? `<div class="countdown-box">
+      <div>
+        <div class="countdown-label">Next Auto-Send</div>
+        <div class="countdown-time" id="cd-time">--:--:--</div>
+        <div class="countdown-detail" id="cd-next"></div>
+      </div>
+      <div class="countdown-right">
+        <div>⏰ ${sendTime} · ${tz}</div>
+        <div>📅 ${sendDays.join(', ')}</div>
+      </div>
+    </div>` : `<div class="info-banner">ℹ️ No send schedule set yet. Go to Settings → Daily Send Schedule to configure auto-send.</div>`}
+    ${seqScheds.length ? `<div class="panel" style="margin-bottom:20px">
+      <div class="panel-header"><h2>Sequence Schedules</h2></div>
+      <table><thead><tr><th>Sequence</th><th>Time</th><th>Days</th><th>Next Send</th></tr></thead><tbody>${scheduleRows}</tbody></table>
+    </div>` : ''}
     <div class="cards">
       <div class="card"><div class="label">Active Sequences</div><div class="value" style="color:var(--blue)">${(seqs||[]).filter(s=>s.active).length}</div><div class="sub">${(seqs||[]).length} total</div></div>
       <div class="card"><div class="label">Active Enrollments</div><div class="value">${(enrs||[]).filter(e=>e.status==='active').length}</div><div class="sub">${(enrs||[]).filter(e=>e.status==='completed').length} completed</div></div>
@@ -240,8 +357,10 @@ async function renderDashboard() {
       </div>
       <div id="recent-log"><div class="empty">Loading…</div></div>
     </div>`;
+
   await refreshLog();
   checkRunStatus();
+  if (sendTime) startCountdown(sendTime, sendDays, tz);
 }
 
 async function refreshLog() {
@@ -266,14 +385,12 @@ async function checkRunStatus(poll) {
   const token = cfg.github_token;
   const repo = cfg.github_repo;
   if (!token || !repo) return;
-
   const box = document.getElementById('run-status-box');
   const dot = document.getElementById('run-status-dot');
   const text = document.getElementById('run-status-text');
   const time = document.getElementById('run-status-time');
   const link = document.getElementById('run-status-link');
   if (!box) return;
-
   try {
     const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/drip.yml/runs?per_page=1`, {
       headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
@@ -281,11 +398,9 @@ async function checkRunStatus(poll) {
     const data = await r.json();
     const run = data.workflow_runs?.[0];
     if (!run) { box.style.display = 'none'; return; }
-
     box.style.display = 'block';
     link.href = run.html_url;
     const started = new Date(run.created_at).toLocaleString();
-
     if (run.status === 'in_progress' || run.status === 'queued') {
       dot.style.background = '#f59e0b';
       text.textContent = run.status === 'queued' ? 'Queued — starting soon…' : 'Running — emails sending now…';
@@ -305,9 +420,7 @@ async function checkRunStatus(poll) {
       text.textContent = `Last run: ${run.conclusion || run.status}`;
       time.textContent = started;
     }
-  } catch(e) {
-    box.style.display = 'none';
-  }
+  } catch(e) { box.style.display = 'none'; }
 }
 
 async function sendNow() {
@@ -316,27 +429,20 @@ async function sendNow() {
   btn.disabled = true;
   status.textContent = 'Triggering…';
   status.style.color = 'var(--gray)';
-
   const { data: rows } = await sb.from('settings').select('key,value');
   const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
   const token = cfg.github_token;
   const repo = cfg.github_repo;
-
   if (!token || !repo) {
     status.textContent = 'GitHub token and repo not set in Settings.';
     status.style.color = 'var(--red)';
     btn.disabled = false;
     return;
   }
-
   try {
     const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/drip.yml/dispatches`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
       body: JSON.stringify({ ref: 'main' }),
     });
     if (r.status === 204) {
@@ -355,6 +461,7 @@ async function sendNow() {
   btn.disabled = false;
 }
 
+/* ─── SEQUENCES ─── */
 async function renderSequences() {
   const { data: seqs } = await sb.from('sequences').select('*').order('created_at');
   document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openSeqModal()">+ New Sequence</button>`;
@@ -362,14 +469,15 @@ async function renderSequences() {
     <div class="panel">
       <div class="panel-header"><h2>Sequences</h2></div>
       ${!seqs||!seqs.length ? '<div class="empty">No sequences yet. Create one to get started.</div>' :
-      `<table><thead><tr><th>Name</th><th>Description</th><th>Active</th><th>Actions</th></tr></thead><tbody>
+      `<table><thead><tr><th>Name</th><th>Description</th><th>Schedule</th><th>Active</th><th>Actions</th></tr></thead><tbody>
       ${seqs.map(s=>`<tr>
         <td><strong>${s.name}</strong></td>
         <td style="color:var(--gray)">${s.description||'—'}</td>
+        <td>${s.send_time ? `<span class="seq-sched">⏰ ${s.send_time} · ${(s.send_days||'global').replace(',','/')}</span>` : '<span style="font-size:12px;color:var(--gray)">Global schedule</span>'}</td>
         <td><label class="toggle"><input type="checkbox" ${s.active?'checked':''} onchange="toggleSeq('${s.id}',this.checked)"><span class="toggle-slider"></span></label></td>
         <td><div class="actions">
           <button class="btn btn-secondary btn-sm" onclick="openStepsModal('${s.id}','${esc(s.name)}')">Steps</button>
-          <button class="btn btn-secondary btn-sm" onclick="openSeqModal('${s.id}','${esc(s.name)}','${esc(s.description||'')}')">Edit</button>
+          <button class="btn btn-secondary btn-sm" onclick="openSeqModal('${s.id}','${esc(s.name)}','${esc(s.description||'')}','${esc(s.send_time||'')}','${esc(s.send_days||'')}')">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteSeq('${s.id}')">Delete</button>
         </div></td>
       </tr>`).join('')}</tbody></table>`}
@@ -386,11 +494,27 @@ async function deleteSeq(id) {
   renderSequences();
 }
 
-function openSeqModal(id, name, desc) {
+function openSeqModal(id, name, desc, seqTime, seqDays) {
+  const activeDays = (seqDays || '').split(',').map(d => d.trim()).filter(Boolean);
+  const days = [{v:'mon',l:'Mon'},{v:'tue',l:'Tue'},{v:'wed',l:'Wed'},{v:'thu',l:'Thu'},{v:'fri',l:'Fri'},{v:'sat',l:'Sat'},{v:'sun',l:'Sun'}];
   showModal(`
     <h2>${id ? 'Edit' : 'New'} Sequence</h2>
     <div class="form-group"><label>Name</label><input id="sq-name" value="${name||''}"></div>
     <div class="form-group"><label>Description</label><textarea id="sq-desc">${desc||''}</textarea></div>
+    <div class="section-title">Send Schedule Override <span style="color:var(--gray);font-weight:400;text-transform:none;font-size:12px">(optional — overrides global schedule for this sequence)</span></div>
+    <div class="form-row-2">
+      <div class="form-group">
+        <label>Send Time</label>
+        <input id="sq-time" type="time" value="${seqTime||''}">
+        <p class="hint">Leave blank to use global schedule.</p>
+      </div>
+      <div class="form-group">
+        <label>Send Days <span style="font-weight:400;color:var(--gray)">(blank = global)</span></label>
+        <div class="days-grid" style="margin-top:0">
+          ${days.map(d=>`<button type="button" class="day-chip sq-day ${activeDays.includes(d.v)?'on':''}" data-day="${d.v}" onclick="this.classList.toggle('on')">${d.l}</button>`).join('')}
+        </div>
+      </div>
+    </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveSeq('${id||''}')">Save</button>
@@ -401,8 +525,12 @@ async function saveSeq(id) {
   const name = document.getElementById('sq-name').value.trim();
   const description = document.getElementById('sq-desc').value.trim();
   if (!name) { alert('Name required'); return; }
-  if (id) await sb.from('sequences').update({ name, description }).eq('id', id);
-  else await sb.from('sequences').insert({ name, description, active: true });
+  const send_time = document.getElementById('sq-time').value || null;
+  const checkedDays = Array.from(document.querySelectorAll('.sq-day.on')).map(el => el.dataset.day);
+  const send_days = checkedDays.length ? checkedDays.join(',') : null;
+  const payload = { name, description, send_time, send_days };
+  if (id) await sb.from('sequences').update(payload).eq('id', id);
+  else await sb.from('sequences').insert({ ...payload, active: true });
   closeModal();
   renderSequences();
 }
@@ -428,9 +556,7 @@ function delay(s) {
 function stepCard(s) {
   const batchLimit = s.batch_limit > 0 ? s.batch_limit : null;
   const interval = s.batch_interval_minutes > 0 ? s.batch_interval_minutes : null;
-  const batchText = batchLimit
-    ? `Batch: ${batchLimit} emails${interval ? `, ${interval} min apart` : ''}`
-    : (interval ? `${interval} min between emails` : 'No batch limit');
+  const batchText = batchLimit ? `Batch: ${batchLimit} emails${interval ? `, ${interval} min apart` : ''}` : (interval ? `${interval} min between emails` : 'No batch limit');
   const tagPills = s.tags ? s.tags.split(',').map(t => t.trim()).filter(Boolean).map(t => `<span class="tag-pill">${t}</span>`).join('') : '';
   const bodyPreview = s.body ? s.body.replace(/<[^>]+>/g, '').trim().substring(0, 80) + (s.body.length > 80 ? '…' : '') : '';
   return `<div class="step-card">
@@ -499,7 +625,6 @@ Blu Balence Bookkeeping"></textarea>
       <button class="btn btn-secondary" onclick="openStepsModal('${seqId}','${esc(seqName)}')">Back</button>
       <button class="btn btn-primary" onclick="saveStep('${seqId}','${esc(seqName)}',${stepNum},'${stepId||''}')">Save Step</button>
     </div>`, true);
-
   if (stepId) {
     sb.from('steps').select('*').eq('id', stepId).single().then(({ data: s }) => {
       if (!s) return;
@@ -518,8 +643,7 @@ Blu Balence Bookkeeping"></textarea>
 
 async function saveStep(seqId, seqName, stepNum, stepId) {
   const payload = {
-    sequence_id: seqId,
-    step_number: stepNum,
+    sequence_id: seqId, step_number: stepNum,
     subject: document.getElementById('st-subj').value.trim(),
     from_email: document.getElementById('st-from').value.trim(),
     template_id: 1,
@@ -546,6 +670,7 @@ async function deleteStep(stepId, seqId) {
   openStepsModal(seqId, seq?.name || '');
 }
 
+/* ─── SUBSCRIBERS ─── */
 async function renderSubscribers() {
   const { data: enrs } = await sb.from('enrollments').select('*,sequences(name)').order('enrolled_at', { ascending: false });
   document.getElementById('topbar-actions').innerHTML = `
@@ -558,416 +683,17 @@ async function renderSubscribers() {
       ${!enrs||!enrs.length ? '<div class="empty">No enrollments yet.</div>' :
       `<table><thead><tr><th>Email</th><th>Name</th><th>Sequence</th><th>Step</th><th>Status</th><th>Last Sent</th><th>Actions</th></tr></thead><tbody>
       ${enrs.map(e=>`<tr>
-        <td>${e.email}</td>
-        <td>${e.name||'—'}</td>
-        <td>${e.sequences?.name||'—'}</td>
+        <td>${e.email}</td><td>${e.name||'—'}</td><td>${e.sequences?.name||'—'}</td>
         <td>Step ${e.current_step}</td>
         <td><span class="badge ${badge(e.status)}">${e.status}</span></td>
         <td>${e.last_sent_at ? new Date(e.last_sent_at).toLocaleDateString() : 'Not yet'}</td>
         <td><div class="actions">
-          ${e.status==='active'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','paused')">Pause</button>`:
-            e.status==='paused'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','active')">Resume</button>`:''}
+          ${e.status==='active'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','paused')">Pause</button>`:e.status==='paused'?`<button class="btn btn-secondary btn-sm" onclick="setStatus('${e.id}','active')">Resume</button>`:''}
           <button class="btn btn-danger btn-sm" onclick="removeEnr('${e.id}')">Remove</button>
         </div></td>
       </tr>`).join('')}</tbody></table>`}
     </div>`;
 }
 
-async function setStatus(id, status) {
-  await sb.from('enrollments').update({ status }).eq('id', id);
-  renderSubscribers();
-}
-
-async function removeEnr(id) {
-  if (!confirm('Remove this enrollment?')) return;
-  await sb.from('enrollments').delete().eq('id', id);
-  renderSubscribers();
-}
-
-async function openEnrollModal() {
-  const { data: seqs } = await sb.from('sequences').select('id,name').eq('active', true);
-  showModal(`
-    <h2>Enroll Subscriber</h2>
-    <div class="form-group"><label>Email</label><input id="en-email" type="email" placeholder="prospect@example.com"></div>
-    <div class="form-group"><label>Name</label><input id="en-name" placeholder="First Last"></div>
-    <div class="form-group"><label>Sequence</label><select id="en-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="enrollOne()">Enroll</button>
-    </div>`);
-}
-
-async function enrollOne() {
-  const email = document.getElementById('en-email').value.trim();
-  const name = document.getElementById('en-name').value.trim();
-  const sequence_id = document.getElementById('en-seq').value;
-  if (!email || !sequence_id) { alert('Email and sequence required'); return; }
-  const { error } = await sb.from('enrollments').insert({ email, name, sequence_id, current_step: 0, status: 'active' });
-  if (error) { alert(error.message); return; }
-  closeModal();
-  renderSubscribers();
-}
-
-async function openBulkModal() {
-  const { data: seqs } = await sb.from('sequences').select('id,name').eq('active', true);
-  showModal(`
-    <h2>Bulk Enroll via CSV</h2>
-    <div class="form-group"><label>Sequence</label><select id="bl-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
-    <div class="form-group">
-      <label>Paste CSV — one per line: <code>email, First Last</code></label>
-      <textarea id="bl-csv" style="min-height:160px" placeholder="john@example.com, John Smith&#10;jane@example.com, Jane Doe"></textarea>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="bulkEnroll()">Enroll All</button>
-    </div>`);
-}
-
-async function bulkEnroll() {
-  const seq = document.getElementById('bl-seq').value;
-  const csv = document.getElementById('bl-csv').value.trim();
-  if (!seq || !csv) { alert('Sequence and CSV required'); return; }
-  const rows = csv.split('\n').map(line => {
-    const [email, ...rest] = line.split(',').map(s => s.trim());
-    return email && email.includes('@') ? { email, name: rest.join(' ').trim() || null, sequence_id: seq, current_step: 0, status: 'active' } : null;
-  }).filter(Boolean);
-  if (!rows.length) { alert('No valid emails found'); return; }
-  const { error } = await sb.from('enrollments').upsert(rows, { onConflict: 'email,sequence_id', ignoreDuplicates: true });
-  if (error) { alert(error.message); return; }
-  closeModal();
-  renderSubscribers();
-}
-
-async function renderAnalytics() {
-  const BADGE = {
-    opened:'badge-green', clicked:'badge-purple', bounced:'badge-yellow',
-    softBounce:'badge-yellow', hardBounce:'badge-yellow', spam:'badge-red',
-    unsubscribed:'badge-red', delivered:'badge-blue', deferred:'badge-yellow',
-    error:'badge-red', sent:'badge-gray', blocked:'badge-yellow', invalid_email:'badge-red',
-  };
-
-  const cutoff = aF.days
-    ? new Date(Date.now() - parseInt(aF.days) * 86400000).toISOString()
-    : null;
-
-  const [{ data: seqs }, { data: logs }, { data: evts }] = await Promise.all([
-    sb.from('sequences').select('id,name').order('name'),
-    sb.from('send_log')
-      .select('id,sent_at,step_number,brevo_message_id,enrollment_id,enrollments(email,name,sequence_id,sequences(name))')
-      .order('sent_at', { ascending: false })
-      .limit(1000),
-    sb.from('email_events')
-      .select('message_id,email,event_type,event_at')
-      .limit(2000),
-  ]);
-
-  const evByMsg = {};
-  (evts || []).forEach(e => {
-    if (!evByMsg[e.message_id]) evByMsg[e.message_id] = [];
-    evByMsg[e.message_id].push(e);
-  });
-
-  let filteredLogs = (logs || []);
-  if (cutoff) filteredLogs = filteredLogs.filter(l => l.sent_at >= cutoff);
-  if (aF.seqId) filteredLogs = filteredLogs.filter(l => l.enrollments?.sequence_id === aF.seqId);
-  if (aF.search) {
-    const q = aF.search.toLowerCase();
-    filteredLogs = filteredLogs.filter(l =>
-      (l.enrollments?.email||'').toLowerCase().includes(q) ||
-      (l.enrollments?.sequences?.name||'').toLowerCase().includes(q)
-    );
-  }
-
-  const totalSent = filteredLogs.length;
-  const evCounts = {};
-  filteredLogs.forEach(l => {
-    const evs = evByMsg[l.brevo_message_id] || [];
-    evs.forEach(e => { evCounts[e.event_type] = (evCounts[e.event_type] || 0) + 1; });
-  });
-
-  const opens = evCounts['opened'] || 0;
-  const clicks = evCounts['clicked'] || 0;
-  const bounces = (evCounts['bounced'] || 0) + (evCounts['softBounce'] || 0) + (evCounts['hardBounce'] || 0);
-  const unsubs = evCounts['unsubscribed'] || 0;
-  const spam = evCounts['spam'] || 0;
-  const delivered = evCounts['delivered'] || 0;
-  const hasWebhook = evts && evts.length > 0;
-
-  const openRate = totalSent > 0 ? (opens / totalSent * 100).toFixed(1) : '0.0';
-  const clickRate = totalSent > 0 ? (clicks / totalSent * 100).toFixed(1) : '0.0';
-  const bounceRate = totalSent > 0 ? (bounces / totalSent * 100).toFixed(1) : '0.0';
-
-  const seqMap = {};
-  (seqs || []).forEach(s => seqMap[s.id] = s.name);
-
-  const bySeq = {};
-  filteredLogs.forEach(l => {
-    const sid = l.enrollments?.sequence_id || 'unknown';
-    const sname = l.enrollments?.sequences?.name || 'Unknown';
-    if (!bySeq[sid]) bySeq[sid] = { name: sname, sent: 0, opens: 0, clicks: 0 };
-    bySeq[sid].sent++;
-    const evs = evByMsg[l.brevo_message_id] || [];
-    evs.forEach(e => {
-      if (e.event_type === 'opened') bySeq[sid].opens++;
-      if (e.event_type === 'clicked') bySeq[sid].clicks++;
-    });
-  });
-
-  const domainMap = {};
-  filteredLogs.forEach(l => {
-    const email = l.enrollments?.email || '';
-    const dom = email.split('@')[1] || 'unknown';
-    domainMap[dom] = (domainMap[dom] || 0) + 1;
-  });
-  const topDomains = Object.entries(domainMap).sort((a,b) => b[1]-a[1]).slice(0, 8);
-
-  document.getElementById('content').innerHTML = `
-    ${!hasWebhook ? `<div class="info-banner">
-      ℹ️ <strong>Open &amp; click tracking requires Brevo webhooks.</strong>
-      Set up the <code>brevo-webhook</code> Supabase Edge Function and point your Brevo webhook URL there to see full event data.
-    </div>` : ''}
-    <div class="filter-bar">
-      <div class="fg"><label>Date Range</label>
-        <select onchange="aF.days=this.value;renderAnalytics()">
-          <option value="7" ${aF.days==='7'?'selected':''}>Last 7 days</option>
-          <option value="30" ${aF.days==='30'?'selected':''}>Last 30 days</option>
-          <option value="90" ${aF.days==='90'?'selected':''}>Last 90 days</option>
-          <option value="" ${aF.days===''?'selected':''}>All time</option>
-        </select>
-      </div>
-      <div class="fg"><label>Sequence</label>
-        <select onchange="aF.seqId=this.value;renderAnalytics()">
-          <option value="">All sequences</option>
-          ${(seqs||[]).map(s=>`<option value="${s.id}" ${aF.seqId===s.id?'selected':''}>${s.name}</option>`).join('')}
-        </select>
-      </div>
-      <div class="fg"><label>Search email</label>
-        <input type="text" placeholder="Search…" value="${aF.search||''}"
-          oninput="aF.search=this.value;renderAnalytics()" style="width:180px">
-      </div>
-    </div>
-    <div class="stat-grid">
-      <div class="stat-card"><div class="sv">${totalSent}</div><div class="sl">Sent</div></div>
-      <div class="stat-card"><div class="sv" style="color:var(--blue)">${delivered}</div><div class="sl">Delivered</div></div>
-      <div class="stat-card"><div class="sv" style="color:var(--green)">${opens}</div><div class="sl">Opened</div><div class="ss">${openRate}%</div></div>
-      <div class="stat-card"><div class="sv" style="color:var(--purple)">${clicks}</div><div class="sl">Clicked</div><div class="ss">${clickRate}%</div></div>
-      <div class="stat-card"><div class="sv" style="color:var(--yellow)">${bounces}</div><div class="sl">Bounced</div><div class="ss">${bounceRate}%</div></div>
-      <div class="stat-card"><div class="sv" style="color:var(--red)">${unsubs}</div><div class="sl">Unsubs</div></div>
-      <div class="stat-card"><div class="sv" style="color:var(--red)">${spam}</div><div class="sl">Spam</div></div>
-    </div>
-    ${Object.keys(bySeq).length > 1 ? `
-    <div class="panel" style="margin-bottom:20px">
-      <div class="panel-header"><h2>By Sequence</h2></div>
-      <table><thead><tr><th>Sequence</th><th>Sent</th><th>Opens</th><th>Open Rate</th><th>Clicks</th><th>Click Rate</th></tr></thead><tbody>
-      ${Object.values(bySeq).sort((a,b)=>b.sent-a.sent).map(s=>`<tr>
-        <td><strong>${s.name}</strong></td>
-        <td>${s.sent}</td>
-        <td>${s.opens}</td>
-        <td>${s.sent>0?(s.opens/s.sent*100).toFixed(1):0}%</td>
-        <td>${s.clicks}</td>
-        <td>${s.sent>0?(s.clicks/s.sent*100).toFixed(1):0}%</td>
-      </tr>`).join('')}
-      </tbody></table>
-    </div>` : ''}
-    ${topDomains.length ? `
-    <div class="panel" style="margin-bottom:20px">
-      <div class="panel-header"><h2>Top Domains</h2></div>
-      <table><thead><tr><th>Domain</th><th>Count</th></tr></thead><tbody>
-      ${topDomains.map(([d,c])=>`<tr><td>${d}</td><td>${c}</td></tr>`).join('')}
-      </tbody></table>
-    </div>` : ''}
-    <div class="panel">
-      <div class="panel-header"><h2>Send Log</h2></div>
-      ${!filteredLogs.length ? '<div class="empty">No sends found for the selected filters.</div>' :
-      `<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Events</th></tr></thead><tbody>
-      ${filteredLogs.slice(0,200).map(l => {
-        const evs = evByMsg[l.brevo_message_id] || [];
-        const badges = evs.map(e => `<span class="badge ${BADGE[e.event_type]||'badge-gray'}">${e.event_type}</span>`).join(' ');
-        return `<tr>
-          <td>${new Date(l.sent_at).toLocaleString()}</td>
-          <td>${l.enrollments?.email||'—'}</td>
-          <td>${l.enrollments?.sequences?.name||'—'}</td>
-          <td>Step ${l.step_number}</td>
-          <td>${badges || '<span class="badge badge-gray">sent</span>'}</td>
-        </tr>`;
-      }).join('')}
-      </tbody></table>`}
-    </div>`;
-}
-
-async function renderSettings() {
-  const { data: rows } = await sb.from('settings').select('key,value');
-  const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
-  const activeDays = (cfg.send_days || 'mon,tue,wed,thu,fri').split(',').map(d => d.trim());
-  const days = [{v:'mon',l:'Mon'},{v:'tue',l:'Tue'},{v:'wed',l:'Wed'},{v:'thu',l:'Thu'},{v:'fri',l:'Fri'},{v:'sat',l:'Sat'},{v:'sun',l:'Sun'}];
-
-  document.getElementById('content').innerHTML = `
-    <div style="max-width:560px">
-      <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><h2>Brevo Connection</h2></div>
-        <div style="padding:20px">
-          <div class="form-group">
-            <label>Brevo API Key</label>
-            <input id="s-brevo" type="password" value="${cfg.brevo_api_key||''}" placeholder="xkeysib-...">
-            <p class="hint">Brevo dashboard → API Keys → Generate. NOT the SMTP key — the API key.</p>
-          </div>
-          <div class="form-group">
-            <label>From Email (default)</label>
-            <input id="s-from" value="${cfg.from_email||'Aaron <aaron@blubalencebookkeeping.com>'}">
-          </div>
-        </div>
-      </div>
-      <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><h2>GitHub Actions</h2></div>
-        <div style="padding:20px">
-          <div class="form-group">
-            <label>GitHub Repo <span style="color:var(--gray);font-weight:400">(owner/repo)</span></label>
-            <input id="s-repo" value="${cfg.github_repo||'aaronjp722/blu-balences'}">
-          </div>
-          <div class="form-group">
-            <label>GitHub Token <span style="color:var(--gray);font-weight:400">(needs workflow scope)</span></label>
-            <input id="s-ghtoken" type="password" value="${cfg.github_token||''}" placeholder="ghp_...">
-            <p class="hint">GitHub → Settings → Developer settings → Personal access tokens → Generate (check workflow scope).</p>
-          </div>
-        </div>
-      </div>
-      <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><h2>Daily Send Schedule</h2></div>
-        <div style="padding:20px">
-          <div class="form-row-2">
-            <div class="form-group">
-              <label>Send Time</label>
-              <input id="s-time" type="time" value="${cfg.send_time||'09:00'}">
-              <p class="hint">Time to auto-trigger the drip run (tab must be open).</p>
-            </div>
-            <div class="form-group">
-              <label>Timezone</label>
-              <select id="s-tz">
-                ${['America/New_York','America/Chicago','America/Denver','America/Los_Angeles','America/Phoenix','UTC']
-                  .map(tz=>`<option value="${tz}" ${(cfg.send_timezone||'America/New_York')===tz?'selected':''}>${tz}</option>`).join('')}
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Send Days</label>
-            <div class="days-grid">
-              ${days.map(d=>`<button type="button" class="day-chip ${activeDays.includes(d.v)?'on':''}" data-day="${d.v}" onclick="this.classList.toggle('on')">${d.l}</button>`).join('')}
-            </div>
-            <p class="hint" style="margin-top:8px">Click days to toggle. Blue = active send day.</p>
-          </div>
-        </div>
-      </div>
-      <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><h2>Send Rate (Global Defaults)</h2></div>
-        <div style="padding:20px">
-          <div class="form-row">
-            <div class="form-group"><label>Emails / Min</label><input id="s-rate" type="number" min="1" max="60" value="${cfg.emails_per_minute||'2'}"></div>
-            <div class="form-group"><label>Batch Size</label><input id="s-batch" type="number" min="1" value="${cfg.batch_size||'50'}"></div>
-            <div class="form-group"><label>Daily Limit</label><input id="s-daily" type="number" value="${cfg.daily_limit||'300'}"></div>
-          </div>
-          <p class="hint">Brevo free plan: 300/day. Each step can override batch size and interval.</p>
-        </div>
-      </div>
-      <div style="display:flex;gap:10px">
-        <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
-        <button class="btn btn-secondary" onclick="resetConn()">Change Supabase Connection</button>
-      </div>
-    </div>`;
-}
-
-async function saveSettings() {
-  const sendDays = Array.from(document.querySelectorAll('.day-chip.on')).map(el => el.dataset.day).join(',');
-  const kvs = [
-    ['brevo_api_key', document.getElementById('s-brevo').value.trim()],
-    ['from_email', document.getElementById('s-from').value.trim()],
-    ['github_repo', document.getElementById('s-repo').value.trim()],
-    ['github_token', document.getElementById('s-ghtoken').value.trim()],
-    ['emails_per_minute', document.getElementById('s-rate').value],
-    ['batch_size', document.getElementById('s-batch').value],
-    ['daily_limit', document.getElementById('s-daily').value],
-    ['send_time', document.getElementById('s-time').value],
-    ['send_timezone', document.getElementById('s-tz').value],
-    ['send_days', sendDays],
-  ];
-  for (const [key, value] of kvs) {
-    await sb.from('settings').upsert({ key, value }, { onConflict: 'key' });
-  }
-  alert('Settings saved!');
-  initAutoSend();
-}
-
-function resetConn() {
-  localStorage.removeItem('sb_url');
-  localStorage.removeItem('sb_key');
-  location.reload();
-}
-
-function initAutoSend() {
-  if (window._autoSendTimer) clearInterval(window._autoSendTimer);
-  window._autoSendTimer = setInterval(async () => {
-    try {
-      const { data: rows } = await sb.from('settings').select('key,value');
-      const cfg = Object.fromEntries((rows||[]).map(r => [r.key, cfgVal(r.value)]));
-      const sendTime = cfg.send_time || '';
-      const sendDays = (cfg.send_days || 'mon,tue,wed,thu,fri').split(',').map(d => d.trim());
-      const tz = cfg.send_timezone || 'America/New_York';
-      const token = cfg.github_token || '';
-      const repo = cfg.github_repo || '';
-      if (!sendTime || !token || !repo) return;
-
-      const now = new Date();
-      const localStr = now.toLocaleString('en-US', { timeZone: tz, hour12: false,
-        year:'numeric', month:'2-digit', day:'2-digit',
-        hour:'2-digit', minute:'2-digit', weekday:'short' });
-
-      const parts = localStr.match(/(\w+),\s+(\d+)\/(\d+)\/(\d+),\s+(\d+):(\d+)/);
-      if (!parts) return;
-      const [, dayName, month, day, year, hour, minute] = parts;
-      const currentTime = `${hour.padStart(2,'0')}:${minute.padStart(2,'0')}`;
-      const dayMap = { Sun:'sun', Mon:'mon', Tue:'tue', Wed:'wed', Thu:'thu', Fri:'fri', Sat:'sat' };
-      const currentDay = dayMap[dayName] || '';
-      const dateKey = `${year}-${month}-${day}`;
-      const sessionKey = `auto_sent_${dateKey}_${sendTime}`;
-
-      if (currentTime === sendTime && sendDays.includes(currentDay) && !sessionStorage.getItem(sessionKey)) {
-        sessionStorage.setItem(sessionKey, '1');
-        const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/drip.yml/dispatches`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/vnd.github+json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ref: 'main' }),
-        });
-        if (r.status === 204) {
-          console.log(`[auto-send] Triggered at ${currentTime} on ${currentDay}`);
-        } else {
-          console.warn(`[auto-send] Trigger failed: ${r.status}`);
-        }
-      }
-    } catch(e) {
-      console.warn('[auto-send] error:', e.message);
-    }
-  }, 30000);
-}
-
-function showModal(html, wide) {
-  const o = document.createElement('div');
-  o.className = 'modal-overlay';
-  o.innerHTML = `<div class="modal" style="${wide?'width:720px':''}">${html}</div>`;
-  o.addEventListener('click', e => { if (e.target === o) closeModal(); });
-  document.getElementById('modals').innerHTML = '';
-  document.getElementById('modals').appendChild(o);
-}
-function closeModal() { document.getElementById('modals').innerHTML = ''; }
-function esc(s) { return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
-
-(function() {
-  const url = localStorage.getItem('sb_url');
-  const key = localStorage.getItem('sb_key');
-  if (url && key) boot(url, key);
-})();
-</script>
-</body>
-</html>
+async function setStatus(id, status) { await sb.from('enrollments').update({ status }).eq('id', id); renderSubscribers(); }
+async
