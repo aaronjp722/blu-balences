@@ -752,6 +752,7 @@ async function bulkEnroll() {
   if (error) { alert(error.message); return; }
   closeModal(); renderSubscribers();
 }
+
 /* ─── ANALYTICS ─── */
 async function renderAnalytics() {
   const BADGE = {
@@ -973,7 +974,8 @@ function initAutoSend() {
       }
     } catch(e) { console.warn('[auto-send] error:', e.message); }
   }, 30000);
-}
+}  
+
   /* ─── INBOXES ─── */
 async function renderInboxes() {
   const { data: inboxes } = await sb.from('inboxes').select('*').order('created_at');
