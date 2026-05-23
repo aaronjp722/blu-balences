@@ -49,25 +49,36 @@ def parse_setting(v):
     return v
 
 
-def personalize(body, to_email, to_name):
+def personalize(body, to_email, to_name, company=""):
     display = to_name or to_email.split("@")[0]
-    first   = display.split()[0] if display else to_email.split("@")[0]
+    parts   = display.split()
+    first   = parts[0]  if parts          else to_email.split("@")[0]
+    last    = parts[-1] if len(parts) > 1 else ""
+    now        = dt.datetime.now()
+    today      = now.strftime("%B %d, %Y")
+    this_month = now.strftime("%B")
     return (
         body
         .replace("{{ .Subscriber.FirstName }}", first)
         .replace("{{.Subscriber.FirstName}}",   first)
-        .replace("{{ .Subscriber.Name }}",       display)
-        .replace("{{.Subscriber.Name}}",         display)
-        .replace("{{ .Subscriber.Email }}",      to_email)
-        .replace("{{.Subscriber.Email}}",        to_email)
-        .replace("{{name}}",                     display)
-        .replace("{{first_name}}",               first)
-        .replace("{{email}}",                    to_email)
+        .replace("{{ .Subscriber.LastName }}",  last)
+        .replace("{{.Subscriber.LastName}}",    last)
+        .replace("{{ .Subscriber.Name }}",      display)
+        .replace("{{.Subscriber.Name}}",        display)
+        .replace("{{ .Subscriber.Email }}",     to_email)
+        .replace("{{.Subscriber.Email}}",       to_email)
+        .replace("{{name}}",                    display)
+        .replace("{{first_name}}",              first)
+        .replace("{{last_name}}",               last)
+        .replace("{{email}}",                   to_email)
+        .replace("{{today}}",                   today)
+        .replace("{{this_month}}",              this_month)
+        .replace("{{company}}",                 company)
     )
 
 
-def send_email(api_key, to_email, to_name, from_email, from_name, subject, body, tags):
-    text = personalize(body, to_email, to_name or "")
+def send_email(api_key, to_email, to_name, from_email, from_name, subject, body, tags, company="", in_reply_to=""):
+    text = personalize(body, to_email, to_name or "", company=company)
     html = text if "<" in text else "<html><body>" + text.replace("\n", "<br>") + "</body></html>"
     payload = {
         "sender": {"email": from_email, "name": from_name or from_email},
@@ -77,6 +88,8 @@ def send_email(api_key, to_email, to_name, from_email, from_name, subject, body,
     }
     if tags:
         payload["tags"] = tags
+    if in_reply_to:
+        payload["headers"] = {"In-Reply-To": in_reply_to, "References": in_reply_to}
     r = requests.post(
         "https://api.brevo.com/v3/smtp/email",
         json=payload,
@@ -131,7 +144,7 @@ def main():
     global_rate     = float(cfg.get("emails_per_minute", "2"))
     global_interval = 60.0 / global_rate
 
-    sequences = get("sequences", "?active=eq.true&select=id,name")
+        sequences = get("sequences", "?active=eq.true&select=id,name,same_thread")
     log.info("%d active sequence(s)", len(sequences))
 
     for seq in sequences:
@@ -140,7 +153,8 @@ def main():
             log.info("  '%s' has no steps", seq["name"])
             continue
         total_steps = len(steps)
-        log.info("Sequence '%s' — %d steps", seq["name"], total_steps)
+               log.info("Sequence '%s' — %d steps", seq["name"], total_steps)
+        same_thread = seq.get("same_thread", False)
 
         for step in steps:
             snum       = step["step_number"]
@@ -151,11 +165,11 @@ def main():
             step_body   = step.get("body") or ""
             step_tags   = [t.strip() for t in (step.get("tags") or "").split(",") if t.strip()]
 
-            if snum == 1:
-                due = get("enrollments", f"?sequence_id=eq.{seq['id']}&current_step=eq.0&status=eq.active&select=id,email,name")
+                        if snum == 1:
+                due = get("enrollments", f"?sequence_id=eq.{seq['id']}&current_step=eq.0&status=eq.active&select=id,email,name,company,thread_message_id")
             else:
                 cutoff = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=delay_mins)).isoformat()
-                due = get("enrollments", f"?sequence_id=eq.{seq['id']}&current_step=eq.{snum-1}&status=eq.active&last_sent_at=lte.{cutoff}&select=id,email,name")
+                due = get("enrollments", f"?sequence_id=eq.{seq['id']}&current_step=eq.{snum-1}&status=eq.active&last_sent_at=lte.{cutoff}&select=id,email,name,company,thread_message_id")
 
             if not due:
                 log.info("  Step %d: nobody due", snum)
@@ -180,18 +194,24 @@ def main():
 
             is_last = snum >= total_steps
 
-            for i, enr in enumerate(due):
+                        for i, enr in enumerate(due):
                 try:
+                    in_reply_to = (enr.get("thread_message_id") or "") if (same_thread and snum > 1) else ""
                     msg_id = send_email(
                         api_key=brevo_api_key, to_email=enr["email"],
                         to_name=enr.get("name") or "", from_email=from_email,
                         from_name=from_name, subject=step["subject"],
                         body=step_body, tags=step_tags,
+                        company=enr.get("company") or "",
+                        in_reply_to=in_reply_to,
                     )
                     log.info("  [%d/%d] → %s (msg: %s)", i+1, len(due), enr["email"], msg_id)
                     now = dt.datetime.now(dt.timezone.utc).isoformat()
                     post("send_log", {"enrollment_id": enr["id"], "step_id": step["id"], "step_number": snum, "brevo_message_id": msg_id, "status": "sent"})
-                    patch("enrollments", f"?id=eq.{enr['id']}", {"current_step": snum, "last_sent_at": now, "status": "completed" if is_last else "active"})
+                    update_payload = {"current_step": snum, "last_sent_at": now, "status": "completed" if is_last else "active"}
+                    if same_thread and snum == 1 and msg_id:
+                        update_payload["thread_message_id"] = msg_id
+                    patch("enrollments", f"?id=eq.{enr['id']}", update_payload)
                 except Exception:
                     log.exception("  [%d/%d] failed for %s", i+1, len(due), enr["email"])
 
