@@ -294,8 +294,31 @@ select {
     grid-template-columns: 1fr;
   }
 }
+  /* ── LOGIN OVERLAY ── */
+#login-overlay{position:fixed;inset:0;background:#0a1628;display:flex;align-items:center;justify-content:center;z-index:300}
+#login-overlay .login-card{background:#111827;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:40px 36px;width:100%;max-width:420px}
+#login-overlay h1{color:#fff;font-size:26px;font-weight:700;margin-bottom:8px;font-family:Inter,sans-serif}
+#login-overlay .login-sub{color:#9ca3af;font-size:15px;margin-bottom:28px}
+#login-overlay .lo-label{color:#d1d5db;font-size:14px;font-weight:500;margin-bottom:6px;display:block;margin-top:14px}
+#login-overlay .lo-input{background:#1f2937;border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:12px 14px;font-size:15px;width:100%;outline:none;transition:border-color .2s;font-family:Inter,sans-serif}
+#login-overlay .lo-input:focus{border-color:#22c55e}
+#login-overlay .login-btn{width:100%;background:#22c55e;color:#fff;border:none;border-radius:10px;padding:13px;font-size:16px;font-weight:600;cursor:pointer;transition:background .2s;margin-top:18px;font-family:Inter,sans-serif}
+#login-overlay .login-btn:hover{background:#16a34a}
+#login-overlay .login-err{color:#f87171;font-size:13px;margin-top:12px;text-align:center;min-height:20px}
 </style>
 
+<div id="login-overlay">
+  <div class="login-card">
+    <h1>Welcome Back</h1>
+    <p class="login-sub">Please sign in to your account.</p>
+    <label class="lo-label">Email</label>
+    <input class="lo-input" id="lo-email" type="email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()">
+    <label class="lo-label">Password</label>
+    <input class="lo-input" id="lo-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="lo-err"></div>
+  </div>
+</div>
 <div class="admin-container">
 
   <div id="statusBar" class="status"></div>
@@ -374,7 +397,10 @@ select {
   }
 
   const sb = window.brandSupabase;
-
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session) document.getElementById('login-overlay').style.display = 'none';
+  });
+  
   let jobs = [];
   let selectedJobId = null;
   let currentFormId = null;
@@ -940,4 +966,13 @@ select {
 
   loadJobs();
 })();
+
+async function doLogin() {
+  const email = document.getElementById('lo-email').value.trim();
+  const pass  = document.getElementById('lo-pass').value;
+  document.getElementById('lo-err').textContent = '';
+  const { error } = await window.brandSupabase.auth.signInWithPassword({ email, password: pass });
+  if (error) { document.getElementById('lo-err').textContent = error.message; return; }
+  document.getElementById('login-overlay').style.display = 'none';
+}
 </script>
