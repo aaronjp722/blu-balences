@@ -23,6 +23,64 @@
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }
+
+    /* ── EXACT LOGIN STYLES ── */
+    .login-wrapper {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 60vh;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0a1628;
+    }
+    .login-card {
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      color: #e5e7eb;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .login-card h1 { margin: 0 0 10px; color: #fff; font-size: 24px; }
+    .login-card p { color: #9ca3af; margin-bottom: 24px; font-size: 14px; }
+    .login-input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 12px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+    .login-input:focus { border-color: #22c55e; }
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      background: #22c55e;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    .login-btn:hover { background: #16a34a; }
+    .login-btn:disabled { opacity: 0.7; cursor: wait; }
+    .status-text { margin-top: 15px; font-size: 13px; min-height: 20px; }
+    .forgot-link { display: block; margin-top: 20px; color: #9ca3af; text-decoration: none; font-size: 13px; }
+    .forgot-link:hover { color: white; text-decoration: underline; }
+
+    /* ── STAFF DASHBOARD STYLES ── */
     header {
       background: rgba(10,22,40,0.97);
       border-bottom: 1px solid var(--border);
@@ -157,66 +215,6 @@
     .icon-purple { background: rgba(124,58,237,0.15); color: #a78bfa; }
     .icon-teal   { background: rgba(13,148,136,0.15); color: #2dd4bf; }
     .icon-slate  { background: rgba(100,116,139,0.15);color: #94a3b8; }
-
-    /* ── LOGIN OVERLAY ── */
-    #login-overlay {
-      position: fixed;
-      inset: 0;
-      background: var(--navy);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 200;
-      padding: 20px;
-    }
-    .login-card {
-      background: var(--navy2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 40px 32px;
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    }
-    .login-card h1 { font-size: 22px; font-weight: 800; color: var(--white); margin-bottom: 6px; letter-spacing: -0.5px; }
-    .login-card p { font-size: 14px; color: var(--text-dim); margin-bottom: 28px; }
-    .login-input {
-      width: 100%;
-      padding: 13px 14px;
-      margin-bottom: 12px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 15px;
-      outline: none;
-      font-family: 'Inter', sans-serif;
-      transition: border-color 0.15s;
-    }
-    .login-input:focus { border-color: var(--blue-light); }
-    .login-input::placeholder { color: var(--text-dim); }
-    .login-btn {
-      width: 100%;
-      padding: 13px;
-      background: var(--blue);
-      color: white;
-      font-weight: 700;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 15px;
-      margin-top: 6px;
-      font-family: 'Inter', sans-serif;
-      letter-spacing: 0.3px;
-      transition: background 0.15s;
-    }
-    .login-btn:hover { background: var(--blue-light); }
-    .login-btn:disabled { opacity: 0.6; cursor: wait; }
-    .login-status { margin-top: 14px; font-size: 13px; min-height: 20px; color: var(--text-dim); }
-    .forgot-link { display: block; margin-top: 18px; color: var(--text-dim); text-decoration: none; font-size: 12px; }
-    .forgot-link:hover { color: var(--text); text-decoration: underline; }
-
     @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 580px) {
       .grid { grid-template-columns: 1fr; }
@@ -227,16 +225,16 @@
 </head>
 <body>
 
-<!-- LOGIN OVERLAY -->
-<div id="login-overlay">
+<!-- LOGIN (exact working code, displayed as overlay) -->
+<div class="login-wrapper" id="login-section">
   <div class="login-card">
-    <h1>Staff Access</h1>
-    <p>Sign in to view the dashboard.</p>
-    <input id="email-field" class="login-input" type="email" placeholder="Email address" required />
+    <h1>Welcome Back</h1>
+    <p>Please sign in to your account.</p>
+    <input id="email-field" class="login-input" type="email" placeholder="Email Address" required />
     <input id="pass-field" class="login-input" type="password" placeholder="Password" required />
     <button id="login-btn" class="login-btn">Sign In</button>
-    <div id="login-status" class="login-status"></div>
-    <a href="/forgot-password" class="forgot-link">Forgot password?</a>
+    <div id="status-msg" class="status-text"></div>
+    <a href="/forgot-password" class="forgot-link">New User / Forgot Password?</a>
   </div>
 </div>
 
@@ -482,68 +480,70 @@
 
 <script>
   if (typeof window.supabaseClient === 'undefined') {
-    window.supabaseClient = window.supabase.createClient(
-      "https://rfdvogakvyodixgpvqvz.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E"
-    );
+    const CONFIG = {
+      URL: "https://rfdvogakvyodixgpvqvz.supabase.co",
+      KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E"
+    };
+    window.supabaseClient = window.supabase.createClient(CONFIG.URL, CONFIG.KEY);
   }
 
   function showDashboard() {
-    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('login-section').style.display = 'none';
     document.getElementById('main-content').style.display = 'block';
     document.getElementById('signout-btn').style.display = 'inline-block';
   }
 
-  function showLogin() {
-    document.getElementById('login-overlay').style.display = 'flex';
+  async function signOut() {
+    await window.supabaseClient.auth.signOut();
+    document.getElementById('login-section').style.display = 'flex';
     document.getElementById('main-content').style.display = 'none';
     document.getElementById('signout-btn').style.display = 'none';
   }
 
-  async function signOut() {
-    await window.supabaseClient.auth.signOut();
-    showLogin();
-  }
-
-  // Check existing session immediately
+  // Check existing session on load
   window.supabaseClient.auth.getSession().then(({ data: { session } }) => {
     if (session && session.user) showDashboard();
   });
 
-  document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function() {
     const btn = document.getElementById('login-btn');
     const emailInput = document.getElementById('email-field');
     const passInput = document.getElementById('pass-field');
-    const status = document.getElementById('login-status');
+    const msg = document.getElementById('status-msg');
 
-    btn.addEventListener('click', async () => {
-      status.textContent = '';
-      status.style.color = '';
-      const email = emailInput.value.trim();
-      const password = passInput.value;
-      if (!email || !password) {
-        status.textContent = 'Please enter both email and password.';
-        status.style.color = '#f87171';
-        return;
-      }
-      const orig = btn.innerText;
-      btn.innerText = 'Signing in…';
-      btn.disabled = true;
-      try {
-        const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        status.textContent = 'Success!';
-        status.style.color = '#4ade80';
-        setTimeout(showDashboard, 600);
-      } catch (err) {
-        status.textContent = err.message || 'Invalid email or password.';
-        status.style.color = '#f87171';
-        btn.innerText = orig;
-        btn.disabled = false;
-      }
-    });
+    if (btn) {
+      btn.addEventListener('click', async () => {
+        msg.textContent = "";
+        msg.style.color = "";
+        const email = emailInput.value.trim();
+        const password = passInput.value;
+        if (!email || !password) {
+          msg.textContent = "Please enter both email and password.";
+          msg.style.color = "#ef4444";
+          return;
+        }
+        const originalText = btn.innerText;
+        btn.innerText = "Signing in...";
+        btn.disabled = true;
+        try {
+          const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+          });
+          if (error) throw error;
+          msg.textContent = "Success!";
+          msg.style.color = "#22c55e";
+          setTimeout(showDashboard, 800);
+        } catch (err) {
+          console.error("Login Error:", err);
+          msg.textContent = err.message || "Invalid email or password.";
+          msg.style.color = "#ef4444";
+          btn.innerText = originalText;
+          btn.disabled = false;
+        }
+      });
+    }
 
-    // Allow Enter key to submit
     [emailInput, passInput].forEach(el => {
       el.addEventListener('keydown', e => { if (e.key === 'Enter') btn.click(); });
     });
