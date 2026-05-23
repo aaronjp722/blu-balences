@@ -759,7 +759,8 @@ async function renderSequences() {
         <td>${s.same_thread ? '<span class="badge badge-blue">On</span>' : '<span style="font-size:12px;color:var(--gray)">Off</span>'}</td>
         <td><label class="toggle"><input type="checkbox" ${s.active?'checked':''} onchange="toggleSeq('${s.id}',this.checked)"><span class="toggle-slider"></span></label></td>
         <td><div class="actions">
-          <button class="btn btn-secondary btn-sm" onclick="openStepsModal('${s.id}','${esc(s.name)}')">Steps</button>
+                    <button class="btn btn-secondary btn-sm" onclick="openStepsModal('${s.id}','${esc(s.name)}')">Steps</button>
+          <button class="btn btn-secondary btn-sm" onclick="openSeqInboxModal('${s.id}','${esc(s.name)}')">Inboxes</button>
           <button class="btn btn-secondary btn-sm" onclick="openSeqModal('${s.id}','${esc(s.name)}','${esc(s.description||'')}','${esc(s.send_time||'')}','${esc(s.send_days||'')}',${!!s.same_thread})">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteSeq('${s.id}')">Delete</button>
         </div></td>
@@ -775,6 +776,79 @@ async function deleteSeq(id) {
   if (!confirm('Delete this sequence and all enrollments?')) return;
   await sb.from('sequences').delete().eq('id', id);
   renderSequences();
+}
+
+async function openSeqInboxModal(seqId, seqName) {
+  const { data: allInboxes } = await sb.from('inboxes').select('*').eq('active', true).order('created_at');
+  const { data: assigned }   = await sb.from('sequence_inboxes').select('*').eq('sequence_id', seqId);
+  const aMap = {};
+  (assigned || []).forEach(a => { aMap[a.inbox_id] = a; });
+  if (!allInboxes || !allInboxes.length) {
+    showModal(`<h2>Inboxes — ${seqName}</h2><div class="empty" style="padding:20px">No active inboxes. Add one in the Inboxes tab first.</div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Close</button></div>`);
+    return;
+  }
+  const rows = allInboxes.map(ib => {
+    const a      = aMap[ib.id] || {};
+    const isOn   = !!(a.inbox_id && a.active !== false);
+    const useLim = !!(a.use_inbox_limit);
+    const lim    = a.daily_limit || 0;
+    return `<div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:${isOn?'10px':'0'}">
+        <label class="toggle" style="margin:0"><input type="checkbox" id="sqi-chk-${ib.id}" ${isOn?'checked':''} onchange="toggleSeqInboxRow('${ib.id}')"><span class="toggle-slider"></span></label>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:14px">${ib.name}</div>
+          <div style="font-size:12px;color:var(--gray)">${ib.email}</div>
+        </div>
+      </div>
+      <div id="sqi-opts-${ib.id}" style="${isOn?'':'display:none'}">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <label class="toggle" style="margin:0"><input type="checkbox" id="sqi-uselim-${ib.id}" ${useLim?'checked':''} onchange="toggleSeqInboxLimitRow('${ib.id}')"><span class="toggle-slider"></span></label>
+          <span style="font-size:13px;color:var(--gray)">Use a custom daily limit for this inbox</span>
+        </div>
+        <div id="sqi-limwrap-${ib.id}" style="${useLim?'':'display:none'}">
+          <div class="form-group" style="margin:0">
+            <label style="font-size:12px;color:var(--gray)">Max emails/day from this inbox (this sequence)</label>
+            <input id="sqi-lim-${ib.id}" type="number" min="0" value="${lim}" placeholder="e.g. 50">
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  showModal(`
+    <h2>Inboxes — ${seqName}</h2>
+    <p class="hint" style="margin-bottom:14px">Toggle inboxes on to include them in this sequence. The drip script rotates through enabled inboxes picking the one with fewest sends today. Each contact is locked to one inbox for their whole sequence — this keeps same-thread replies consistent.</p>
+    ${rows}
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSeqInboxes('${seqId}')">Save</button>
+    </div>`, true);
+}
+
+function toggleSeqInboxRow(inboxId) {
+  const checked = document.getElementById(`sqi-chk-${inboxId}`).checked;
+  document.getElementById(`sqi-opts-${inboxId}`).style.display = checked ? '' : 'none';
+}
+
+function toggleSeqInboxLimitRow(inboxId) {
+  const checked = document.getElementById(`sqi-uselim-${inboxId}`).checked;
+  document.getElementById(`sqi-limwrap-${inboxId}`).style.display = checked ? '' : 'none';
+}
+
+async function saveSeqInboxes(seqId) {
+  const { data: allInboxes } = await sb.from('inboxes').select('id').eq('active', true);
+  if (!allInboxes) return;
+  for (const ib of allInboxes) {
+    const chk = document.getElementById(`sqi-chk-${ib.id}`);
+    if (!chk) continue;
+    const active  = chk.checked;
+    const useLim  = document.getElementById(`sqi-uselim-${ib.id}`)?.checked || false;
+    const lim     = parseInt(document.getElementById(`sqi-lim-${ib.id}`)?.value || '0') || 0;
+    await sb.from('sequence_inboxes').upsert(
+      { sequence_id: seqId, inbox_id: ib.id, active, use_inbox_limit: useLim, daily_limit: lim },
+      { onConflict: 'sequence_id,inbox_id' }
+    );
+  }
+  closeModal();
 }
 
 function openSeqModal(id, name, desc, seqTime, seqDays, sameThread) {
