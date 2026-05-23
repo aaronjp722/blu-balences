@@ -372,6 +372,7 @@ async function renderDashboard() {
       <div class="card"><div class="label">Open Rate</div><div class="value" style="color:var(--green)">${openRate}%</div><div class="sub">${opens} opens</div></div>
       <div class="card"><div class="label">Click Rate</div><div class="value" style="color:var(--purple)">${clickRate}%</div><div class="sub">${clicks} clicks</div></div>
     </div>
+        <div id="brevo-stats-panel" class="panel" style="margin-bottom:20px"></div>
     <div class="panel" style="margin-bottom:20px">
       <div class="panel-header"><h2>Send Drip Emails</h2></div>
       <div style="padding:20px">
@@ -399,7 +400,8 @@ async function renderDashboard() {
       <div id="recent-log"><div class="empty">Loading…</div></div>
     </div>`;
 
-  await refreshLog();
+    await refreshLog();
+  await loadBrevoStats(cfg.brevo_api_key || '');
   checkRunStatus();
   if (sendTime) startCountdown(sendTime, sendDays, tz);
 }
@@ -501,7 +503,156 @@ async function sendNow() {
   }
   btn.disabled = false;
 }
+async function loadBrevoStats(apiKey) {
+  const el = document.getElementById('brevo-stats-panel');
+  if (!el) return;
+  if (!apiKey) {
+    el.innerHTML = '<div class="info-banner" style="margin:16px">⚠️ Add your Brevo API key in Settings to see live delivery stats.</div>';
+    return;
+  }
+  el.innerHTML = '<div style="padding:16px;color:var(--gray);font-size:13px">Loading Brevo stats…</div>';
+  try {
+    const end = new Date().toISOString().slice(0, 10);
+    const start = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+    const r = await fetch(`https://api.brevo.com/v3/smtp/statistics/aggregatedReport?startDate=${start}&endDate=${end}`, {
+      headers: { 'api-key': apiKey, 'Content-Type': 'application/json' }
+    });
+    if (!r.ok) {
+      el.innerHTML = `<div class="info-banner" style="margin:16px">⚠️ Brevo API error ${r.status}. Check your API key in Settings.</div>`;
+      return;
+    }
+    const d = await r.json();
+    const sent = d.requests || 0;
+    const delivered = d.delivered || 0;
+    const uniqueOpens = d.uniqueOpens || 0;
+    const opens = d.opens || 0;
+    const uniqueClicks = d.uniqueClicks || 0;
+    const hardBounces = d.hardBounces || 0;
+    const softBounces = d.softBounces || 0;
+    const spam = d.spamReports || 0;
+    const blocked = d.blocked || 0;
+    const pct = (n) => sent > 0 ? (n / sent * 100).toFixed(2) : '0.00';
+    const bar = (val, color) => `<div style="height:6px;background:var(--border);border-radius:3px;margin-top:6px"><div style="height:6px;background:${color};border-radius:3px;width:${Math.min(parseFloat(val),100)}%"></div></div>`;
+    el.innerHTML = `
+      <div class="panel-header">
+        <h2>Brevo Delivery Stats <span style="font-size:12px;font-weight:400;color:var(--gray)">(last 30 days)</span></h2>
+        <span style="font-size:13px;font-weight:700">${sent} emails sent</span>
+      </div>
+      <div style="padding:20px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:18px">
+          <div>
+            <div style="font-size:13px;color:var(--gray);margin-bottom:2px">Delivered</div>
+            <div style="font-weight:700;font-size:18px">${pct(delivered)}%</div>
+            ${bar(pct(delivered), '#1a56db')}
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--gray);margin-bottom:2px">Estimated openers</div>
+            <div style="font-weight:700;font-size:18px">${uniqueOpens}</div>
+            ${bar(pct(uniqueOpens), '#10b981')}
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--gray);margin-bottom:2px">Trackable openers</div>
+            <div style="font-weight:700;font-size:18px">${pct(opens)}%</div>
+            ${bar(pct(opens), '#10b981')}
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--gray);margin-bottom:2px">Unique clickers</div>
+            <div style="font-weight:700;font-size:18px">${pct(uniqueClicks)}%</div>
+            ${bar(pct(uniqueClicks), '#10b981')}
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--gray);margin-bottom:2px">Bounced</div>
+            <div style="font-weight:700;font-size:18px">${(parseFloat(pct(hardBounces))+parseFloat(pct(softBounces))).toFixed(2)}%</div>
+            ${bar(0, '#d1d5db')}
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;padding-top:14px;border-top:1px solid var(--border)">
+          <div style="font-size:13px;color:var(--gray)">Complaint <strong style="color:var(--text)">${pct(spam)}%</strong></div>
+          <div style="font-size:13px;color:var(--gray)">Hard bounce <strong style="color:var(--text)">${pct(hardBounces)}%</strong></div>
+          <div style="font-size:13px;color:var(--gray)">Soft bounce <strong style="color:var(--text)">${pct(softBounces)}%</strong></div>
+          <div style="font-size:13px;color:var(--gray)">Blocked <strong style="color:var(--text)">${pct(blocked)}%</strong></div>
+        </div>
+      </div>`;
+  } catch(e) {
+    el.innerHTML = `<div style="padding:16px;color:var(--red);font-size:13px">Failed to load Brevo stats: ${e.message}</div>`;
+  }
+}
+async function loadBrevoStats(apiKey) {
+  const el = document.getElementById('brevo-stats-panel');
+  if (!el) return;
+  if (!apiKey) {
+    el.innerHTML = '<div class="info-banner" style="margin:16px">⚠️ Add your Brevo API key in Settings to see live delivery stats.</div>';
+    return;
+  }
+  el.innerHTML = '<div style="padding:16px;color:var(--gray);font-size:13px">Loading Brevo stats…</div>';
+  try {
+    const end = new Date().toISOString().slice(0, 10);
+    const start = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+    const r = await fetch(`https://api.brevo.com/v3/smtp/statistics/aggregatedReport?startDate=${start}&endDate=${end}`, {
+      headers: { 'api-key': apiKey, 'Content-Type': 'application/json' }
+    });
+    if (!r.ok) {
+      el.innerHTML = `<div class="info-banner" style="margin:16px">⚠️ Brevo API error ${r.status}. Check your API key in Settings.</div>`;
+      return;
+    }
+    const d = await r.json();
+    const sent = d.requests || 0;
+    const delivered = d.delivered || 0;
+    const uniqueOpens = d.uniqueOpens || 0;
+    const opens = d.opens || 0;
+    const uniqueClicks = d.uniqueClicks || 0;
+    const hardBounces = d.hardBounces || 0;
+    const softBounces = d.softBounces || 0;
+    const spam = d.spamReports || 0;
+    const blocked = d.blocked || 0;
+    const pct = (n) => sent > 0 ? (n / sent * 100).toFixed(2) : '0.00';
+    const bar = (val, color) => `<div style="height:6px;background:var(--border);border-radius:3px;margin-top:6px"><div style="height:6px;background:${color};border-radius:3px;width:${Math.min(parseFloat(val),100)}%"></div></div>`;
+    el.innerHTML = `
+      <div class="panel-header">
+        <h2>Brevo Delivery Stats <span style="font-size:12px;font-weight:400;color:var(--gray)">(last 30 days)</span></h2>
+        <span style="font-size:13px;font-weight:700">${sent} emails sent</span>
+      </div>
+      <div style="padding:20px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:18px">
+          <div>
+            <div style="font-size:13px;color:var(--gray);margin-bottom:2px">Delivered</div>
+            <div style="font-weight:700;font-size:18px">${pct(delivered)}%</div>
+            ${bar(pct(delivered), '#1a56db')}
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--gray);margin-bottom:2px">Estimated openers</div>
+            <div style="font-weight:700;font-size:18px">${uniqueOpens}</div>
+            ${bar(pct(uniqueOpens), '#10b981')}
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--gray);margin-bottom:2px">Trackable openers</div>
+            <div style="font-weight:700;font-size:18px">${pct(opens)}%</div>
+            ${bar(pct(opens), '#10b981')}
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--gray);margin-bottom:2px">Unique clickers</div>
+            <div style="font-weight:700;font-size:18px">${pct(uniqueClicks)}%</div>
+            ${bar(pct(uniqueClicks), '#10b981')}
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--gray);margin-bottom:2px">Bounced</div>
+            <div style="font-weight:700;font-size:18px">${(parseFloat(pct(hardBounces))+parseFloat(pct(softBounces))).toFixed(2)}%</div>
+            ${bar(0, '#d1d5db')}
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;padding-top:14px;border-top:1px solid var(--border)">
+          <div style="font-size:13px;color:var(--gray)">Complaint <strong style="color:var(--text)">${pct(spam)}%</strong></div>
+          <div style="font-size:13px;color:var(--gray)">Hard bounce <strong style="color:var(--text)">${pct(hardBounces)}%</strong></div>
+          <div style="font-size:13px;color:var(--gray)">Soft bounce <strong style="color:var(--text)">${pct(softBounces)}%</strong></div>
+          <div style="font-size:13px;color:var(--gray)">Blocked <strong style="color:var(--text)">${pct(blocked)}%</strong></div>
+        </div>
+      </div>`;
+  } catch(e) {
+    el.innerHTML = `<div style="padding:16px;color:var(--red);font-size:13px">Failed to load Brevo stats: ${e.message}</div>`;
+  }
+}
 
+  
 /* ─── SEQUENCES ─── */
 async function renderSequences() {
   const { data: seqs } = await sb.from('sequences').select('*').order('created_at');
