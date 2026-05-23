@@ -1,116 +1,554 @@
-<style>
-  .login-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 40px 20px;
-    min-height: 60vh;
-    font-family: system-ui, -apple-system, sans-serif;
-  }
-  .login-card {
-    background: #111827;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 16px;
-    padding: 40px 32px;
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-    color: #e5e7eb;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-  }
-  .login-card h1 { margin: 0 0 10px; color: #fff; font-size: 24px; }
-  .login-card p { color: #9ca3af; margin-bottom: 24px; font-size: 14px; }
-  .login-input {
-    width: 100%;
-    padding: 14px;
-    margin-bottom: 12px;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    color: white;
-    font-size: 16px;
-    outline: none;
-  }
-  .login-input:focus { border-color: #22c55e; }
-  .login-btn {
-    width: 100%;
-    padding: 14px;
-    background: #22c55e;
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 10px;
-  }
-  .login-btn:hover { background: #16a34a; }
-  .login-btn:disabled { opacity: 0.7; cursor: wait; }
-  .status-text { margin-top: 15px; font-size: 13px; min-height: 20px; }
-  .forgot-link { display: block; margin-top: 20px; color: #9ca3af; text-decoration: none; font-size: 13px; }
-  .forgot-link:hover { color: white; text-decoration: underline; }
-</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Dashboard | Blu Balence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0a1628; --navy2: #0f1f3d; --navy3: #162444;
+      --blue: #2563eb; --blue-light: #3b82f6; --blue-glow: rgba(37,99,235,0.18);
+      --green: #16a34a; --amber: #d97706; --red: #dc2626;
+      --purple: #7c3aed; --teal: #0d9488;
+      --text: #e2e8f0; --text-sub: #94a3b8; --text-dim: #64748b;
+      --border: rgba(255,255,255,0.08); --white: #ffffff;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    header {
+      background: rgba(10,22,40,0.97);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { font-size: 18px; font-weight: 800; color: var(--white); letter-spacing: -0.5px; }
+    .logo span { color: var(--blue-light); }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 100px;
+    }
+    .signout-btn {
+      display: none;
+      padding: 6px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-sub);
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.5px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .signout-btn:hover { background: rgba(220,38,38,0.15); color: #f87171; border-color: rgba(220,38,38,0.3); }
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+      display: none;
+    }
+    .page-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.8px;
+      margin-bottom: 6px;
+    }
+    .page-sub {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 40px;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .link-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-decoration: none;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      cursor: pointer;
+    }
+    .link-card:hover {
+      border-color: rgba(59,130,246,0.4);
+      box-shadow: 0 0 24px var(--blue-glow);
+      transform: translateY(-2px);
+    }
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .card-body { flex: 1; min-width: 0; }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+    .card-desc {
+      font-size: 12px;
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+    .card-url {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 10px;
+      font-family: monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .icon-blue   { background: rgba(37,99,235,0.15);  color: #60a5fa; }
+    .icon-green  { background: rgba(22,163,74,0.15);  color: #4ade80; }
+    .icon-amber  { background: rgba(217,119,6,0.15);  color: #fbbf24; }
+    .icon-red    { background: rgba(220,38,38,0.15);  color: #f87171; }
+    .icon-purple { background: rgba(124,58,237,0.15); color: #a78bfa; }
+    .icon-teal   { background: rgba(13,148,136,0.15); color: #2dd4bf; }
+    .icon-slate  { background: rgba(100,116,139,0.15);color: #94a3b8; }
 
-<div class="login-wrapper">
+    /* ── LOGIN OVERLAY ── */
+    #login-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+    }
+    .login-card {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .login-card h1 { font-size: 22px; font-weight: 800; color: var(--white); margin-bottom: 6px; letter-spacing: -0.5px; }
+    .login-card p { font-size: 14px; color: var(--text-dim); margin-bottom: 28px; }
+    .login-input {
+      width: 100%;
+      padding: 13px 14px;
+      margin-bottom: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.15s;
+    }
+    .login-input:focus { border-color: var(--blue-light); }
+    .login-input::placeholder { color: var(--text-dim); }
+    .login-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--blue);
+      color: white;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      margin-top: 6px;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.3px;
+      transition: background 0.15s;
+    }
+    .login-btn:hover { background: var(--blue-light); }
+    .login-btn:disabled { opacity: 0.6; cursor: wait; }
+    .login-status { margin-top: 14px; font-size: 13px; min-height: 20px; color: var(--text-dim); }
+    .forgot-link { display: block; margin-top: 18px; color: var(--text-dim); text-decoration: none; font-size: 12px; }
+    .forgot-link:hover { color: var(--text); text-decoration: underline; }
+
+    @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 580px) {
+      .grid { grid-template-columns: 1fr; }
+      main { padding: 32px 20px 60px; }
+      header { padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="login-overlay">
   <div class="login-card">
-    <h1>Welcome Back</h1>
-    <p>Please sign in to your account.</p>
-    <input id="email-field" class="login-input" type="email" placeholder="Email Address" required />
+    <h1>Staff Access</h1>
+    <p>Sign in to view the dashboard.</p>
+    <input id="email-field" class="login-input" type="email" placeholder="Email address" required />
     <input id="pass-field" class="login-input" type="password" placeholder="Password" required />
     <button id="login-btn" class="login-btn">Sign In</button>
-    <div id="status-msg" class="status-text"></div>
-    <a href="/forgot-password" class="forgot-link">New User / Forgot Password?</a>
+    <div id="login-status" class="login-status"></div>
+    <a href="/forgot-password" class="forgot-link">Forgot password?</a>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<header>
+  <div class="header-inner">
+    <div class="logo">Blu <span>Balence</span></div>
+    <div class="header-right">
+      <div class="badge">Staff Only</div>
+      <button class="signout-btn" id="signout-btn" onclick="signOut()">Sign Out</button>
+    </div>
+  </div>
+</header>
+
+<main id="main-content">
+  <div class="page-title">Staff Dashboard</div>
+  <div class="page-sub">Internal links — not for clients</div>
+
+  <!-- EMAIL MARKETING -->
+  <div class="section-label">Email Marketing</div>
+  <div class="grid">
+
+    <a href="/email-dashboard.html" class="link-card">
+      <div class="card-icon icon-teal">&#128140;</div>
+      <div class="card-body">
+        <div class="card-title">Email Control</div>
+        <div class="card-desc">Drip sequences, enrollments, analytics, auto-send scheduling, and inbox management.</div>
+        <div class="card-url">/email-dashboard.html</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- CLIENT-FACING -->
+  <div class="section-label">Client-Facing Pages</div>
+  <div class="grid">
+
+    <a href="/" class="link-card">
+      <div class="card-icon icon-blue">&#127968;</div>
+      <div class="card-body">
+        <div class="card-title">Homepage</div>
+        <div class="card-desc">Main sales funnel with booking forms and pricing.</div>
+        <div class="card-url">/</div>
+      </div>
+    </a>
+
+    <a href="/pricing" class="link-card">
+      <div class="card-icon icon-green">&#36;</div>
+      <div class="card-body">
+        <div class="card-title">Pricing</div>
+        <div class="card-desc">Standalone pricing page for sharing with prospects.</div>
+        <div class="card-url">/pricing</div>
+      </div>
+    </a>
+
+    <a href="/cancel" class="link-card">
+      <div class="card-icon icon-red">&#10005;</div>
+      <div class="card-body">
+        <div class="card-title">Cancel Appointment</div>
+        <div class="card-desc">Linked from confirmation emails. Deletes appointment from Supabase.</div>
+        <div class="card-url">/cancel</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- OPERATIONS -->
+  <div class="section-label">Operations & Documents</div>
+  <div class="grid">
+
+    <a href="/calendar" class="link-card">
+      <div class="card-icon icon-blue">&#128197;</div>
+      <div class="card-body">
+        <div class="card-title">Appointment Calendar</div>
+        <div class="card-desc">View and manage all scheduled discovery calls.</div>
+        <div class="card-url">/calendar</div>
+      </div>
+    </a>
+
+    <a href="/calendar-v2" class="link-card">
+      <div class="card-icon icon-blue">&#128197;</div>
+      <div class="card-body">
+        <div class="card-title">Calendar V2</div>
+        <div class="card-desc">Updated calendar with enhanced scheduling features.</div>
+        <div class="card-url">/calendar-v2</div>
+      </div>
+    </a>
+
+    <a href="/document-creation" class="link-card">
+      <div class="card-icon icon-amber">&#128196;</div>
+      <div class="card-body">
+        <div class="card-title">Document Creation</div>
+        <div class="card-desc">Generate client documents and agreements.</div>
+        <div class="card-url">/document-creation</div>
+      </div>
+    </a>
+
+    <a href="/contract-template" class="link-card">
+      <div class="card-icon icon-amber">&#128221;</div>
+      <div class="card-body">
+        <div class="card-title">Contract Template</div>
+        <div class="card-desc">Standard service agreement template for new clients.</div>
+        <div class="card-url">/contract-template</div>
+      </div>
+    </a>
+
+    <a href="/sign-document" class="link-card">
+      <div class="card-icon icon-purple">&#9998;</div>
+      <div class="card-body">
+        <div class="card-title">Sign Document</div>
+        <div class="card-desc">Client-facing e-signature page for contracts.</div>
+        <div class="card-url">/sign-document</div>
+      </div>
+    </a>
+
+    <a href="/blu-balence-email-contacts" class="link-card">
+      <div class="card-icon icon-teal">&#9993;</div>
+      <div class="card-body">
+        <div class="card-title">Email Contacts</div>
+        <div class="card-desc">Client email list and contact management.</div>
+        <div class="card-url">/blu-balence-email-contacts</div>
+      </div>
+    </a>
+
+    <a href="/blu-balence-calculator" class="link-card">
+      <div class="card-icon icon-green">&#128200;</div>
+      <div class="card-body">
+        <div class="card-title">Pricing Calculator</div>
+        <div class="card-desc">Internal tool for estimating client monthly rates.</div>
+        <div class="card-url">/blu-balence-calculator</div>
+      </div>
+    </a>
+
+    <a href="/requisition" class="link-card">
+      <div class="card-icon icon-amber">&#128230;</div>
+      <div class="card-body">
+        <div class="card-title">Requisition</div>
+        <div class="card-desc">Internal purchase and resource requisition form.</div>
+        <div class="card-url">/requisition</div>
+      </div>
+    </a>
+
+    <a href="/formatter" class="link-card">
+      <div class="card-icon icon-slate">&#128295;</div>
+      <div class="card-body">
+        <div class="card-title">Formatter</div>
+        <div class="card-desc">Text and data formatting utility tool.</div>
+        <div class="card-url">/formatter</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- CRM & SALES -->
+  <div class="section-label">CRM & Sales</div>
+  <div class="grid">
+
+    <a href="/crm" class="link-card">
+      <div class="card-icon icon-blue">&#128222;</div>
+      <div class="card-body">
+        <div class="card-title">CRM</div>
+        <div class="card-desc">Lead management, auto dialer, tags, and activity tracking.</div>
+        <div class="card-url">/crm</div>
+      </div>
+    </a>
+
+    <a href="/find-work" class="link-card">
+      <div class="card-icon icon-green">&#128269;</div>
+      <div class="card-body">
+        <div class="card-title">Find Work</div>
+        <div class="card-desc">Lead discovery and prospecting tool.</div>
+        <div class="card-url">/find-work</div>
+      </div>
+    </a>
+
+    <a href="/form-builder" class="link-card">
+      <div class="card-icon icon-teal">&#128203;</div>
+      <div class="card-body">
+        <div class="card-title">Form Builder</div>
+        <div class="card-desc">Create and manage client intake and survey forms.</div>
+        <div class="card-url">/form-builder</div>
+      </div>
+    </a>
+
+    <a href="/email-cleaner" class="link-card">
+      <div class="card-icon icon-teal">&#9993;</div>
+      <div class="card-body">
+        <div class="card-title">Email Cleaner</div>
+        <div class="card-desc">Validate and clean email lists before outreach.</div>
+        <div class="card-url">/email-cleaner</div>
+      </div>
+    </a>
+
+    <a href="/scraper-dashboard" class="link-card">
+      <div class="card-icon icon-purple">&#128202;</div>
+      <div class="card-body">
+        <div class="card-title">Scraper Dashboard</div>
+        <div class="card-desc">Control the lead scraper, view jobs, and manage scraped leads.</div>
+        <div class="card-url">/scraper-dashboard</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- HR & HIRING -->
+  <div class="section-label">HR & Hiring</div>
+  <div class="grid">
+
+    <a href="/careers-template" class="link-card">
+      <div class="card-icon icon-purple">&#127942;</div>
+      <div class="card-body">
+        <div class="card-title">Careers Template</div>
+        <div class="card-desc">Job posting template for open positions.</div>
+        <div class="card-url">/careers-template</div>
+      </div>
+    </a>
+
+    <a href="/applications-template" class="link-card">
+      <div class="card-icon icon-purple">&#128101;</div>
+      <div class="card-body">
+        <div class="card-title">Applications Template</div>
+        <div class="card-desc">Job application form template for candidates.</div>
+        <div class="card-url">/applications-template</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- ACCOUNT -->
+  <div class="section-label">Account</div>
+  <div class="grid">
+
+    <a href="/login" class="link-card">
+      <div class="card-icon icon-slate">&#128274;</div>
+      <div class="card-body">
+        <div class="card-title">Login</div>
+        <div class="card-desc">Staff login portal connected to Supabase authentication.</div>
+        <div class="card-url">/login</div>
+      </div>
+    </a>
+
+  </div>
+</main>
 
 <script>
   if (typeof window.supabaseClient === 'undefined') {
-    const CONFIG = {
-      URL: "https://rfdvogakvyodixgpvqvz.supabase.co",
-      KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E"
-    };
-    window.supabaseClient = window.supabase.createClient(CONFIG.URL, CONFIG.KEY);
+    window.supabaseClient = window.supabase.createClient(
+      "https://rfdvogakvyodixgpvqvz.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E"
+    );
   }
 
-  document.addEventListener("DOMContentLoaded", function() {
+  function showDashboard() {
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+    document.getElementById('signout-btn').style.display = 'inline-block';
+  }
+
+  function showLogin() {
+    document.getElementById('login-overlay').style.display = 'flex';
+    document.getElementById('main-content').style.display = 'none';
+    document.getElementById('signout-btn').style.display = 'none';
+  }
+
+  async function signOut() {
+    await window.supabaseClient.auth.signOut();
+    showLogin();
+  }
+
+  // Check existing session immediately
+  window.supabaseClient.auth.getSession().then(({ data: { session } }) => {
+    if (session && session.user) showDashboard();
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
     const btn = document.getElementById('login-btn');
     const emailInput = document.getElementById('email-field');
     const passInput = document.getElementById('pass-field');
-    const msg = document.getElementById('status-msg');
+    const status = document.getElementById('login-status');
 
-    if (btn) {
-      btn.addEventListener('click', async () => {
-        msg.textContent = "";
-        msg.style.color = "";
-        const email = emailInput.value.trim();
-        const password = passInput.value;
-        if (!email || !password) {
-          msg.textContent = "Please enter both email and password.";
-          msg.style.color = "#ef4444";
-          return;
-        }
-        const originalText = btn.innerText;
-        btn.innerText = "Signing in...";
-        btn.disabled = true;
-        try {
-          const { data, error } = await window.supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: password
-          });
-          if (error) throw error;
-          msg.textContent = "Success! Redirecting...";
-          msg.style.color = "#22c55e";
-          setTimeout(() => { window.location.href = "/dashboard"; }, 1500);
-        } catch (err) {
-          console.error("Login Error:", err);
-          msg.textContent = err.message || "Invalid email or password.";
-          msg.style.color = "#ef4444";
-          btn.innerText = originalText;
-          btn.disabled = false;
-        }
-      });
-    }
+    btn.addEventListener('click', async () => {
+      status.textContent = '';
+      status.style.color = '';
+      const email = emailInput.value.trim();
+      const password = passInput.value;
+      if (!email || !password) {
+        status.textContent = 'Please enter both email and password.';
+        status.style.color = '#f87171';
+        return;
+      }
+      const orig = btn.innerText;
+      btn.innerText = 'Signing in…';
+      btn.disabled = true;
+      try {
+        const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        status.textContent = 'Success!';
+        status.style.color = '#4ade80';
+        setTimeout(showDashboard, 600);
+      } catch (err) {
+        status.textContent = err.message || 'Invalid email or password.';
+        status.style.color = '#f87171';
+        btn.innerText = orig;
+        btn.disabled = false;
+      }
+    });
+
+    // Allow Enter key to submit
+    [emailInput, passInput].forEach(el => {
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') btn.click(); });
+    });
   });
 </script>
+
+</body>
+</html>
