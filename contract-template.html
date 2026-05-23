@@ -206,9 +206,41 @@
       .form-row, .form-row-3, .type-selector { grid-template-columns: 1fr; }
       .card { padding: 20px; }
     }
+        /* ── LOGIN OVERLAY ── */
+    #login-overlay{position:fixed;inset:0;background:#0a1628;display:flex;align-items:center;justify-content:center;z-index:300}
+    #login-overlay .login-card{background:#111827;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:40px 36px;width:100%;max-width:420px}
+    #login-overlay h1{color:#fff;font-size:26px;font-weight:700;margin-bottom:8px;font-family:'Roboto',sans-serif}
+    #login-overlay .login-sub{color:#9ca3af;font-size:15px;margin-bottom:28px}
+    #login-overlay .lo-label{color:#d1d5db;font-size:14px;font-weight:500;margin-bottom:6px;display:block;margin-top:14px}
+    #login-overlay .lo-input{background:#1f2937;border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:12px 14px;font-size:15px;width:100%;outline:none;transition:border-color .2s;font-family:'Roboto',sans-serif}
+    #login-overlay .lo-input:focus{border-color:#22c55e}
+    #login-overlay .login-btn{width:100%;background:#22c55e;color:#fff;border:none;border-radius:10px;padding:13px;font-size:16px;font-weight:600;cursor:pointer;transition:background .2s;margin-top:18px;font-family:'Roboto',sans-serif}
+    #login-overlay .login-btn:hover{background:#16a34a}
+    #login-overlay .login-err{color:#f87171;font-size:13px;margin-top:12px;text-align:center;min-height:20px}
+    /* ── OWNER BLOCKS ── */
+    .owner-block { border-top: 1px solid var(--border2); padding-top: 16px; margin-top: 16px; }
+    .owner-block:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+    .owner-label { font-size: 11px; font-weight: 500; color: var(--text-sub); letter-spacing: .06em; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+    .remove-owner-btn { background: transparent; border: 1px solid rgba(217,48,37,.4); color: #ff6b6b; border-radius: 6px; padding: 3px 10px; font-size: 11px; cursor: pointer; font-family: inherit; transition: all .15s; }
+    .remove-owner-btn:hover { background: rgba(217,48,37,.15); }
+    .add-owner-btn { background: transparent; border: 1px dashed rgba(255,255,255,.2); color: var(--text-sub); border-radius: 8px; padding: 10px 18px; font-family: inherit; font-size: 13px; cursor: pointer; width: 100%; transition: all .15s; margin-top: 16px; }
+    .add-owner-btn:hover { border-color: var(--primary-light); color: var(--primary-light); }
+    .add-owner-btn:disabled { opacity: .3; cursor: not-allowed; }
   </style>
 </head>
 <body>
+  <div id="login-overlay">
+  <div class="login-card">
+    <h1>Welcome Back</h1>
+    <p class="login-sub">Please sign in to your account.</p>
+    <label class="lo-label">Email</label>
+    <input class="lo-input" id="lo-email" type="email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()">
+    <label class="lo-label">Password</label>
+    <input class="lo-input" id="lo-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="lo-err"></div>
+  </div>
+</div>
 
 <div class="topbar">
   <a class="logo" href="/">
@@ -258,33 +290,31 @@
       </div>
     </div>
 
-    <!-- ③ CLIENT INFO -->
+        <!-- ③ CLIENT INFO -->
     <div class="card">
       <div class="section-title">Client Information</div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Business Name</label>
-          <input type="text" id="business_name" placeholder="Acme Corp" required>
-        </div>
-        <div class="form-group">
-          <label>Client Title</label>
-          <input type="text" id="client_title" placeholder="Owner, CEO, CFO…">
+      <div class="form-group">
+        <label>Business Name</label>
+        <input type="text" id="business_name" placeholder="Acme Corp" required>
+      </div>
+      <div class="section-title" style="margin-top:20px;margin-bottom:0;">
+        Business Owners
+        <span id="owner-count-label" style="font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-dim);margin-left:6px;">1 added</span>
+      </div>
+      <div id="owners-container">
+        <div class="owner-block" id="owner-block-1">
+          <div class="owner-label">OWNER 1</div>
+          <div class="form-row">
+            <div class="form-group"><label>Full Name</label><input type="text" id="owner1_name" placeholder="Jane Smith" required></div>
+            <div class="form-group"><label>Title</label><input type="text" id="owner1_title" placeholder="Owner, CEO…"></div>
+          </div>
+          <div class="form-row" style="margin-bottom:0;">
+            <div class="form-group" style="margin-bottom:0;"><label>Email</label><input type="email" id="owner1_email" placeholder="jane@acme.com" required></div>
+            <div class="form-group" style="margin-bottom:0;"><label>Phone</label><input type="tel" id="owner1_phone" placeholder="(555) 000-0000" required></div>
+          </div>
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Contact Name</label>
-          <input type="text" id="contact_name" placeholder="Jane Smith" required>
-        </div>
-        <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" id="email" placeholder="jane@acme.com" required>
-        </div>
-      </div>
-      <div class="form-group" style="margin-bottom:0;">
-        <label>Phone Number</label>
-        <input type="tel" id="phone" placeholder="(555) 000-0000" required>
-      </div>
+      <button type="button" class="add-owner-btn" id="add-owner-btn" onclick="addOwner()">+ Add Another Owner</button>
     </div>
 
     <!-- ④ MONTHLY PRICING -->
@@ -428,6 +458,87 @@
 const WEBHOOK_URL  = "https://hook.us1.make.com/gtsp4m0n8bli6trnew1d6ctxuqx8bngp";
 const SUPABASE_URL = "https://rfdvogakvyodixgpvqvz.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E";
+  const AUTH_URL = SUPABASE_URL + "/auth/v1";
+
+async function doLogin() {
+  const email = document.getElementById('lo-email').value.trim();
+  const pass  = document.getElementById('lo-pass').value;
+  document.getElementById('lo-err').textContent = '';
+  try {
+    const res = await fetch(`${AUTH_URL}/token?grant_type=password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
+      body: JSON.stringify({ email, password: pass })
+    });
+    const data = await res.json();
+    if (!res.ok) { document.getElementById('lo-err').textContent = data.error_description || data.msg || 'Login failed'; return; }
+    localStorage.setItem('contract_token', data.access_token);
+    document.getElementById('login-overlay').style.display = 'none';
+  } catch(e) { document.getElementById('lo-err').textContent = 'Network error'; }
+}
+
+async function checkSession() {
+  const token = localStorage.getItem('contract_token');
+  if (!token) return false;
+  try {
+    const res = await fetch(`${AUTH_URL}/user`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${token}` }
+    });
+    return res.ok;
+  } catch(e) { return false; }
+}
+
+let ownerCount = 1;
+
+function addOwner() {
+  if (ownerCount >= 3) return;
+  ownerCount++;
+  const n = ownerCount;
+  const block = document.createElement('div');
+  block.className = 'owner-block';
+  block.id = `owner-block-${n}`;
+  block.innerHTML = `
+    <div class="owner-label">OWNER ${n}
+      <button type="button" class="remove-owner-btn" onclick="removeOwner(${n})">Remove</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Full Name</label><input type="text" id="owner${n}_name" placeholder="John Smith"></div>
+      <div class="form-group"><label>Title</label><input type="text" id="owner${n}_title" placeholder="Owner, CFO…"></div>
+    </div>
+    <div class="form-row" style="margin-bottom:0;">
+      <div class="form-group" style="margin-bottom:0;"><label>Email</label><input type="email" id="owner${n}_email" placeholder="john@acme.com"></div>
+      <div class="form-group" style="margin-bottom:0;"><label>Phone</label><input type="tel" id="owner${n}_phone" placeholder="(555) 000-0000"></div>
+    </div>`;
+  document.getElementById('owners-container').appendChild(block);
+  updateOwnerUI();
+}
+
+function removeOwner(n) {
+  const block = document.getElementById(`owner-block-${n}`);
+  if (block) block.remove();
+  ownerCount--;
+  updateOwnerUI();
+}
+
+function updateOwnerUI() {
+  document.getElementById('owner-count-label').textContent = `${ownerCount} added`;
+  document.getElementById('add-owner-btn').disabled = ownerCount >= 3;
+}
+
+function collectOwners() {
+  const owners = [];
+  for (let i = 1; i <= 3; i++) {
+    const nameEl = document.getElementById(`owner${i}_name`);
+    if (!nameEl) continue;
+    owners.push({
+      name:  nameEl.value.trim(),
+      title: (document.getElementById(`owner${i}_title`)?.value || '').trim(),
+      email: (document.getElementById(`owner${i}_email`)?.value || '').trim(),
+      phone: (document.getElementById(`owner${i}_phone`)?.value || '').trim(),
+    });
+  }
+  return owners;
+}
 
 let contractType = "monthly";
 
@@ -487,9 +598,9 @@ function fillFromCalendar() {
   const sel = document.getElementById("calendar-client");
   const opt = sel.options[sel.selectedIndex];
   if (!opt || !opt.value) return;
-  if (opt.dataset.clientName) document.getElementById("contact_name").value  = opt.dataset.clientName;
-  if (opt.dataset.phone)      document.getElementById("phone").value          = opt.dataset.phone;
-  if (opt.dataset.email)      document.getElementById("email").value          = opt.dataset.email;
+    if (opt.dataset.clientName) document.getElementById("owner1_name").value  = opt.dataset.clientName;
+  if (opt.dataset.phone)      document.getElementById("owner1_phone").value  = opt.dataset.phone;
+  if (opt.dataset.email)      document.getElementById("owner1_email").value  = opt.dataset.email;
   if (opt.dataset.apptName && !document.getElementById("business_name").value)
     document.getElementById("business_name").value = opt.dataset.apptName;
 }
@@ -532,13 +643,22 @@ document.getElementById("contract-form").addEventListener("submit", async (e) =>
   const hasMonthly = contractType === "monthly" || contractType === "both";
   const hasCleanup = contractType === "cleanup"  || contractType === "both";
 
+    const owners = collectOwners();
   const payload = {
-    contract_type:             contractType,   // "monthly" | "cleanup" | "both"
+    contract_type:             contractType,
     business_name:             document.getElementById("business_name").value.trim(),
-    client_title:              document.getElementById("client_title").value.trim(),
-    contact_name:              document.getElementById("contact_name").value.trim(),
-    email:                     document.getElementById("email").value.trim(),
-    phone:                     document.getElementById("phone").value.trim(),
+    owner1_name:               owners[0]?.name  || "",
+    owner1_title:              owners[0]?.title || "",
+    owner1_email:              owners[0]?.email || "",
+    owner1_phone:              owners[0]?.phone || "",
+    owner2_name:               owners[1]?.name  || null,
+    owner2_title:              owners[1]?.title || null,
+    owner2_email:              owners[1]?.email || null,
+    owner2_phone:              owners[1]?.phone || null,
+    owner3_name:               owners[2]?.name  || null,
+    owner3_title:              owners[2]?.title || null,
+    owner3_email:              owners[2]?.email || null,
+    owner3_phone:              owners[2]?.phone || null,
     monthly_price:             hasMonthly ? (parseFloat(document.getElementById("monthly_price").value) || 0) : null,
     additional_services_price: hasMonthly ? (parseFloat(document.getElementById("additional_services_price").value) || 0) : null,
     billing_day:               hasMonthly ? (parseInt(document.getElementById("billing_day").value) || 1) : null,
@@ -576,8 +696,12 @@ document.getElementById("contract-form").addEventListener("submit", async (e) =>
   }
 });
 
-setDefaults();
-loadCalendarClients();
+(async function() {
+  const authed = await checkSession();
+  if (authed) document.getElementById('login-overlay').style.display = 'none';
+  setDefaults();
+  loadCalendarClients();
+})();
 </script>
 </body>
 </html>
