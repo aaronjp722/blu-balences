@@ -102,6 +102,42 @@ def send_email(api_key, to_email, to_name, from_email, from_name, subject, body,
     return r.json().get("messageId", "")
 
 
+def load_seq_inboxes(get_fn, seq_id):
+    """Return active inboxes assigned to this sequence, with their limit settings."""
+    rows = get_fn("sequence_inboxes", f"?sequence_id=eq.{seq_id}&active=eq.true&select=*,inboxes(*)")
+    result = []
+    for r in rows:
+        inbox = r.get("inboxes") or {}
+        if not inbox.get("id") or inbox.get("active") is False:
+            continue
+        api_key = inbox.get("brevo_api_key") or ""
+        if not api_key:
+            continue
+        result.append({
+            "inbox_id":        inbox["id"],
+            "name":            inbox.get("name", ""),
+            "email":           inbox.get("email", ""),
+            "api_key":         api_key,
+            "daily_limit":     r.get("daily_limit") or 0,
+            "use_inbox_limit": r.get("use_inbox_limit") or False,
+        })
+    return result
+
+
+def pick_inbox(seq_inboxes, sends_today):
+    """Pick the inbox with fewest sends today that hasn't hit its daily limit."""
+    available = []
+    for ib in seq_inboxes:
+        count = sends_today.get(ib["inbox_id"], 0)
+        if ib["use_inbox_limit"] and ib["daily_limit"] > 0 and count >= ib["daily_limit"]:
+            continue
+        available.append((count, ib))
+    if not available:
+        return None
+    available.sort(key=lambda x: x[0])
+    return available[0][1]
+
+
 def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s", handlers=[logging.StreamHandler(sys.stdout)])
 
@@ -134,7 +170,6 @@ def main():
         from_email = m.group(2).strip()
     log.info("From: %s <%s>", from_name, from_email)
 
-    # check send_days setting
     send_days = [d.strip() for d in cfg.get("send_days", "mon,tue,wed,thu,fri").split(",")]
     today_abbr = dt.datetime.now().strftime("%a").lower()
     if today_abbr not in send_days:
@@ -144,7 +179,7 @@ def main():
     global_rate     = float(cfg.get("emails_per_minute", "2"))
     global_interval = 60.0 / global_rate
 
-        sequences = get("sequences", "?active=eq.true&select=id,name,same_thread")
+    sequences = get("sequences", "?active=eq.true&select=id,name,same_thread")
     log.info("%d active sequence(s)", len(sequences))
 
     for seq in sequences:
@@ -153,23 +188,33 @@ def main():
             log.info("  '%s' has no steps", seq["name"])
             continue
         total_steps = len(steps)
-               log.info("Sequence '%s' — %d steps", seq["name"], total_steps)
+        log.info("Sequence '%s' — %d steps", seq["name"], total_steps)
         same_thread = seq.get("same_thread", False)
 
+        # Load inboxes assigned to this sequence and seed today's send counts
+        seq_inboxes = load_seq_inboxes(get, seq["id"])
+        today_start = dt.datetime.now(dt.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+        sends_today = {
+            ib["inbox_id"]: len(get("send_log", f"?inbox_id=eq.{ib['inbox_id']}&sent_at=gte.{today_start}&select=id"))
+            for ib in seq_inboxes
+        }
+        if seq_inboxes:
+            log.info("  %d inbox(es) assigned for rotation", len(seq_inboxes))
+
         for step in steps:
-            snum       = step["step_number"]
-            delay_mins = step["delay_days"]*1440 + step["delay_hours"]*60 + step["delay_minutes"]
+            snum        = step["step_number"]
+            delay_mins  = step["delay_days"]*1440 + step["delay_hours"]*60 + step["delay_minutes"]
             batch_limit = int(step.get("batch_limit") or 0)
             batch_iv    = int(step.get("batch_interval_minutes") or 0)
             interval    = batch_iv * 60 if batch_iv > 0 else global_interval
             step_body   = step.get("body") or ""
             step_tags   = [t.strip() for t in (step.get("tags") or "").split(",") if t.strip()]
 
-                        if snum == 1:
-                due = get("enrollments", f"?sequence_id=eq.{seq['id']}&current_step=eq.0&status=eq.active&select=id,email,name,company,thread_message_id")
+            if snum == 1:
+                due = get("enrollments", f"?sequence_id=eq.{seq['id']}&current_step=eq.0&status=eq.active&select=id,email,name,company,thread_message_id,assigned_inbox_id")
             else:
                 cutoff = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=delay_mins)).isoformat()
-                due = get("enrollments", f"?sequence_id=eq.{seq['id']}&current_step=eq.{snum-1}&status=eq.active&last_sent_at=lte.{cutoff}&select=id,email,name,company,thread_message_id")
+                due = get("enrollments", f"?sequence_id=eq.{seq['id']}&current_step=eq.{snum-1}&status=eq.active&last_sent_at=lte.{cutoff}&select=id,email,name,company,thread_message_id,assigned_inbox_id")
 
             if not due:
                 log.info("  Step %d: nobody due", snum)
@@ -194,23 +239,46 @@ def main():
 
             is_last = snum >= total_steps
 
-                        for i, enr in enumerate(due):
+            for i, enr in enumerate(due):
                 try:
+                    # Resolve which inbox to use
+                    if snum == 1 and seq_inboxes:
+                        inbox_info = pick_inbox(seq_inboxes, sends_today)
+                        if not inbox_info:
+                            log.warning("  [%d/%d] All inboxes at daily limit — skipping %s", i+1, len(due), enr["email"])
+                            continue
+                        sends_today[inbox_info["inbox_id"]] = sends_today.get(inbox_info["inbox_id"], 0) + 1
+                    elif snum > 1 and seq_inboxes and enr.get("assigned_inbox_id"):
+                        inbox_info = next((ib for ib in seq_inboxes if ib["inbox_id"] == enr["assigned_inbox_id"]), None)
+                    else:
+                        inbox_info = None
+
+                    use_api_key    = inbox_info["api_key"]  if inbox_info else brevo_api_key
+                    use_from_email = inbox_info["email"]    if inbox_info else from_email
+                    use_from_name  = inbox_info["name"]     if inbox_info else from_name
+                    use_inbox_id   = inbox_info["inbox_id"] if inbox_info else None
+
                     in_reply_to = (enr.get("thread_message_id") or "") if (same_thread and snum > 1) else ""
                     msg_id = send_email(
-                        api_key=brevo_api_key, to_email=enr["email"],
-                        to_name=enr.get("name") or "", from_email=from_email,
-                        from_name=from_name, subject=step["subject"],
+                        api_key=use_api_key, to_email=enr["email"],
+                        to_name=enr.get("name") or "", from_email=use_from_email,
+                        from_name=use_from_name, subject=step["subject"],
                         body=step_body, tags=step_tags,
                         company=enr.get("company") or "",
                         in_reply_to=in_reply_to,
                     )
-                    log.info("  [%d/%d] → %s (msg: %s)", i+1, len(due), enr["email"], msg_id)
+                    log.info("  [%d/%d] → %s via %s (msg: %s)", i+1, len(due), enr["email"], use_from_email, msg_id)
                     now = dt.datetime.now(dt.timezone.utc).isoformat()
-                    post("send_log", {"enrollment_id": enr["id"], "step_id": step["id"], "step_number": snum, "brevo_message_id": msg_id, "status": "sent"})
+                    post("send_log", {
+                        "enrollment_id": enr["id"], "step_id": step["id"],
+                        "step_number": snum, "brevo_message_id": msg_id,
+                        "status": "sent", "inbox_id": use_inbox_id,
+                    })
                     update_payload = {"current_step": snum, "last_sent_at": now, "status": "completed" if is_last else "active"}
                     if same_thread and snum == 1 and msg_id:
                         update_payload["thread_message_id"] = msg_id
+                    if snum == 1 and use_inbox_id:
+                        update_payload["assigned_inbox_id"] = use_inbox_id
                     patch("enrollments", f"?id=eq.{enr['id']}", update_payload)
                 except Exception:
                     log.exception("  [%d/%d] failed for %s", i+1, len(due), enr["email"])
