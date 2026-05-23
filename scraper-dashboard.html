@@ -20,6 +20,25 @@
   </style>
 </head>
 <body class="bg-[#0a0c14] text-gray-100 min-h-screen">
+  <div id="login-overlay" class="fixed inset-0 bg-[#0a1628] flex items-center justify-center z-[300]">
+  <div class="bg-[#111827] border border-white/10 rounded-2xl px-10 py-10 w-full max-w-md">
+    <h1 class="text-white text-2xl font-bold mb-2">Welcome Back</h1>
+    <p class="text-gray-400 text-sm mb-7">Please sign in to your account.</p>
+    <label class="block text-gray-300 text-sm font-medium mb-1.5">Email</label>
+    <input id="lo-email" type="email" placeholder="you@example.com"
+      class="w-full bg-[#1f2937] border border-white/10 text-white rounded-lg px-4 py-3 text-sm outline-none focus:border-green-500 transition mb-4"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <label class="block text-gray-300 text-sm font-medium mb-1.5">Password</label>
+    <input id="lo-pass" type="password" placeholder="••••••••"
+      class="w-full bg-[#1f2937] border border-white/10 text-white rounded-lg px-4 py-3 text-sm outline-none focus:border-green-500 transition"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()"
+      class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-xl transition mt-5 text-base cursor-pointer">
+      Sign In
+    </button>
+    <div id="lo-err" class="text-red-400 text-sm text-center mt-3 min-h-[20px]"></div>
+  </div>
+</div>
 
   <!-- Setup Modal -->
   <div id="setupModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden">
@@ -215,7 +234,21 @@
 
     const SB_URL = 'https://xbwuvaxtnylqvagdvpxp.supabase.co';
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhid3V2YXh0bnlscXZhZ2R2cHhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3Njk1NjMsImV4cCI6MjA5NDM0NTU2M30.WnCOew6w9HtQ2eAM1vpSJCb_AjAvv9x7Mev-k2IxSpc';
+        // Separate auth client — uses your main login project, not the scraper project
+    const AUTH_SB_URL = 'https://rfdvogakvyodixgpvqvz.supabase.co';
+    const AUTH_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E';
+    const authSb = createClient(AUTH_SB_URL, AUTH_SB_KEY);
 
+    async function doLogin() {
+      const email = document.getElementById('lo-email').value.trim();
+      const pass  = document.getElementById('lo-pass').value;
+      document.getElementById('lo-err').textContent = '';
+      const { error } = await authSb.auth.signInWithPassword({ email, password: pass });
+      if (error) { document.getElementById('lo-err').textContent = error.message; return; }
+      document.getElementById('login-overlay').style.display = 'none';
+      init();
+    }
+    
     function loadConfig() { sb = createClient(SB_URL, SB_KEY); return true; }
     function saveConfig() { document.getElementById('setupModal').classList.add('hidden'); init(); }
     function showSetup() {
@@ -496,7 +529,14 @@
       btn.disabled=false; btn.textContent='Save Schedule';
     }
 
-    loadConfig(); init();
+        loadConfig();
+    (async function() {
+      const { data: { session } } = await authSb.auth.getSession();
+      if (session) {
+        document.getElementById('login-overlay').style.display = 'none';
+        init();
+      }
+    })();
   </script>
 </body>
 </html>
