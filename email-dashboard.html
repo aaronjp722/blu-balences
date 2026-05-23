@@ -751,15 +751,16 @@ async function renderSequences() {
     <div class="panel">
       <div class="panel-header"><h2>Sequences</h2></div>
       ${!seqs||!seqs.length ? '<div class="empty">No sequences yet. Create one to get started.</div>' :
-      `<table><thead><tr><th>Name</th><th>Description</th><th>Schedule</th><th>Active</th><th>Actions</th></tr></thead><tbody>
+            `<table><thead><tr><th>Name</th><th>Description</th><th>Schedule</th><th>Thread</th><th>Active</th><th>Actions</th></tr></thead><tbody>
       ${seqs.map(s=>`<tr>
         <td><strong>${s.name}</strong></td>
         <td style="color:var(--gray)">${s.description||'—'}</td>
         <td>${s.send_time ? `<span class="seq-sched">⏰ ${s.send_time} · ${(s.send_days||'global').replace(',','/')}</span>` : '<span style="font-size:12px;color:var(--gray)">Global schedule</span>'}</td>
+        <td>${s.same_thread ? '<span class="badge badge-blue">On</span>' : '<span style="font-size:12px;color:var(--gray)">Off</span>'}</td>
         <td><label class="toggle"><input type="checkbox" ${s.active?'checked':''} onchange="toggleSeq('${s.id}',this.checked)"><span class="toggle-slider"></span></label></td>
         <td><div class="actions">
           <button class="btn btn-secondary btn-sm" onclick="openStepsModal('${s.id}','${esc(s.name)}')">Steps</button>
-          <button class="btn btn-secondary btn-sm" onclick="openSeqModal('${s.id}','${esc(s.name)}','${esc(s.description||'')}','${esc(s.send_time||'')}','${esc(s.send_days||'')}')">Edit</button>
+          <button class="btn btn-secondary btn-sm" onclick="openSeqModal('${s.id}','${esc(s.name)}','${esc(s.description||'')}','${esc(s.send_time||'')}','${esc(s.send_days||'')}',${!!s.same_thread})">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteSeq('${s.id}')">Delete</button>
         </div></td>
       </tr>`).join('')}</tbody></table>`}
@@ -776,7 +777,7 @@ async function deleteSeq(id) {
   renderSequences();
 }
 
-function openSeqModal(id, name, desc, seqTime, seqDays) {
+function openSeqModal(id, name, desc, seqTime, seqDays, sameThread) {
   const activeDays = (seqDays || '').split(',').map(d => d.trim()).filter(Boolean);
   const days = [{v:'mon',l:'Mon'},{v:'tue',l:'Tue'},{v:'wed',l:'Wed'},{v:'thu',l:'Thu'},{v:'fri',l:'Fri'},{v:'sat',l:'Sat'},{v:'sun',l:'Sun'}];
   showModal(`
@@ -797,6 +798,12 @@ function openSeqModal(id, name, desc, seqTime, seqDays) {
         </div>
       </div>
     </div>
+        <div class="section-title">Threading</div>
+    <div class="form-group" style="display:flex;align-items:center;gap:12px">
+      <label class="toggle" style="margin:0"><input type="checkbox" id="sq-thread" ${sameThread?'checked':''}><span class="toggle-slider"></span></label>
+      <span style="font-size:14px">Send sequence emails on the same thread (reply chain)</span>
+    </div>
+    <p class="hint">When on, steps 2+ appear as replies to the first email in each contact's inbox. Keep the same subject line for best threading compatibility.</p>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveSeq('${id||''}')">Save</button>
@@ -809,8 +816,9 @@ async function saveSeq(id) {
   if (!name) { alert('Name required'); return; }
   const send_time = document.getElementById('sq-time').value || null;
   const checkedDays = Array.from(document.querySelectorAll('.sq-day.on')).map(el => el.dataset.day);
-  const send_days = checkedDays.length ? checkedDays.join(',') : null;
-  const payload = { name, description, send_time, send_days };
+    const send_days = checkedDays.length ? checkedDays.join(',') : null;
+  const same_thread = document.getElementById('sq-thread').checked;
+  const payload = { name, description, send_time, send_days, same_thread };
   if (id) await sb.from('sequences').update(payload).eq('id', id);
   else await sb.from('sequences').insert({ ...payload, active: true });
   closeModal();
@@ -877,7 +885,7 @@ I noticed you're a realtor in Atlanta and wanted to reach out...
 Best,
 Aaron
 Blu Balence Bookkeeping"></textarea>
-      <p class="hint">Use <code>{{ .Subscriber.FirstName }}</code> and <code>{{ .Subscriber.Email }}</code> for personalization.</p>
+            <p class="hint">Variables: <code>{{first_name}}</code> <code>{{last_name}}</code> <code>{{company}}</code> <code>{{today}}</code> <code>{{this_month}}</code> <code>{{email}}</code></p>
     </div>
     <div class="section-title">Wait Before Sending This Step</div>
     <div class="form-row">
@@ -988,7 +996,8 @@ async function openEnrollModal() {
   showModal(`
     <h2>Enroll Subscriber</h2>
     <div class="form-group"><label>Email</label><input id="en-email" type="email" placeholder="prospect@example.com"></div>
-    <div class="form-group"><label>Name</label><input id="en-name" placeholder="First Last"></div>
+        <div class="form-group"><label>Name</label><input id="en-name" placeholder="First Last"></div>
+    <div class="form-group"><label>Company</label><input id="en-company" placeholder="Acme Inc."></div>
     <div class="form-group"><label>Sequence</label><select id="en-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
@@ -999,9 +1008,10 @@ async function openEnrollModal() {
 async function enrollOne() {
   const email = document.getElementById('en-email').value.trim();
   const name = document.getElementById('en-name').value.trim();
+  const company = document.getElementById('en-company').value.trim() || null;
   const sequence_id = document.getElementById('en-seq').value;
   if (!email || !sequence_id) { alert('Email and sequence required'); return; }
-  const { error } = await sb.from('enrollments').insert({ email, name, sequence_id, current_step: 0, status: 'active' });
+  const { error } = await sb.from('enrollments').insert({ email, name, company, sequence_id, current_step: 0, status: 'active' });
   if (error) { alert(error.message); return; }
   closeModal(); renderSubscribers();
 }
@@ -1012,8 +1022,8 @@ async function openBulkModal() {
     <h2>Bulk Enroll via CSV</h2>
     <div class="form-group"><label>Sequence</label><select id="bl-seq"><option value="">Select…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
     <div class="form-group">
-      <label>Paste CSV — one per line: <code>email, First Last</code></label>
-      <textarea id="bl-csv" style="min-height:160px" placeholder="john@example.com, John Smith&#10;jane@example.com, Jane Doe"></textarea>
+            <label>Paste CSV — one per line: <code>email, First Last, Company Name</code></label>
+      <textarea id="bl-csv" style="min-height:160px" placeholder="john@example.com, John Smith, Acme Inc&#10;jane@example.com, Jane Doe, Beta Corp"></textarea>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
@@ -1025,9 +1035,9 @@ async function bulkEnroll() {
   const seq = document.getElementById('bl-seq').value;
   const csv = document.getElementById('bl-csv').value.trim();
   if (!seq || !csv) { alert('Sequence and CSV required'); return; }
-  const rows = csv.split('\n').map(line => {
-    const [email, ...rest] = line.split(',').map(s => s.trim());
-    return email && email.includes('@') ? { email, name: rest.join(' ').trim() || null, sequence_id: seq, current_step: 0, status: 'active' } : null;
+    const rows = csv.split('\n').map(line => {
+    const [email, nameVal, companyVal] = line.split(',').map(s => s.trim());
+    return email && email.includes('@') ? { email, name: nameVal || null, company: companyVal || null, sequence_id: seq, current_step: 0, status: 'active' } : null;
   }).filter(Boolean);
   if (!rows.length) { alert('No valid emails found'); return; }
   const { error } = await sb.from('enrollments').upsert(rows, { onConflict: 'email,sequence_id', ignoreDuplicates: true });
