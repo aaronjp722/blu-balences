@@ -103,9 +103,32 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
 @media(max-width:800px){
   .page{grid-template-columns:1fr;padding:16px}
 }
+  /* ── LOGIN OVERLAY ── */
+#login-overlay{position:fixed;inset:0;background:#0a1628;display:flex;align-items:center;justify-content:center;z-index:300}
+#login-overlay .login-card{background:#111827;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:40px 36px;width:100%;max-width:420px}
+#login-overlay h1{color:#fff;font-size:26px;font-weight:700;margin-bottom:8px}
+#login-overlay .login-sub{color:#9ca3af;font-size:15px;margin-bottom:28px}
+#login-overlay .lo-label{color:#d1d5db;font-size:14px;font-weight:500;margin-bottom:6px;display:block;margin-top:14px}
+#login-overlay .lo-input{background:#1f2937;border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:12px 14px;font-size:15px;width:100%;outline:none;transition:border-color .2s}
+#login-overlay .lo-input:focus{border-color:#22c55e}
+#login-overlay .login-btn{width:100%;background:#22c55e;color:#fff;border:none;border-radius:10px;padding:13px;font-size:16px;font-weight:600;cursor:pointer;transition:background .2s;margin-top:18px}
+#login-overlay .login-btn:hover{background:#16a34a}
+#login-overlay .login-err{color:#f87171;font-size:13px;margin-top:12px;text-align:center;min-height:20px}
 </style>
 </head>
 <body>
+  <div id="login-overlay">
+  <div class="login-card">
+    <h1>Welcome Back</h1>
+    <p class="login-sub">Please sign in to your account.</p>
+    <label class="lo-label">Email</label>
+    <input class="lo-input" id="lo-email" type="email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()">
+    <label class="lo-label">Password</label>
+    <input class="lo-input" id="lo-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="lo-err"></div>
+  </div>
+</div>
 
 <nav class="nav">
   <div class="nav-logo"><span>Blu</span> Balances</div>
@@ -232,6 +255,35 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
 <script>
 const SUPABASE_URL = "https://rfdvogakvyodixgpvqvz.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZHZvZ2FrdnlvZGl4Z3B2cXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzU4MDMsImV4cCI6MjA4MjYxMTgwM30.UumTuz6AaKL8uYmmNxFj1ec5CInHVNQowt6LRo4cu-E";
+  const AUTH_URL = SUPABASE_URL + "/auth/v1";
+
+async function doLogin() {
+  const email = document.getElementById('lo-email').value.trim();
+  const pass  = document.getElementById('lo-pass').value;
+  document.getElementById('lo-err').textContent = '';
+  try {
+    const res = await fetch(`${AUTH_URL}/token?grant_type=password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
+      body: JSON.stringify({ email, password: pass })
+    });
+    const data = await res.json();
+    if (!res.ok) { document.getElementById('lo-err').textContent = data.error_description || data.msg || 'Login failed'; return; }
+    localStorage.setItem('calc_token', data.access_token);
+    document.getElementById('login-overlay').style.display = 'none';
+  } catch(e) { document.getElementById('lo-err').textContent = 'Network error'; }
+}
+
+async function checkSession() {
+  const token = localStorage.getItem('calc_token');
+  if (!token) return false;
+  try {
+    const res = await fetch(`${AUTH_URL}/user`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${token}` }
+    });
+    return res.ok;
+  } catch(e) { return false; }
+}
 
 const ADDONS = [
   { id:'payroll',   icon:'💼', label:'Payroll',           price:75,  desc:'Per pay period' },
@@ -527,7 +579,11 @@ function toast(msg) {
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-init();
+(async function() {
+  const authed = await checkSession();
+  if (authed) document.getElementById('login-overlay').style.display = 'none';
+  init();
+})();
 </script>
 </body>
 </html>
