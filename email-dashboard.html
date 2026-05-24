@@ -247,6 +247,7 @@ function boot(url, key) {
 }
 
 async function navigate(tab) {
+  if (window._liveLogTimer) { clearInterval(window._liveLogTimer); window._liveLogTimer = null; }
   document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
   const el = document.getElementById('nav-' + tab);
   if (el) el.classList.add('active');
@@ -393,34 +394,58 @@ async function renderDashboard() {
         </div>
       </div>
     </div>
-    <div class="panel">
+            <div class="panel">
       <div class="panel-header">
-        <h2>Recent Activity</h2>
+        <h2>Recent Activity <span style="font-size:11px;font-weight:400;color:var(--green)">● live</span></h2>
         <button class="btn btn-secondary btn-sm" onclick="refreshLog()">Refresh</button>
       </div>
       <div id="recent-log"><div class="empty">Loading…</div></div>
     </div>`;
 
-    await refreshLog();
+      await refreshLog();
+  startLiveLog();
   await loadBrevoStats(cfg.brevo_api_key || '');
   checkRunStatus();
   if (sendTime) startCountdown(sendTime, sendDays, tz);
 }
 
 async function refreshLog() {
+  const el = document.getElementById('recent-log');
+  if (!el) return;
   const { data: recent } = await sb.from('send_log')
-    .select('sent_at,step_number,brevo_message_id,enrollments(email,sequences(name))')
-    .order('sent_at', { ascending: false }).limit(20);
-  document.getElementById('recent-log').innerHTML = !recent || !recent.length
-    ? '<div class="empty">No sends yet. Create a sequence and enroll subscribers.</div>'
-    : `<table><thead><tr><th>Sent At</th><th>Email</th><th>Sequence</th><th>Step</th><th>Message ID</th></tr></thead><tbody>
-      ${recent.map(l=>`<tr>
-        <td>${new Date(l.sent_at).toLocaleString()}</td>
-        <td>${l.enrollments?.email||'—'}</td>
-        <td>${l.enrollments?.sequences?.name||'—'}</td>
+    .select('sent_at,step_number,inbox_id,enrollments(email,sequences(name)),inboxes(name,email)')
+    .order('sent_at', { ascending: false }).limit(30);
+  if (!recent || !recent.length) {
+    el.innerHTML = '<div class="empty">No sends yet. Create a sequence and enroll subscribers.</div>';
+    return;
+  }
+  const now = Date.now();
+  el.innerHTML = `<table><thead><tr><th>Sent At</th><th>To</th><th>Sequence</th><th>Step</th><th>From Inbox</th></tr></thead><tbody>
+    ${recent.map(l => {
+      const ageMs  = now - new Date(l.sent_at).getTime();
+      const isLive = ageMs < 120000;
+      const timeStr = isLive
+        ? `<span style="color:var(--green);font-weight:600">● ${ageMs < 8000 ? 'Just now' : Math.floor(ageMs / 1000) + 's ago'}</span>`
+        : new Date(l.sent_at).toLocaleString();
+      const inbox = l.inboxes
+        ? `<span style="font-weight:500">${l.inboxes.name}</span><br><span style="font-size:11px;color:var(--gray)">${l.inboxes.email}</span>`
+        : '<span style="font-size:12px;color:var(--gray)">global</span>';
+      return `<tr style="${isLive ? 'background:#f0fdf4;' : ''}">
+        <td style="white-space:nowrap">${timeStr}</td>
+        <td>${l.enrollments?.email || '—'}</td>
+        <td>${l.enrollments?.sequences?.name || '—'}</td>
         <td>Step ${l.step_number}</td>
-        <td style="font-size:11px;color:var(--gray)">${l.brevo_message_id||'—'}</td>
-      </tr>`).join('')}</tbody></table>`;
+        <td>${inbox}</td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
+}
+
+function startLiveLog() {
+  if (window._liveLogTimer) clearInterval(window._liveLogTimer);
+  window._liveLogTimer = setInterval(() => {
+    if (document.getElementById('recent-log')) refreshLog();
+    else { clearInterval(window._liveLogTimer); window._liveLogTimer = null; }
+  }, 5000);
 }
 
 async function checkRunStatus(poll) {
