@@ -265,7 +265,7 @@ function saveConfig() {
   if (!url || !key) { alert('Both fields are required'); return; }
   localStorage.setItem('sb_url', url);
   localStorage.setItem('sb_key', key);
-  boot(url, key);
+    sb = supabase.createClient(url, key); bootApp();
 }
 let aF = { days: '30', seqId: '', status: '', search: '' };
 
@@ -1794,7 +1794,7 @@ function esc(s) { return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
 (function() {
   const url = localStorage.getItem('sb_url');
   const key = localStorage.getItem('sb_key');
-  if (url && key) boot(url, key);
+    if (url && key) { sb = supabase.createClient(url, key); bootApp(); }
 })();
 </script>
 </body>
