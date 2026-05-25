@@ -79,7 +79,7 @@ tr:hover td{background:#fafafa}
 textarea{resize:vertical;min-height:80px}
 .section-title{font-size:13px;font-weight:600;margin:16px 0 8px;color:var(--gray);text-transform:uppercase;letter-spacing:.04em}
 .hint{font-size:12px;color:var(--gray);margin-top:4px}
-  #login-overlay{position:fixed;inset:0;background:#0a1628;display:flex;align-items:center;justify-content:center;z-index:300}
+  #login-overlay{position:fixed;inset:0;background:#0a1628;display:none;align-items:center;justify-content:center;z-index:300}
 #login-overlay .login-card{background:#111827;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:40px 36px;width:100%;max-width:420px}
 #login-overlay h1{color:#fff;font-size:26px;font-weight:700;margin-bottom:8px}
 #login-overlay .login-sub{color:#9ca3af;font-size:15px;margin-bottom:28px}
@@ -1774,13 +1774,10 @@ function showModal(html, wide) {
 function closeModal() { document.getElementById('modals').innerHTML = ''; }
 function esc(s) { return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
 
-(async function() {
-  const { data: { session } } = await authClient.auth.getSession();
-  if (session) {
-  document.getElementById('login-overlay').style.display = 'none';
-  sb = authClient;
-  bootApp();
-}
+(function() {
+  const url = localStorage.getItem('sb_url');
+  const key = localStorage.getItem('sb_key');
+  if (url && key) boot(url, key);
 })();
 </script>
 </body>
