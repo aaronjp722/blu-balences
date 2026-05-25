@@ -1524,23 +1524,46 @@ function initAutoSend() {
 
   /* ─── INBOXES ─── */
 async function renderInboxes() {
-  const { data: inboxes } = await sb.from('inboxes').select('*').order('created_at');
+  const [{ data: inboxes }, { data: sendStats }] = await Promise.all([
+    sb.from('inboxes').select('*').order('created_at'),
+    sb.from('send_log').select('inbox_id,sent_at').not('inbox_id', 'is', null),
+  ]);
+  const today = new Date().toDateString();
+  const perInbox = {};
+  (sendStats || []).forEach(l => {
+    if (!perInbox[l.inbox_id]) perInbox[l.inbox_id] = { today: 0, total: 0 };
+    perInbox[l.inbox_id].total++;
+    if (new Date(l.sent_at).toDateString() === today) perInbox[l.inbox_id].today++;
+  });
   document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openInboxModal()">+ Add Inbox</button>`;
   document.getElementById('content').innerHTML = `
     <div class="info-banner">ℹ️ Each inbox is a sending email address with its own Brevo API key. Use multiple inboxes to rotate senders or manage separate accounts.</div>
     ${!inboxes||!inboxes.length ? '<div class="panel"><div class="empty">No inboxes yet. Add one to get started.</div></div>' :
-    (inboxes.map(inbox => `
-      <div class="inbox-card">
-        <div class="inbox-info">
+    (inboxes.map(inbox => {
+      const s = perInbox[inbox.id] || { today: 0, total: 0 };
+      return `
+      <div class="inbox-card" style="flex-wrap:wrap;gap:12px">
+        <div class="inbox-info" style="flex:1;min-width:160px">
           <div class="inbox-name">${inbox.name}</div>
           <div class="inbox-email">${inbox.email}${inbox.reply_to?` · Reply-To: ${inbox.reply_to}`:''}</div>
           <div class="inbox-hint">API Key: ${inbox.brevo_api_key ? '••••••••' + inbox.brevo_api_key.slice(-4) : 'not set'} · ${inbox.active?'<span style="color:var(--green)">Active</span>':'<span style="color:var(--gray)">Inactive</span>'}</div>
         </div>
-        <div class="actions">
+        <div style="display:flex;gap:20px;align-items:center;flex-shrink:0;padding:0 4px">
+          <div style="text-align:center">
+            <div style="font-size:24px;font-weight:700;color:var(--green)">${s.today}</div>
+            <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:.05em">Today</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:24px;font-weight:700">${s.total}</div>
+            <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:.05em">All Time</div>
+          </div>
+        </div>
+        <div class="actions" style="flex-shrink:0">
           <button class="btn btn-secondary btn-sm" onclick="openInboxModal('${inbox.id}','${esc(inbox.name)}','${esc(inbox.email)}','${esc(inbox.reply_to||'')}','${esc(inbox.brevo_api_key||'')}',${inbox.active})">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteInbox('${inbox.id}')">Delete</button>
         </div>
-      </div>`).join(''))}`;
+      </div>`;
+    }).join(''))}`;
 }
 
 function openInboxModal(id, name, email, replyTo, apiKey, active) {
