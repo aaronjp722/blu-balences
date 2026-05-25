@@ -250,6 +250,14 @@ async function doLogin() {
 sb = authClient;
 bootApp();
 }
+function saveConfig() {
+  const url = document.getElementById('cfg-url').value.trim();
+  const key = document.getElementById('cfg-key').value.trim();
+  if (!url || !key) { alert('Both fields are required'); return; }
+  localStorage.setItem('sb_url', url);
+  localStorage.setItem('sb_key', key);
+  boot(url, key);
+}
 let aF = { days: '30', seqId: '', status: '', search: '' };
 
 function toggleSidebar() {
