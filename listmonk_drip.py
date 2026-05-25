@@ -192,13 +192,18 @@ def main():
         same_thread = seq.get("same_thread", False)
 
         # Load inboxes assigned to this sequence and seed today's send counts
-        seq_inboxes = load_seq_inboxes(get, seq["id"])
+                seq_inboxes = load_seq_inboxes(get, seq["id"])
         today_start = dt.datetime.now(dt.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
-        sends_today = {
-            ib["inbox_id"]: len(get("send_log", f"?inbox_id=eq.{ib['inbox_id']}&sent_at=gte.{today_start}&select=id"))
-            for ib in seq_inboxes
-        }
+        sends_today = {}
         if seq_inboxes:
+            try:
+                sends_today = {
+                    ib["inbox_id"]: len(get("send_log", f"?inbox_id=eq.{ib['inbox_id']}&sent_at=gte.{today_start}&select=id"))
+                    for ib in seq_inboxes
+                }
+            except Exception:
+                log.warning("  send_log missing inbox_id/sent_at columns — defaulting counts to 0")
+                sends_today = {ib["inbox_id"]: 0 for ib in seq_inboxes}
             log.info("  %d inbox(es) assigned for rotation", len(seq_inboxes))
 
         for step in steps:
