@@ -193,7 +193,7 @@ def main():
 
         # Load inboxes assigned to this sequence and seed today's send counts
         seq_inboxes = load_seq_inboxes(get, seq["id"])
-        today_start = dt.datetime.now(dt.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+        today_start = dt.datetime.now(dt.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat().replace("+00:00", "Z")
         sends_today = {}
         if seq_inboxes:
             try:
