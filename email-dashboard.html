@@ -246,8 +246,9 @@ async function doLogin() {
   document.getElementById('lo-err').textContent = '';
   const { error } = await authClient.auth.signInWithPassword({ email, password: pass });
   if (error) { document.getElementById('lo-err').textContent = error.message; return; }
-  document.getElementById('login-overlay').style.display = 'none';
-  sb = authClient;
+    document.getElementById('login-overlay').style.display = 'none';
+  const _k = localStorage.getItem('sb_key');
+  sb = _k ? supabase.createClient(AUTH_CONFIG.url, _k) : authClient;
   bootApp();
 }
 let aF = { days: '30', seqId: '', status: '', search: '' };
@@ -1778,7 +1779,8 @@ function esc(s) { return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
   const { data: { session } } = await authClient.auth.getSession();
   if (session) {
     document.getElementById('login-overlay').style.display = 'none';
-    sb = authClient;
+    const _k = localStorage.getItem('sb_key');
+    sb = _k ? supabase.createClient(AUTH_CONFIG.url, _k) : authClient;
     bootApp();
   }
 })();
