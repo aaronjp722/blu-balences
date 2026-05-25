@@ -197,6 +197,10 @@ textarea{resize:vertical;min-height:80px}
         </div>
         <span id="nav-replies-badge" style="display:none;background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700"></span>
       </a>
+            <a onclick="navigate('copy')" id="nav-copy">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        Copy
+      </a>
       <a onclick="navigate('settings')" id="nav-settings">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         Settings
@@ -279,12 +283,13 @@ async function navigate(tab) {
   const el = document.getElementById('nav-' + tab);
   if (el) el.classList.add('active');
   document.getElementById('page-title').textContent =
-    { dashboard:'Dashboard', sequences:'Sequences', subscribers:'Subscribers', analytics:'Analytics', settings:'Settings', inboxes:'Inboxes', replies:'Replies' }[tab] || tab;
+        { dashboard:'Dashboard', sequences:'Sequences', subscribers:'Subscribers', analytics:'Analytics', settings:'Settings', inboxes:'Inboxes', replies:'Replies', copy:'Copy' }[tab] || tab;
   document.getElementById('topbar-actions').innerHTML = '';
   document.getElementById('content').innerHTML = '<div style="padding:40px;text-align:center;color:#6b7280">Loading…</div>';
   if (tab === 'dashboard') await renderDashboard();
   else if (tab === 'sequences') await renderSequences();
   else if (tab === 'subscribers') await renderSubscribers();
+  else if (tab === 'copy') await renderCopy();
   else if (tab === 'analytics') await renderAnalytics();
   else if (tab === 'settings') await renderSettings();
   else if (tab === 'inboxes') await renderInboxes();
@@ -1549,6 +1554,70 @@ function initAutoSend() {
   }, 30000);
 }  
 
+
+  async function renderCopy() {
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openCopyModal()">+ New Copy</button>`;
+  const { data: templates, error } = await sb.from('templates').select('*').order('created_at', { ascending: false });
+  if (error) { document.getElementById('content').innerHTML = `<div class="panel" style="padding:20px;color:var(--red)">Error loading copy: ${error.message}</div>`; return; }
+  document.getElementById('content').innerHTML = !templates || !templates.length
+    ? `<div class="panel"><div class="empty" style="padding:40px;text-align:center;color:var(--gray)">No copy saved yet. Tap "+ New Copy" to write your first email.</div></div>`
+    : templates.map(t => `
+      <div class="panel" style="padding:20px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:16px;margin-bottom:4px">${t.name}</div>
+            ${t.subject ? `<div style="font-size:13px;color:var(--gray);margin-bottom:8px">Subject: ${t.subject}</div>` : ''}
+            <div style="font-size:14px;color:#374151;white-space:pre-wrap;line-height:1.6;max-height:120px;overflow:hidden;mask-image:linear-gradient(to bottom,black 60%,transparent)">${t.body||''}</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-shrink:0">
+            <button class="btn btn-secondary btn-sm" onclick="openCopyModal('${t.id}','${esc(t.name)}','${esc(t.subject||'')}','${esc(t.body||'')}')">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteCopy('${t.id}')">Delete</button>
+          </div>
+        </div>
+      </div>`).join('');
+}
+
+function openCopyModal(id, name, subject, body) {
+  showModal(`
+    <h2 style="margin-bottom:16px">${id ? 'Edit' : 'New'} Copy</h2>
+    <div class="form-group">
+      <label>Name <span style="color:var(--gray);font-weight:400;font-size:12px">(e.g. "Cold Intro Email")</span></label>
+      <input id="cp-name" value="${name||''}" placeholder="What is this email about?">
+    </div>
+    <div class="form-group">
+      <label>Subject Line</label>
+      <input id="cp-subject" value="${subject||''}" placeholder="Quick question about your books…">
+    </div>
+    <div class="form-group">
+      <label>Body</label>
+      <textarea id="cp-body" style="min-height:260px;font-size:15px;line-height:1.7;resize:vertical" placeholder="Hey {{first_name}}, I wanted to reach out…">${body||''}</textarea>
+    </div>
+    <div style="font-size:12px;color:var(--gray);margin:-8px 0 16px">Variables: {{first_name}} {{last_name}} {{company}} {{today}} {{this_month}} {{email}}</div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCopy('${id||''}')">Save</button>
+    </div>`);
+}
+
+async function saveCopy(id) {
+  const name    = document.getElementById('cp-name').value.trim();
+  const subject = document.getElementById('cp-subject').value.trim();
+  const body    = document.getElementById('cp-body').value;
+  if (!name) { alert('Give this copy a name'); return; }
+  const payload = { name, subject, body };
+  const { error } = id
+    ? await sb.from('templates').update(payload).eq('id', id)
+    : await sb.from('templates').insert(payload);
+  if (error) { alert('Save failed: ' + error.message); return; }
+  closeModal();
+  renderCopy();
+}
+
+async function deleteCopy(id) {
+  if (!confirm('Delete this copy?')) return;
+  await sb.from('templates').delete().eq('id', id);
+  renderCopy();
+}
   /* ─── INBOXES ─── */
 async function renderInboxes() {
   const [{ data: inboxes }, { data: sendStats }] = await Promise.all([
