@@ -247,9 +247,8 @@ async function doLogin() {
   const { error } = await authClient.auth.signInWithPassword({ email, password: pass });
   if (error) { document.getElementById('lo-err').textContent = error.message; return; }
     document.getElementById('login-overlay').style.display = 'none';
-  const _k = localStorage.getItem('sb_key');
-  sb = _k ? supabase.createClient(AUTH_CONFIG.url, _k) : authClient;
-  bootApp();
+sb = authClient;
+bootApp();
 }
 let aF = { days: '30', seqId: '', status: '', search: '' };
 
@@ -1778,11 +1777,10 @@ function esc(s) { return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
 (async function() {
   const { data: { session } } = await authClient.auth.getSession();
   if (session) {
-    document.getElementById('login-overlay').style.display = 'none';
-    const _k = localStorage.getItem('sb_key');
-    sb = _k ? supabase.createClient(AUTH_CONFIG.url, _k) : authClient;
-    bootApp();
-  }
+  document.getElementById('login-overlay').style.display = 'none';
+  sb = authClient;
+  bootApp();
+}
 })();
 </script>
 </body>
