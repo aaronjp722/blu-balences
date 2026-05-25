@@ -170,11 +170,31 @@ def main():
         from_email = m.group(2).strip()
     log.info("From: %s <%s>", from_name, from_email)
 
-    send_days = [d.strip() for d in cfg.get("send_days", "mon,tue,wed,thu,fri").split(",")]
-    today_abbr = dt.datetime.now().strftime("%a").lower()
+        send_days    = [d.strip() for d in cfg.get("send_days", "mon,tue,wed,thu,fri").split(",")]
+    send_time_str = cfg.get("send_time", "")
+    tz_name      = cfg.get("send_timezone", "America/New_York")
+    try:
+        from zoneinfo import ZoneInfo
+        local_now = dt.datetime.now(ZoneInfo(tz_name))
+    except Exception:
+        local_now = dt.datetime.now(dt.timezone.utc)
+        log.warning("Could not load timezone %s — falling back to UTC", tz_name)
+    log.info("Local time: %s (%s)", local_now.strftime("%a %Y-%m-%d %H:%M"), tz_name)
+    today_abbr = local_now.strftime("%a").lower()
     if today_abbr not in send_days:
         log.info("Today (%s) not in send_days (%s) — skipping", today_abbr, send_days)
         return 0
+    if send_time_str:
+        try:
+            send_h, send_m = map(int, send_time_str.split(':'))
+            scheduled  = local_now.replace(hour=send_h, minute=send_m, second=0, microsecond=0)
+            diff_mins  = abs((local_now - scheduled).total_seconds() / 60)
+            if diff_mins > 60:
+                log.info("Local time %s is %.0f min away from send_time %s (>60 min window) — skipping",
+                         local_now.strftime("%H:%M"), diff_mins, send_time_str)
+                return 0
+        except Exception as e:
+            log.warning("Could not check send_time '%s': %s", send_time_str, e)
 
     global_rate     = float(cfg.get("emails_per_minute", "2"))
     global_interval = 60.0 / global_rate
