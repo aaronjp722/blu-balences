@@ -250,6 +250,15 @@ async function doLogin() {
 sb = authClient;
 bootApp();
 }
+  function boot(url, key) {
+  try { sb = supabase.createClient(url, key); }
+  catch(e) {
+    const err = document.getElementById('cfg-error');
+    if (err) { err.textContent = 'Failed to connect: ' + e.message; err.style.display = 'block'; }
+    return;
+  }
+  bootApp();
+}
 function saveConfig() {
   const url = document.getElementById('cfg-url').value.trim();
   const key = document.getElementById('cfg-key').value.trim();
