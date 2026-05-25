@@ -126,6 +126,34 @@ textarea{resize:vertical;min-height:80px}
 .inbox-hint{font-size:11px;color:var(--gray);margin-top:2px}
 .seq-sched{display:inline-block;font-size:11px;padding:2px 7px;border-radius:4px;background:var(--blue-light);color:var(--blue-dark);margin-top:4px}
 .unread-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-left:6px;flex-shrink:0}
+#nav-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:49}
+#nav-overlay.show{display:block}
+#hamburger{display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--text);align-items:center}
+#hamburger svg{width:22px;height:22px}
+@media(max-width:768px){
+  body{overflow:auto;height:auto;min-height:100vh}
+  #app{flex-direction:column;height:auto;min-height:100vh}
+  #sidebar{position:fixed;top:0;left:0;bottom:0;width:240px;z-index:50;transform:translateX(-100%);transition:transform .25s;overflow-y:auto}
+  #sidebar.open{transform:translateX(0)}
+  #main{flex:1;display:flex;flex-direction:column;overflow:visible;min-width:0}
+  #topbar{position:sticky;top:0;z-index:40}
+  #hamburger{display:flex}
+  #content{padding:12px;overflow-y:visible}
+  .cards{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+  .card{padding:14px}.card .value{font-size:22px}
+  .panel{margin-bottom:12px}
+  .panel-header{padding:12px 14px}
+  .modal{width:96vw;max-width:96vw;padding:18px}
+  table{font-size:12px;display:block;overflow-x:auto;white-space:nowrap}
+  th,td{padding:8px 10px}
+  .actions{flex-wrap:wrap}
+  .form-row{grid-template-columns:1fr 1fr}
+  .form-row-2{grid-template-columns:1fr}
+  .countdown-box{padding:14px 16px}
+  .countdown-time{font-size:30px}
+  .step-body-preview{max-width:180px}
+  .inbox-card{flex-wrap:wrap}
+}
 </style>
 </head>
 <body>
@@ -190,12 +218,18 @@ textarea{resize:vertical;min-height:80px}
   </div>
   <div id="main">
     <div id="topbar">
-      <h1 id="page-title">Dashboard</h1>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button id="hamburger" onclick="toggleSidebar()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <h1 id="page-title">Dashboard</h1>
+      </div>
       <div id="topbar-actions"></div>
     </div>
     <div id="content"></div>
   </div>
 </div>
+<div id="nav-overlay" onclick="toggleSidebar()"></div>
 <div id="modals"></div>
 
 <script>
@@ -206,12 +240,6 @@ let sb;
 };
 const authClient = supabase.createClient(AUTH_CONFIG.url, AUTH_CONFIG.key);
 
-function bootFromStorage() {
-  const url = localStorage.getItem('sb_url');
-  const key = localStorage.getItem('sb_key');
-  if (url && key) boot(url, key);
-}
-
 async function doLogin() {
   const email = document.getElementById('lo-email').value.trim();
   const pass  = document.getElementById('lo-pass').value;
@@ -219,28 +247,25 @@ async function doLogin() {
   const { error } = await authClient.auth.signInWithPassword({ email, password: pass });
   if (error) { document.getElementById('lo-err').textContent = error.message; return; }
   document.getElementById('login-overlay').style.display = 'none';
-  bootFromStorage();
+  sb = authClient;
+  bootApp();
 }
 let aF = { days: '30', seqId: '', status: '', search: '' };
 
-function saveConfig() {
-  const url = document.getElementById('cfg-url').value.trim();
-  const key = document.getElementById('cfg-key').value.trim();
-  if (!url || !key) { alert('Both fields are required'); return; }
-  localStorage.setItem('sb_url', url);
-  localStorage.setItem('sb_key', key);
-  boot(url, key);
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('nav-overlay').classList.toggle('show');
 }
 
-function boot(url, key) {
-  try { sb = supabase.createClient(url, key); }
-  catch(e) {
-    const err = document.getElementById('cfg-error');
-    if (err) { err.textContent = 'Failed to connect: ' + e.message; err.style.display = 'block'; }
-    return;
-  }
+function bootApp() {
   document.getElementById('config-screen').style.display = 'none';
   document.getElementById('app').classList.add('show');
+  document.querySelectorAll('nav a').forEach(a => a.addEventListener('click', () => {
+    if (window.innerWidth <= 768) {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('nav-overlay').classList.remove('show');
+    }
+  }));
   navigate('dashboard');
   initAutoSend();
   refreshUnreadBadge();
@@ -1524,23 +1549,45 @@ function initAutoSend() {
 
   /* ─── INBOXES ─── */
 async function renderInboxes() {
-  const { data: inboxes } = await sb.from('inboxes').select('*').order('created_at');
+  const [{ data: inboxes }, { data: sendStats }] = await Promise.all([
+    sb.from('inboxes').select('*').order('created_at'),
+    sb.from('send_log').select('inbox_id,sent_at').not('inbox_id', 'is', null),
+  ]);
+  const today = new Date().toDateString();
+  const perInbox = {};
+  (sendStats || []).forEach(l => {
+    if (!perInbox[l.inbox_id]) perInbox[l.inbox_id] = { today: 0, total: 0 };
+    perInbox[l.inbox_id].total++;
+    if (new Date(l.sent_at).toDateString() === today) perInbox[l.inbox_id].today++;
+  });
   document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openInboxModal()">+ Add Inbox</button>`;
   document.getElementById('content').innerHTML = `
     <div class="info-banner">ℹ️ Each inbox is a sending email address with its own Brevo API key. Use multiple inboxes to rotate senders or manage separate accounts.</div>
     ${!inboxes||!inboxes.length ? '<div class="panel"><div class="empty">No inboxes yet. Add one to get started.</div></div>' :
-    (inboxes.map(inbox => `
-      <div class="inbox-card">
-        <div class="inbox-info">
+    inboxes.map(inbox => {
+      const s = perInbox[inbox.id] || { today: 0, total: 0 };
+      return `<div class="inbox-card" style="flex-wrap:wrap;gap:12px">
+        <div class="inbox-info" style="flex:1;min-width:160px">
           <div class="inbox-name">${inbox.name}</div>
-          <div class="inbox-email">${inbox.email}${inbox.reply_to?` · Reply-To: ${inbox.reply_to}`:''}</div>
-          <div class="inbox-hint">API Key: ${inbox.brevo_api_key ? '••••••••' + inbox.brevo_api_key.slice(-4) : 'not set'} · ${inbox.active?'<span style="color:var(--green)">Active</span>':'<span style="color:var(--gray)">Inactive</span>'}</div>
+          <div class="inbox-email">${inbox.email}${inbox.reply_to ? ' · Reply-To: ' + inbox.reply_to : ''}</div>
+          <div class="inbox-hint">API Key: ${inbox.brevo_api_key ? '•••• ' + inbox.brevo_api_key.slice(-4) : 'not set'} · ${inbox.active ? '<span style="color:var(--green)">Active</span>' : '<span style="color:var(--gray)">Inactive</span>'}</div>
         </div>
-        <div class="actions">
+        <div style="display:flex;gap:20px;align-items:center;flex-shrink:0;padding:0 4px">
+          <div style="text-align:center">
+            <div style="font-size:24px;font-weight:700;color:var(--green)">${s.today}</div>
+            <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:.05em">Today</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:24px;font-weight:700">${s.total}</div>
+            <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:.05em">All Time</div>
+          </div>
+        </div>
+        <div class="actions" style="flex-shrink:0">
           <button class="btn btn-secondary btn-sm" onclick="openInboxModal('${inbox.id}','${esc(inbox.name)}','${esc(inbox.email)}','${esc(inbox.reply_to||'')}','${esc(inbox.brevo_api_key||'')}',${inbox.active})">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteInbox('${inbox.id}')">Delete</button>
         </div>
-      </div>`).join(''))}`;
+      </div>`;
+    }).join('')}`;
 }
 
 function openInboxModal(id, name, email, replyTo, apiKey, active) {
@@ -1731,7 +1778,8 @@ function esc(s) { return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
   const { data: { session } } = await authClient.auth.getSession();
   if (session) {
     document.getElementById('login-overlay').style.display = 'none';
-    bootFromStorage();
+    sb = authClient;
+    bootApp();
   }
 })();
 </script>
