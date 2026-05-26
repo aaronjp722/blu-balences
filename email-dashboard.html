@@ -197,6 +197,10 @@ textarea{resize:vertical;min-height:80px}
         </div>
         <span id="nav-replies-badge" style="display:none;background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700"></span>
       </a>
+            <a onclick="navigate('lists')" id="nav-lists">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Lists
+      </a>
             <a onclick="navigate('copy')" id="nav-copy">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
         Copy
@@ -283,13 +287,14 @@ async function navigate(tab) {
   const el = document.getElementById('nav-' + tab);
   if (el) el.classList.add('active');
   document.getElementById('page-title').textContent =
-        { dashboard:'Dashboard', sequences:'Sequences', subscribers:'Subscribers', analytics:'Analytics', settings:'Settings', inboxes:'Inboxes', replies:'Replies', copy:'Copy' }[tab] || tab;
+     { dashboard:'Dashboard', sequences:'Sequences', subscribers:'Subscribers', analytics:'Analytics', settings:'Settings', inboxes:'Inboxes', replies:'Replies', copy:'Copy', lists:'Lists' }[tab] || tab;
   document.getElementById('topbar-actions').innerHTML = '';
   document.getElementById('content').innerHTML = '<div style="padding:40px;text-align:center;color:#6b7280">Loading…</div>';
   if (tab === 'dashboard') await renderDashboard();
   else if (tab === 'sequences') await renderSequences();
   else if (tab === 'subscribers') await renderSubscribers();
   else if (tab === 'copy') await renderCopy();
+  else if (tab === 'lists') await renderLists();
   else if (tab === 'analytics') await renderAnalytics();
   else if (tab === 'settings') await renderSettings();
   else if (tab === 'inboxes') await renderInboxes();
@@ -1617,6 +1622,137 @@ async function deleteCopy(id) {
   if (!confirm('Delete this copy?')) return;
   await sb.from('templates').delete().eq('id', id);
   renderCopy();
+}
+  async function renderLists() {
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openListModal()">+ New List</button>`;
+  const [{ data: lists }, { data: allMembers }] = await Promise.all([
+    sb.from('lists').select('*').order('created_at', { ascending: false }),
+    sb.from('list_members').select('list_id'),
+  ]);
+  const countMap = {};
+  (allMembers||[]).forEach(r => { countMap[r.list_id] = (countMap[r.list_id]||0)+1; });
+  document.getElementById('content').innerHTML = !lists||!lists.length
+    ? `<div class="panel"><div class="empty" style="padding:40px;text-align:center;color:var(--gray)">No lists yet. Create one to organize your contacts.</div></div>`
+    : lists.map(l => `
+      <div class="panel" style="padding:20px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:16px">${l.name}</div>
+            ${l.description?`<div style="font-size:13px;color:var(--gray);margin-top:2px">${l.description}</div>`:''}
+            <div style="font-size:13px;color:var(--gray);margin-top:6px">${countMap[l.id]||0} contact${(countMap[l.id]||0)===1?'':'s'}</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0">
+            <button class="btn btn-secondary btn-sm" onclick="renderListDetail('${l.id}','${esc(l.name)}')">View</button>
+            <button class="btn btn-primary btn-sm" onclick="openEnrollListModal('${l.id}','${esc(l.name)}')">Enroll All</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteList('${l.id}')">Delete</button>
+          </div>
+        </div>
+      </div>`).join('');
+}
+
+function openListModal(id, name, description) {
+  showModal(`
+    <h2>${id?'Edit':'New'} List</h2>
+    <div class="form-group"><label>List Name</label><input id="ls-name" value="${name||''}" placeholder="e.g. Warm-Up Seeds, Cold Prospects Q2"></div>
+    <div class="form-group"><label>Description <span style="color:var(--gray);font-weight:400">(optional)</span></label><input id="ls-desc" value="${description||''}" placeholder="What is this list for?"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveList('${id||''}')">Save</button>
+    </div>`);
+}
+
+async function saveList(id) {
+  const name = document.getElementById('ls-name').value.trim();
+  const description = document.getElementById('ls-desc').value.trim();
+  if (!name) { alert('List name is required'); return; }
+  const { error } = id
+    ? await sb.from('lists').update({ name, description }).eq('id', id)
+    : await sb.from('lists').insert({ name, description });
+  if (error) { alert(error.message); return; }
+  closeModal(); renderLists();
+}
+
+async function deleteList(id) {
+  if (!confirm('Delete this list and all its members? Enrollments already sent are not affected.')) return;
+  await sb.from('lists').delete().eq('id', id);
+  renderLists();
+}
+
+async function renderListDetail(listId, listName) {
+  document.getElementById('topbar-actions').innerHTML = `
+    <button class="btn btn-secondary" style="margin-right:8px" onclick="renderLists()">← Back</button>
+    <button class="btn btn-secondary" style="margin-right:8px" onclick="openAddMembersModal('${listId}','${esc(listName)}')">+ Add Members</button>
+    <button class="btn btn-primary" onclick="openEnrollListModal('${listId}','${esc(listName)}')">Enroll All</button>`;
+  const { data: members } = await sb.from('list_members').select('*').eq('list_id', listId).order('added_at', { ascending: false });
+  document.getElementById('content').innerHTML = `
+    <div class="panel">
+      <div class="panel-header"><h2>${listName} — ${(members||[]).length} contacts</h2></div>
+      ${!members||!members.length
+        ? '<div class="empty" style="padding:24px">No members yet. Click "+ Add Members" to add contacts via CSV.</div>'
+        : `<div style="overflow-x:auto"><table><thead><tr><th>Email</th><th>Name</th><th>Company</th><th></th></tr></thead><tbody>
+          ${members.map(m=>`<tr>
+            <td>${m.email}</td><td>${m.name||'—'}</td><td>${m.company||'—'}</td>
+            <td><button class="btn btn-danger btn-sm" onclick="removeMember('${m.id}','${listId}','${esc(listName)}')">Remove</button></td>
+          </tr>`).join('')}
+          </tbody></table></div>`}
+    </div>`;
+}
+
+async function removeMember(memberId, listId, listName) {
+  await sb.from('list_members').delete().eq('id', memberId);
+  renderListDetail(listId, listName);
+}
+
+function openAddMembersModal(listId, listName) {
+  showModal(`
+    <h2>Add to "${listName}"</h2>
+    <div class="form-group">
+      <label>Paste contacts — one per line: <code>email, Name, Company</code></label>
+      <textarea id="lm-csv" style="min-height:200px;font-size:14px;line-height:1.6" placeholder="john@example.com, John Smith, Acme Inc&#10;jane@example.com, Jane Doe&#10;bob@example.com"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addMembersToList('${listId}','${esc(listName)}')">Add Contacts</button>
+    </div>`);
+}
+
+async function addMembersToList(listId, listName) {
+  const csv = document.getElementById('lm-csv').value.trim();
+  if (!csv) { alert('Paste at least one email address'); return; }
+  const rows = csv.split('\n').map(line => {
+    const [email, name, company] = line.split(',').map(s => s.trim());
+    return email && email.includes('@') ? { list_id: listId, email, name: name||null, company: company||null } : null;
+  }).filter(Boolean);
+  if (!rows.length) { alert('No valid emails found'); return; }
+  const { error } = await sb.from('list_members').upsert(rows, { onConflict: 'list_id,email', ignoreDuplicates: true });
+  if (error) { alert(error.message); return; }
+  closeModal(); renderListDetail(listId, listName);
+}
+
+async function openEnrollListModal(listId, listName) {
+  const { data: seqs } = await sb.from('sequences').select('id,name').eq('active', true);
+  showModal(`
+    <h2>Enroll "${listName}"</h2>
+    <p style="font-size:14px;color:var(--gray);margin-bottom:16px">All contacts in this list will be enrolled. Anyone already in the sequence is skipped — no duplicates.</p>
+    <div class="form-group"><label>Sequence</label>
+      <select id="el-seq"><option value="">Select a sequence…</option>${(seqs||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="enrollList('${listId}','${esc(listName)}')">Enroll All</button>
+    </div>`);
+}
+
+async function enrollList(listId, listName) {
+  const seqId = document.getElementById('el-seq').value;
+  if (!seqId) { alert('Select a sequence'); return; }
+  const { data: members } = await sb.from('list_members').select('*').eq('list_id', listId);
+  if (!members||!members.length) { alert('This list has no members'); return; }
+  const rows = members.map(m => ({ email: m.email, name: m.name||null, company: m.company||null, sequence_id: seqId, current_step: 0, status: 'active' }));
+  const { error } = await sb.from('enrollments').upsert(rows, { onConflict: 'email,sequence_id', ignoreDuplicates: true });
+  if (error) { alert(error.message); return; }
+  closeModal();
+  alert(`Enrolled ${rows.length} contacts from "${listName}".`);
 }
   /* ─── INBOXES ─── */
 async function renderInboxes() {
