@@ -247,13 +247,13 @@ def main():
             for i, enr in enumerate(due):
                 try:
                     # Resolve which inbox to use
-                    if snum == 1 and seq_inboxes:
+                    if (snum == 1 or not same_thread) and seq_inboxes:
                         inbox_info = pick_inbox(seq_inboxes, sends_today)
                         if not inbox_info:
                             log.warning("  [%d/%d] All inboxes at daily limit — skipping %s", i+1, len(due), enr["email"])
                             continue
                         sends_today[inbox_info["inbox_id"]] = sends_today.get(inbox_info["inbox_id"], 0) + 1
-                    elif snum > 1 and seq_inboxes and enr.get("assigned_inbox_id"):
+                    elif snum > 1 and same_thread and seq_inboxes and enr.get("assigned_inbox_id"):
                         inbox_info = next((ib for ib in seq_inboxes if ib["inbox_id"] == enr["assigned_inbox_id"]), None)
                     else:
                         inbox_info = None
