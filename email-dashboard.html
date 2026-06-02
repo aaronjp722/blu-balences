@@ -2010,8 +2010,9 @@ async function renderWarmupMailboxes() {
         <td>${m.rescue_from_spam!==false?'<span class="badge badge-green">On</span>':'<span class="badge badge-gray">Off</span>'}</td>
         <td>${m.app_password?'<span class="badge badge-green">✓ set</span>':'<span class="badge badge-red">missing</span>'}</td>
         <td><label class="toggle"><input type="checkbox" ${m.active?'checked':''} onchange="toggleWarmupMailbox('${m.id}',this.checked)"><span class="toggle-slider"></span></label></td>
-        <td><div class="actions">
-          <button class="btn btn-primary btn-sm" onclick="openWarmupEnroll('${m.id}')">Enroll</button>
+                <td><div class="actions">
+          <button class="btn btn-primary btn-sm" onclick="openWarmupTest('${m.id}')">✉ Test Send</button>
+          <button class="btn btn-secondary btn-sm" onclick="openWarmupEnroll('${m.id}')">Enroll</button>
           <button class="btn btn-secondary btn-sm" onclick="openWarmupMailboxModal('${m.id}')">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteWarmupMailbox('${m.id}')">Delete</button>
         </div></td>
@@ -2124,6 +2125,49 @@ async function enrollWarmupMailbox(id) {
 
 async function toggleWarmupMailbox(id, active) {
   await sb.from('warmup_mailboxes').update({ active }).eq('id', id);
+}
+
+function openWarmupTest(id) {
+  const m = (window._warmupMbs||[]).find(x => x.id === id) || {};
+  showModal(`
+    <h2>✉ Test Send — ${esc(m.email||'')}</h2>
+    <p class="hint" style="margin-bottom:14px">Sends a real email <strong>from ${esc(m.email||'this mailbox')}</strong> through its SMTP + the Webshare proxy, so you can confirm the credentials and rotating IP work. Send it to any inbox you can check.</p>
+    <div class="form-group"><label>Send To</label><input id="wt-to" value="${esc(m.email||'')}" placeholder="where to send the test"></div>
+    <div class="form-group"><label>Subject</label><input id="wt-subj" value="Warm-up test ${new Date().toLocaleTimeString()}"></div>
+    <div class="form-group"><label>Message</label><textarea id="wt-body" style="min-height:100px">This is a warm-up test send. If you got this, the mailbox can send through the proxy. 🎉</textarea></div>
+    <div id="wt-status" style="font-size:13px;margin-top:4px"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+      <button class="btn btn-primary" id="wt-btn" onclick="sendWarmupTest('${id}')">Send Test</button>
+    </div>`);
+}
+
+async function sendWarmupTest(id) {
+  const to = document.getElementById('wt-to').value.trim();
+  const subject = document.getElementById('wt-subj').value.trim();
+  const body = document.getElementById('wt-body').value;
+  const status = document.getElementById('wt-status');
+  const btn = document.getElementById('wt-btn');
+  if (!to) { alert('Send To is required'); return; }
+  btn.disabled = true; btn.textContent = 'Sending…';
+  status.style.color = 'var(--gray)'; status.textContent = 'Connecting through proxy and sending…';
+  try {
+    const { data, error } = await sb.functions.invoke('warmup-test', {
+      body: { mailbox_id: id, to, subject, body }
+    });
+    if (error) throw error;
+    if (data && data.ok) {
+      status.style.color = 'var(--green)';
+      status.textContent = `✓ Sent from ${data.from} → ${to}. Check that inbox.`;
+    } else {
+      status.style.color = 'var(--red)';
+      status.textContent = '✗ ' + ((data && data.error) || 'Unknown error');
+    }
+  } catch (e) {
+    status.style.color = 'var(--red)';
+    status.textContent = '✗ ' + (e.message || e);
+  }
+  btn.disabled = false; btn.textContent = 'Send Test';
 }
 
 async function deleteWarmupMailbox(id) {
