@@ -1810,7 +1810,8 @@ async function renderInboxes() {
         </div>
         <div class="actions" style="flex-shrink:0">
           <button class="btn btn-secondary btn-sm" onclick="openInboxModal('${inbox.id}','${esc(inbox.name)}','${esc(inbox.email)}','${esc(inbox.reply_to||'')}','${esc(inbox.brevo_api_key||'')}',${inbox.active})">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteInbox('${inbox.id}')">Delete</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteInbox('${inbox.id}')">Delete</button>
+          <button class="btn btn-ghost btn-sm" onclick="openInboxSendToWarmup('${inbox.id}')">✉ To Warm-Up</button>
         </div>
       </div>`;
     }).join(''))}`;
@@ -2127,26 +2128,80 @@ async function toggleWarmupMailbox(id, active) {
   await sb.from('warmup_mailboxes').update({ active }).eq('id', id);
 }
 
-function openWarmupSend(id) {
+async function openWarmupSend(id) {
   const m = (window._warmupMbs||[]).find(x => x.id === id) || {};
   const others = (window._warmupMbs||[]).filter(x => x.id !== id);
-  const quick = others.map(o => `<option value="${esc(o.email)}">${esc(o.email)}</option>`).join('');
+  const toOpts = others.map(o => `<option value="${esc(o.email)}">${esc(o.name||o.email)} — ${esc(o.email)}</option>`).join('');
   showModal(`
-    <h2>✉ Send from ${esc(m.email||'')}</h2>
-    <p class="hint" style="margin-bottom:14px">Sends a real email <strong>from ${esc(m.email||'this mailbox')}</strong> through its SMTP. Pick any recipient — usually another warm-up inbox.</p>
-    ${quick ? `<div class="form-group"><label>Quick pick (other warm-up inboxes)</label><select onchange="document.getElementById('ws-to').value=this.value"><option value="">— choose —</option>${quick}</select></div>` : ''}
-    <div class="form-group"><label>Send To</label><input id="ws-to" placeholder="recipient@example.com"></div>
+    <h2>✉ Send from ${esc(m.name||m.email||'')}</h2>
+    <p class="hint" style="margin-bottom:14px">Sends a real email <strong>from ${esc(m.email||'this mailbox')}</strong> to another warm-up inbox.</p>
+    <div class="form-group"><label>Send To (warm-up inbox)</label>
+      <select id="ws-to">
+        <option value="">— pick recipient —</option>
+        ${toOpts}
+      </select>
+    </div>
     <div class="form-group"><label>Subject</label><input id="ws-subj" value="Quick note"></div>
     <div class="form-group"><label>Message</label><textarea id="ws-body" style="min-height:110px">Hey — just checking in, hope you're doing well!</textarea></div>
     <div id="ws-status" style="font-size:13px;margin-top:4px"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal()">Close</button>
-      <button class="btn btn-primary" id="ws-btn" onclick="sendWarmupManual('${id}')">Send</button>
+      <button class="btn btn-primary" id="ws-btn" onclick="sendWarmupManual('${id}','warmup-send')">Send</button>
     </div>`);
 }
 
+async function openInboxSendToWarmup(inboxId) {
+  const { data: wInboxes } = await sb.from('warmup_mailboxes').select('id,email,name').eq('active', true).order('created_at');
+  const toOpts = (wInboxes||[]).map(w => `<option value="${esc(w.email)}">${esc(w.name||w.email)} — ${esc(w.email)}</option>`).join('');
+  showModal(`
+    <h2>✉ Send to Warm-Up Inbox</h2>
+    <p class="hint" style="margin-bottom:14px">Sends from this inbox through Brevo → rotating IPs → into a warm-up mailbox.</p>
+    <div class="form-group"><label>Send To (warm-up inbox)</label>
+      <select id="wi-to">
+        <option value="">— pick recipient —</option>
+        ${toOpts}
+      </select>
+    </div>
+    <div class="form-group"><label>Subject</label><input id="wi-subj" value="Quick note"></div>
+    <div class="form-group"><label>Message</label><textarea id="wi-body" style="min-height:110px">Hey — just checking in, hope you're doing well!</textarea></div>
+    <div id="wi-status" style="font-size:13px;margin-top:4px"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+      <button class="btn btn-primary" id="wi-btn" onclick="sendInboxToWarmup('${inboxId}')">Send</button>
+    </div>`);
+}
+
+async function sendInboxToWarmup(inboxId) {
+  const to = document.getElementById('wi-to').value.trim();
+  const subject = document.getElementById('wi-subj').value.trim();
+  const body = document.getElementById('wi-body').value;
+  const status = document.getElementById('wi-status');
+  const btn = document.getElementById('wi-btn');
+  if (!to) { alert('Pick a recipient'); return; }
+  btn.disabled = true; btn.textContent = 'Sending…';
+  status.style.color = 'var(--gray)'; status.textContent = 'Sending via Brevo…';
+  try {
+    const { data, error } = await sb.functions.invoke('warmup-send', {
+      body: { inbox_id: inboxId, to, subject, body }
+    });
+    if (error) throw error;
+    if (data && data.ok) {
+      status.style.color = 'var(--green)';
+      status.textContent = `✓ Sent → ${to}`;
+    } else {
+      status.style.color = 'var(--red)';
+      status.textContent = '✗ ' + ((data && data.error) || 'Unknown error');
+    }
+  } catch (e) {
+    status.style.color = 'var(--red)';
+    status.textContent = '✗ ' + (e.message || e);
+  }
+  btn.disabled = false; btn.textContent = 'Send';
+}
+
 async function sendWarmupManual(id) {
-  const to = document.getElementById('ws-to').value.trim();
+  const toEl = document.getElementById('ws-to');
+  const to = (toEl.tagName === 'SELECT' ? toEl.value : toEl.value).trim();
   const subject = document.getElementById('ws-subj').value.trim();
   const body = document.getElementById('ws-body').value;
   const status = document.getElementById('ws-status');
