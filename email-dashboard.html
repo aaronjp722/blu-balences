@@ -197,6 +197,10 @@ textarea{resize:vertical;min-height:80px}
         </div>
         <span id="nav-replies-badge" style="display:none;background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700"></span>
       </a>
+                  <a onclick="navigate('warmup')" id="nav-warmup">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+        Warm-Up ⭐
+      </a>
             <a onclick="navigate('lists')" id="nav-lists">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
         Lists
@@ -287,7 +291,7 @@ async function navigate(tab) {
   const el = document.getElementById('nav-' + tab);
   if (el) el.classList.add('active');
   document.getElementById('page-title').textContent =
-     { dashboard:'Dashboard', sequences:'Sequences', subscribers:'Subscribers', analytics:'Analytics', settings:'Settings', inboxes:'Inboxes', replies:'Replies', copy:'Copy', lists:'Lists' }[tab] || tab;
+     { dashboard:'Dashboard', sequences:'Sequences', subscribers:'Subscribers', analytics:'Analytics', settings:'Settings', inboxes:'Inboxes', replies:'Replies', copy:'Copy', lists:'Lists', warmup:'Warm-Up ⭐' }[tab] || tab;
   document.getElementById('topbar-actions').innerHTML = '';
   document.getElementById('content').innerHTML = '<div style="padding:40px;text-align:center;color:#6b7280">Loading…</div>';
   if (tab === 'dashboard') await renderDashboard();
@@ -298,7 +302,8 @@ async function navigate(tab) {
   else if (tab === 'analytics') await renderAnalytics();
   else if (tab === 'settings') await renderSettings();
   else if (tab === 'inboxes') await renderInboxes();
-  else if (tab === 'replies') await renderReplies();
+    else if (tab === 'replies') await renderReplies();
+  else if (tab === 'warmup') await renderWarmupMailboxes();
 }
 
 function cfgVal(v) { return typeof v === 'string' ? v.replace(/^"|"$/g, '') : (v || ''); }
@@ -815,7 +820,7 @@ async function renderSequences() {
       ${!seqs||!seqs.length ? '<div class="empty">No sequences yet. Create one to get started.</div>' :
             `<table><thead><tr><th>Name</th><th>Description</th><th>Schedule</th><th>Thread</th><th>Active</th><th>Actions</th></tr></thead><tbody>
       ${seqs.map(s=>`<tr>
-        <td><strong>${s.name}</strong></td>
+                <td><strong>${s.is_warmup?'⭐ ':''}${s.name}</strong></td>
         <td style="color:var(--gray)">${s.description||'—'}</td>
         <td>${s.send_time ? `<span class="seq-sched">⏰ ${s.send_time} · ${(s.send_days||'global').replace(',','/')}</span>` : '<span style="font-size:12px;color:var(--gray)">Global schedule</span>'}</td>
         <td>${s.same_thread ? '<span class="badge badge-blue">On</span>' : '<span style="font-size:12px;color:var(--gray)">Off</span>'}</td>
@@ -1474,6 +1479,17 @@ async function renderSettings() {
           <p class="hint">Brevo free plan: 300/day.</p>
         </div>
       </div>
+            <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><h2>Warm-Up Interval</h2></div>
+        <div style="padding:20px">
+          <p style="font-size:13px;color:var(--gray);margin-bottom:14px">How many minutes between each warm-up send. Fires on a bell curve so timing looks human.</p>
+          <div class="form-row-2">
+            <div class="form-group"><label>Min Minutes</label><input id="s-wmin" type="number" min="1" value="${cfg.warmup_min_minutes||'5'}"></div>
+            <div class="form-group"><label>Max Minutes</label><input id="s-wmax" type="number" min="1" value="${cfg.warmup_max_minutes||'15'}"></div>
+          </div>
+          ${cfg.warmup_next_run_at ? `<p class="hint">Next scheduled run: <strong>${new Date(cfg.warmup_next_run_at).toLocaleString()}</strong></p>` : ''}
+        </div>
+      </div>
       <div style="display:flex;gap:10px">
         <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
         <button class="btn btn-secondary" onclick="resetConn()">Change Supabase Connection</button>
@@ -1493,7 +1509,9 @@ async function saveSettings() {
     ['daily_limit', document.getElementById('s-daily').value],
     ['send_time', document.getElementById('s-time').value],
     ['send_timezone', document.getElementById('s-tz').value],
-    ['send_days', sendDays],
+        ['send_days', sendDays],
+    ['warmup_min_minutes', document.getElementById('s-wmin').value],
+    ['warmup_max_minutes', document.getElementById('s-wmax').value],
   ];
   for (const [key, value] of kvs) await sb.from('settings').upsert({ key, value }, { onConflict: 'key' });
   alert('Settings saved!');
@@ -1878,8 +1896,8 @@ async function renderReplies() {
         <div class="reply-meta">
           <div class="reply-from">${r.from_name||r.from_email} ${!r.read?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--blue);margin-left:4px;vertical-align:middle"></span>':''}</div>
           <div class="reply-subj">${r.subject||'(no subject)'}</div>
-          <div class="reply-preview">${(r.body_text||'').replace(/\n/g,' ').slice(0,120)}</div>
-          ${r.replied_at?`<div style="margin-top:6px"><span class="badge badge-green" style="font-size:11px">Replied ${new Date(r.replied_at).toLocaleDateString()}</span></div>`:''}
+                    <div class="reply-preview">${(r.body_text||'').replace(/\n/g,' ').slice(0,120)}</div>
+          ${r.replied_at?`<div style="margin-top:6px"><span class="badge badge-green" style="font-size:11px">✓ You replied ${new Date(r.replied_at).toLocaleDateString()}</span></div><div style="font-size:12px;color:#065f46;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><em>${(r.reply_body||'').replace(/\n/g,' ').slice(0,100)}</em></div>`:''}
         </div>
         <div class="reply-time">${new Date(r.received_at).toLocaleDateString()}<br><span style="color:var(--gray)">${new Date(r.received_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span></div>
       </div>`).join('')}`;
@@ -1906,7 +1924,10 @@ async function openReplyModal(replyId) {
       <strong>Received:</strong> ${new Date(r.received_at).toLocaleString()}
     </div>
     <div class="reply-thread">${(r.body_text||r.body_html||'(empty)').replace(/</g,'&lt;')}</div>
-    ${r.replied_at ? `<div class="info-banner" style="margin-bottom:12px">✓ You replied on ${new Date(r.replied_at).toLocaleString()}<br><em>${(r.reply_body||'').slice(0,200)}</em></div>` : ''}
+        ${r.replied_at ? `
+    <div class="section-title" style="color:var(--green)">Your Reply — ${new Date(r.replied_at).toLocaleString()}</div>
+    <div class="reply-thread" style="background:#f0fdf4;border:1px solid #bbf7d0;margin-bottom:16px;white-space:pre-wrap">${(r.reply_body||'(empty)').replace(/</g,'&lt;')}</div>
+    ` : ''}
     <div class="section-title">Compose Reply</div>
     ${window._replyInboxes && window._replyInboxes.length > 1 ? `<div class="form-group"><label>Send From</label><select id="rp-inbox">${inboxOpts}</select></div>` : ''}
     <div class="form-group"><label>Subject</label><input id="rp-subj" value="Re: ${esc(r.subject||'')}"></div>
@@ -1968,6 +1989,147 @@ async function sendReplyEmail(replyId, toEmail) {
     renderReplies();
     alert('Reply sent!');
   } catch(e) { alert('Error: ' + e.message); }
+}
+
+/* ─── WARM-UP MAILBOXES ─── */
+async function renderWarmupMailboxes() {
+  const { data: mbs } = await sb.from('warmup_mailboxes').select('*').order('created_at');
+  window._warmupMbs = mbs || [];
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openWarmupMailboxModal()">+ Add Mailbox</button>`;
+  const provLabel = { gmail:'Gmail', outlook:'Outlook / Microsoft', office365:'Outlook / Microsoft', microsoft:'Outlook / Microsoft', icloud:'iCloud', custom:'Custom' };
+  document.getElementById('content').innerHTML = `
+    <div class="info-banner">⭐ <strong>Warm-Up reply mailboxes.</strong> These inboxes receive your warm-up emails and auto-reply through rotating Webshare IPs — no phone needed. Add Gmail, Outlook, iCloud or custom mailboxes, each with its own app password / key.</div>
+    ${!mbs || !mbs.length ? '<div class="panel"><div class="empty">No warm-up mailboxes yet. Add blubalencesupport@gmail.com to start.</div></div>' :
+    `<div class="panel" style="overflow-x:auto"><table>
+      <thead><tr><th>Name</th><th>Email</th><th>Provider</th><th>Reply %</th><th>Spam Rescue</th><th>Key</th><th>Active</th><th>Actions</th></tr></thead>
+      <tbody>${mbs.map(m => `<tr>
+        <td><strong>${esc(m.name||'')}</strong></td>
+        <td>${m.email}</td>
+        <td><span class="badge badge-blue">${provLabel[m.provider]||m.provider}</span></td>
+        <td>${Math.round((m.reply_chance==null?0.4:m.reply_chance)*100)}%</td>
+        <td>${m.rescue_from_spam!==false?'<span class="badge badge-green">On</span>':'<span class="badge badge-gray">Off</span>'}</td>
+        <td>${m.app_password?'<span class="badge badge-green">✓ set</span>':'<span class="badge badge-red">missing</span>'}</td>
+        <td><label class="toggle"><input type="checkbox" ${m.active?'checked':''} onchange="toggleWarmupMailbox('${m.id}',this.checked)"><span class="toggle-slider"></span></label></td>
+        <td><div class="actions">
+          <button class="btn btn-primary btn-sm" onclick="openWarmupEnroll('${m.id}')">Enroll</button>
+          <button class="btn btn-secondary btn-sm" onclick="openWarmupMailboxModal('${m.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteWarmupMailbox('${m.id}')">Delete</button>
+        </div></td>
+      </tr>`).join('')}</tbody></table></div>`}`;
+}
+
+function openWarmupMailboxModal(id) {
+  const m = (window._warmupMbs||[]).find(x => x.id === id) || {};
+  showModal(`
+    <h2>${m.id?'Edit':'Add'} Warm-Up Mailbox ⭐</h2>
+    <div class="form-group"><label>Name</label><input id="wm-name" value="${esc(m.name||'')}" placeholder="Blu Balence Support"></div>
+    <div class="form-group"><label>Email</label><input id="wm-email" value="${esc(m.email||'')}" placeholder="you@gmail.com"></div>
+    <div class="form-group"><label>Provider</label>
+      <select id="wm-prov" onchange="warmupProviderFill()">
+        ${['gmail','outlook','icloud','custom'].map(p=>`<option value="${p}" ${(m.provider||'gmail')===p?'selected':''}>${p}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>IMAP Host</label><input id="wm-imaph" value="${esc(m.imap_host||'')}"></div>
+      <div class="form-group"><label>IMAP Port</label><input id="wm-imapp" type="number" value="${m.imap_port||993}"></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>SMTP Host</label><input id="wm-smtph" value="${esc(m.smtp_host||'')}"></div>
+      <div class="form-group"><label>SMTP Port</label><input id="wm-smtpp" type="number" value="${m.smtp_port||587}"></div>
+    </div>
+    <div class="form-group"><label>App Password / Key</label><input id="wm-pass" value="${esc(m.app_password||'')}" placeholder="app password (spaces ok)"><p class="hint">Gmail: generate at myaccount.google.com/apppasswords</p></div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Reply Chance (%)</label><input id="wm-reply" type="number" min="0" max="100" value="${Math.round((m.reply_chance==null?0.4:m.reply_chance)*100)}"></div>
+      <div class="form-group"><label>Rescue From Spam</label>
+        <select id="wm-rescue"><option value="true" ${m.rescue_from_spam!==false?'selected':''}>Yes</option><option value="false" ${m.rescue_from_spam===false?'selected':''}>No</option></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveWarmupMailbox('${m.id||''}')">Save</button>
+    </div>`, true);
+  if (!m.id) warmupProviderFill();
+}
+
+function warmupProviderFill() {
+  const p = document.getElementById('wm-prov').value;
+  const map = {
+    gmail:   ['imap.gmail.com',993,'smtp.gmail.com',587],
+    outlook: ['outlook.office365.com',993,'smtp.office365.com',587],
+    icloud:  ['imap.mail.me.com',993,'smtp.mail.me.com',587],
+    custom:  ['',993,'',587],
+  };
+  const [ih,ip,sh,sp] = map[p] || map.custom;
+  document.getElementById('wm-imaph').value = ih;
+  document.getElementById('wm-imapp').value = ip;
+  document.getElementById('wm-smtph').value = sh;
+  document.getElementById('wm-smtpp').value = sp;
+}
+
+async function saveWarmupMailbox(id) {
+  const payload = {
+    name: document.getElementById('wm-name').value.trim(),
+    email: document.getElementById('wm-email').value.trim(),
+    provider: document.getElementById('wm-prov').value,
+    imap_host: document.getElementById('wm-imaph').value.trim() || null,
+    imap_port: parseInt(document.getElementById('wm-imapp').value) || 993,
+    smtp_host: document.getElementById('wm-smtph').value.trim() || null,
+    smtp_port: parseInt(document.getElementById('wm-smtpp').value) || 587,
+    app_password: document.getElementById('wm-pass').value.replace(/\s+/g,''),
+    reply_chance: (parseInt(document.getElementById('wm-reply').value)||40) / 100,
+    rescue_from_spam: document.getElementById('wm-rescue').value === 'true',
+  };
+  if (!payload.email) { alert('Email is required'); return; }
+  let error;
+  if (id) ({ error } = await sb.from('warmup_mailboxes').update(payload).eq('id', id));
+  else ({ error } = await sb.from('warmup_mailboxes').insert(payload));
+  if (error) { alert(error.message); return; }
+  closeModal();
+  renderWarmupMailboxes();
+}
+
+async function openWarmupEnroll(id) {
+  const m = (window._warmupMbs||[]).find(x => x.id === id) || {};
+  const { data: seqs } = await sb.from('sequences').select('id,name,is_warmup').eq('is_warmup', true).order('created_at');
+  if (!seqs || !seqs.length) {
+    showModal(`<h2>Enroll ${esc(m.email||'')}</h2><div class="empty" style="padding:20px">No warm-up sequences found. Create one (mark it Warm-up) in the Sequences tab first.</div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Close</button></div>`);
+    return;
+  }
+  const { data: existing } = await sb.from('enrollments').select('sequence_id').eq('email', m.email);
+  const enrolledIds = new Set((existing||[]).map(e => e.sequence_id));
+  showModal(`
+    <h2>Enroll ${esc(m.email||'')} ⭐</h2>
+    <p class="hint" style="margin-bottom:14px">Adds this mailbox as a warm-up recipient. Your warmed inboxes will send to it, and it auto-replies via rotating IPs.</p>
+    <div class="form-group"><label>Warm-Up Sequence</label>
+      <select id="wm-seq">${seqs.map(s=>`<option value="${s.id}">${esc(s.name)}${enrolledIds.has(s.id)?' (already enrolled)':''}</option>`).join('')}</select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="enrollWarmupMailbox('${id}')">Enroll</button>
+    </div>`);
+}
+
+async function enrollWarmupMailbox(id) {
+  const m = (window._warmupMbs||[]).find(x => x.id === id) || {};
+  const seqId = document.getElementById('wm-seq').value;
+  if (!m.email || !seqId) { alert('Missing email or sequence'); return; }
+  await sb.from('enrollments').delete().eq('email', m.email).eq('sequence_id', seqId);
+  const { error } = await sb.from('enrollments').insert({
+    email: m.email, name: m.name || null, sequence_id: seqId, current_step: 0, status: 'active'
+  });
+  if (error) { alert(error.message); return; }
+  closeModal();
+  alert('Enrolled as a warm-up recipient.');
+}
+
+async function toggleWarmupMailbox(id, active) {
+  await sb.from('warmup_mailboxes').update({ active }).eq('id', id);
+}
+
+async function deleteWarmupMailbox(id) {
+  if (!confirm('Delete this warm-up mailbox?')) return;
+  await sb.from('warmup_mailboxes').delete().eq('id', id);
+  renderWarmupMailboxes();
 }
 
 /* ─── SHARED ─── */
